@@ -6,16 +6,6 @@ plugins {
     id("io.spring.dependency-management") version "1.1.7" apply false
 }
 
-group = "com.stack_oder_flow.eatngo"
-version = "1.0-SNAPSHOT"
-
-repositories {
-    mavenCentral()
-}
-
-dependencies {
-}
-
 allprojects {
     group = "com.stack_oder_flow.eatngo"
     version = "0.0.1-SNAPSHOT"
@@ -29,10 +19,6 @@ subprojects {
     apply(plugin = "org.jetbrains.kotlin.plugin.spring")
     apply(plugin = "io.spring.dependency-management")
 
-    repositories {
-        mavenCentral()
-    }
-
     tasks.withType<Test> {
         useJUnitPlatform()
     }
@@ -41,6 +27,7 @@ subprojects {
 tasks.test {
     useJUnitPlatform()
 }
+
 kotlin {
     jvmToolchain(21)
 }
