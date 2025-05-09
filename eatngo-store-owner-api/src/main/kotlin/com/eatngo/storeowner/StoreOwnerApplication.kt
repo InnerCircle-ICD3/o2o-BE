@@ -1,6 +1,6 @@
 package com.eatngo.storeowner
 
-import com.eatngo.common.config.SwaggerConfig
+import com.eatngo.swagger.SwaggerConfig
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 import org.springframework.context.annotation.Import
