@@ -19,6 +19,17 @@ subprojects {
     apply(plugin = "org.jetbrains.kotlin.plugin.spring")
     apply(plugin = "io.spring.dependency-management")
 
+    // jar, bootJar, bootRun 비활성화 설정
+    tasks.withType<org.springframework.boot.gradle.tasks.bundling.BootJar> {
+        enabled = false
+    }
+    tasks.withType<org.springframework.boot.gradle.tasks.run.BootRun> {
+        enabled = false
+    }
+    if (name !in listOf("swagger", "unit-test", "common-test")) {
+        tasks.withType<Jar> { enabled = false }
+    }
+
     tasks.withType<Test> {
         useJUnitPlatform()
     }
