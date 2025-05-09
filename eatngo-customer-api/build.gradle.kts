@@ -22,13 +22,3 @@ dependencies {
     testImplementation("io.kotest:kotest-assertions-core:5.8.1")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
-
-tasks.bootJar {
-    enabled = true
-}
-tasks.jar {
-    enabled = true
-}
-tasks.bootRun {
-    enabled = true
-}

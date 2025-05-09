@@ -19,15 +19,25 @@ subprojects {
     apply(plugin = "org.jetbrains.kotlin.plugin.spring")
     apply(plugin = "io.spring.dependency-management")
 
-    // jar, bootJar, bootRun 비활성화 설정
-    tasks.withType<org.springframework.boot.gradle.tasks.bundling.BootJar> {
-        enabled = false
-    }
-    tasks.withType<org.springframework.boot.gradle.tasks.run.BootRun> {
-        enabled = false
-    }
-    if (name !in listOf("swagger", "unit-test", "common-test")) {
+    // 실행 모듈 목록
+    val executableModules = listOf("eatngo-customer-api", "eatngo-store-owner-api")
+    val enableJarModules = listOf("swagger", "unit-test", "common-test")
+
+    if (name in executableModules) {
+        // 실행 모듈: jar, bootJar, bootRun 모두 활성화
+        tasks.withType<Jar> { enabled = true }
+        tasks.withType<org.springframework.boot.gradle.tasks.bundling.BootJar> { enabled = true }
+        tasks.withType<org.springframework.boot.gradle.tasks.run.BootRun> { enabled = true }
+    } else if (name in enableJarModules) {
+        // 공통 모듈: jar만 활성화, bootJar/bootRun 비활성화
+        tasks.withType<Jar> { enabled = true }
+        tasks.withType<org.springframework.boot.gradle.tasks.bundling.BootJar> { enabled = false }
+        tasks.withType<org.springframework.boot.gradle.tasks.run.BootRun> { enabled = false }
+    } else {
+        // 나머지 모듈: 모두 비활성화
         tasks.withType<Jar> { enabled = false }
+        tasks.withType<org.springframework.boot.gradle.tasks.bundling.BootJar> { enabled = false }
+        tasks.withType<org.springframework.boot.gradle.tasks.run.BootRun> { enabled = false }
     }
 
     tasks.withType<Test> {
