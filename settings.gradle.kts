@@ -12,6 +12,5 @@ include(
     "eatngo-common"
 )
 
-include(":eatngo-common:unit-test")
 include(":eatngo-common:swagger")
 include(":eatngo-common:p6spy")
