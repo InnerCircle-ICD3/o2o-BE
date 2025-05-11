@@ -7,6 +7,7 @@ import com.eatngo.order.dto.OrderDto
 import com.eatngo.order.infra.OrderPersistence
 import org.springframework.stereotype.Service
 
+
 @Service
 class OrderService(
     private val orderPersistence: OrderPersistence
@@ -18,10 +19,10 @@ class OrderService(
             storeId = orderDto.storeId,
             orderItems = orderDto.orderItems.map {
                 OrderItem.of(
-                    it.productId,
-                    it.productName,
-                    it.price,
-                    it.quantity
+                    productId = it.productId,
+                    name = it.productName,
+                    quantity = it.quantity,
+                    price = it.price
                 )
             }
         )
