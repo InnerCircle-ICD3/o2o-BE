@@ -16,3 +16,7 @@ include(":eatngo-common:swagger")
 include(":eatngo-common:p6spy")
 include(":eatngo-common:logging")
 
+
+include("eatngo-infra:postgresql")
+include("eatngo-infra:redis")
+include("eatngo-infra:mongodb")
