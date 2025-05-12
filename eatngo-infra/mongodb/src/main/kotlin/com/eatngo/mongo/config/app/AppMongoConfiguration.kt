@@ -11,6 +11,9 @@ import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.data.mongodb.core.convert.MappingMongoConverter
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories
 
+/**
+ * APP Mongo 설정을 정의하고 Primary MongoDB 빈을 등록하는 설정 클래스
+ */
 @Configuration
 @EnableMongoRepositories(basePackages = ["com.eatngo.mongo.repository.app"])
 class AppMongoConfiguration: AbstractMongoConfiguration() {

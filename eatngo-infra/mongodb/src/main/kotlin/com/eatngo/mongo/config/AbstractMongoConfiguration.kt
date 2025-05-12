@@ -10,6 +10,9 @@ import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.data.mongodb.core.convert.MappingMongoConverter
 
 
+/**
+ * MongoConfig를 기반으로 MongoClient와 MongoTemplate을 구성하는 공통 설정 추상 클래스.
+ */
 abstract class AbstractMongoConfiguration: AbstractMongoClientConfiguration() {
 
     protected abstract fun getMongoConfig(): MongoConfig
