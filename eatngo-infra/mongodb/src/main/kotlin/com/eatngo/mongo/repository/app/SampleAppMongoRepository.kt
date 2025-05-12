@@ -1,12 +1,13 @@
 package com.eatngo.mongo.repository.app
 
 import com.eatngo.mongo.entity.app.SampleApp
+import com.eatngo.mongo.repository.MongoRepository
 import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query
 import org.springframework.stereotype.Repository
 
 @Repository
-class SampleAppMongoRepository: AppMongoRepository<SampleApp>(
+class SampleAppMongoRepository: MongoRepository<SampleApp>(
     SampleApp::class.java
 ) {
 

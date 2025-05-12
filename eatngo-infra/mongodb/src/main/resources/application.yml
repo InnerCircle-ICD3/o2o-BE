@@ -8,13 +8,7 @@ spring:
         secret-key: ${AWS_SECRET_KEY}
 datastore:
   mongodb:
-    app:
-      uri: ${MONGO_APP_URI}
-      database: APP
-      username: eatngo-owner
-      password: ${MONGO_APP_PW}
-    log:
-      uri: ${MONGO_APP_URI}
-      database: LOG
-      username: eatngo-owner
-      password: ${MONGO_LOG_PW}
+    uri: ${MONGO_APP_URI}
+    database: APP
+    username: eatngo-owner
+    password: ${MONGO_APP_PW}
