@@ -48,7 +48,6 @@ class OrderControllerTest : StringSpec() {
                 OrderDto::class.java
             )
             response.statusCode shouldBe HttpStatus.OK
-            println(response.body)
         }
     }
 }
