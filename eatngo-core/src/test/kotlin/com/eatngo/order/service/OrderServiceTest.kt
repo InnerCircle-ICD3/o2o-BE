@@ -1,4 +1,3 @@
-// src/test/kotlin/com/eatngo/order/service/OrderServiceTest.kt
 package com.eatngo.order.service
 
 import com.eatngo.order.domain.Order
