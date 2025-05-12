@@ -1,4 +1,4 @@
-package com.eatngo.customer
+package com.eatngo
 
 import com.eatngo.swagger.SwaggerConfig
 import org.springframework.boot.autoconfigure.SpringBootApplication
