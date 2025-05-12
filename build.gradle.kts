@@ -21,7 +21,7 @@ subprojects {
 
     // 실행 모듈 목록
     val executableModules = listOf("eatngo-customer-api", "eatngo-store-owner-api")
-    val enableJarModules = listOf("swagger", "unit-test", "common-test")
+    val enableJarModules = listOf("swagger", "common-test")
 
     if (name in executableModules) {
         // 실행 모듈: jar, bootJar, bootRun 모두 활성화
