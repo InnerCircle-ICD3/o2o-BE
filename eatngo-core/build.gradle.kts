@@ -1,6 +1,6 @@
 plugins {
-    id("org.springframework.boot")
     kotlin("jvm") version "1.9.22"
+    id("org.springframework.boot")
 }
 
 dependencies {
@@ -12,4 +12,13 @@ dependencies {
     // 테스트 의존성
     testImplementation("io.kotest:kotest-runner-junit5:5.8.1")
     testImplementation("io.kotest:kotest-assertions-core:5.8.1")
+}
+
+tasks.bootJar{
+    enabled = false
+}
+
+tasks.jar{
+    enabled = true
+    archiveFileName.set("${project.name}.jar")
 }
