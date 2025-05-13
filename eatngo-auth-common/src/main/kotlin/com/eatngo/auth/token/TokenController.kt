@@ -18,9 +18,9 @@ class TokenController(
     fun refreshToken(
         request: HttpServletRequest,
         response: HttpServletResponse
-    ): ResponseEntity<String> {
+    ): ResponseEntity<String> { // TODO 응답 포맷 변경
         val refreshToken = request.cookies?.firstOrNull { it.name == "refresh_token" }?.value
-            ?: return ResponseEntity.status(401).body("No Refresh Token")
+            ?: return ResponseEntity.status(401).body("No Refresh Token") // TODO 응답 포맷 변경
 
         return try {
             val userId = tokenProvider.getUserIdFromToken(refreshToken)
@@ -35,10 +35,10 @@ class TokenController(
                 }
             )
 
-            ResponseEntity.ok("Access token refreshed")
+            ResponseEntity.ok("Access token refreshed") // TODO 응답 포맷 변경
 
         } catch (e: Exception) {
-            ResponseEntity.status(401).body("Invalid refresh token")
+            ResponseEntity.status(401).body("Invalid refresh token") // TODO 응답 포맷 변경
         }
     }
 }

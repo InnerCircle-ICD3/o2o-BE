@@ -4,7 +4,6 @@ import com.eatngo.auth.token.TokenProvider
 import jakarta.servlet.http.Cookie
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
-import org.springframework.boot.web.servlet.server.Session
 import org.springframework.http.HttpStatus
 import org.springframework.security.core.Authentication
 import org.springframework.security.oauth2.core.user.OAuth2User
@@ -27,11 +26,11 @@ class OAuth2LoginSuccessHandler(
         val accessToken = tokenProvider.createAccessToken(userId)
         val refreshToken = tokenProvider.createRefreshToken(userId)
 
-        response.addCookie(buildCookie("access_token", accessToken, maxAge = 600))   // 10분
-        response.addCookie(buildCookie("refresh_token", refreshToken, maxAge = 1209600)) // 14일
+        response.addCookie(buildCookie("access_token", accessToken, maxAge = 1000 * 60 * 10 * 6))   // 1 hour
+        response.addCookie(buildCookie("refresh_token", refreshToken, maxAge = 1000 * 60 * 60 * 24 * 14)) // 14 days
 
         response.status = HttpStatus.OK.value()
-        response.writer.write("""{"message": "Authenticated"}""")
+        response.writer.write("""{"message": "Authenticated"}""") // TODO 응답 포맷 변경
     }
 
     private fun buildCookie(name: String, value: String, maxAge: Int): Cookie {
