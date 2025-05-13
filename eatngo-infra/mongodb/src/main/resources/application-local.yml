@@ -1,0 +1,6 @@
+datastore:
+  mongodb:
+    uri: localhost:27017
+    database: APP
+    username: eatngo-owner
+    password: localpw
