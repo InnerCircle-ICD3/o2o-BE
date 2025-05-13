@@ -22,4 +22,7 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("io.mockk:mockk:1.13.10")                        // mockk
     testImplementation("com.appmattus.fixture:fixture:1.2.0")           // Kotlin-fixture
+
+    // h2
+    runtimeOnly("com.h2database:h2")
 }
