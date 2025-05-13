@@ -21,7 +21,7 @@ subprojects {
 
     // 실행 모듈 목록
     val executableModules = listOf("eatngo-customer-api", "eatngo-store-owner-api")
-    val enableJarModules = listOf("swagger", "common-test")
+    val enableJarModules = listOf("common")
 
     if (name in executableModules) {
         // 실행 모듈: jar, bootJar, bootRun 모두 활성화
@@ -38,6 +38,16 @@ subprojects {
         tasks.withType<Jar> { enabled = false }
         tasks.withType<org.springframework.boot.gradle.tasks.bundling.BootJar> { enabled = false }
         tasks.withType<org.springframework.boot.gradle.tasks.run.BootRun> { enabled = false }
+    }
+    tasks.withType<JavaCompile>().configureEach {
+        sourceCompatibility = "21"
+        targetCompatibility = "21"
+    }
+
+    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+        kotlinOptions {
+            jvmTarget = "21"
+        }
     }
 
     tasks.withType<Test> {

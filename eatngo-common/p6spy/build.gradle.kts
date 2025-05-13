@@ -7,3 +7,12 @@ dependencies {
     implementation ("com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.9.0")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 }
+
+tasks.bootJar{
+    enabled = false
+}
+
+tasks.jar {
+    enabled = true
+    archiveFileName.set("${project.name}.jar")
+}
