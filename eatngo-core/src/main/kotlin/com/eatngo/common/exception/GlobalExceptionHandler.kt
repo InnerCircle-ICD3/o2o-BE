@@ -1,159 +1,140 @@
 package com.eatngo.common.exception
 
+import com.eatngo.common.error.CommonErrorCode
+import com.eatngo.common.error.ErrorCode
 import com.eatngo.common.response.ApiResponse
+import jakarta.servlet.http.HttpServletRequest
 import org.slf4j.LoggerFactory
-import org.springframework.http.HttpStatus
+import org.slf4j.event.Level
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException
 import java.util.concurrent.ConcurrentHashMap
-import org.springframework.web.HttpRequestMethodNotSupportedException
-import jakarta.servlet.http.HttpServletRequest
 
+/**
+ * 전역 예외 처리기
+ * 모든 API 예외를 일관된 형식으로 처리
+ */
 @RestControllerAdvice
 class GlobalExceptionHandler {
     private val log = LoggerFactory.getLogger(this::class.java)
-    
-    // 에러 카운트 저장 맵 - 모니터링 알람 용도
-    private val errorCountMap = ConcurrentHashMap<String, Int>()
-    
-    // 임계값 설정 - 실제 상황에 맞게 조정 필요
-    private val ERROR_THRESHOLD = 10 
-    private val WARN_THRESHOLD = 100
+    private val errorCounter = ErrorCounter()
 
+    // --------------------- Business Exceptions ---------------------
     @ExceptionHandler(BusinessException::class)
-    fun handleBusinessException(e: BusinessException, request: HttpServletRequest): ResponseEntity<ApiResponse<Nothing>> {
-        // 로깅을 위한 컨텍스트 정보 구성
-        val logContext = mapOf(
-            "path" to request.requestURI,
-            "method" to request.method,
-            "errorData" to (e.data ?: emptyMap<String, Any>())
-        )
-        
-        // 로깅 및 에러 카운트 증가
-        logException(e, logContext)
-        incrementErrorCount(e.errorCode.code)
-        
-        return ResponseEntity
-            .status(determineHttpStatus(e.errorCode))
-            .body(ApiResponse.error(e.errorCode.code, e.message))
+    fun handleBusinessException(
+        e: BusinessException,
+        request: HttpServletRequest
+    ): ResponseEntity<ApiResponse<Nothing>> {
+        val context = buildLogContext(request, e.data)
+        logError(e, e.errorCode.logLevel, e.message, context)
+        errorCounter.increment(e.errorCode.code)
+        return createResponse(e.errorCode, e.message)
     }
 
+    // --------------------- Validation Exceptions ---------------------
     @ExceptionHandler(MethodArgumentNotValidException::class)
-    fun handleMethodArgumentNotValidException(e: MethodArgumentNotValidException, request: HttpServletRequest): ResponseEntity<ApiResponse<Nothing>> {
-        val message = e.bindingResult.fieldErrors
-            .joinToString(", ") { "${it.field}: ${it.defaultMessage}" }
-        
-        // 로깅을 위한 컨텍스트 정보 구성
+    fun handleValidationException(
+        e: MethodArgumentNotValidException,
+        request: HttpServletRequest
+    ): ResponseEntity<ApiResponse<Nothing>> {
         val fieldErrors = e.bindingResult.fieldErrors.associate { 
             it.field to (it.rejectedValue?.toString() ?: "null") 
         }
-        
-        val logContext = mapOf(
-            "path" to request.requestURI,
-            "method" to request.method,
-            "fields" to fieldErrors
+        val message = fieldErrors.entries.joinToString { "${it.key}=${it.value}" }
+        val context = buildLogContext(request).plus("fields" to fieldErrors)
+
+        logError(e, Level.WARN, "Validation failed: $message", context)
+        errorCounter.increment(CommonErrorCode.INVALID_INPUT.code)
+
+        return createResponse(
+            CommonErrorCode.INVALID_INPUT,
+            "${CommonErrorCode.INVALID_INPUT.message}: $message"
         )
-        
-        log.warn("Validation failed: {}, context: {}", message, logContext)
-        incrementErrorCount(ErrorCode.INVALID_INPUT_VALUE.code)
-        
-        return ResponseEntity
-            .status(HttpStatus.BAD_REQUEST)
-            .body(ApiResponse.error(ErrorCode.INVALID_INPUT_VALUE.code, message))
     }
 
+    // --------------------- Type Mismatch ---------------------
     @ExceptionHandler(MethodArgumentTypeMismatchException::class)
-    fun handleMethodArgumentTypeMismatchException(e: MethodArgumentTypeMismatchException, request: HttpServletRequest): ResponseEntity<ApiResponse<Nothing>> {
-        val errorMessage = "${e.name}의 값(${e.value})이 ${e.requiredType?.simpleName ?: "요구되는 타입"}으로 변환될 수 없습니다."
-        
-        // 로깅을 위한 컨텍스트 정보 구성
-        val logContext = mapOf(
-            "path" to request.requestURI,
-            "method" to request.method,
-            "paramName" to e.name,
-            "paramValue" to (e.value?.toString() ?: "null"),
-            "requiredType" to (e.requiredType?.simpleName ?: "unknown")
+    fun handleTypeMismatch(
+        e: MethodArgumentTypeMismatchException,
+        request: HttpServletRequest
+    ): ResponseEntity<ApiResponse<Nothing>> {
+        val message = "${e.name}=${e.value} (required type: ${e.requiredType?.simpleName})"
+        val context = buildLogContext(request) + mapOf(
+            "param" to (e.name ?: "unknown_param"),
+            "value" to (e.value?.toString() ?: "null"),
+            "requiredType" to (e.requiredType?.simpleName ?: "unknown_type")
         )
-        
-        log.warn("Type mismatch: {}, context: {}", errorMessage, logContext)
-        incrementErrorCount(ErrorCode.INVALID_TYPE_VALUE.code)
-        
-        return ResponseEntity
-            .status(HttpStatus.BAD_REQUEST)
-            .body(ApiResponse.error(ErrorCode.INVALID_TYPE_VALUE.code, errorMessage))
-    }
-    
-    @ExceptionHandler(HttpRequestMethodNotSupportedException::class)
-    fun handleHttpRequestMethodNotSupportedException(e: HttpRequestMethodNotSupportedException, request: HttpServletRequest): ResponseEntity<ApiResponse<Nothing>> {
-        val errorMessage = "${request.method} 메서드는 ${request.requestURI} 경로에서 지원되지 않습니다. 지원되는 메서드: ${e.supportedMethods?.joinToString(", ") ?: "없음"}"
-        
-        // 로깅을 위한 컨텍스트 정보 구성
-        val logContext = mapOf(
-            "path" to request.requestURI,
-            "method" to request.method,
-            "supportedMethods" to (e.supportedMethods?.toList() ?: emptyList<String>())
-        )
-        
-        log.warn("Method not allowed: {}, context: {}", errorMessage, logContext)
-        incrementErrorCount(ErrorCode.METHOD_NOT_ALLOWED.code)
-        
-        return ResponseEntity
-            .status(HttpStatus.METHOD_NOT_ALLOWED)
-            .body(ApiResponse.error(ErrorCode.METHOD_NOT_ALLOWED.code, errorMessage))
+
+        logError(e, Level.WARN, "Type mismatch: $message", context)
+        errorCounter.increment(CommonErrorCode.INVALID_TYPE_VALUE.code)
+
+        return createResponse(CommonErrorCode.INVALID_TYPE_VALUE, message)
     }
 
+    // --------------------- Unhandled Exceptions ---------------------
     @ExceptionHandler(Exception::class)
     fun handleException(e: Exception, request: HttpServletRequest): ResponseEntity<ApiResponse<Nothing>> {
-        // 로깅을 위한 컨텍스트 정보 구성
-        val logContext = mapOf(
-            "path" to request.requestURI,
-            "method" to request.method,
-            "errorType" to e.javaClass.simpleName
-        )
-        
-        // 시스템 레벨의 예외는 항상 스택 트레이스와 함께 로깅
-        log.error("Unexpected error occurred: {}, context: {}", e.message, logContext, e)
-        incrementErrorCount(ErrorCode.INTERNAL_SERVER_ERROR.code)
-        
-        return ResponseEntity
-            .status(HttpStatus.INTERNAL_SERVER_ERROR)
-            .body(ApiResponse.error(ErrorCode.INTERNAL_SERVER_ERROR.code, ErrorCode.INTERNAL_SERVER_ERROR.message))
+        val context = buildLogContext(request).plus("exceptionType" to e.javaClass.simpleName)
+        logError(e, Level.ERROR, "Unhandled exception: ${e.message}", context)
+        errorCounter.increment(CommonErrorCode.INTERNAL_SERVER_ERROR.code)
+        return createResponse(CommonErrorCode.INTERNAL_SERVER_ERROR)
     }
 
-    private fun logException(e: BusinessException, context: Map<String, Any>) {
-        when (e.errorCode.logLevel) {
-            org.slf4j.event.Level.ERROR -> log.error("Business error occurred: {}, context: {}", e.message, context, e)
-            org.slf4j.event.Level.WARN -> log.warn("Business warning: {}, context: {}", e.message, context)
-            org.slf4j.event.Level.INFO -> log.info("Business info: {}, context: {}", e.message, context)
-            else -> log.debug("Business debug: {}, context: {}", e.message, context)
+    // --------------------- Helper Methods ---------------------
+    private fun buildLogContext(
+        request: HttpServletRequest,
+        data: Map<String, Any>? = null
+    ): Map<String, Any> {
+        return mutableMapOf<String, Any>( // 타입 명시적 선언
+            "path" to request.requestURI,
+            "method" to request.method
+        ).apply {
+            data?.let { putAll(it) }
         }
     }
-    
-    private fun incrementErrorCount(errorCode: String) {
-        val currentCount = errorCountMap.compute(errorCode) { _, count -> (count ?: 0) + 1 }
-        
-        // 특정 임계값을 초과하면 모니터링 알람 트리거 로직 추가 가능
-        if (currentCount != null) {
-            val threshold = if (errorCode.startsWith("C")) WARN_THRESHOLD else ERROR_THRESHOLD
-            if (currentCount % threshold == 0) {
-                log.error("Error threshold exceeded for code {}: {} occurrences", errorCode, currentCount)
-                // 여기에 알람 전송 로직 추가 가능
+
+    private fun logError(e: Exception, level: Level, message: String, context: Map<String, Any>) {
+        when (level) {
+            Level.ERROR -> log.error("[$level] $message | Context: $context", e)
+            Level.WARN -> log.warn("[$level] $message | Context: $context")
+            else -> log.info("[$level] $message | Context: $context")
+        }
+    }
+
+    private fun createResponse(
+        errorCode: ErrorCode,
+        message: String = errorCode.message
+    ): ResponseEntity<ApiResponse<Nothing>> {
+        return ResponseEntity
+            .status(errorCode.httpStatus)
+            .body(ApiResponse.error(errorCode.code, message))
+    }
+
+    // --------------------- Error Counter ---------------------
+    /** 추후 error count 해서 알림 설정 위해서 추가 */
+    private inner class ErrorCounter {
+        private val counts = ConcurrentHashMap<String, Int>()
+        private val thresholds = mapOf(
+            "ERROR" to 10,
+            "WARN" to 100
+        )
+
+        fun increment(code: String) {
+            val count = counts.merge(code, 1) { old, _ -> old + 1 } ?: 1
+            checkThreshold(code, count)
+        }
+
+        private fun checkThreshold(code: String, count: Int) {
+            val threshold = when {
+                code.startsWith("C") -> thresholds["WARN"]
+                else -> thresholds["ERROR"]
             }
-        }
-    }
-    
-    private fun determineHttpStatus(errorCode: ErrorCode): HttpStatus {
-        // 에러 코드에 따라 적절한 HTTP 상태 코드 반환
-        return when(errorCode) {
-            ErrorCode.UNAUTHORIZED -> HttpStatus.UNAUTHORIZED
-            ErrorCode.FORBIDDEN -> HttpStatus.FORBIDDEN
-            ErrorCode.ENTITY_NOT_FOUND -> HttpStatus.NOT_FOUND
-            ErrorCode.METHOD_NOT_ALLOWED -> HttpStatus.METHOD_NOT_ALLOWED
-            ErrorCode.DUPLICATE_ENTITY -> HttpStatus.CONFLICT
-            else -> HttpStatus.BAD_REQUEST
+            threshold?.takeIf { count % it == 0 }?.let {
+                log.warn("[Threshold] Code: $code, Count: $count")
+            }
         }
     }
 } 
