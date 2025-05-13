@@ -1,25 +1,27 @@
 package com.eatngo.common.response
 
-data class ApiResponse<T>(
-    val success: Boolean,
-    val data: T? = null,
-    val errorCode: String? = null,
-    val errorMessage: String? = null
-) {
+
+sealed class ApiResponse<T> {
+    abstract val success: Boolean
+    
+    data class Success<T>(
+        override val success: Boolean = true,
+        val data: T
+    ) : ApiResponse<T>()
+    
+    data class Error<T>(
+        override val success: Boolean = false,
+        val errorCode: String,
+        val errorMessage: String
+    ) : ApiResponse<T>()
+    
     companion object {
         fun <T> success(data: T): ApiResponse<T> {
-            return ApiResponse(
-                success = true,
-                data = data
-            )
+            return Success(data = data)
         }
 
         fun <T> error(errorCode: String, errorMessage: String): ApiResponse<T> {
-            return ApiResponse(
-                success = false,
-                errorCode = errorCode,
-                errorMessage = errorMessage
-            )
+            return Error(errorCode = errorCode, errorMessage = errorMessage)
         }
     }
 } 
