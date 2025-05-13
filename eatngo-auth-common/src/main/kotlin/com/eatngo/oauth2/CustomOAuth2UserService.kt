@@ -35,11 +35,12 @@ class CustomOAuth2UserService : OAuth2UserService<OAuth2UserRequest, OAuth2User>
         }
 
         val authorities = roles.map { SimpleGrantedAuthority(it.roleName) }
-
+        val userNameAttributeName = userRequest.clientRegistration.providerDetails
+            .userInfoEndpoint.userNameAttributeName
         return DefaultOAuth2User(
             authorities.toSet(),
             oAuth2User.attributes,
-            "id"
+            userNameAttributeName
         )
     }
 }

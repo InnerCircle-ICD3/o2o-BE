@@ -28,7 +28,8 @@ class JwtAuthenticationFilter(
             } catch (e: ExpiredJwtException) {
                 // do nothing - 처리 흐름은 refresh 로 넘긴다
             } catch (e: Exception) {
-                // invalid token
+                logger.debug("Invalid token: ${e.message}")
+                SecurityContextHolder.clearContext()
             }
         }
 

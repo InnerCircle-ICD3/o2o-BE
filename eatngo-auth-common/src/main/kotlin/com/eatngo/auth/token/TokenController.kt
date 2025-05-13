@@ -31,7 +31,7 @@ class TokenController(
                     isHttpOnly = true
                     secure = true
                     path = "/"
-                    maxAge = 600
+                    maxAge = 60 * 10 * 60 // 1 hour
                 }
             )
 
