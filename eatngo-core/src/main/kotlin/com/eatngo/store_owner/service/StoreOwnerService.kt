@@ -17,7 +17,7 @@ class StoreOwnerService(
         )
     }
 
-    fun getStoreOwnerById(id: Long): StoreOwner? {
+    fun getStoreOwnerById(id: Long): StoreOwner {
         return storeOwnerPersistence.getByIdOrThrow(id)
     }
 

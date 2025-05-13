@@ -17,7 +17,7 @@ class CustomerService(
         )
     }
 
-    fun getCustomerById(id: Long): Customer? {
+    fun getCustomerById(id: Long): Customer {
         return customerPersistence.getByIdOrThrow(id)
     }
 

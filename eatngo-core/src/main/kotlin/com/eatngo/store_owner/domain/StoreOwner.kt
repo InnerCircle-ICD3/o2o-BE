@@ -7,9 +7,9 @@ class StoreOwner(
     val id: Long = 0,
     val account: UserAccount,
     val createdAt: ZonedDateTime,
-    val updatedAt: ZonedDateTime,
-    val isDeleted: Boolean = false,
-    val deletedAt: ZonedDateTime? = null,
+    var updatedAt: ZonedDateTime,
+    var isDeleted: Boolean = false,
+    var deletedAt: ZonedDateTime? = null,
 ) {
     companion object {
         fun create(account: UserAccount): StoreOwner {
@@ -19,5 +19,13 @@ class StoreOwner(
                 updatedAt = ZonedDateTime.now()
             )
         }
+    }
+
+    fun delete() {
+        if (isDeleted) {
+            throw IllegalStateException("Store owner is already deleted")
+        }
+        isDeleted = true
+        deletedAt = ZonedDateTime.now()
     }
 }

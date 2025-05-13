@@ -9,9 +9,9 @@ class UserAccount(
     val id: Long = 0,
     val email: EmailAddress,
     val createdAt: ZonedDateTime,
-    val updatedAt: ZonedDateTime,
-    val isDeleted: Boolean = false,
-    val deletedAt: ZonedDateTime? = null,
+    var updatedAt: ZonedDateTime,
+    var isDeleted: Boolean = false,
+    var deletedAt: ZonedDateTime? = null,
 ) {
     private val _oauth2 = mutableListOf<UserAccountOauth2>()
     val oauth2: List<UserAccountOauth2> get() = _oauth2
@@ -37,5 +37,13 @@ class UserAccount(
 
             return userAccount
         }
+    }
+
+    fun delete() {
+        if (isDeleted) {
+            throw IllegalStateException("Store owner is already deleted")
+        }
+        isDeleted = true
+        deletedAt = ZonedDateTime.now()
     }
 }
