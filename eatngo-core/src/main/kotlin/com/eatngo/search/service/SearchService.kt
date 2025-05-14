@@ -38,7 +38,8 @@ class SearchService {
 
     fun searchStoreMap(searchDto: SearchStoreDto): SearchStoreMapResultDto {
         val searchStore: SearchStoreMap = SearchStoreMap(
-            storeID = 1L
+            storeID = 1L,
+            storeName = "Test Store",
         )
         val box: Box = Box(
             topLeft = Point(

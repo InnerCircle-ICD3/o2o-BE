@@ -7,6 +7,7 @@ data class SearchStoreMapResultDto (
 
 data class SearchStoreMap (
     val storeID: Long,
+    val storeName: String,
 )
 
 data class Box (

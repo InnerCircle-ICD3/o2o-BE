@@ -2,6 +2,7 @@ package com.eatngo.search
 
 import com.eatngo.search.dto.SearchStoreDto
 import com.eatngo.search.dto.SearchStoreMapRequestDto
+import com.eatngo.search.dto.SearchStoreMapResponseDto
 import com.eatngo.search.dto.SearchStoreMapResultDto
 import com.eatngo.search.dto.SearchStoreRequestDto
 import com.eatngo.search.dto.SearchStoreResponseDto
@@ -36,12 +37,17 @@ class SearchController (
         )
     }
 
+    /**
+     * 지도 검색 API
+     */
     @GetMapping("/search/store/map")
-    fun searchStoreMap(@RequestParam searchDto: SearchStoreMapRequestDto): SearchStoreMapResultDto {
-        // Simulate a search operation
-        return searchService.searchStoreMap(
-            SearchStoreDto(
-                viewPoint = searchDto.viewPoint
+    fun searchStoreMap(@RequestParam searchDto: SearchStoreMapRequestDto): SearchStoreMapResponseDto {
+        return SearchStoreMapResponseDto(
+            success = true,
+            data = searchService.searchStoreMap(
+                SearchStoreDto(
+                    viewPoint = searchDto.viewPoint
+                )
             )
         )
     }
