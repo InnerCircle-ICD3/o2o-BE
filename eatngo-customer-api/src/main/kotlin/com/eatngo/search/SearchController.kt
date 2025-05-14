@@ -5,6 +5,7 @@ import com.eatngo.search.dto.SearchStoreDto
 import com.eatngo.search.dto.SearchStoreMapResponseDto
 import com.eatngo.search.dto.SearchStoreRequestDto
 import com.eatngo.search.dto.SearchStoreResponseDto
+import com.eatngo.search.dto.SearchSuggestionsResponseDto
 import com.eatngo.search.service.SearchService
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.ModelAttribute
@@ -56,6 +57,17 @@ class SearchController (
                     ),
                 )
             )
+        )
+    }
+
+    /**
+     * 자동완성 검색어 API
+     */
+    @GetMapping("/search/suggestions")
+    fun searchSuggestions(@RequestParam keyword: String): SearchSuggestionsResponseDto {
+        return SearchSuggestionsResponseDto(
+            success = true,
+            data = searchService.searchSuggestions(keyword)
         )
     }
 }

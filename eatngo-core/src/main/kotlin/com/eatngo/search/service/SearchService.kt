@@ -57,4 +57,8 @@ class SearchService {
             storeList = listOf(searchStore)
         )
     }
+
+    fun searchSuggestions(keyword: String): List<String> {
+        return List(1) { "치킨" }
+    }
 }
