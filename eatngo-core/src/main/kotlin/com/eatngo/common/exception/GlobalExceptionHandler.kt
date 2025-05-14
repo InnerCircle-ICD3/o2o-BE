@@ -31,7 +31,7 @@ class GlobalExceptionHandler {
         val context = buildLogContext(request, e.data)
         logError(e, e.errorCode.logLevel, e.message, context)
         errorCounter.increment(e.errorCode.code)
-        return createResponse(e.errorCode, e.message)
+        return createResponse(e.errorCode, e.message ?: e.errorCode.message)
     }
 
     // --------------------- Validation Exceptions ---------------------
@@ -96,7 +96,7 @@ class GlobalExceptionHandler {
         }
     }
 
-    private fun logError(e: Exception, level: Level, message: String, context: Map<String, Any>) {
+    private fun logError(e: Exception, level: Level, message: String?, context: Map<String, Any>) {
         when (level) {
             Level.ERROR -> log.error("[$level] $message | Context: $context", e)
             Level.WARN -> log.warn("[$level] $message | Context: $context")

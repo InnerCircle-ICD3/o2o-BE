@@ -4,7 +4,7 @@ import com.eatngo.common.error.ErrorCode
 
 open class BusinessException(
     val errorCode: ErrorCode,
-    override val message: String = errorCode.message,
+    override val message: String? = errorCode.message,
     val data: Map<String, Any>? = null,
     override val cause: Throwable? = null
 ) : RuntimeException(message, cause) {
