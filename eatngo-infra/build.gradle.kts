@@ -1,5 +1,6 @@
 plugins {
     kotlin("jvm") version "1.9.22"
+    kotlin("plugin.jpa")
     id("org.springframework.boot")
 }
 
@@ -15,6 +16,9 @@ dependencies {
     // 테스트 의존성
     testImplementation("io.kotest:kotest-runner-junit5:5.8.1")
     testImplementation("io.kotest:kotest-assertions-core:5.8.1")
+
+    // jpa
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 }
 
 tasks.bootJar{
