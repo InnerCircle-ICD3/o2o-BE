@@ -1,7 +1,6 @@
 package com.eatngo.customer
 
 import com.eatngo.common.error.BusinessErrorCode
-import com.eatngo.common.exception.BusinessException
 import com.eatngo.common.response.ApiResponse
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.DescribeSpec
