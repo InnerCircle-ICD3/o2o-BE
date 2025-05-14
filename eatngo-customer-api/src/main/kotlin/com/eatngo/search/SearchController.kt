@@ -1,9 +1,7 @@
 package com.eatngo.search
 
 import com.eatngo.search.dto.Point
-import com.eatngo.search.dto.SearchFilter
 import com.eatngo.search.dto.SearchStoreDto
-import com.eatngo.search.dto.SearchStoreMapRequestDto
 import com.eatngo.search.dto.SearchStoreMapResponseDto
 import com.eatngo.search.dto.SearchStoreRequestDto
 import com.eatngo.search.dto.SearchStoreResponseDto
@@ -47,12 +45,15 @@ class SearchController (
      * 지도 검색 API
      */
     @GetMapping("/search/store/map")
-    fun searchStoreMap(@RequestParam searchDto: SearchStoreMapRequestDto): SearchStoreMapResponseDto {
+    fun searchStoreMap(@RequestParam lat: Double, @RequestParam lng: Double): SearchStoreMapResponseDto {
         return SearchStoreMapResponseDto(
             success = true,
             data = searchService.searchStoreMap(
                 SearchStoreDto(
-                    viewPoint = searchDto.viewPoint
+                    viewPoint = Point(
+                        lat = lat,
+                        lng = lng
+                    ),
                 )
             )
         )
