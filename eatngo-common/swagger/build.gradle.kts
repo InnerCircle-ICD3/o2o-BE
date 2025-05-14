@@ -7,3 +7,8 @@ dependencies {
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.5")    // Swagger UI
     implementation("org.springdoc:springdoc-openapi-starter-common:2.8.5")       // Swagger 공통 기능
 }
+
+tasks.jar {
+    enabled = true
+    archiveFileName.set("${project.name}.jar")
+}

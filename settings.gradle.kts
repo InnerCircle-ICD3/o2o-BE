@@ -9,7 +9,8 @@ include(
     "eatngo-customer-api",
     "eatngo-store-owner-api",
     "eatngo-infra",
-    "eatngo-common"
+    "eatngo-common",
+    "eatngo-auth-common",
 )
 
 include(":eatngo-common:swagger")

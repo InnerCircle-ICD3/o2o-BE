@@ -1,0 +1,24 @@
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          kakao:
+            client-id: your-kakao-client-id
+            client-secret: your-kakao-client-secret
+            client-authentication-method: POST
+            authorization-grant-type: authorization_code
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+            scope:
+              - profile_nickname
+              - account_email
+            client-name: Kakao
+        provider:
+          kakao:
+            authorization-uri: https://kauth.kakao.com/oauth/authorize
+            token-uri: https://kauth.kakao.com/oauth/token
+            user-info-uri: https://kapi.kakao.com/v2/user/me
+            user-name-attribute: id
+jwt:
+  secret: YW5Zb3UtY2FuLXVzZS10aGlzLWtleS1mb3ItanVzdC10ZXN0aW5nIQ==
+  # anYou-can-use-this-key-for-just-testing! Base64-encoded -> // TODO 교체 및 외부 주입
