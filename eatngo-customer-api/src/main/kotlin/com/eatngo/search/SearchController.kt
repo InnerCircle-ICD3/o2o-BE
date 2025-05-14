@@ -1,13 +1,15 @@
 package com.eatngo.search
 
+import com.eatngo.search.dto.Point
+import com.eatngo.search.dto.SearchFilter
 import com.eatngo.search.dto.SearchStoreDto
 import com.eatngo.search.dto.SearchStoreMapRequestDto
 import com.eatngo.search.dto.SearchStoreMapResponseDto
-import com.eatngo.search.dto.SearchStoreMapResultDto
 import com.eatngo.search.dto.SearchStoreRequestDto
 import com.eatngo.search.dto.SearchStoreResponseDto
 import com.eatngo.search.service.SearchService
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.ModelAttribute
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
@@ -25,14 +27,18 @@ class SearchController (
      * 리스트 검색 API
      */
     @GetMapping("/search/store")
-    fun searchStore(@RequestParam searchDto: SearchStoreRequestDto): SearchStoreResponseDto {
+    fun searchStore(@ModelAttribute searchDto: SearchStoreRequestDto): SearchStoreResponseDto {
         return SearchStoreResponseDto(
             success = true,
             data = searchService.searchStore(
                 SearchStoreDto(
-                    viewPoint = searchDto.viewPoint,
+                    viewPoint = Point(
+                        lat = searchDto.lat,
+                        lng = searchDto.lng
+                    ),
                     filter = searchDto.filter
-                )
+                ),
+                offset = searchDto.offset
             )
         )
     }

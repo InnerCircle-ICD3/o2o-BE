@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service
 @Service
 class SearchService {
 
-    fun searchStore(searchDto: SearchStoreDto): SearchStoreResultDto {
+    fun searchStore(searchDto: SearchStoreDto, offset: Int): SearchStoreResultDto {
         // TODO: 리스트 검색 로직 구현
         val searchStore: SearchStore = SearchStore(
             storeID = 1L,
