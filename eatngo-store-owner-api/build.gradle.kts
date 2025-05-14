@@ -6,6 +6,7 @@ plugins {
 dependencies {
     // 내부 모듈 의존성
     implementation(project(":eatngo-common:swagger"))
+    implementation(project(":eatngo-core"))
 
     // Spring Boot 기본 의존성
     implementation("org.springframework.boot:spring-boot-starter-web")  // REST API 지원
