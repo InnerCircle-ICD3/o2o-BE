@@ -40,8 +40,11 @@ class GlobalExceptionHandler {
         e: MethodArgumentNotValidException,
         request: HttpServletRequest
     ): ResponseEntity<ApiResponse<Nothing>> {
-        val fieldErrors = e.bindingResult.fieldErrors.associate { 
-            it.field to (it.rejectedValue?.toString() ?: "null") 
+        val fieldErrors = e.bindingResult.fieldErrors.associate { fe ->
+            fe.field to mapOf(
+                "rejectedValue" to (fe.rejectedValue?.toString() ?: "null"),
+                "reason"        to (fe.defaultMessage ?: "invalid")
+            )
         }
         val message = fieldErrors.entries.joinToString { "${it.key}=${it.value}" }
         val context = buildLogContext(request).plus("fields" to fieldErrors)
