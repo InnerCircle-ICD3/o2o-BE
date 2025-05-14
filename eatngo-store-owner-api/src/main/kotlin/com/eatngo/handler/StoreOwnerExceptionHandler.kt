@@ -88,22 +88,6 @@ class StoreOwnerExceptionHandler {
             .body(ApiResponse.error(CommonErrorCode.INVALID_INPUT.code, firstErrorMessage))
     }
 
-    @ExceptionHandler(AccessDeniedException::class)
-    fun handleAccessDeniedException(
-        e: AccessDeniedException,
-        request: HttpServletRequest
-    ): ResponseEntity<ApiResponse<Nothing>> {
-        // 컨텍스트 정보 구성
-        val context = buildLogContext(request)
-
-        // 로그 기록
-        logError(e, Level.WARN, CommonErrorCode.FORBIDDEN.message, context)
-
-        return ResponseEntity
-            .status(HttpStatus.FORBIDDEN)
-            .body(ApiResponse.error(CommonErrorCode.FORBIDDEN.code, CommonErrorCode.FORBIDDEN.message))
-    }
-
     @ExceptionHandler(RuntimeException::class)
     fun handleRuntimeException(
         e: RuntimeException,

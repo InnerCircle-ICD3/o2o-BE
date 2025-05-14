@@ -15,10 +15,6 @@ enum class CommonErrorCode(
     INVALID_TYPE_VALUE("C005", "잘못된 타입의 값이 입력되었습니다."),
     DUPLICATE_ENTITY("C006", "엔티티가 이미 존재합니다."),
 
-    // Security
-    UNAUTHORIZED("S001", "인증이 필요합니다."),
-    FORBIDDEN("S002", "접근이 거부되었습니다."),
-
     // Validation
     VALIDATION_FAILED("V001", "유효성 검증에 실패했습니다.");
 }
