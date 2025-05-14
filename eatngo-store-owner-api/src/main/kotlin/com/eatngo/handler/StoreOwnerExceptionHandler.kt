@@ -97,11 +97,11 @@ class StoreOwnerExceptionHandler {
         val context = buildLogContext(request)
 
         // 로그 기록
-        logError(e, Level.WARN, "접근이 거부되었습니다", context)
+        logError(e, Level.WARN, CommonErrorCode.FORBIDDEN.message, context)
 
         return ResponseEntity
             .status(HttpStatus.FORBIDDEN)
-            .body(ApiResponse.error("S002", "접근 권한이 없습니다"))
+            .body(ApiResponse.error(CommonErrorCode.FORBIDDEN.code, CommonErrorCode.FORBIDDEN.message))
     }
 
     @ExceptionHandler(RuntimeException::class)
