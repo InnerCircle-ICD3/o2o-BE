@@ -35,10 +35,10 @@ class SecurityConfig(
             .formLogin { it.disable() }
             .httpBasic { it.disable() }
 
-            .authorizeHttpRequests {
-                it.requestMatchers("/", "/oauth2/**", "/login/**", "/api/v1/test/hello").permitAll()
-                    .anyRequest().authenticated()
-            }
+//            .authorizeHttpRequests {
+//                it.requestMatchers("/", "/oauth2/**", "/login/**", "/api/v1/test/hello").permitAll()
+//                    .anyRequest().authenticated()
+//            }
 
             .authorizeHttpRequests { it.anyRequest().permitAll() } // TODO 모든 요청 허용 제거
 

@@ -24,7 +24,7 @@ class UserAccount(
 
         fun create(oauth2: Oauth2): UserAccount {
             val userAccount = UserAccount(
-                email = EmailAddress.from(oauth2.getEmail()),
+                email = EmailAddress.from(oauth2.email),
                 createdAt = ZonedDateTime.now(),
                 updatedAt = ZonedDateTime.now()
             )
