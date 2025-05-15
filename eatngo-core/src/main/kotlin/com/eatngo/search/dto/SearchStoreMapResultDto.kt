@@ -8,6 +8,7 @@ data class SearchStoreMapResultDto (
 data class SearchStoreMap (
     val storeID: Long,
     val storeName: String,
+    val stock: Int, // 상품 재고 수량
 )
 
 data class Box (
