@@ -18,11 +18,11 @@ jobs:
         uses: actions/checkout@v3
 
       # 2. JDK 설치 및 Gradle 캐시 설정
-      - name: Set up JDK 17 and cache Gradle
+      - name: Set up JDK 21 and cache Gradle
         uses: actions/setup-java@v3
         with:
           distribution: temurin
-          java-version: '17'
+          java-version: '21'
           cache: gradle
 
       # 3. gradlew 스크립트 실행 권한 부여 (windows-hosted 환경이 아니라면 생략 가능)
