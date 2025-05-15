@@ -20,13 +20,13 @@ class CustomerAddressController (
 ) {
 
     @Operation(summary = "주소 목록 API", description = "유저의 주소 목록을 조회하는 API")
-    @GetMapping("/customer/address")
+    @GetMapping("/api/v1/customer/address")
     fun getAddressList(): ApiResponse<List<CustomerAddress>> {
         return ApiResponse.success(customerAddressService.getAddressList())
     }
 
     @Operation(summary = "주소 등록 API", description = "유저의 주소를 등록하는 API")
-    @PostMapping("/customer/address")
+    @PostMapping("/api/v1/customer/address")
     fun addAddress(@RequestBody address: AddAddressRequestDto): ApiResponse<Long/*AddressID*/> {
         return ApiResponse.success(customerAddressService.addAddress(
             CustomerAddress(
@@ -39,7 +39,7 @@ class CustomerAddressController (
     }
 
     @Operation(summary = "주소 삭제 API", description = "유저의 주소를 삭제하는 API")
-    @DeleteMapping("/customer/address/{addressId}")
+    @DeleteMapping("/api/v1/customer/address/{addressId}")
     fun deleteAddress(@PathVariable addressId: Long): ApiResponse<Boolean> {
         return ApiResponse.success(customerAddressService.deleteAddress(addressId))
     }

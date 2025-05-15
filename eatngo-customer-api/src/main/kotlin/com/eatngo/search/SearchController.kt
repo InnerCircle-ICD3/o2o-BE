@@ -21,8 +21,9 @@ class SearchController (
 ) {
 
     // TODO : GET vs POST
+    // TODO : 공통 모듈로 묶기
     @Operation(summary = "가게 검색 API", description = "매장 리스트 리턴 및 검색 API")
-    @GetMapping("/search/store")
+    @GetMapping("/api/v1/search/store")
     fun searchStore(@ModelAttribute searchDto: SearchStoreRequestDto): ApiResponse<SearchStoreResultDto> {
         return ApiResponse.success(
             searchService.searchStore(
@@ -39,7 +40,7 @@ class SearchController (
     }
 
     @Operation(summary = "지도 검색 API", description = "지도에서 매장 포인트 리턴 API")
-    @GetMapping("/search/store/map")
+    @GetMapping("/api/v1/search/store/map")
     fun searchStoreMap(@RequestParam lat: Double, @RequestParam lng: Double): ApiResponse<SearchStoreMapResultDto> {
         return ApiResponse.success(
             searchService.searchStoreMap(
@@ -54,7 +55,7 @@ class SearchController (
     }
 
     @Operation(summary = "검색어 자동완성 API", description = "검색어 자동완성 API ex: '치킨' -> '치킨, 치킨너겟'")
-    @GetMapping("/search/suggestions")
+    @GetMapping("/api/v1/search/suggestions")
     fun searchSuggestions(@RequestParam keyword: String): ApiResponse<List<String>> {
         return ApiResponse.success(
             searchService.searchSuggestions(keyword)
