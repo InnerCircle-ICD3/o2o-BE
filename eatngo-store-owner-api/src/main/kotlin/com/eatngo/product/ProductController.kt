@@ -24,10 +24,6 @@ class ProductController(
                 imageUrl = imageUrl,
                 storeId = storeId,
                 foodTypes = createProductRequestDto.foodType,
-                id = TODO(),
-                status = TODO(),
-                createdAt = TODO(),
-                updatedAt = TODO()
             )
         )
 

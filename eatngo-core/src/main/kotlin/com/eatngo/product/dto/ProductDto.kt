@@ -3,10 +3,11 @@ package com.eatngo.product.dto
 import com.eatngo.product.domain.Inventory
 import com.eatngo.product.domain.Product
 import com.eatngo.product.domain.ProductPrice
+import java.time.LocalDateTime
 import java.time.ZonedDateTime
 
 data class ProductDto(
-    val id: Long?,
+    var id: Long? = null,
     val name: String,
     val description: String,
     val size: String,
@@ -15,9 +16,9 @@ data class ProductDto(
     var imageUrl: String?,
     val storeId: Long,
     val foodTypes: List<String>,
-    var status: String?,
-    var createdAt: ZonedDateTime?,
-    var updatedAt: ZonedDateTime?,
+    var status: String? = "ACTIVE",
+    var createdAt: ZonedDateTime? = null,
+    var updatedAt: ZonedDateTime? = null,
 ) {
     companion object {
         fun from(product: Product): ProductDto {
