@@ -21,8 +21,8 @@ class OrderController {
     fun confirmOrder(@PathVariable orderId: Long) = ResponseEntity.ok(Unit)
 
     @GetMapping("/api/v1/store/{storeId}/orders")
-    @Operation(summary = "내 주문 조회", description = "내 주문 이력 조회")
-    fun getOrdersByCustomerId(@PathVariable("storeId") storeId: Long): ResponseEntity<List<OrderDto>> {
+    @Operation(summary = "상점 주문 조회", description = "상점 주문 조회")
+    fun getOrdersByStoreId(@PathVariable("storeId") storeId: Long): ResponseEntity<List<OrderDto>> {
         return ResponseEntity.ok(
             listOf(
                 OrderDto(
