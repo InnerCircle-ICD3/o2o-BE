@@ -15,6 +15,9 @@ dependencies {
     // 테스트 의존성
     testImplementation("io.kotest:kotest-runner-junit5:5.8.1")
     testImplementation("io.kotest:kotest-assertions-core:5.8.1")
+
+    // jpa 의존성
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 }
 
 tasks.bootJar{
