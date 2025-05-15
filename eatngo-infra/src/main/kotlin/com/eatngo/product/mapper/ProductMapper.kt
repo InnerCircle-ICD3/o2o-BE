@@ -1,6 +1,7 @@
 package com.eatngo.product.mapper
 
 import com.eatngo.product.domain.*
+import com.eatngo.product.domain.Product.*
 import com.eatngo.product.entity.InventoryEmbeddable
 import com.eatngo.product.entity.ProductEntity
 import com.eatngo.product.entity.ProductPriceEmbeddable

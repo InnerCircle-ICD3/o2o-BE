@@ -2,16 +2,60 @@ package com.eatngo.product.domain
 
 import java.time.ZonedDateTime
 
-interface Product {
-    var id: Long?
-    val name: String
-    val description: String
-    val inventory: Inventory
-    val price: ProductPrice
-    val imageUrl: String
-    val storeId: Long
-    val foodTypes: FoodTypes
-    val status: ProductStatus
-    val createdAt: ZonedDateTime?
-    val updatedAt: ZonedDateTime?
+sealed class Product {
+    abstract var id: Long?
+    abstract val name: String
+    abstract val description: String
+    abstract val inventory: Inventory
+    abstract val price: ProductPrice
+    abstract val imageUrl: String?
+    abstract val storeId: Long
+    abstract val foodTypes: FoodTypes
+    abstract val status: ProductStatus
+    abstract val createdAt: ZonedDateTime?
+    abstract val updatedAt: ZonedDateTime?
+
+    data class LargeLuckBag(
+        override var id: Long?,
+        override val name: String,
+        override val description: String,
+        override val inventory: Inventory,
+        override val price: ProductPrice,
+        override val imageUrl: String?,
+        override val storeId: Long,
+        override val foodTypes: FoodTypes,
+        override val status: ProductStatus = ProductStatus.ACTIVE,
+        override val createdAt: ZonedDateTime? = null,
+        override val updatedAt: ZonedDateTime? = null,
+    ) : Product()
+
+    data class MediumLuckBag(
+        override var id: Long?,
+        override val name: String,
+        override val description: String,
+        override val inventory: Inventory,
+        override val price: ProductPrice,
+        override val imageUrl: String?,
+        override val storeId: Long,
+        override val foodTypes: FoodTypes,
+        override val status: ProductStatus = ProductStatus.ACTIVE,
+        override val createdAt: ZonedDateTime? = null,
+        override val updatedAt: ZonedDateTime? = null,
+        val mediumSpecificField: Int? = null
+    ) : Product()
+
+    data class SmallLuckBag(
+        override var id: Long?,
+        override val name: String,
+        override val description: String,
+        override val inventory: Inventory,
+        override val price: ProductPrice,
+        override val imageUrl: String?,
+        override val storeId: Long,
+        override val foodTypes: FoodTypes,
+        override val status: ProductStatus = ProductStatus.ACTIVE,
+        override val createdAt: ZonedDateTime? = null,
+        override val updatedAt: ZonedDateTime? = null,
+        val smallSpecificField: Boolean? = null
+    ) : Product()
 }

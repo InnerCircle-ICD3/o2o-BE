@@ -8,6 +8,7 @@ import java.time.ZonedDateTime
 
 @Entity
 @Table(name = "products")
+// TODO 이후 DType 추가 필요!
 data class ProductEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,7 +27,7 @@ data class ProductEntity(
     var price: ProductPriceEmbeddable,
 
     @Column(nullable = false, columnDefinition = "TEXT")
-    var imageUrl: String,
+    var imageUrl: String?,
 
     @Column(nullable = false)
     var storeId: Long,
