@@ -14,11 +14,11 @@ import java.time.ZonedDateTime
 class OrderController {
     @PostMapping("/api/v1/orders/{orderId}/cancel")
     @Operation(summary = "주문 취소", description = "주문 취소")
-    fun createOrder(@PathVariable orderId: Long) = ResponseEntity.ok(Unit)
+    fun cancelOrder(@PathVariable orderId: Long) = ResponseEntity.ok(Unit)
 
     @PostMapping("/api/v1/orders/{orderId}/confirm")
     @Operation(summary = "주문 승인", description = "주문 승인")
-    fun confrimOrder(@PathVariable orderId: Long) = ResponseEntity.ok(Unit)
+    fun confirmOrder(@PathVariable orderId: Long) = ResponseEntity.ok(Unit)
 
     @GetMapping("/api/v1/store/{storeId}/orders")
     @Operation(summary = "내 주문 조회", description = "내 주문 이력 조회")
