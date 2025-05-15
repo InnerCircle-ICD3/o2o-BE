@@ -22,9 +22,9 @@ class CustomerAddressService {
         }
     }
 
-    fun addAddress(address: String): Long {
+    fun addAddress(address: CustomerAddress): Long {
         // TODO : 주소 등록 구현
-        return 1L
+        return 1L // 등록된 주소 ID 반환
     }
 
     fun deleteAddress(addressId: Long): Boolean {
