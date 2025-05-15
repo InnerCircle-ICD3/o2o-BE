@@ -4,16 +4,16 @@ import com.eatngo.search.dto.Address
 import com.eatngo.search.dto.Box
 import com.eatngo.common.type.Point
 import com.eatngo.search.dto.SearchStore
-import com.eatngo.search.dto.SearchStoreDto
 import com.eatngo.search.dto.SearchStoreMap
 import com.eatngo.search.dto.SearchStoreMapResultDto
+import com.eatngo.search.dto.SearchStoreQueryDto
 import com.eatngo.search.dto.SearchStoreResultDto
 import org.springframework.stereotype.Service
 
 @Service
 class SearchService {
 
-    fun searchStore(searchDto: SearchStoreDto, offset: Int): SearchStoreResultDto {
+    fun searchStore(searchQuery: SearchStoreQueryDto, offset: Int): SearchStoreResultDto {
         // TODO: 리스트 검색 로직 구현
         val searchStore: SearchStore = SearchStore(
             storeID = 1L,
@@ -36,7 +36,7 @@ class SearchService {
         )
     }
 
-    fun searchStoreMap(searchDto: SearchStoreDto): SearchStoreMapResultDto {
+    fun searchStoreMap(searchQuery: SearchStoreQueryDto): SearchStoreMapResultDto {
         val searchStore: SearchStoreMap = SearchStoreMap(
             storeID = 1L,
             storeName = "Test Store",

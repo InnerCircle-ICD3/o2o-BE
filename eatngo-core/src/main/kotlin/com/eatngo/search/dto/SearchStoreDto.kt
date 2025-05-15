@@ -3,7 +3,7 @@ package com.eatngo.search.dto
 import com.eatngo.common.type.Point
 
 
-data class SearchStoreDto(
+data class SearchStoreQueryDto(
     val viewPoint: Point,               // 검색하는 유저의 위치 정보
     val filter: SearchFilter? = null,   // 검색필터 -> 위치 기반 검색에서는 MVP 에서 필터링 하지 않기 때문에 null
 )

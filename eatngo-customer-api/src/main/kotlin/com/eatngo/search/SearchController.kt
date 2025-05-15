@@ -2,8 +2,8 @@ package com.eatngo.search
 
 import com.eatngo.common.response.ApiResponse
 import com.eatngo.common.type.Point
-import com.eatngo.search.dto.SearchStoreDto
 import com.eatngo.search.dto.SearchStoreMapResultDto
+import com.eatngo.search.dto.SearchStoreQueryDto
 import com.eatngo.search.dto.SearchStoreRequestDto
 import com.eatngo.search.dto.SearchStoreResultDto
 import com.eatngo.search.service.SearchService
@@ -26,7 +26,7 @@ class SearchController (
     fun searchStore(@ModelAttribute searchDto: SearchStoreRequestDto): ApiResponse<SearchStoreResultDto> {
         return ApiResponse.success(
             searchService.searchStore(
-                SearchStoreDto(
+                SearchStoreQueryDto(
                     viewPoint = Point(
                         lat = searchDto.lat,
                         lng = searchDto.lng
@@ -43,7 +43,7 @@ class SearchController (
     fun searchStoreMap(@RequestParam lat: Double, @RequestParam lng: Double): ApiResponse<SearchStoreMapResultDto> {
         return ApiResponse.success(
             searchService.searchStoreMap(
-                SearchStoreDto(
+                SearchStoreQueryDto(
                     viewPoint = Point(
                         lat = lat,
                         lng = lng
