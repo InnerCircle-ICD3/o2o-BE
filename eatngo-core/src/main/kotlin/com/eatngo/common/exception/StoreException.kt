@@ -29,16 +29,11 @@ open class StoreException(
         "${BusinessErrorCode.STORE_NOT_AVAILABLE.message} (ID: $storeId)",
         mapOf("storeId" to storeId)
     )
-    
-    class StoreNotAvailableForPickup(storeId: Long) : StoreException(
-        BusinessErrorCode.STORE_NOT_AVAILABLE,
-        "매장이 현재 픽업 가능한 시간이 아닙니다 (ID: $storeId)",
-        mapOf("storeId" to storeId)
-    )
-    
-    class StoreNotAvailableForTomorrow(storeId: Long) : StoreException(
-        BusinessErrorCode.STORE_NOT_AVAILABLE,
-        "매장이 내일 픽업을 지원하지 않습니다 (ID: $storeId)",
-        mapOf("storeId" to storeId)
+
+    // 구독 관련 예외
+    class SubscriptionNotFound(subscriptionId: String) : StoreException(
+        BusinessErrorCode.SUBSCRIPTION_NOT_FOUND,
+        "${BusinessErrorCode.SUBSCRIPTION_NOT_FOUND.message}: $subscriptionId",
+        mapOf("subscriptionId" to subscriptionId)
     )
 }

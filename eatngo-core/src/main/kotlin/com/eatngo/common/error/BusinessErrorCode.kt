@@ -35,6 +35,9 @@ enum class BusinessErrorCode(
     STORE_CLOSED("S002", "영업 종료된 매장입니다."),
     STORE_NOT_AVAILABLE("S003", "이용 불가능한 매장입니다."),
 
+    // 매장 구독 관련 오류
+    SUBSCRIPTION_NOT_FOUND("S004", "구독 정보를 찾을 수 없습니다."),
+
     // 매장 점주 관련 오류
     STORE_OWNER_NOT_FOUND("S004", "점주 정보를 찾을 수 없습니다."),
     STORE_OWNER_ALREADY_EXISTS("S005", "이미 등록된 점주입니다."),
