@@ -1,9 +1,9 @@
 package com.eatngo.product
 
 import com.eatngo.product.dto.CreateProductRequestDto
-import com.eatngo.product.dto.ProductCreateDto
-import com.eatngo.product.dto.ProductInventoryCreateDto
-import com.eatngo.product.dto.ProductPriceCreateDto
+import com.eatngo.product.dto.ProductDto
+import com.eatngo.product.dto.ProductInventoryDto
+import com.eatngo.product.dto.ProductPriceDto
 import com.eatngo.product.service.ProductService
 import org.springframework.web.bind.annotation.*
 
@@ -18,12 +18,12 @@ class ProductController(
         @ModelAttribute createProductRequestDto: CreateProductRequestDto
     ) {
         productService.createProduct(
-            ProductCreateDto(
+            ProductDto(
                 name = createProductRequestDto.name,
                 description = createProductRequestDto.description,
                 size = createProductRequestDto.size,
-                inventory = ProductInventoryCreateDto(createProductRequestDto.quantity),
-                price = ProductPriceCreateDto(createProductRequestDto.originalPrice),
+                inventory = ProductInventoryDto(createProductRequestDto.quantity),
+                price = ProductPriceDto(createProductRequestDto.originalPrice),
                 imageUrl = imageUrl,
                 storeId = storeId,
                 foodTypes = createProductRequestDto.foodType,

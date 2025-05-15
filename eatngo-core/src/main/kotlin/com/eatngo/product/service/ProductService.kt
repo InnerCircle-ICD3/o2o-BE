@@ -3,7 +3,7 @@ package com.eatngo.product.service
 import com.eatngo.product.domain.*
 import com.eatngo.product.domain.Product.*
 import com.eatngo.product.domain.ProductSizeType.*
-import com.eatngo.product.dto.ProductCreateDto
+import com.eatngo.product.dto.ProductDto
 import com.eatngo.product.infra.ProductPersistence
 import org.springframework.stereotype.Service
 
@@ -13,7 +13,7 @@ class ProductService(
     // TODO storeRepository
 ) {
 
-    fun createProduct(createProductDto: ProductCreateDto): Unit {
+    fun createProduct(createProductDto: ProductDto): Unit {
         // TODO storeRepo.findById()
 
         val inventory = Inventory.create(createProductDto.inventory.quantity)
