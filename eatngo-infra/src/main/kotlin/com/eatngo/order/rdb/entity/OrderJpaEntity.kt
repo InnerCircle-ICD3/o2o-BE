@@ -12,7 +12,7 @@ class OrderJpaEntity(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
     val orderNumber: Long,
-    @OneToMany(mappedBy = "survey", cascade = [CascadeType.ALL])
+    @OneToMany(mappedBy = "order", cascade = [CascadeType.ALL])
     val orderItems: MutableList<OrderItemJpaEntity> = mutableListOf(),
     val customerId: Long,
     val storeId: Long,
