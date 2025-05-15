@@ -7,12 +7,33 @@
     <!-- log pattern 정의 -->
     <property name="CONSOLE_LOG_PATTERN" value="%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %highlight(%-5level) %cyan(%-40.40logger{39}) : %msg%n%wEx"/>
     <property name="FILE_LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n%wEx"/>
+    
+    <!-- 에러 로그용 패턴 - 전체 스택 트레이스 포함 -->
+    <property name="ERROR_LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n%wEx{full}"/>
 
     <!-- appenders.xml 포함 -->
     <include resource="logback/appenders.xml"/>
+    
+    <!-- 에러 로그 전용 파일 appender 추가 -->
+    <appender name="ERROR_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>ERROR</level>
+        </filter>
+        <file>${LOG_PATH:-logs}/error.log</file>
+        <encoder>
+            <pattern>${ERROR_LOG_PATTERN}</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH:-logs}/error-%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+    </appender>
 
     <!-- 애플리케이션 패키지 로깅 레벨 설정 -->
     <logger name="com.eatngo" level="DEBUG"/>
+    
+    <!-- 예외 처리 관련 패키지는 더 자세히 로깅 -->
+    <logger name="com.eatngo.common.exception" level="DEBUG"/>
 
     <!-- 외부 라이브러리 로깅 레벨 설정 (MongoDB/P6spy는 appenders.xml에서 관리) -->
     <logger name="org.springframework" level="INFO"/>
@@ -22,5 +43,6 @@
     <root level="INFO">
         <appender-ref ref="CONSOLE"/>
         <appender-ref ref="FILE"/>
+        <appender-ref ref="ERROR_FILE"/>
     </root>
 </configuration>
