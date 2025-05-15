@@ -13,7 +13,7 @@ class ProductService(
     // TODO storeRepository
 ) {
 
-    fun createProduct(createProductDto: ProductDto): Unit {
+    fun createProduct(createProductDto: ProductDto): ProductDto {
         // TODO storeRepo.findById()
 
         val inventory = Inventory.create(createProductDto.inventory.quantity)
@@ -57,11 +57,10 @@ class ProductService(
                     foodTypes = foodTypes,
                 )
             }
-            else -> throw IllegalArgumentException("Invalid product size: ${createProductDto.size}")
         }
 
         val savedProduct: Product = productPersistence.save(product)
 
-        // TODO response needed
+        return ProductDto.from(savedProduct)
     }
 }

@@ -1,9 +1,6 @@
 package com.eatngo.product
 
-import com.eatngo.product.dto.CreateProductRequestDto
-import com.eatngo.product.dto.ProductDto
-import com.eatngo.product.dto.ProductInventoryDto
-import com.eatngo.product.dto.ProductPriceDto
+import com.eatngo.product.dto.*
 import com.eatngo.product.service.ProductService
 import org.springframework.web.bind.annotation.*
 
@@ -16,8 +13,8 @@ class ProductController(
         @PathVariable("store-id") storeId: Long,
         @RequestParam("image-url") imageUrl: String,
         @ModelAttribute createProductRequestDto: CreateProductRequestDto
-    ) {
-        productService.createProduct(
+    ): CreateProductResponseDto {
+        val productDto: ProductDto = productService.createProduct(
             ProductDto(
                 name = createProductRequestDto.name,
                 description = createProductRequestDto.description,
@@ -27,7 +24,13 @@ class ProductController(
                 imageUrl = imageUrl,
                 storeId = storeId,
                 foodTypes = createProductRequestDto.foodType,
+                id = TODO(),
+                status = TODO(),
+                createdAt = TODO(),
+                updatedAt = TODO()
             )
         )
+
+        return CreateProductResponseDto.from(productDto)
     }
 }

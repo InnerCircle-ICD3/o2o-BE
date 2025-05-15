@@ -12,12 +12,12 @@ data class ProductDto(
     val size: String,
     val inventory: ProductInventoryDto,
     val price: ProductPriceDto,
-    val imageUrl: String?,
+    var imageUrl: String?,
     val storeId: Long,
     val foodTypes: List<String>,
-    val status: String?,
-    val createdAt: ZonedDateTime?,
-    val updatedAt: ZonedDateTime?,
+    var status: String?,
+    var createdAt: ZonedDateTime?,
+    var updatedAt: ZonedDateTime?,
 ) {
     companion object {
         fun from(product: Product): ProductDto {
