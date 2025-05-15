@@ -1,8 +1,8 @@
 package com.eatngo.order
 
 import com.eatngo.order.domain.Status
-import com.eatngo.order.dto.*
-import com.eatngo.order.service.OrderService
+import com.eatngo.order.dto.OrderDto
+import com.eatngo.order.dto.OrderItemDto
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.ResponseEntity
@@ -11,41 +11,18 @@ import java.time.ZonedDateTime
 
 @Tag(name = "주문", description = "주문 관련 API")
 @RestController
-class OrderController(
-    private val orderService: OrderService
-) {
-    @PostMapping("/api/v1/orders")
-    @Operation(summary = "주문 생성", description = "주문 생성")
-    fun createOrder(@RequestBody requestDto: CreateOrderRequestDto): ResponseEntity<OrderDto> {
-        return ResponseEntity.ok(
-            orderService.createOrder(
-                OrderCreateDto(
-                    customerId = 1L,
-                    storeId = requestDto.storeId,
-                    orderItems = requestDto.orderItems.map {
-                        OrderItemCreateDto(
-                            productId = it.productId,
-                            productName = it.productName,
-                            quantity = it.quantity,
-                            price = it.price,
-                        )
-                    }
-                )
-            )
-        )
-    }
-
+class OrderController {
     @PostMapping("/api/v1/orders/{orderId}/cancel")
     @Operation(summary = "주문 취소", description = "주문 취소")
-    fun cancelOrder(@PathVariable orderId: Long) = ResponseEntity.ok(Unit)
+    fun createOrder(@PathVariable orderId: Long) = ResponseEntity.ok(Unit)
 
-    @PostMapping("/api/v1/orders/{orderId}/done")
-    @Operation(summary = "주문 완료", description = "주문 완료")
-    fun doneOrder(@PathVariable orderId: Long) = ResponseEntity.ok(Unit)
+    @PostMapping("/api/v1/orders/{orderId}/confirm")
+    @Operation(summary = "주문 승인", description = "주문 승인")
+    fun confrimOrder(@PathVariable orderId: Long) = ResponseEntity.ok(Unit)
 
-    @GetMapping("/api/v1/customers/{customerId}/orders")
+    @GetMapping("/api/v1/store/{storeId}/orders")
     @Operation(summary = "내 주문 조회", description = "내 주문 이력 조회")
-    fun getOrdersByCustomerId(@PathVariable("customerId") customerId: Long): ResponseEntity<List<OrderDto>> {
+    fun getOrdersByCustomerId(@PathVariable("storeId") storeId: Long): ResponseEntity<List<OrderDto>> {
         return ResponseEntity.ok(
             listOf(
                 OrderDto(
