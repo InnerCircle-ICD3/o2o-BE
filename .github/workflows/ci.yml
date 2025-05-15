@@ -32,13 +32,3 @@ jobs:
       # 4. 의존성 다운로드 및 테스트 실행
       - name: Run tests
         run: ./gradlew clean test --no-daemon
-
-      # 5. (선택) 테스트 결과 업로드
-      - name: Publish Test Results
-        if: always()
-        uses: actions/upload-artifact@v3
-        with:
-          name: test-results
-          path: |
-            **/build/test-results/**/*.xml
-            **/build/reports/tests/**/*.html
