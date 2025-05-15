@@ -1,6 +1,6 @@
 package com.eatngo.search
 
-import com.eatngo.search.dto.Point
+import com.eatngo.common.type.Point
 import com.eatngo.search.dto.SearchStoreDto
 import com.eatngo.search.dto.SearchStoreMapResponseDto
 import com.eatngo.search.dto.SearchStoreRequestDto

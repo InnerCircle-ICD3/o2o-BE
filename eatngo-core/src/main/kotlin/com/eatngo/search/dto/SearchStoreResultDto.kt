@@ -1,5 +1,7 @@
 package com.eatngo.search.dto
 
+import com.eatngo.common.type.Point
+
 data class SearchStoreResultDto (
     val storeList: List<SearchStore>,
 )

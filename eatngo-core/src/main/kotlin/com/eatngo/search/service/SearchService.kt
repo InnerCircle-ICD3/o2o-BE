@@ -2,7 +2,7 @@ package com.eatngo.search.service
 
 import com.eatngo.search.dto.Address
 import com.eatngo.search.dto.Box
-import com.eatngo.search.dto.Point
+import com.eatngo.common.type.Point
 import com.eatngo.search.dto.SearchStore
 import com.eatngo.search.dto.SearchStoreDto
 import com.eatngo.search.dto.SearchStoreMap
