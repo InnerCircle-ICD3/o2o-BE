@@ -18,10 +18,10 @@ class SearchService {
         val searchStore: SearchStore = SearchStore(
             storeID = 1L,
             storeName = "Test Store",
-            storeCategory = "Test Category",
+            storeCategory = listOf("한식", "중식"),
             foodCategory = listOf("햄버거", "피자"),
             distanceKm = 1.0,
-            openStatus = 1,
+            stock = 5,
             address = Address(
                 address = "Test Address",
                 point = Point(
@@ -40,6 +40,7 @@ class SearchService {
         val searchStore: SearchStoreMap = SearchStoreMap(
             storeID = 1L,
             storeName = "Test Store",
+            stock = 5
         )
         val box: Box = Box(
             topLeft = Point(
