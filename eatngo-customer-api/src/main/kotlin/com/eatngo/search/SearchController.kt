@@ -20,6 +20,7 @@ class SearchController (
     private val searchService: SearchService
 ) {
 
+    // TODO : GET vs POST
     @Operation(summary = "가게 검색 API", description = "매장 리스트 리턴 및 검색 API")
     @GetMapping("/search/store")
     fun searchStore(@ModelAttribute searchDto: SearchStoreRequestDto): ApiResponse<SearchStoreResultDto> {
