@@ -1,0 +1,17 @@
+package com.eatngo.product.domain
+
+import java.time.ZonedDateTime
+
+interface Product {
+    var id: Long?
+    val name: String
+    val description: String
+    val inventory: Inventory
+    val price: ProductPrice
+    val imageUrl: String
+    val storeId: Long
+    val foodTypes: FoodTypes
+    val status: ProductStatus
+    val createdAt: ZonedDateTime?
+    val updatedAt: ZonedDateTime?
+}

@@ -2,16 +2,18 @@ package com.eatngo.product.domain
 
 import java.time.ZonedDateTime
 
-class MediumLuckBag (
-    val id: Long = 0,
-    val name: String,
-    val description: String,
-    val inventory: Inventory,
-    val price: ProductPrice,
-    val imageUrl: String,
-    val storeId: Long,
-    val foodTypes: FoodTypes,
-    val status: ProductStatus,
-    val createdAt: ZonedDateTime,
-    val updatedAt: ZonedDateTime,
-)
+class MediumLuckBag(
+    override var id: Long?,
+    override val name: String,
+    override val description: String,
+    override val inventory: Inventory,
+    override val price: ProductPrice,
+    override val imageUrl: String,
+    override val storeId: Long,
+    override val foodTypes: FoodTypes,
+    override val status: ProductStatus,
+    override val createdAt: ZonedDateTime? = null,
+    override val updatedAt: ZonedDateTime? = null,
+) : Product {
+
+}
