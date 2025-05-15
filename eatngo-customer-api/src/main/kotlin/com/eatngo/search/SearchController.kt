@@ -1,35 +1,30 @@
 package com.eatngo.search
 
+import com.eatngo.common.response.ApiResponse
 import com.eatngo.common.type.Point
 import com.eatngo.search.dto.SearchStoreDto
-import com.eatngo.search.dto.SearchStoreMapResponseDto
+import com.eatngo.search.dto.SearchStoreMapResultDto
 import com.eatngo.search.dto.SearchStoreRequestDto
-import com.eatngo.search.dto.SearchStoreResponseDto
-import com.eatngo.search.dto.SearchSuggestionsResponseDto
+import com.eatngo.search.dto.SearchStoreResultDto
 import com.eatngo.search.service.SearchService
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.ModelAttribute
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
-/**
- * SearchController.kt
- * @author : 이다영
- * @date : 2025-05-14
- * @description : 검색 관련 컨트롤러
- */
+@Tag(name = "Search", description = "검색 API")
 @RestController
 class SearchController (
     private val searchService: SearchService
 ) {
-    /**
-     * 리스트 검색 API
-     */
+
+    @Operation(summary = "가게 검색 API", description = "매장 리스트 리턴 및 검색 API")
     @GetMapping("/search/store")
-    fun searchStore(@ModelAttribute searchDto: SearchStoreRequestDto): SearchStoreResponseDto {
-        return SearchStoreResponseDto(
-            success = true,
-            data = searchService.searchStore(
+    fun searchStore(@ModelAttribute searchDto: SearchStoreRequestDto): ApiResponse<SearchStoreResultDto> {
+        return ApiResponse.success(
+            searchService.searchStore(
                 SearchStoreDto(
                     viewPoint = Point(
                         lat = searchDto.lat,
@@ -42,14 +37,11 @@ class SearchController (
         )
     }
 
-    /**
-     * 지도 검색 API
-     */
+    @Operation(summary = "지도 검색 API", description = "지도에서 매장 포인트 리턴 API")
     @GetMapping("/search/store/map")
-    fun searchStoreMap(@RequestParam lat: Double, @RequestParam lng: Double): SearchStoreMapResponseDto {
-        return SearchStoreMapResponseDto(
-            success = true,
-            data = searchService.searchStoreMap(
+    fun searchStoreMap(@RequestParam lat: Double, @RequestParam lng: Double): ApiResponse<SearchStoreMapResultDto> {
+        return ApiResponse.success(
+            searchService.searchStoreMap(
                 SearchStoreDto(
                     viewPoint = Point(
                         lat = lat,
@@ -60,14 +52,11 @@ class SearchController (
         )
     }
 
-    /**
-     * 자동완성 검색어 API
-     */
+    @Operation(summary = "검색어 자동완성 API", description = "검색어 자동완성 API ex: '치킨' -> '치킨, 치킨너겟'")
     @GetMapping("/search/suggestions")
-    fun searchSuggestions(@RequestParam keyword: String): SearchSuggestionsResponseDto {
-        return SearchSuggestionsResponseDto(
-            success = true,
-            data = searchService.searchSuggestions(keyword)
+    fun searchSuggestions(@RequestParam keyword: String): ApiResponse<List<String>> {
+        return ApiResponse.success(
+            searchService.searchSuggestions(keyword)
         )
     }
 }
