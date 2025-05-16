@@ -43,7 +43,7 @@ class OrderControllerTest : StringSpec() {
             val entity = HttpEntity(requestDto, headers)
 
             val response = restTemplate.postForEntity(
-                "/orders",
+                "/api/v1/orders",
                 entity,
                 OrderDto::class.java
             )
