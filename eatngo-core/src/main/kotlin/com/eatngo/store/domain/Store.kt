@@ -228,7 +228,7 @@ class BusinessHour(
 /**
  * 도로명 주소
  */
-class RoadAddress(
+data class RoadAddress(
     val addressName: String,
     val zoneNo: String,
     val buildingName: String?
@@ -237,7 +237,7 @@ class RoadAddress(
 /**
  * 지번 주소
  */
-class LotAddress(
+data class LotAddress(
     val addressName: String,
     val mainAddressNo: String,
     val subAddressNo: String?

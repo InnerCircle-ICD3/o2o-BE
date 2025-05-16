@@ -15,7 +15,16 @@ object StoreEnum {
     enum class StoreStatus {
         OPEN,       // 영업 중
         CLOSED,     // 영업 종료
-        VACATION,   // 휴업
         PENDING     // 승인 대기
+    }
+
+    /**
+     * 알림 유형
+     */
+    enum class NotificationType {
+        NEW_PRODUCT,         // 새 상품 등록 알림
+        DISCOUNT,            // 할인 알림
+        RESERVATION_UPDATE,  // 예약 상태 변경 알림
+        STORE_UPDATE         // 매장 정보 변경 알림
     }
 }
