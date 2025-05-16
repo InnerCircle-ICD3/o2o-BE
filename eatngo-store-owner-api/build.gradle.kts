@@ -9,6 +9,10 @@ dependencies {
     implementation(project(":eatngo-core"))
     implementation(project(":eatngo-auth-common"))
 
+    // core, infra 모듈 의존성
+    implementation(project(":eatngo-core"))
+    implementation(project(":eatngo-infra"))
+
     // Spring Boot 기본 의존성
     implementation("org.springframework.boot:spring-boot-starter-web")  // REST API 지원
     implementation("org.springframework.boot:spring-boot-starter-security") // Spring Security 지원
