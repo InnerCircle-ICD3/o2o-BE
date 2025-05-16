@@ -13,7 +13,7 @@ data class ProductDto(
     val size: String,
     val inventory: ProductInventoryDto,
     val price: ProductPriceDto,
-    var imageUrl: String?,
+    var imageUrl: String? = null,
     val storeId: Long,
     val foodTypes: List<String>,
     var status: String? = "ACTIVE",
