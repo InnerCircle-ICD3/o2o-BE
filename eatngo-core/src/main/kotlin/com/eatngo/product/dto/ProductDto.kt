@@ -3,7 +3,6 @@ package com.eatngo.product.dto
 import com.eatngo.product.domain.Inventory
 import com.eatngo.product.domain.Product
 import com.eatngo.product.domain.ProductPrice
-import java.time.LocalDateTime
 import java.time.ZonedDateTime
 
 data class ProductDto(
@@ -22,16 +21,17 @@ data class ProductDto(
 ) {
     companion object {
         fun from(product: Product): ProductDto {
-            val size = when (product) {
-                is Product.LargeLuckBag -> "L"
-                is Product.MediumLuckBag -> "M"
-                is Product.SmallLuckBag -> "S"
-            }
+//            val size = when (product) {
+//                is Product.LargeLuckBag -> "L"
+//                is Product.MediumLuckBag -> "M"
+//                is Product.SmallLuckBag -> "S"
+//            }
             return ProductDto(
                 id = product.id,
                 name = product.name,
                 description = product.description,
-                size = size,
+                // when 이 아닌 추상메소드로 로직 수정
+                size = product.getSize(),
                 inventory = ProductInventoryDto.from(product.inventory),
                 price = ProductPriceDto.from(product.price),
                 imageUrl = product.imageUrl,

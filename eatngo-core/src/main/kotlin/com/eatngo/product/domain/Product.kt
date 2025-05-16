@@ -15,6 +15,8 @@ sealed class Product {
     abstract val createdAt: ZonedDateTime?
     abstract val updatedAt: ZonedDateTime?
 
+    abstract fun getSize(): String
+
     data class LargeLuckBag(
         override var id: Long?,
         override val name: String,
@@ -27,7 +29,9 @@ sealed class Product {
         override val status: ProductStatus = ProductStatus.ACTIVE,
         override val createdAt: ZonedDateTime? = null,
         override val updatedAt: ZonedDateTime? = null,
-    ) : Product()
+    ) : Product() {
+        override fun getSize() = "L"
+    }
 
     data class MediumLuckBag(
         override var id: Long?,
@@ -41,8 +45,9 @@ sealed class Product {
         override val status: ProductStatus = ProductStatus.ACTIVE,
         override val createdAt: ZonedDateTime? = null,
         override val updatedAt: ZonedDateTime? = null,
-        val mediumSpecificField: Int? = null
-    ) : Product()
+    ) : Product() {
+        override fun getSize() = "M"
+    }
 
     data class SmallLuckBag(
         override var id: Long?,
@@ -56,6 +61,7 @@ sealed class Product {
         override val status: ProductStatus = ProductStatus.ACTIVE,
         override val createdAt: ZonedDateTime? = null,
         override val updatedAt: ZonedDateTime? = null,
-        val smallSpecificField: Boolean? = null
-    ) : Product()
+    ) : Product() {
+        override fun getSize() = "S"
+    }
 }

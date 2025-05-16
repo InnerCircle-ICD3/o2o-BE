@@ -26,7 +26,7 @@ data class ProductEntity(
     @Embedded
     var price: ProductPriceEmbeddable,
 
-    @Column(nullable = false, columnDefinition = "TEXT")
+    @Column(columnDefinition = "TEXT")
     var imageUrl: String?,
 
     @Column(nullable = false)
@@ -47,10 +47,10 @@ data class ProductEntity(
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
-    var createdAt: ZonedDateTime? = null,
+    var createdAt: ZonedDateTime = ZonedDateTime.now(),
 
     @UpdateTimestamp
     @Column(nullable = false)
-    var updatedAt: ZonedDateTime? = null
+    var updatedAt: ZonedDateTime? = ZonedDateTime.now()
 ) {
 }

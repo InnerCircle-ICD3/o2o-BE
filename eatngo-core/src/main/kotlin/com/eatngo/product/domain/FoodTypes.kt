@@ -1,7 +1,7 @@
 package com.eatngo.product.domain
 
 class FoodTypes(
-    foods: List<Food>
+    val foods: List<Food>
 ) {
     companion object {
         fun create(foods: List<String>): FoodTypes {

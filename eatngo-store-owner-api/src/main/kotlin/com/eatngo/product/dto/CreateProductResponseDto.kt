@@ -5,7 +5,7 @@ import java.time.ZonedDateTime
 data class CreateProductResponseDto(
     val id: Long?,
     val name: String,
-    val stockId: Long,
+    val storeId: Long,
     val price: CreateProductPriceResponseDto,
     val size: String,
     val inventory: CreateProductInventoryResponseDto,
@@ -19,7 +19,7 @@ data class CreateProductResponseDto(
             return CreateProductResponseDto(
                 id = productDto.id,
                 name = productDto.name,
-                stockId = productDto.storeId,
+                storeId = productDto.storeId,
                 price = CreateProductPriceResponseDto.from(productDto.price),
                 size = productDto.size,
                 inventory = CreateProductInventoryResponseDto.from(productDto.inventory),
