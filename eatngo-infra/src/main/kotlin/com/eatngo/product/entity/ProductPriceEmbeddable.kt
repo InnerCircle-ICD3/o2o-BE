@@ -7,5 +7,4 @@ data class ProductPriceEmbeddable(
     var originalPrice: Int,
     var discountRate: Double,
     var finalPrice: Int,
-) {
-}
+)

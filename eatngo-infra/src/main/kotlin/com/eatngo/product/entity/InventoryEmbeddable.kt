@@ -6,5 +6,4 @@ import jakarta.persistence.Embeddable
 data class InventoryEmbeddable(
     var quantity: Int,
     var stock: Int,
-) {
-}
+)
