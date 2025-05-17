@@ -1,4 +1,4 @@
-package com.eatngo.redis.repository
+package com.eatngo.redis.sample
 
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.stereotype.Repository

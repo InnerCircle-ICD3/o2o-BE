@@ -26,7 +26,7 @@ class RedisConfig (
 
         val lettuceClientConfiguration = LettuceClientConfiguration.builder()
             .build()
-        val redisStandaloneConfiguration = RedisStandaloneConfiguration(host, port)
+        val redisStandaloneConfiguration = RedisStandaloneConfiguration(/* hostName = */ host, /* port = */ port)
 
         return LettuceConnectionFactory(redisStandaloneConfiguration, lettuceClientConfiguration)
     }

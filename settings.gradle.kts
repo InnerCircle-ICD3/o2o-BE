@@ -17,5 +17,3 @@ include(":eatngo-common:swagger")
 include(":eatngo-common:p6spy")
 include(":eatngo-common:logging")
 include(":eatngo-common:secrets")
-
-include(":eatngo-infra:redis")
