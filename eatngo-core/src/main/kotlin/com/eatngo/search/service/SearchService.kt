@@ -1,9 +1,9 @@
 package com.eatngo.search.service
 
-import com.eatngo.search.dto.Address
 import com.eatngo.search.dto.Box
 import com.eatngo.common.type.Point
-import com.eatngo.search.dto.SearchStore
+import com.eatngo.search.domain.SearchStore
+import com.eatngo.search.dto.SearchStoreDto
 import com.eatngo.search.dto.SearchStoreMap
 import com.eatngo.search.dto.SearchStoreMapResultDto
 import com.eatngo.search.dto.SearchStoreQueryDto
@@ -15,24 +15,10 @@ class SearchService {
 
     fun searchStore(searchQuery: SearchStoreQueryDto, offset: Int): SearchStoreResultDto {
         // TODO: 리스트 검색 로직 구현
-        val searchStore: SearchStore = SearchStore(
-            storeId = 1L,
-            storeName = "Test Store",
-            storeCategory = listOf("한식", "중식"),
-            foodCategory = listOf("햄버거", "피자"),
-            distanceKm = 1.0,
-            stock = 5,
-            address = Address(
-                address = "Test Address",
-                point = Point(
-                    lat = 36.456789,
-                    lng = 127.012345
-                )
-            ),
-        )
+        val searchStore: SearchStore = SearchStore.create()
 
         return SearchStoreResultDto(
-            storeList = listOf(searchStore)
+            storeList = listOf(SearchStoreDto.from(searchStore))
         )
     }
 

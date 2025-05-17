@@ -1,12 +1,13 @@
 package com.eatngo.search.dto
 
 import com.eatngo.common.type.Point
+import com.eatngo.search.domain.SearchStore
 
 data class SearchStoreResultDto (
-    val storeList: List<SearchStore>,
+    val storeList: List<SearchStoreDto>,
 )
 
-data class SearchStore (
+data class SearchStoreDto (
     val storeId: Long,
     val storeName: String,
     val storeImage: String="", // 매장 이미지 URL
@@ -22,4 +23,21 @@ data class SearchStore (
     val reviewCount: Int?=0,         // 리뷰 수
     val reviewScore: Double?=5.0,    // 리뷰 평점
     val isFavorite: Boolean?=false,  // 찜 여부
-)
+) {
+    companion object {
+        fun from(searchStore: SearchStore): SearchStoreDto {
+            return SearchStoreDto(
+                storeId = searchStore.storeId,
+                storeName = searchStore.storeName,
+                storeImage = searchStore.storeImage,
+                storeCategory = searchStore.storeCategory,
+                foodCategory = searchStore.foodCategory,
+                roadAddress = searchStore.roadAddress,
+                location = searchStore.location, // TODO: MongoDB GeoJSON -> Point 변환
+                distanceKm = 0.0,
+                isOpen = false,
+                stock = 0,
+                )
+        }
+    }
+}
