@@ -89,13 +89,13 @@ jobs:
             --cli-input-json file://task-def-customer.json \
             --region $AWS_REGION
 
-      - name: Update ECS service
-        run: |
           REVISION=$(aws ecs describe-task-definition \
             --task-definition eatngo-customer-api \
             --query "taskDefinition.revision" \
             --region $AWS_REGION --output text)
 
+      - name: Update ECS service
+        run: |
           aws ecs update-service \
             --cluster eatngo-cluster \
             --service eatngo-customer-api-service \
