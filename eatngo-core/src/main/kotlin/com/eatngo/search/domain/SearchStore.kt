@@ -12,6 +12,7 @@ import java.time.ZonedDateTime
 class SearchStore (
     var storeId: Long = 0L,
     var storeName: String = "",
+    var storeImage: String = "", // 매장 이미지 S3 URL
     var storeCategory: List<String> = emptyList(),
     var foodCategory: List<String> = emptyList(),
     var roadAddress: String = "",
@@ -24,6 +25,7 @@ class SearchStore (
             return SearchStore(
                 storeId = 0L,
                 storeName = "",
+                storeImage = "",
                 storeCategory = emptyList(),
                 foodCategory = emptyList(),
                 roadAddress = "",
