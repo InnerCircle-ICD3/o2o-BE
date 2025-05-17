@@ -37,13 +37,17 @@ enum class BusinessErrorCode(
 
     // 매장 구독 관련 오류
     SUBSCRIPTION_NOT_FOUND("S004", "구독 정보를 찾을 수 없습니다."),
+    SUBSCRIPTION_UPDATE_FAILED("S005", "구독 정보 업데이트에 실패했습니다."),
+
+    // 매장 생성 관련 오류
+    STORE_VALIDATION_FAILED("S006", "매장 정보 검증에 실패했습니다."),
 
     // 매장 점주 관련 오류
-    STORE_OWNER_NOT_FOUND("S004", "점주 정보를 찾을 수 없습니다."),
-    STORE_OWNER_ALREADY_EXISTS("S005", "이미 등록된 점주입니다."),
-    STORE_REGISTRATION_FAILED("S006", "매장 등록에 실패했습니다."),
-    STORE_UPDATE_FAILED("S007", "매장 정보 수정에 실패했습니다."),
-    STORE_DELETE_FAILED("S008", "매장 삭제에 실패했습니다."),
+    STORE_OWNER_NOT_FOUND("S007", "점주 정보를 찾을 수 없습니다."),
+    STORE_OWNER_ALREADY_EXISTS("S008", "이미 등록된 점주입니다."),
+    STORE_REGISTRATION_FAILED("S009", "매장 등록에 실패했습니다."),
+    STORE_UPDATE_FAILED("S010", "매장 정보 수정에 실패했습니다."),
+    STORE_DELETE_FAILED("S011", "매장 삭제에 실패했습니다."),
 
     // 메뉴 관련 오류
     PRODUCT_NOT_FOUND("M001", "메뉴를 찾을 수 없습니다."),
