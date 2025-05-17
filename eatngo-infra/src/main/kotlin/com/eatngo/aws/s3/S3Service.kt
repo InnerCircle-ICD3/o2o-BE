@@ -2,7 +2,6 @@ package com.eatngo.aws.s3
 
 import com.eatngo.file.FileStorageService
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import software.amazon.awssdk.services.s3.S3Client
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest
