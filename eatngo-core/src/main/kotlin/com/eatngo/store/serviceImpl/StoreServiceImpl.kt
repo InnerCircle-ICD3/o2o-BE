@@ -9,17 +9,17 @@ import com.eatngo.store.domain.LegalAddress
 import com.eatngo.store.domain.RoadAddress
 import com.eatngo.store.domain.Store
 import com.eatngo.store.dto.AdminAddressDto
-import com.eatngo.store.dto.CustomerStoreDetailResponse
-import com.eatngo.store.dto.CustomerStoreListResponse
 import com.eatngo.store.dto.LocationDto
 import com.eatngo.store.dto.PickupInfoUpdateRequest
 import com.eatngo.store.dto.StatusUpdateRequest
 import com.eatngo.store.dto.StoreCreateDto
+import com.eatngo.store.dto.StoreDetailResponse
 import com.eatngo.store.dto.StoreDto
 import com.eatngo.store.dto.StoreSearchDto
 import com.eatngo.store.dto.StoreSummary
 import com.eatngo.store.dto.StoreUpdateDto
 import com.eatngo.store.infra.StorePersistence
+import com.eatngo.store.infra.StoreSubscriptionPersistence
 import com.eatngo.store.service.StoreService
 import org.springframework.stereotype.Service
 import java.time.DayOfWeek
@@ -32,7 +32,8 @@ import java.time.format.DateTimeFormatter
  */
 @Service
 class StoreServiceImpl(
-    private val storePersistence: StorePersistence
+    private val storePersistence: StorePersistence,
+    private val storeSubscriptionPersistence: StoreSubscriptionPersistence
 ) : StoreService {
     /**
      * 상점 생성
@@ -162,50 +163,22 @@ class StoreServiceImpl(
         return StoreDto.from(savedStore)
     }
 
-    override suspend fun getStoreById(id: Long): StoreDto {
-        val store = storePersistence.findById(id) ?: throw StoreException.StoreNotFound(id)
-        return StoreDto.from(store)
-    }
+    override suspend fun getStoreDetail(
+        storeId: Long
+    ): StoreDetailResponse {
+        val userId = "임시사용자" //TODO: 로그인 사용자 유틸 함수 생성 후 변경 예정
+        val store = storePersistence.findById(storeId) ?: throw StoreException.StoreNotFound(storeId)
 
-    /**
-     * 스토어 상세 정보 조회 및 CustomerStoreDetailResponse 생성
-     */
-    override suspend fun getStoreDetailById(storeId: Long): CustomerStoreDetailResponse {
-        val store = getStoreById(storeId)
-        
-        // CustomerStoreDetailResponse 생성
-        return CustomerStoreDetailResponse(
-            storeId = store.storeId,
-            name = store.name,
-            roadAddress = store.roadAddress,
-            legalAddress = store.legalAddress,
-            adminAddress = store.adminAddress,
-            location = store.location,
-            businessHours = store.businessHours,
-            contact = store.contact,
-            description = store.description,
-            pickupStartTime = store.pickupStartTime,
-            pickupEndTime = store.pickupEndTime,
-            pickupAvailableForTomorrow = store.pickupAvailableForTomorrow,
-            mainImageUrl = store.mainImageUrl,
-            status = store.status,
-            isAvailableForPickup = store.isAvailableForPickup,
-            categories = store.categories,
-            isSubscribed = false // 실제 구현시 서비스에서 확인
-        )
-    }
+        val isSubscribed = if (userId != null) {
+            storeSubscriptionPersistence.existsByUserIdAndStoreId(userId, storeId)
+        } else {
+            false
+        }
 
-    /**
-     * 스토어 검색 및 CustomerStoreListResponse 생성
-     */
-    override suspend fun searchStoresWithResponse(request: StoreSearchDto): CustomerStoreListResponse {
-        val stores = searchStores(request)
-        
-        return CustomerStoreListResponse(
-            stores = stores,
-            totalCount = stores.size,
-            offset = request.offset,
-            limit = request.limit
+        // 3. 응답 객체 생성
+        return StoreDetailResponse(
+            store = StoreDto.from(store),
+            subscribed = isSubscribed
         )
     }
 

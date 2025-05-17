@@ -2,16 +2,12 @@ package com.eatngo.store.serviceImpl
 
 import com.eatngo.common.exception.StoreException
 import com.eatngo.store.domain.StoreSubscription
-import com.eatngo.store.dto.CustomerStoreSubscriptionListResponse
-import com.eatngo.store.dto.CustomerStoreSubscriptionResponse
 import com.eatngo.store.dto.StoreDto
 import com.eatngo.store.dto.StoreSubscriptionCreateDto
 import com.eatngo.store.dto.StoreSubscriptionDto
 import com.eatngo.store.dto.StoreSubscriptionSummary
 import com.eatngo.store.dto.StoreSummary
-import com.eatngo.store.dto.StoreSummaryResponse
 import com.eatngo.store.dto.SubscribedStoresResponse
-import com.eatngo.store.dto.SubscriptionToggleResponse
 import com.eatngo.store.infra.StorePersistence
 import com.eatngo.store.infra.StoreSubscriptionPersistence
 import com.eatngo.store.service.StoreSubscriptionService
@@ -50,23 +46,6 @@ class StoreSubscriptionServiceImpl(
         }
     }
 
-    /**
-     * 토글 구독 응답 DTO 생성
-     */
-    override suspend fun toggleSubscriptionWithResponse(storeId: Long): SubscriptionToggleResponse {
-        val coreDto = toggleSubscription(storeId)
-        
-        return SubscriptionToggleResponse(
-            subscribed = coreDto.subscribed,
-            subscriptionId = coreDto.id,
-            store = StoreSummaryResponse(
-                id = coreDto.storeId,
-                name = coreDto.store?.name ?: "",
-                imageUrl = coreDto.store?.mainImageUrl
-            )
-        )
-    }
-
     override suspend fun getSubscriptionById(id: String): StoreSubscriptionDto {
         val subscription = storeSubscriptionPersistence.findById(id) ?: throw StoreException.SubscriptionNotFound(id)
 
@@ -78,26 +57,6 @@ class StoreSubscriptionServiceImpl(
     override suspend fun getSubscriptionsByUserId(userId: String, limit: Int, offset: Int): List<StoreSubscriptionSummary> {
         val subscriptions = storeSubscriptionPersistence.findByUserId(userId, limit, offset)
         return mapToSummaryResponses(subscriptions)
-    }
-
-    /**
-     * 사용자 ID로 구독 목록 조회 및 응답 DTO 생성
-     */
-    override suspend fun getSubscriptionsByUserIdWithResponse(userId: String, limit: Int, offset: Int): CustomerStoreSubscriptionListResponse {
-        val subscriptions = getSubscriptionsByUserId(userId, limit, offset)
-        
-        val responseItems = subscriptions.map { subscription ->
-            CustomerStoreSubscriptionResponse(
-                subscriptionId = subscription.id,
-                storeId = subscription.storeId,
-                store = subscription.store
-            )
-        }
-        
-        return CustomerStoreSubscriptionListResponse(
-            subscriptions = responseItems,
-            totalCount = responseItems.size
-        )
     }
 
     override suspend fun getSubscriptionsByStoreId(storeId: Long, limit: Int, offset: Int): List<StoreSubscriptionSummary> {
