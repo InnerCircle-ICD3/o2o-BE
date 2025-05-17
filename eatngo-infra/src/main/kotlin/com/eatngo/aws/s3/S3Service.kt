@@ -8,6 +8,7 @@ import org.springframework.web.multipart.MultipartFile
 import software.amazon.awssdk.core.sync.RequestBody
 import software.amazon.awssdk.services.s3.S3Client
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest
+import software.amazon.awssdk.services.s3.model.GetUrlRequest
 import software.amazon.awssdk.services.s3.model.PutObjectRequest
 import java.io.IOException
 import java.util.UUID
@@ -77,6 +78,15 @@ class S3Service(
             log.error("파일 삭제 중 오류 발생: {}", e.message, e)
             throw IllegalArgumentException("파일 삭제에 실패했습니다.", e)
         }
+    }
+
+    override fun resolveImageUrl(imageUrl: String): String {
+        val getUrlRequest = GetUrlRequest.builder()
+            .bucket(bucket)
+            .key(imageUrl) // s3 key
+            .build()
+
+        return s3Client.utilities().getUrl(getUrlRequest).toString()
     }
 
 }

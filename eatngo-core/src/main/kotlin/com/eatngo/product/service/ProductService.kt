@@ -73,6 +73,6 @@ class ProductService(
 
         val savedProduct: Product = productPersistence.save(product)
 
-        return ProductDto.from(savedProduct)
+        return ProductDto.from(savedProduct, fileStorageService.resolveImageUrl(imageUrl))
     }
 }

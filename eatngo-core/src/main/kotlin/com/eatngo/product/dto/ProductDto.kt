@@ -20,7 +20,10 @@ data class ProductDto(
     var updatedAt: ZonedDateTime? = null,
 ) {
     companion object {
-        fun from(product: Product): ProductDto {
+        fun from(
+            product: Product,
+            imageUrl: String?
+        ): ProductDto {
 //            val size = when (product) {
 //                is Product.LargeLuckBag -> "L"
 //                is Product.MediumLuckBag -> "M"
@@ -34,7 +37,7 @@ data class ProductDto(
                 size = product.getSize().value,
                 inventory = ProductInventoryDto.from(product.inventory),
                 price = ProductPriceDto.from(product.price),
-                imageUrl = product.imageUrl,
+                imageUrl = imageUrl,
                 storeId = product.storeId,
                 foodTypes = product.foodTypes.foods.map { it.name },
                 status = product.status.name,

@@ -8,5 +8,7 @@ interface FileStorageService {
         path: String
     ): String
 
-    fun deleteFile(key: String): Unit
+    fun deleteFile(key: String)
+
+    fun resolveImageUrl(imageUrl: String): String
 }
