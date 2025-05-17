@@ -37,6 +37,12 @@ open class StoreException(
         mapOf("validationErrors" to errors)
     )
 
+    class StoreNotFoundByStoreOwner(storeOwnerId: String) : StoreException(
+        BusinessErrorCode.STORE_NOT_FOUND,
+        "${BusinessErrorCode.STORE_NOT_FOUND.message} (StoreOwnerId: $storeOwnerId)",
+        mapOf("storeOwnerId" to storeOwnerId)
+    )
+
 
     // 구독 관련 예외
     class SubscriptionNotFound(subscriptionId: String) : StoreException(
