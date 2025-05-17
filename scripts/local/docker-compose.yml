@@ -32,8 +32,12 @@ services:
     container_name: eatngo-redis
     ports:
       - "6379:6379"
+    command: redis-server --requirepass eatngolocal
+    volumes:
+        - redis_data:/data/redis
     restart: unless-stopped
 
 volumes:
   pg_data:
   mongo_data:
+  redis_data:

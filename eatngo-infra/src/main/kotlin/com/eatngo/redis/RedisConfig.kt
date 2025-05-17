@@ -10,6 +10,7 @@ import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactor
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.data.redis.repository.configuration.EnableRedisRepositories
 import org.springframework.data.redis.serializer.StringRedisSerializer
+import java.time.Duration
 
 @Configuration
 @EnableRedisRepositories
@@ -23,10 +24,14 @@ class RedisConfig (
     fun redisConnectionFactory(): RedisConnectionFactory {
         val host = env.getProperty("spring.redis.host")?: "localhost"
         val port = env.getProperty("spring.redis.port")?.toInt() ?: 6379
+        val password = env.getProperty("spring.redis.password")
 
         val lettuceClientConfiguration = LettuceClientConfiguration.builder()
+            .commandTimeout(Duration.ofSeconds(5))
+            .shutdownTimeout(Duration.ZERO)
             .build()
-        val redisStandaloneConfiguration = RedisStandaloneConfiguration(/* hostName = */ host, /* port = */ port)
+        val redisStandaloneConfiguration = RedisStandaloneConfiguration(host, /* port = */ port)
+        redisStandaloneConfiguration.setPassword(password)
 
         return LettuceConnectionFactory(redisStandaloneConfiguration, lettuceClientConfiguration)
     }
