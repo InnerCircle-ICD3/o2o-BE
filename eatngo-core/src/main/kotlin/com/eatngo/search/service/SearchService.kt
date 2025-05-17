@@ -8,12 +8,14 @@ import com.eatngo.search.dto.SearchStoreMap
 import com.eatngo.search.dto.SearchStoreMapResultDto
 import com.eatngo.search.dto.SearchStoreQueryDto
 import com.eatngo.search.dto.SearchStoreResultDto
+import com.eatngo.search.infra.SearchMapRedisRepository
 import com.eatngo.search.infra.SearchStoreRepository
 import org.springframework.stereotype.Service
 
 @Service
 class SearchService (
-    private val searchStoreRepository: SearchStoreRepository
+    private val searchStoreRepository: SearchStoreRepository,
+    private val searchMapRedisRepository: SearchMapRedisRepository
 ) {
 
     fun searchStore(searchQuery: SearchStoreQueryDto, offset: Int): SearchStoreResultDto {
