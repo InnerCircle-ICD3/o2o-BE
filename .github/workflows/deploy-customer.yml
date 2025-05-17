@@ -71,9 +71,22 @@ jobs:
           aws ecs describe-task-definition \
             --task-definition eatngo-customer-api \
             --query "taskDefinition" \
-            --region $AWS_REGION > task-def.json
-
-          jq ".containerDefinitions[0].image |= \"$IMAGE_URI\"" task-def.json > task-def-customer.json
+            --region $AWS_REGION > task-def-raw.json
+        
+          jq \
+          --arg IMAGE "$IMAGE_URI" \
+          '{
+            family,
+            taskRoleArn,
+            executionRoleArn,
+            networkMode,
+            containerDefinitions: (.containerDefinitions | map(.image = $IMAGE)),
+            volumes,
+            placementConstraints,
+            requiresCompatibilities,
+            cpu,
+            memory
+          }' task-def-raw.json > task-def-customer.json
 
           aws ecs register-task-definition \
             --cli-input-json file://task-def-customer.json \
