@@ -2,6 +2,7 @@ package com.eatngo.store.dto
 
 import com.eatngo.store.domain.Store
 import com.eatngo.store.domain.StoreSubscription
+import java.time.ZonedDateTime
 
 /**
  * 상점 구독 DTO
@@ -10,8 +11,9 @@ data class StoreSubscriptionDto(
     val id: String,
     val userId: String,
     val storeId: Long,
-    val createdAt: String,
-    val updatedAt: String,
+    val createdAt: ZonedDateTime,
+    val updatedAt: ZonedDateTime,
+    val deletedAt: ZonedDateTime? = null,
     val store: StoreSummary? = null,
     val subscribed: Boolean = true
 ) {
@@ -29,7 +31,7 @@ data class StoreSubscriptionSummary(
     val id: String,
     val storeId: Long,
     val userId: String,
-    val createdAt: String,
+    val createdAt: ZonedDateTime,
     val store: StoreSummary? = null
 ) {
     companion object {

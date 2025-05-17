@@ -40,8 +40,8 @@ class StoreSubscription(
             id = subscription.id,
             userId = subscription.userId,
             storeId = subscription.storeId,
-            createdAt = subscription.createdAt.toString(),
-            updatedAt = subscription.updatedAt.toString(),
+            createdAt = subscription.createdAt,
+            updatedAt = subscription.updatedAt,
             store = store?.toSummaryDto(),
             subscribed = subscription.deletedAt == null
         )
@@ -56,7 +56,7 @@ class StoreSubscription(
             id = id,
             storeId = storeId,
             userId = userId,
-            createdAt = createdAt.toString(),
+            createdAt = createdAt,
             store = storeDto
         )
     }
