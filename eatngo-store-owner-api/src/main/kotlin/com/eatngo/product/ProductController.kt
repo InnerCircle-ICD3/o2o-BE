@@ -2,6 +2,7 @@ package com.eatngo.product
 
 import com.eatngo.product.dto.*
 import com.eatngo.product.service.ProductService
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -46,4 +47,10 @@ class ProductController(
         @PathVariable("store-id") storeId: Long
     ): List<GetProductDetailsResponseDto> = productService.findAllProducts(storeId)
         .map { GetProductDetailsResponseDto.from(it) }
+
+    @DeleteMapping("/stores/{store-id}/products/{product-id}")
+    fun deleteProduct(
+        @PathVariable("store-id") storeId: Long,
+        @PathVariable("product-id") productId: Long,
+    ): Unit = productService.deleteProduct(storeId, productId)
 }

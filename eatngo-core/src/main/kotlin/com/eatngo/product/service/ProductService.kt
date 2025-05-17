@@ -90,4 +90,10 @@ class ProductService(
                 it.imageUrl?.let { fileStorageService.resolveImageUrl(it) }
             )
         }
+
+    fun deleteProduct(storeId: Long, productId: Long) {
+        productPersistence.findByIdAndStoreId(productId, storeId)
+        productPersistence.deleteById(productId)
+        // TODO storePersistence.deleteById(storeId)
+    }
 }

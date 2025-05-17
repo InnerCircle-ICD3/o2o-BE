@@ -6,4 +6,6 @@ interface ProductPersistence {
     fun save(product: Product): Product
     fun findById(productId: Long): Product?
     fun findAllByStoreId(storeId: Long): List<Product>
+    fun findByIdAndStoreId(productId: Long, storeId: Long): Product?
+    fun deleteById(productId: Long): Unit
 }
