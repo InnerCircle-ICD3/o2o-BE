@@ -1,5 +1,7 @@
 package com.eatngo.store.domain
 
+import com.eatngo.store.dto.StoreSubscriptionDto
+import com.eatngo.store.dto.StoreSubscriptionSummary
 import java.time.ZonedDateTime
 
 /**
@@ -7,52 +9,13 @@ import java.time.ZonedDateTime
  * 사용자가 매장을 즐겨찾기(구독)하는 정보를 관리합니다.
  */
 class StoreSubscription(
-    val id: String,
-    val userId: String,
-    val storeId: Long,
-    val notificationEnabled: Boolean, // 알림 활성화 여부
-    val createdAt: ZonedDateTime,
-    val updatedAt: ZonedDateTime,
-    var deletedAt: ZonedDateTime? = null,
+    val id: String = "",            // 구독 정보의 고유 id
+    val userId: String,             // 구독한 사용자의 계정 id
+    val storeId: Long,              // 구독된 매장의 매장 id
+    val createdAt: ZonedDateTime = ZonedDateTime.now(),   // 생성일
+    val updatedAt: ZonedDateTime = createdAt,   // 수정일
+    var deletedAt: ZonedDateTime? = null, // 삭제일(softDel용, 삭제 시간이 존재하면 softDel)
 ) {
-    /**
-     * 알림 활성화
-     */
-    fun enableNotifications(): StoreSubscription {
-        return if (notificationEnabled) {
-            this
-        } else {
-            StoreSubscription(
-                id = this.id,
-                userId = this.userId,
-                storeId = this.storeId,
-                notificationEnabled = true,
-                createdAt = this.createdAt,
-                updatedAt = ZonedDateTime.now(),
-                deletedAt = this.deletedAt
-            )
-        }
-    }
-    
-    /**
-     * 알림 비활성화
-     */
-    fun disableNotifications(): StoreSubscription {
-        return if (!notificationEnabled) {
-            this
-        } else {
-            StoreSubscription(
-                id = this.id,
-                userId = this.userId,
-                storeId = this.storeId,
-                notificationEnabled = false,
-                createdAt = this.createdAt,
-                updatedAt = ZonedDateTime.now(),
-                deletedAt = this.deletedAt
-            )
-        }
-    }
-    
     /**
      * Soft Delete를 위한 메서드
      */
@@ -67,5 +30,34 @@ class StoreSubscription(
      */
     fun isActive(): Boolean {
         return deletedAt == null
+    }
+
+    /**
+     * 상점 구독 응답 DTO로 변환
+     */
+    fun toResponseDto(subscription: StoreSubscription, store: Store? = null): StoreSubscriptionDto {
+        return StoreSubscriptionDto(
+            id = subscription.id,
+            userId = subscription.userId,
+            storeId = subscription.storeId,
+            createdAt = subscription.createdAt.toString(),
+            updatedAt = subscription.updatedAt.toString(),
+            store = store?.toSummaryDto(),
+            subscribed = subscription.deletedAt == null
+        )
+    }
+
+    /**
+     * 상점 구독 요약 응답 DTO로 변환
+     */
+    fun toSummaryDto(store: Store? = null): StoreSubscriptionSummary {
+        val storeDto = store?.toSummaryDto()
+        return StoreSubscriptionSummary(
+            id = id,
+            storeId = storeId,
+            userId = userId,
+            createdAt = createdAt.toString(),
+            store = storeDto
+        )
     }
 }

@@ -6,7 +6,8 @@ object StoreEnum {
      */
     enum class AddressType {
         ROAD,   // 도로명 주소
-        LOT     // 지번 주소
+        ADMIN,  // 행정동
+        LEGAL   // 법정동
     }
 
     /**
