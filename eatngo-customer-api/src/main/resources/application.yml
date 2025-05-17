@@ -27,6 +27,13 @@ spring:
     console:
       enabled: true
 
+datastore:
+  mongodb:
+    uri: mongodb://localhost:27017/eatngo
+    database: eatngo
+    username: eatngo-owner
+    password: eatngolocal
+
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
