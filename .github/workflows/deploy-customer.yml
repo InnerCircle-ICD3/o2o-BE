@@ -89,16 +89,21 @@ jobs:
             --cli-input-json file://task-def-customer.json \
             --region $AWS_REGION
 
-          REVISION=$(aws ecs describe-task-definition \
+          CUSTOMER_REVISION=$(aws ecs describe-task-definition \
             --task-definition eatngo-customer-api \
             --query "taskDefinition.revision" \
             --region $AWS_REGION --output text)
+
+          echo "CUSTOMER_REVISION=CUSTOMER_REVISION" >> $GITHUB_ENV
+
+      - name: Debug print REVISION
+        run: echo "Task Revision is ${{ env.CUSTOMER_REVISION }}"
 
       - name: Update ECS service
         run: |
           aws ecs update-service \
             --cluster eatngo-cluster \
             --service eatngo-customer-api-service \
-            --task-definition eatngo-customer-api:$REVISION \
+            --task-definition eatngo-customer-api:${{ env.CUSTOMER_REVISION }} \
             --force-new-deployment \
             --region $AWS_REGION
