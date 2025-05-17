@@ -94,5 +94,6 @@ jobs:
           aws ecs update-service \
             --cluster eatngo-cluster \
             --service eatngo-store-owner-api-service \
+            --task-definition eatngo-store-owner-api:$REVISION \
             --force-new-deployment \
             --region $AWS_REGION
