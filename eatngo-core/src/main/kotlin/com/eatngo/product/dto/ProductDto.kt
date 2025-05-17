@@ -31,7 +31,7 @@ data class ProductDto(
                 name = product.name,
                 description = product.description,
                 // when 이 아닌 추상메소드로 로직 수정
-                size = product.getSize(),
+                size = product.getSize().value,
                 inventory = ProductInventoryDto.from(product.inventory),
                 price = ProductPriceDto.from(product.price),
                 imageUrl = product.imageUrl,

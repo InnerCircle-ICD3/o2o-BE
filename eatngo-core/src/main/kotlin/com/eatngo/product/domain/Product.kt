@@ -15,9 +15,9 @@ sealed class Product {
     abstract val createdAt: ZonedDateTime?
     abstract val updatedAt: ZonedDateTime?
 
-    abstract fun getSize(): String
+    abstract fun getSize(): ProductSizeType
 
-    data class LargeLuckBag(
+    data class LargeEatNGoBag(
         override var id: Long?,
         override val name: String,
         override val description: String,
@@ -30,10 +30,10 @@ sealed class Product {
         override val createdAt: ZonedDateTime? = null,
         override val updatedAt: ZonedDateTime? = null,
     ) : Product() {
-        override fun getSize() = "L"
+        override fun getSize() = ProductSizeType.L
     }
 
-    data class MediumLuckBag(
+    data class MediumEatNGoBag(
         override var id: Long?,
         override val name: String,
         override val description: String,
@@ -46,10 +46,10 @@ sealed class Product {
         override val createdAt: ZonedDateTime? = null,
         override val updatedAt: ZonedDateTime? = null,
     ) : Product() {
-        override fun getSize() = "M"
+        override fun getSize() = ProductSizeType.M
     }
 
-    data class SmallLuckBag(
+    data class SmallEatNGoBag(
         override var id: Long?,
         override val name: String,
         override val description: String,
@@ -62,6 +62,6 @@ sealed class Product {
         override val createdAt: ZonedDateTime? = null,
         override val updatedAt: ZonedDateTime? = null,
     ) : Product() {
-        override fun getSize() = "S"
+        override fun getSize() = ProductSizeType.S
     }
 }

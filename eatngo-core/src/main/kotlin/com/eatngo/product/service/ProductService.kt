@@ -32,7 +32,7 @@ class ProductService(
 
         val product: Product = when (ProductSizeType.fromValue(createProductDto.size)) {
             L -> {
-                LargeLuckBag(
+                LargeEatNGoBag(
                     id = null,
                     name = createProductDto.name,
                     description = createProductDto.description,
@@ -45,7 +45,7 @@ class ProductService(
             }
 
             M -> {
-                MediumLuckBag(
+                MediumEatNGoBag(
                     id = null,
                     name = createProductDto.name,
                     description = createProductDto.description,
@@ -58,7 +58,7 @@ class ProductService(
             }
 
             S -> {
-                SmallLuckBag(
+                SmallEatNGoBag(
                     id = null,
                     name = createProductDto.name,
                     description = createProductDto.description,

@@ -12,9 +12,9 @@ class ProductMapper {
     companion object {
         fun toEntity(product: Product): ProductEntity {
             val productType = when (product) {
-                is LargeLuckBag -> L
-                is MediumLuckBag -> M
-                is SmallLuckBag -> S
+                is LargeEatNGoBag -> L
+                is MediumEatNGoBag -> M
+                is SmallEatNGoBag -> S
                 else -> throw IllegalArgumentException("Unknown product type: $product")
             }
 
@@ -49,7 +49,7 @@ class ProductMapper {
             val foodTypes = FoodTypes(entity.foodTypes.map { name -> Food(name) })
 
             return when (entity.productType) {
-                L -> LargeLuckBag(
+                L -> LargeEatNGoBag(
                     id = productId,
                     name = entity.name,
                     description = entity.description,
@@ -63,7 +63,7 @@ class ProductMapper {
                     updatedAt = updatedAt
                 )
 
-                M -> MediumLuckBag(
+                M -> MediumEatNGoBag(
                     id = productId,
                     name = entity.name,
                     description = entity.description,
@@ -77,7 +77,7 @@ class ProductMapper {
                     updatedAt = updatedAt
                 )
 
-                S -> SmallLuckBag(
+                S -> SmallEatNGoBag(
                     id = productId,
                     name = entity.name,
                     description = entity.description,
