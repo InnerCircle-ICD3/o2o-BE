@@ -30,10 +30,24 @@ open class StoreException(
         mapOf("storeId" to storeId)
     )
 
+    // 매장 생성 검증 관련 예외
+    class StoreValidationErrors(errorMessage: String, errors: Map<String, String>) : StoreException(
+        BusinessErrorCode.STORE_VALIDATION_FAILED,
+        errorMessage,
+        mapOf("validationErrors" to errors)
+    )
+
+
     // 구독 관련 예외
     class SubscriptionNotFound(subscriptionId: String) : StoreException(
         BusinessErrorCode.SUBSCRIPTION_NOT_FOUND,
         "${BusinessErrorCode.SUBSCRIPTION_NOT_FOUND.message}: $subscriptionId",
+        mapOf("subscriptionId" to subscriptionId)
+    )
+    
+    class SubscriptionUpdateFailed(subscriptionId: String) : StoreException(
+        BusinessErrorCode.SUBSCRIPTION_UPDATE_FAILED,
+        "${BusinessErrorCode.SUBSCRIPTION_UPDATE_FAILED.message}: $subscriptionId",
         mapOf("subscriptionId" to subscriptionId)
     )
 }
