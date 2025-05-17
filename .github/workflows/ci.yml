@@ -29,6 +29,6 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      # 4. 의존성 다운로드 및 테스트 실행
-      - name: Run tests
-        run: ./gradlew clean test --no-daemon
+      # 이전 캐시로 인해 빌드 오류 발생 가능으로 인한 refresh
+      - name: Run tests with cache refresh and clean build
+        run: ./gradlew clean build --no-daemon --refresh-dependencies
