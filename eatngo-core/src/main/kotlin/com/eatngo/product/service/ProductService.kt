@@ -15,6 +15,9 @@ class ProductService(
     private val fileStorageService: FileStorageService
     // TODO storeRepository
 ) {
+    companion object {
+        private const val PRODUCT_IMAGE_PATH = "product"
+    }
 
     fun createProduct(
         createProductDto: ProductDto,
@@ -25,7 +28,7 @@ class ProductService(
         val inventory = Inventory.create(createProductDto.inventory.quantity)
         val price = ProductPrice.create(createProductDto.price.originalPrice)
         val foodTypes = FoodTypes.create(createProductDto.foodTypes)
-        val imageUrl = fileStorageService.saveFile(image)
+        val imageUrl = fileStorageService.saveFile(image, PRODUCT_IMAGE_PATH)
 
         val product: Product = when (ProductSizeType.fromValue(createProductDto.size)) {
             L -> {

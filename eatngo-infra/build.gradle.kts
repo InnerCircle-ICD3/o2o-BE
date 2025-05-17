@@ -6,6 +6,7 @@ plugins {
 dependencies {
     // core 모듈 의존성
     implementation(project(":eatngo-core"))
+    implementation(project(":eatngo-common"))
 
     // Spring Boot 기본 의존성
     implementation("org.springframework.boot:spring-boot-starter-web")  // REST API 지원
@@ -18,6 +19,9 @@ dependencies {
 
     // jpa 의존성
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+
+    // AWS S3 의존성
+    implementation("software.amazon.awssdk:s3:2.23.15")
 }
 
 tasks.bootJar{
