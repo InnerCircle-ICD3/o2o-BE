@@ -77,15 +77,12 @@ jobs:
           --arg IMAGE "$IMAGE_URI" \
           '{
             family,
-            taskRoleArn,
-            executionRoleArn,
             networkMode,
-            containerDefinitions: (.containerDefinitions | map(.image = $IMAGE)),
-            volumes,
-            placementConstraints,
             requiresCompatibilities,
             cpu,
             memory
+            executionRoleArn,
+            containerDefinitions: (.containerDefinitions | map(.image = $IMAGE)),
           }' task-def-raw.json > task-def-store-owner.json
 
           aws ecs register-task-definition \
