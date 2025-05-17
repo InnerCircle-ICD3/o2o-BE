@@ -17,6 +17,7 @@ class SearchStore (
     var foodCategory: List<String> = emptyList(),
     var roadAddress: String = "",
     var location: Point = Point(0.0, 0.0), // TODO: MongoDB GeoJSON으로 변환
+    var open: Boolean = false,  // 매장 오픈 여부
     var updatedAt: ZonedDateTime, // 마지막 업데이트 시간
     var createdAt: ZonedDateTime, // 생성 시간
 ) {
@@ -30,6 +31,7 @@ class SearchStore (
                 foodCategory = emptyList(),
                 roadAddress = "",
                 location = Point(0.0, 0.0),
+                open = true,
                 updatedAt = ZonedDateTime.now(),
                 createdAt = ZonedDateTime.now()
             )

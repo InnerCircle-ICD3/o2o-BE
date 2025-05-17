@@ -16,6 +16,7 @@ class SearchStoreEntity (
     var storeImage: String = "", // 매장 이미지 S3 URL
     var storeCategory: List<String> = emptyList(),
     var foodCategory: List<String> = emptyList(),
+    var open: Boolean = true,  // 매장 오픈 여부
     var roadAddress: String = "",
     @GeoSpatialIndexed
     var location: GeoJsonPoint = GeoJsonPoint(0.0, 0.0),
@@ -29,6 +30,7 @@ class SearchStoreEntity (
             storeImage = storeImage,
             storeCategory = storeCategory,
             foodCategory = foodCategory,
+            open = open,
             roadAddress = roadAddress,
             location = toPoint(location),
             updatedAt = updatedAt,
@@ -45,6 +47,7 @@ class SearchStoreEntity (
                 storeCategory = searchStore.storeCategory,
                 foodCategory = searchStore.foodCategory,
                 roadAddress = searchStore.roadAddress,
+                open = searchStore.open,
                 location = toGeoJsonPoint(
                     searchStore.location.lat,
                     searchStore.location.lng
