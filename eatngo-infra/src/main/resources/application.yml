@@ -2,7 +2,5 @@ cloud:
   aws:
     region:
       static: us-east-1
-
-aws:
-  s3:
-    bucket: eatgoeatgo
+    s3:
+      bucket: eatgoeatgo
