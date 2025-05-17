@@ -39,7 +39,8 @@ data class SearchStoreDto (
                     from = searchStore.location,
                     to = userPoint,
                 ),
-                open = false,
+                open = searchStore.open,
+                // TODO: 재고 수량은 Redis에서 가져와야 함(상품)
                 stock = 0,
                 )
         }
