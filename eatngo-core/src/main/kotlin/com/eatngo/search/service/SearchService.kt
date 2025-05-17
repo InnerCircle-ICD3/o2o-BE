@@ -16,7 +16,7 @@ class SearchService {
     fun searchStore(searchQuery: SearchStoreQueryDto, offset: Int): SearchStoreResultDto {
         // TODO: 리스트 검색 로직 구현
         val searchStore: SearchStore = SearchStore(
-            storeID = 1L,
+            storeId = 1L,
             storeName = "Test Store",
             storeCategory = listOf("한식", "중식"),
             foodCategory = listOf("햄버거", "피자"),

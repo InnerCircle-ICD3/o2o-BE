@@ -7,7 +7,7 @@ data class SearchStoreResultDto (
 )
 
 data class SearchStore (
-    val storeID: Long,
+    val storeId: Long,
     val storeName: String,
     val storeImage: String="", // 매장 이미지 URL
     val storeCategory: List<String>,
