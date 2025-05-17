@@ -40,4 +40,10 @@ class ProductController(
     ): GetProductDetailsResponseDto = GetProductDetailsResponseDto.from(
         productService.getProductDetails(storeId, productId)
     )
+
+    @GetMapping("/stores/{store-id}/products")
+    fun getAllProducts(
+        @PathVariable("store-id") storeId: Long
+    ): List<GetProductDetailsResponseDto> = productService.findAllProducts(storeId)
+        .map { GetProductDetailsResponseDto.from(it) }
 }

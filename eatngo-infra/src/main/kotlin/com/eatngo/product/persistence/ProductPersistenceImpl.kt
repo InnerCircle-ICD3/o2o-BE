@@ -20,4 +20,9 @@ class ProductPersistenceImpl(
             ProductMapper.toDomain(it)
         }.orElse(null)
     }
+
+    override fun findAllByStoreId(storeId: Long): List<Product> {
+        return productRepository.findAllByStoreId(storeId)
+            .map { ProductMapper.toDomain(it) }
+    }
 }

@@ -83,5 +83,11 @@ class ProductService(
         )
     }
 
-
+    fun findAllProducts(storeId: Long): List<ProductDto> = productPersistence.findAllByStoreId(storeId)
+        .map { it ->
+            ProductDto.from(
+                it,
+                it.imageUrl?.let { fileStorageService.resolveImageUrl(it) }
+            )
+        }
 }
