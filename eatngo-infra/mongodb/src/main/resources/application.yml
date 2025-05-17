@@ -1,0 +1,9 @@
+spring:
+  config:
+    import: aws-parameterstore:/eatngo/
+datastore:
+  mongodb:
+    uri: localhost:27017/APP
+    database: APP
+    username: eatngo-owner
+    password: eatngolocal
