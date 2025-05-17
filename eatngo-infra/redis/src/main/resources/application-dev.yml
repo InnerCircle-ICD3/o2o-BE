@@ -6,9 +6,7 @@ spring:
       credentials:
         access-key: ${AWS_ACCESS_KEY}
         secret-key: ${AWS_SECRET_KEY}
-datastore:
-  mongodb:
-    uri: ${MONGO_APP_URI}
-    database: APP
-    username: eatngo-owner
-    password: ${MONGO_APP_PW}
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: 6379
