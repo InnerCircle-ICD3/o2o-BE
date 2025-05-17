@@ -60,8 +60,8 @@ class SearchStoreEntity (
 
         fun toPoint(geoJsonPoint: GeoJsonPoint): Point {
             return Point(
-                lat = geoJsonPoint.coordinates[0],
-                lng = geoJsonPoint.coordinates[1]
+                lat = geoJsonPoint.coordinates[1],
+                lng = geoJsonPoint.coordinates[0]
             )
         }
     }
