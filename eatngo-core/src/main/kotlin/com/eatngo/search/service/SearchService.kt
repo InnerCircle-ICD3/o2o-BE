@@ -18,7 +18,9 @@ class SearchService {
         val searchStore: SearchStore = SearchStore.create()
 
         return SearchStoreResultDto(
-            storeList = listOf(SearchStoreDto.from(searchStore))
+            storeList = listOf(
+                SearchStoreDto.from(searchQuery.viewPoint, searchStore)
+            )
         )
     }
 

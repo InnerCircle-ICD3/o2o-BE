@@ -1,6 +1,7 @@
 package com.eatngo.search.dto
 
 import com.eatngo.common.type.Point
+import com.eatngo.common.util.DistanceCalculator
 import com.eatngo.search.domain.SearchStore
 
 data class SearchStoreResultDto (
@@ -25,7 +26,7 @@ data class SearchStoreDto (
     val isFavorite: Boolean?=false,  // 찜 여부
 ) {
     companion object {
-        fun from(searchStore: SearchStore): SearchStoreDto {
+        fun from(userPoint: Point ,searchStore: SearchStore): SearchStoreDto {
             return SearchStoreDto(
                 storeId = searchStore.storeId,
                 storeName = searchStore.storeName,
@@ -34,7 +35,10 @@ data class SearchStoreDto (
                 foodCategory = searchStore.foodCategory,
                 roadAddress = searchStore.roadAddress,
                 location = searchStore.location, // TODO: MongoDB GeoJSON -> Point 변환
-                distanceKm = 0.0,
+                distanceKm = DistanceCalculator.calculateDistance(
+                    from = searchStore.location,
+                    to = userPoint,
+                ),
                 isOpen = false,
                 stock = 0,
                 )
