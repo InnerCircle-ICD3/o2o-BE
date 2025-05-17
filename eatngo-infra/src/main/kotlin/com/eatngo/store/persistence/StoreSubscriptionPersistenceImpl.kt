@@ -33,10 +33,6 @@ class StoreSubscriptionPersistenceImpl : StoreSubscriptionPersistence {
     override suspend fun softDelete(id: String): Boolean {
         TODO("Not yet implemented")
     }
-    
-    override suspend fun updateNotificationStatus(id: String, enabled: Boolean): Boolean {
-        TODO("Not yet implemented")
-    }
 
     override suspend fun existsByUserIdAndStoreId(userId: String, storeId: Long): Boolean {
         TODO("Not yet implemented")

@@ -1,31 +1,22 @@
 package com.eatngo.store.serviceImpl
 
 import com.eatngo.common.exception.StoreException
-import com.eatngo.store.constant.StoreEnum
 import com.eatngo.store.domain.Address
-import com.eatngo.store.domain.AdminAddress
 import com.eatngo.store.domain.BusinessHour
-import com.eatngo.store.domain.LegalAddress
-import com.eatngo.store.domain.RoadAddress
 import com.eatngo.store.domain.Store
-import com.eatngo.store.dto.AdminAddressDto
-import com.eatngo.store.dto.LocationDto
 import com.eatngo.store.dto.PickupInfoUpdateRequest
 import com.eatngo.store.dto.StatusUpdateRequest
 import com.eatngo.store.dto.StoreCreateDto
-import com.eatngo.store.dto.StoreDetailResponse
 import com.eatngo.store.dto.StoreDto
-import com.eatngo.store.dto.StoreSearchDto
-import com.eatngo.store.dto.StoreSummary
 import com.eatngo.store.dto.StoreUpdateDto
+import com.eatngo.store.dto.extension.toDomain
+import com.eatngo.store.dto.extension.toDto
 import com.eatngo.store.infra.StorePersistence
 import com.eatngo.store.infra.StoreSubscriptionPersistence
 import com.eatngo.store.service.StoreService
 import org.springframework.stereotype.Service
 import java.time.DayOfWeek
 import java.time.LocalTime
-import java.time.ZonedDateTime
-import java.time.format.DateTimeFormatter
 
 /**
  * 상점 서비스 구현체
@@ -39,119 +30,77 @@ class StoreServiceImpl(
      * 상점 생성
      */
     override suspend fun createStore(request: StoreCreateDto): StoreDto {
-        // 필수 필드 검증
-        validateCreateRequest(request)
-
-        // 비즈니스 시간 객체 생성
-        val businessHours = request.businessHours?.map { hourDto ->
-            BusinessHour(
-                dayOfWeek = DayOfWeek.valueOf(hourDto.dayOfWeek),
-                openTime = LocalTime.parse(hourDto.openTime),
-                closeTime = LocalTime.parse(hourDto.closeTime)
-            )
-        }
-
-        // 주소 생성
         val address = Address(
-            roadAddress = request.roadAddress.toDomain(),
-            legalAddress = request.legalAddress?.toDomain()!!,
-            adminAddress = request.adminAddress?.toDomain(),
-            latitude = request.location.lat,
-            longitude = request.location.lng
+            roadAddress = request.address.roadAddress.toDomain(),
+            legalAddress = request.address.legalAddress?.toDomain(),
+            adminAddress = request.address.adminAddress?.toDomain(),
+            latitude = request.address.latitude,
+            longitude = request.address.longitude
         )
 
-        // 픽업 시간 파싱
-        val pickupStartTime = LocalTime.parse(request.pickupStartTime)
-        val pickupEndTime = LocalTime.parse(request.pickupEndTime)
+        val businessHours = request.businessHours?.map { it.toDomain() } ?: emptyList()
 
-        // Store 객체 생성
-        val store = Store(
-            id = 0L, // 저장 시 자동 생성됨
+        val store = Store.create(
             storeOwnerId = request.storeOwnerId,
             name = request.name,
-            description = request.description,
             address = address,
             businessNumber = request.businessNumber,
-            contactNumber = request.contact,
-            imageUrl = request.mainImageUrl,
+            pickupStartTime = request.pickupStartTime,
+            pickupEndTime = request.pickupEndTime,
+            description = request.description,
+            contactNumber = request.contactNumber,
+            imageUrl = request.imageUrl,
             businessHours = businessHours,
-            categories = request.categories.map { it },
-            status = StoreEnum.StoreStatus.CLOSED, // 기본값은 CLOSED
-            pickupStartTime = pickupStartTime,
-            pickupEndTime = pickupEndTime,
-            pickupAvailableForTomorrow = request.pickupAvailableForTomorrow,
-            createdAt = ZonedDateTime.now(),
-            updatedAt = ZonedDateTime.now(),
-            deletedAt = null
+            categories = request.categories,
+            pickupAvailableForTomorrow = request.pickupAvailableForTomorrow
         )
 
         val savedStore = storePersistence.save(store)
-        return StoreDto.from(savedStore)
+        return savedStore.toDto()
     }
 
     override suspend fun updateStore(id: Long, request: StoreUpdateDto): StoreDto {
         val existingStore = storePersistence.findById(id) ?: throw StoreException.StoreNotFound(id)
 
-        // 비즈니스 시간 객체 생성
-        val businessHours = request.businessHours?.map { hourDto ->
-            BusinessHour(
-                dayOfWeek = DayOfWeek.valueOf(hourDto.dayOfWeek),
-                openTime = LocalTime.parse(hourDto.openTime),
-                closeTime = LocalTime.parse(hourDto.closeTime)
-            )
-        }
+        // 1. BusinessHourDto → BusinessHour 변환
+        val businessHours = request.businessHours?.map { it.toDomain() }
 
-        // 주소 생성
-        val address = if (request.roadAddress != null && request.legalAddress != null && request.location != null) {
-            Address(
-                roadAddress = request.roadAddress.toDomain(),
-                legalAddress = request.legalAddress.toDomain(),
-                adminAddress = request.adminAddress?.toDomain(),
-                latitude = request.location.lat,
-                longitude = request.location.lng
-            )
-        } else {
-            null
-        }
+        // 2. AddressDto → Address 변환 (조건부)
+        val address = request.address.toDomain()
 
-        // 픽업 시간 파싱
-        val pickupStartTime = request.pickupStartTime?.let { LocalTime.parse(it) }
-        val pickupEndTime = request.pickupEndTime?.let { LocalTime.parse(it) }
-
-        // 요청에서 전달된 값으로만 업데이트
+        // 3. 도메인 객체 업데이트
         val updatedStore = existingStore.update(
             name = request.name,
             description = request.description,
             address = address,
             businessNumber = request.businessNumber,
-            contactNumber = request.contact,
+            contactNumber = request.contactNumber,
             imageUrl = request.mainImageUrl,
             businessHours = businessHours,
-            categories = request.categories?.map { it },
-            pickupStartTime = pickupStartTime,
-            pickupEndTime = pickupEndTime,
+            categories = request.categories,
+            pickupStartTime = request.pickupStartTime,
+            pickupEndTime = request.pickupEndTime,
             pickupAvailableForTomorrow = request.pickupAvailableForTomorrow
         )
 
+        // 4. 저장 후 DTO 변환
         val savedStore = storePersistence.save(updatedStore)
-        return StoreDto.from(savedStore)
+        return savedStore.toDto()
     }
 
     override suspend fun updateStoreStatus(id: Long, request: StatusUpdateRequest): StoreDto {
         val existingStore = storePersistence.findById(id) ?: throw StoreException.StoreNotFound(id)
-
         val updatedStore = existingStore.updateStatus(request.status)
-
         val savedStore = storePersistence.save(updatedStore)
-        return StoreDto.from(savedStore)
+        return savedStore.toDto()
     }
 
     override suspend fun updateStorePickupInfo(id: Long, request: PickupInfoUpdateRequest): StoreDto {
         val existingStore = storePersistence.findById(id) ?: throw StoreException.StoreNotFound(id)
 
-        // 픽업 시간 파싱
-        val pickupStartTime = request.pickupStartTime?.let { LocalTime.parse(it) }
-        val pickupEndTime = request.pickupEndTime?.let { LocalTime.parse(it) }
+        // 픽업 시간 파싱 (DTO → 도메인 변환)
+        val pickupStartTime = request.pickupStartTime.let { LocalTime.parse(it) }
+        val pickupEndTime = request.pickupEndTime.let { LocalTime.parse(it) }
 
         val updatedStore = existingStore.updatePickupInfo(
             startTime = pickupStartTime,
@@ -160,73 +109,17 @@ class StoreServiceImpl(
         )
 
         val savedStore = storePersistence.save(updatedStore)
-        return StoreDto.from(savedStore)
+        return savedStore.toDto()
     }
 
-    override suspend fun getStoreDetail(
-        storeId: Long
-    ): StoreDetailResponse {
-        val userId = "임시사용자" //TODO: 로그인 사용자 유틸 함수 생성 후 변경 예정
+    override suspend fun getStoreDetail(storeId: Long): StoreDto {
         val store = storePersistence.findById(storeId) ?: throw StoreException.StoreNotFound(storeId)
-
-        val isSubscribed = if (userId != null) {
-            storeSubscriptionPersistence.existsByUserIdAndStoreId(userId, storeId)
-        } else {
-            false
-        }
-
-        // 3. 응답 객체 생성
-        return StoreDetailResponse(
-            store = StoreDto.from(store),
-            subscribed = isSubscribed
-        )
-    }
-
-    override suspend fun searchStores(request: StoreSearchDto): List<StoreSummary> {
-        val stores = when {
-            // 위치 기반 검색
-            request.location != null -> {
-                val address = Address(
-                    roadAddress = RoadAddress("", "", null),
-                    legalAddress = LegalAddress("", "", null),
-                    adminAddress = null,
-                    latitude = request.location.lat,
-                    longitude = request.location.lng
-                )
-                storePersistence.findNearby(address, request.radius ?: 5.0, request.limit, request.offset)
-            }
-            // 카테고리 검색
-            request.category != null -> {
-                storePersistence.findByCategory(request.category, request.limit, request.offset)
-            }
-            // 영업 중인 매장만 검색
-            request.onlyOpen == true -> {
-                storePersistence.findOpenStores(request.limit, request.offset)
-            }
-            // 기본 키워드 검색
-            else -> {
-                storePersistence.findByNameContaining(request.keyword ?: "", request.limit, request.offset)
-            }
-        }
-
-        // 픽업 가능 여부에 따른 필터링
-        val filteredStores = if (request.availableForPickup == true) {
-            val now = ZonedDateTime.now()
-            stores.filter { it.isAvailableForPickup(now) }
-        } else {
-            stores
-        }
-
-        return filteredStores.map { store ->
-            request.location?.let { loc ->
-                StoreSummary.from(store, loc)
-            } ?: StoreSummary.from(store)
-        }
+        return store.toDto()
     }
 
     override suspend fun getStoreByOwnerId(ownerId: String): StoreDto? {
-        val store = storePersistence.findByOwnerId(ownerId) ?: return null
-        return StoreDto.from(store)
+        val store = storePersistence.findByOwnerId(ownerId) ?: throw StoreException.StoreNotFoundByStoreOwner(ownerId)
+        return store.toDto()
     }
 
     override suspend fun deleteStore(id: Long): Boolean {
@@ -234,42 +127,5 @@ class StoreServiceImpl(
         val deletedStore = store.softDelete()
         storePersistence.save(deletedStore)
         return true
-    }
-
-    /**
-     * 매장 생성 요청 유효성 검증
-     */
-    private fun validateCreateRequest(request: StoreCreateDto) {
-        val missingFields = mutableListOf<String>()
-
-        if (request.name.isBlank()) {
-            missingFields.add("매장 이름")
-        }
-
-        if (request.roadAddress == null) {
-            missingFields.add("도로명 주소")
-        }
-
-        if (request.legalAddress == null) {
-            missingFields.add("지번 주소")
-        }
-
-        if (request.storeOwnerId.isBlank()) {
-            missingFields.add("매장 소유자 ID")
-        }
-
-        // 추가 검증 로직...
-
-        if (missingFields.isNotEmpty()) {
-            val errorMessage = when (missingFields.size) {
-                1 -> "${missingFields[0]}은(는) 필수입니다."
-                else -> "${missingFields.joinToString(", ")}은(는) 필수입니다."
-            }
-
-            // 필드를 키로, 에러 메시지는 빈 문자열로 (필드명만 필요하므로)
-            val validationErrors = missingFields.associateWith { "" }
-
-            throw StoreException.StoreValidationErrors(errorMessage, validationErrors)
-        }
     }
 }

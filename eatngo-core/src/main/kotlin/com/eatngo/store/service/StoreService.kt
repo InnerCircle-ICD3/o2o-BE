@@ -34,13 +34,8 @@ interface StoreService {
     /**
      * ID로 상점 조회
      */
-    suspend fun getStoreDetail(id: Long): StoreDetailResponse
+    suspend fun getStoreDetail(id: Long): StoreDto
 
-    /**
-     * 통합 상점 검색 (키워드, 위치, 카테고리, 영업여부 등 복합 조건)
-     */
-    suspend fun searchStores(request: StoreSearchDto): List<StoreSummary>
-    
     /**
      * 점주 ID로 상점 조회
      */

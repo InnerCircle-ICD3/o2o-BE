@@ -37,11 +37,6 @@ interface StoreSubscriptionPersistence {
     suspend fun softDelete(id: String): Boolean
 
     /**
-     * 상점 구독 알림 상태 업데이트
-     */
-    suspend fun updateNotificationStatus(id: String, enabled: Boolean): Boolean
-
-    /**
      * 사용자 ID로 상점 구독 여부 조회
      */
     suspend fun existsByUserIdAndStoreId(userId: String, storeId: Long): Boolean

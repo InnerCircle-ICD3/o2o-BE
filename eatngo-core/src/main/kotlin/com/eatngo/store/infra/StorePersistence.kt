@@ -24,30 +24,6 @@ interface StorePersistence {
     suspend fun findByOwnerId(ownerId: String): Store?
 
     /**
-     * 위치 기반 매장 검색
-     * @param address 주소
-     * @param radiusKm 검색 반경 (km)
-     * @param limit 결과 제한
-     * @param offset 오프셋
-     */
-    suspend fun findNearby(address: Address, radiusKm: Double, limit: Int, offset: Int): List<Store>
-
-    /**
-     * 이름 기반 매장 검색
-     */
-    suspend fun findByNameContaining(name: String, limit: Int, offset: Int): List<Store>
-
-    /**
-     * 카테고리 기반 매장 검색
-     */
-    suspend fun findByCategory(category: String, limit: Int, offset: Int): List<Store>
-
-    /**
-     * 현재 영업 중인 매장 조회 (매장 상태가 OPEN인 매장)
-     */
-    suspend fun findOpenStores(limit: Int, offset: Int): List<Store>
-
-    /**
      * 매장 저장
      */
     suspend fun save(store: Store): Store
