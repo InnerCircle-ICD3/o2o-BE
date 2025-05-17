@@ -2,6 +2,8 @@ server:
   port: 8081
 
 spring:
+  config:
+    import: classpath:auth-common-application.yml
   application:
     name: eatngo-store-owner-api
   datasource:

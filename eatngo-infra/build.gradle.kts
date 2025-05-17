@@ -1,5 +1,6 @@
 plugins {
     kotlin("jvm") version "1.9.22"
+    kotlin("plugin.jpa")
     id("org.springframework.boot")
 }
 
@@ -17,12 +18,18 @@ dependencies {
     testImplementation("io.kotest:kotest-runner-junit5:5.8.1")
     testImplementation("io.kotest:kotest-assertions-core:5.8.1")
 
-    // jpa 의존성
-    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-
     // AWS S3 의존성
     implementation("software.amazon.awssdk:s3:2.23.15")
     implementation("software.amazon.awssdk:s3-presigner:2.23.15") // pre-sign url
+
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("io.kotest:kotest-property:5.8.1")
+    testImplementation("io.kotest.extensions:kotest-extensions-spring:1.1.2")
+    testImplementation("io.mockk:mockk:1.13.10")                        // mockk
+    testImplementation("com.appmattus.fixture:fixture:1.2.0")           // Kotlin-fixture
+
+    // jpa
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 }
 
 tasks.bootJar{

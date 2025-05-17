@@ -32,14 +32,14 @@ class UserAccountOauth2(
         ): UserAccountOauth2 {
             val userAccountOauth2 = UserAccountOauth2(
                 userAccount = account,
-                email = EmailAddress.from(oauth2.getEmail()),
-                nickname = oauth2.getNickname(),
-                provider = oauth2.getProvider(),
-                principal = oauth2.getPrincipal(),
+                email = EmailAddress.from(oauth2.email),
+                nickname = oauth2.nickname,
+                provider = oauth2.provider,
+                principal = oauth2.principal,
                 createdAt = ZonedDateTime.now(),
                 updatedAt = ZonedDateTime.now()
             )
-            val newTerms = oauth2.getTerms().map {
+            val newTerms = oauth2.terms.map {
                 UserAccountOauth2Term.of(
                     userAccountOauth2 = userAccountOauth2,
                     tag = it.tag

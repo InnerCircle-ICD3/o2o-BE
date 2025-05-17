@@ -64,10 +64,41 @@ jobs:
             --push \
             .
 
+      - name: Register new ECS task definition
+        run: |
+          IMAGE_URI="$ECR_URI:latest"
+
+          aws ecs describe-task-definition \
+            --task-definition eatngo-store-owner-api \
+            --query "taskDefinition" \
+            --region $AWS_REGION > task-def-raw.json
+
+          jq \
+          --arg IMAGE "$IMAGE_URI" \
+          '{
+            family,
+            networkMode,
+            requiresCompatibilities,
+            cpu,
+            memory,
+            executionRoleArn,
+            containerDefinitions: (.containerDefinitions | map(.image = $IMAGE)),
+          }' task-def-raw.json > task-def-store-owner.json
+
+          aws ecs register-task-definition \
+            --cli-input-json file://task-def-store-owner.json \
+            --region $AWS_REGION
+
       - name: Update ECS service
         run: |
+          REVISION=$(aws ecs describe-task-definition \
+            --task-definition eatngo-store-owner-api \
+            --query "taskDefinition.revision" \
+            --region $AWS_REGION --output text)
+
           aws ecs update-service \
             --cluster eatngo-cluster \
             --service eatngo-store-owner-api-service \
+            --task-definition eatngo-store-owner-api:$REVISION \
             --force-new-deployment \
             --region $AWS_REGION
