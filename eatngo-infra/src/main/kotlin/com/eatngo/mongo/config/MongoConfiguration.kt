@@ -2,8 +2,6 @@ package com.eatngo.mongo.config
 
 import com.mongodb.ConnectionString
 import com.mongodb.MongoClientSettings
-import com.mongodb.ReadConcern
-import com.mongodb.ReadPreference
 import com.mongodb.client.MongoClient
 import com.mongodb.client.MongoClients
 import org.springframework.context.annotation.Bean
