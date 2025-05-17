@@ -68,4 +68,20 @@ class ProductService(
             productDto.imageUrl?.let { fileStorageService.resolveImageUrl(it) }
         )
     }
+
+    fun getProductDetails(
+        storeId: Long,
+        productId: Long
+    ): ProductDto {
+        // TODO storePersistence.findById(storeId)
+        val product: Product = (productPersistence.findById(productId)
+            ?: throw IllegalArgumentException("상품을 찾을 수 없습니다."))
+
+        return ProductDto.from(
+            product,
+            product.imageUrl?.let { fileStorageService.resolveImageUrl(it) }
+        )
+    }
+
+
 }

@@ -14,4 +14,10 @@ class ProductPersistenceImpl(
         val savedEntity = productRepository.save(productEntity)
         return ProductMapper.toDomain(savedEntity)
     }
+
+    override fun findById(productId: Long): Product? {
+        return productRepository.findById(productId).map {
+            ProductMapper.toDomain(it)
+        }.orElse(null)
+    }
 }

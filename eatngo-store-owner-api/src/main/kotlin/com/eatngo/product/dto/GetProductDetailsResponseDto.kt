@@ -2,7 +2,7 @@ package com.eatngo.product.dto
 
 import java.time.ZonedDateTime
 
-data class CreateProductResponseDto(
+data class GetProductDetailsResponseDto(
     val id: Long?,
     val name: String,
     val storeId: Long,
@@ -32,7 +32,7 @@ data class CreateProductResponseDto(
     }
 }
 
-data class CreateProductInventoryResponseDto(
+data class GetProductInventoryResponseDto(
     val quantity: Int,
     val stock: Int,
 ) {
@@ -46,7 +46,7 @@ data class CreateProductInventoryResponseDto(
     }
 }
 
-data class CreateProductPriceResponseDto(
+data class GetProductPriceResponseDto(
     val originalPrice: Int,
     val discountRate: Double,
     val finalPrice: Int

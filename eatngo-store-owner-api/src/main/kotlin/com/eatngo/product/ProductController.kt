@@ -2,6 +2,7 @@ package com.eatngo.product
 
 import com.eatngo.product.dto.*
 import com.eatngo.product.service.ProductService
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -15,7 +16,7 @@ class ProductController(
     fun createProduct(
         @PathVariable("store-id") storeId: Long,
         @RequestBody createProductRequestDto: CreateProductRequestDto
-    ): CreateProductResponseDto {
+    ): GetProductDetailsResponseDto {
         val productDto: ProductDto = productService.createProduct(
             ProductDto(
                 name = createProductRequestDto.name,
@@ -31,4 +32,12 @@ class ProductController(
 
         return CreateProductResponseDto.from(productDto)
     }
+
+    @GetMapping("/stores/{store-id}/products/{product-id}")
+    fun getProductDetails(
+        @PathVariable("store-id") storeId: Long,
+        @PathVariable("product-id") productId: Long
+    ): GetProductDetailsResponseDto = GetProductDetailsResponseDto.from(
+        productService.getProductDetails(storeId, productId)
+    )
 }
