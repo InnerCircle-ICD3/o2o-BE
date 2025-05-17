@@ -20,7 +20,6 @@ dependencies {
 
     // AWS S3 의존성
     implementation("software.amazon.awssdk:s3:2.23.15")
-    implementation("software.amazon.awssdk:s3-presigner:2.31.41") // pre-sign url
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("io.kotest:kotest-property:5.8.1")
