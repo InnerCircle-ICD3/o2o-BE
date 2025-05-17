@@ -89,16 +89,21 @@ jobs:
             --cli-input-json file://task-def-store-owner.json \
             --region $AWS_REGION
 
-      - name: Update ECS service
-        run: |
-          REVISION=$(aws ecs describe-task-definition \
+          STORE_OWNER_REVISION=$(aws ecs describe-task-definition \
             --task-definition eatngo-store-owner-api \
             --query "taskDefinition.revision" \
             --region $AWS_REGION --output text)
 
+          echo "STORE_OWNER_REVISION=STORE_OWNER_REVISION" >> $GITHUB_ENV
+
+      - name: Debug print REVISION
+        run: echo "Task Revision is ${{ env.STORE_OWNER_REVISION }}"
+
+      - name: Update ECS service
+        run: |
           aws ecs update-service \
             --cluster eatngo-cluster \
             --service eatngo-store-owner-api-service \
-            --task-definition eatngo-store-owner-api:$REVISION \
+            --task-definition eatngo-store-owner-api:${{ env.STORE_OWNER_REVISION }} \
             --force-new-deployment \
             --region $AWS_REGION
