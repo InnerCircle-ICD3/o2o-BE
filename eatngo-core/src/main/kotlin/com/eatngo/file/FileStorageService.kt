@@ -10,5 +10,5 @@ interface FileStorageService {
 
     fun deleteFile(key: String)
 
-    fun resolveImageUrl(imageUrl: String): String
+    fun resolveImageUrl(key: String): String
 }

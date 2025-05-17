@@ -27,6 +27,7 @@ class S3Service(
     * @return 저장된 파일의 S3 키 ex. images/uuid_filename.jpg
     */
     override fun saveFile(image: MultipartFile, path: String): String {
+        validateFile(image)
         val originalImage = image.originalFilename
             ?: throw IllegalArgumentException("원본 파일 이름을 찾을 수 없습니다.")
 
@@ -38,6 +39,17 @@ class S3Service(
         } catch (e: IOException) {
             log.error("파일 업로드 중 오류 발생: {}", e.message, e)
             throw IllegalArgumentException("파일 업로드에 실패했습니다.", e)
+        }
+    }
+
+    private fun validateFile(image: MultipartFile) {
+        if (image.size > 10_000_000_000) {
+            throw IllegalArgumentException("파일 크기가 너무 큽니다.")
+        }
+
+        val allowedTypes = listOf("image/jpeg", "image/png", "image/gif")
+        if (!allowedTypes.contains(image.contentType!!)) {
+            throw IllegalArgumentException("지원하지 않는 파일 형식입니다.")
         }
     }
 
@@ -80,13 +92,22 @@ class S3Service(
         }
     }
 
-    override fun resolveImageUrl(imageUrl: String): String {
-        val getUrlRequest = GetUrlRequest.builder()
-            .bucket(bucket)
-            .key(imageUrl) // s3 key
-            .build()
+    override fun resolveImageUrl(key: String): String {
+        if (key.startsWith("http://") || key.startsWith("https://")) {
+            return key
+        }
 
-        return s3Client.utilities().getUrl(getUrlRequest).toString()
+        try {
+            val getUrlRequest = GetUrlRequest.builder()
+                .bucket(bucket)
+                .key(key) // s3 key
+                .build()
+
+            return s3Client.utilities().getUrl(getUrlRequest).toString()
+        } catch (e: Exception) {
+            log.error("이미지 URL 변환 중 오류 발생: {}", e.message, e)
+            throw IOException("이미지 URL 변환에 실패했습니다.", e)
+        }
+
     }
-
 }
