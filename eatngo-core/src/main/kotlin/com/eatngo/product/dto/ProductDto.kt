@@ -22,14 +22,9 @@ data class ProductDto(
     companion object {
         fun from(
             product: Product,
-            imageUrl: String?
-        ): ProductDto {
-//            val size = when (product) {
-//                is Product.LargeLuckBag -> "L"
-//                is Product.MediumLuckBag -> "M"
-//                is Product.SmallLuckBag -> "S"
-//            }
-            return ProductDto(
+            imageUrl: String?,
+        ): ProductDto =
+            ProductDto(
                 id = product.id,
                 name = product.name,
                 description = product.description,
@@ -44,7 +39,6 @@ data class ProductDto(
                 createdAt = product.createdAt,
                 updatedAt = product.updatedAt,
             )
-        }
     }
 }
 

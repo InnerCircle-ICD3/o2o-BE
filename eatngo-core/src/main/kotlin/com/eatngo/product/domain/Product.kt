@@ -18,7 +18,7 @@ sealed class Product {
     abstract fun getSize(): ProductSizeType
 
     data class LargeEatNGoBag(
-        override var id: Long?,
+        override var id: Long? = null,
         override val name: String,
         override val description: String,
         override val inventory: Inventory,
@@ -34,7 +34,7 @@ sealed class Product {
     }
 
     data class MediumEatNGoBag(
-        override var id: Long?,
+        override var id: Long? = null,
         override val name: String,
         override val description: String,
         override val inventory: Inventory,
@@ -50,7 +50,7 @@ sealed class Product {
     }
 
     data class SmallEatNGoBag(
-        override var id: Long?,
+        override var id: Long? = null,
         override val name: String,
         override val description: String,
         override val inventory: Inventory,

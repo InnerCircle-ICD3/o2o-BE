@@ -7,7 +7,6 @@ import com.eatngo.product.domain.ProductSizeType.*
 import com.eatngo.product.dto.ProductDto
 import com.eatngo.product.infra.ProductPersistence
 import org.springframework.stereotype.Service
-import org.springframework.web.multipart.MultipartFile
 
 @Service
 class ProductService(
@@ -15,57 +14,48 @@ class ProductService(
     private val fileStorageService: FileStorageService
     // TODO storeRepository
 ) {
-    companion object {
-        private const val PRODUCT_IMAGE_PATH = "product"
-    }
-
     fun createProduct(
-        createProductDto: ProductDto,
-        image: MultipartFile
+        productDto: ProductDto,
     ): ProductDto {
         // TODO storeRepo.findById()
 
-        val inventory = Inventory.create(createProductDto.inventory.quantity)
-        val price = ProductPrice.create(createProductDto.price.originalPrice)
-        val foodTypes = FoodTypes.create(createProductDto.foodTypes)
-        val imageUrl = fileStorageService.saveFile(image, PRODUCT_IMAGE_PATH)
+        val inventory = Inventory.create(productDto.inventory.quantity)
+        val price = ProductPrice.create(productDto.price.originalPrice)
+        val foodTypes = FoodTypes.create(productDto.foodTypes)
 
-        val product: Product = when (ProductSizeType.fromValue(createProductDto.size)) {
+        val product: Product = when (ProductSizeType.fromValue(productDto.size)) {
             L -> {
                 LargeEatNGoBag(
-                    id = null,
-                    name = createProductDto.name,
-                    description = createProductDto.description,
+                    name = productDto.name,
+                    description = productDto.description,
                     inventory = inventory,
                     price = price,
-                    imageUrl = imageUrl,
-                    storeId = createProductDto.storeId,
+                    imageUrl = productDto.imageUrl,
+                    storeId = productDto.storeId,
                     foodTypes = foodTypes,
                 )
             }
 
             M -> {
                 MediumEatNGoBag(
-                    id = null,
-                    name = createProductDto.name,
-                    description = createProductDto.description,
+                    name = productDto.name,
+                    description = productDto.description,
                     inventory = inventory,
                     price = price,
-                    imageUrl = imageUrl,
-                    storeId = createProductDto.storeId,
+                    imageUrl = productDto.imageUrl,
+                    storeId = productDto.storeId,
                     foodTypes = foodTypes,
                 )
             }
 
             S -> {
                 SmallEatNGoBag(
-                    id = null,
-                    name = createProductDto.name,
-                    description = createProductDto.description,
+                    name = productDto.name,
+                    description = productDto.description,
                     inventory = inventory,
                     price = price,
-                    imageUrl = imageUrl,
-                    storeId = createProductDto.storeId,
+                    imageUrl = productDto.imageUrl,
+                    storeId = productDto.storeId,
                     foodTypes = foodTypes,
                 )
             }
@@ -73,6 +63,9 @@ class ProductService(
 
         val savedProduct: Product = productPersistence.save(product)
 
-        return ProductDto.from(savedProduct, fileStorageService.resolveImageUrl(imageUrl))
+        return ProductDto.from(
+            savedProduct,
+            productDto.imageUrl?.let { fileStorageService.resolveImageUrl(it) }
+        )
     }
 }
