@@ -10,46 +10,52 @@ import software.amazon.awssdk.services.s3.S3Client
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest
 import software.amazon.awssdk.services.s3.model.GetUrlRequest
 import software.amazon.awssdk.services.s3.model.PutObjectRequest
+import software.amazon.awssdk.services.s3.presigner.S3Presigner
+import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest
 import java.io.IOException
-import java.util.UUID
+import java.time.Duration
+import java.util.*
 
 @Service
 class S3Service(
     private val s3Client: S3Client,
+    private val s3PreSigner: S3Presigner,
     @Value("\${cloud.aws.s3.bucket}") private val bucket: String
 ) : FileStorageService {
     companion object {
         private val log = LoggerFactory.getLogger(S3Service::class.java)
+        private val PRE_SIGNED_URL_DURATION = Duration.ofMinutes(10)
     }
 
-    /*
-    * @param path S3 버킷 내에 파일을 저장할 폴더 경로 ex. => images/, "profiles/
-    * @return 저장된 파일의 S3 키 ex. images/uuid_filename.jpg
-    */
-    override fun saveFile(image: MultipartFile, path: String): String {
-        validateFile(image)
-        val originalImage = image.originalFilename
-            ?: throw IllegalArgumentException("원본 파일 이름을 찾을 수 없습니다.")
-
-        val s3Key = createS3Key(originalImage, path)
+    override fun generatePreSignedUploadUrl(
+        fileName: String,
+        contentType: String,
+        folderPath: String
+    ): Pair<String, String> {
+        val s3Key = createS3Key(fileName, folderPath)
 
         try {
-            putFileToBucket(image, s3Key)
-            return s3Key
-        } catch (e: IOException) {
-            log.error("파일 업로드 중 오류 발생: {}", e.message, e)
-            throw IllegalArgumentException("파일 업로드에 실패했습니다.", e)
-        }
-    }
+            val putObjectRequest = PutObjectRequest.builder()
+                .bucket(bucket)
+                .key(s3Key)
+                .contentType(contentType)
+                .build()
 
-    private fun validateFile(image: MultipartFile) {
-        if (image.size > 10_000_000_000) {
-            throw IllegalArgumentException("파일 크기가 너무 큽니다.")
-        }
+            val putObjectPreSignRequest = PutObjectPresignRequest.builder()
+                .signatureDuration(PRE_SIGNED_URL_DURATION)
+                .putObjectRequest(putObjectRequest)
+                .build()
 
-        val allowedTypes = listOf("image/jpeg", "image/png", "image/gif")
-        if (!allowedTypes.contains(image.contentType!!)) {
-            throw IllegalArgumentException("지원하지 않는 파일 형식입니다.")
+            val preSignedRequest = s3PreSigner.presignPutObject(putObjectPreSignRequest)
+
+            log.info("Generated pre-signed URL for key: {}, URL: {}", s3Key, preSignedRequest.url())
+
+            return Pair(preSignedRequest.url().toString(), s3Key)
+
+        } catch (e: Exception) {
+            log.error("Pre-signed URL 생성 중 오류 발생: {}", e.message, e)
+            // 예외 발생 시 적절한 예외 타입으로 변환하여 던지는 것이 좋습니다.
+            throw RuntimeException("Pre-signed URL 생성에 실패했습니다.", e)
         }
     }
 
@@ -61,21 +67,6 @@ class S3Service(
         }
 
         return cleanedFolderPath + UUID.randomUUID() + "_" + originalImage
-    }
-
-    private fun putFileToBucket(multipartFile: MultipartFile, s3Key: String) {
-        val putObjectRequest = PutObjectRequest.builder()
-            .bucket(bucket)
-            .key(s3Key)
-            .contentType(multipartFile.contentType)
-            .build()
-
-        multipartFile.inputStream.use { inputStream ->
-            s3Client.putObject(
-                putObjectRequest,
-                RequestBody.fromInputStream(inputStream, multipartFile.size)
-            )
-        }
     }
 
     override fun deleteFile(key: String) { // ex. images/uuid_filename.jpg"

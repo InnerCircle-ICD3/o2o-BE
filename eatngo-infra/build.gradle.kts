@@ -22,6 +22,7 @@ dependencies {
 
     // AWS S3 의존성
     implementation("software.amazon.awssdk:s3:2.23.15")
+    implementation("software.amazon.awssdk:s3-presigner:2.23.15") // pre-sign url
 }
 
 tasks.bootJar{

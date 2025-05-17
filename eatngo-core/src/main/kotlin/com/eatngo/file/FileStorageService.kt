@@ -1,12 +1,11 @@
 package com.eatngo.file
 
-import org.springframework.web.multipart.MultipartFile
-
 interface FileStorageService {
-    fun saveFile(
-        image: MultipartFile,
-        path: String
-    ): String
+    fun generatePreSignedUploadUrl(
+        fileName: String,
+        contentType: String,
+        folderPath: String,
+    ): Pair<String, String>
 
     fun deleteFile(key: String)
 
