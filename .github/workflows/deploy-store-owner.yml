@@ -92,7 +92,7 @@ jobs:
       - name: Update ECS service
         run: |
           REVISION=$(aws ecs describe-task-definition \
-            --task-definition eatngo-store-owne-api \
+            --task-definition eatngo-store-owner-api \
             --query "taskDefinition.revision" \
             --region $AWS_REGION --output text)
 
