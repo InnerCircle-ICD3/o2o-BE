@@ -26,14 +26,6 @@ class StoreSubscriptionPersistenceImpl : StoreSubscriptionPersistence {
         TODO("Not yet implemented")
     }
     
-    override suspend fun findByNotificationEnabled(enabled: Boolean, limit: Int, offset: Int): List<StoreSubscription> {
-        TODO("Not yet implemented")
-    }
-    
-    override suspend fun findByStoreIdAndNotificationEnabled(storeId: Long, enabled: Boolean, limit: Int, offset: Int): List<StoreSubscription> {
-        TODO("Not yet implemented")
-    }
-    
     override suspend fun save(subscription: StoreSubscription): StoreSubscription {
         TODO("Not yet implemented")
     }
@@ -43,6 +35,10 @@ class StoreSubscriptionPersistenceImpl : StoreSubscriptionPersistence {
     }
     
     override suspend fun updateNotificationStatus(id: String, enabled: Boolean): Boolean {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun existsByUserIdAndStoreId(userId: String, storeId: Long): Boolean {
         TODO("Not yet implemented")
     }
 }
