@@ -12,5 +12,6 @@ data class SearchStoreRequestDto (
 data class SearchFilter (
     val category: String?,          // 카테고리
     val time:   ZonedDateTime?,     // 픽업 가능 시간(해당 시간 이후)
+    val searchText: String?,        // 검색어(대상 필드: 매장명, 음식명, 카테고리)
     val status: StoreStatus = StoreStatus.ALL,    // 매장 상태
 )
