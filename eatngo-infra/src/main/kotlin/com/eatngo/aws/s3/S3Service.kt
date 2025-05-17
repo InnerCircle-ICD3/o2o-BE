@@ -30,6 +30,7 @@ class S3Service(
         contentType: String,
         folderPath: String
     ): Pair<String, String> {
+        validatePreSignedUrl(fileName, contentType)
         val s3Key = createS3Key(fileName, folderPath)
 
         try {
@@ -52,8 +53,17 @@ class S3Service(
 
         } catch (e: Exception) {
             log.error("Pre-signed URL 생성 중 오류 발생: {}", e.message, e)
-            // 예외 발생 시 적절한 예외 타입으로 변환하여 던지는 것이 좋습니다.
             throw RuntimeException("Pre-signed URL 생성에 실패했습니다.", e)
+        }
+    }
+
+    private fun validatePreSignedUrl(fileName: String, contentType: String) {
+        if (fileName.isBlank()) {
+            throw IllegalArgumentException("파일 이름은 비어있을 수 없습니다.")
+        }
+
+        if (contentType.isBlank()) {
+            throw IllegalArgumentException("콘텐츠 타입은 비어있을 수 없습니다.")
         }
     }
 

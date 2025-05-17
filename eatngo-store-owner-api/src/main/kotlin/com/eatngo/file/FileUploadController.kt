@@ -2,6 +2,7 @@ package com.eatngo.file
 
 import com.eatngo.file.dto.UploadRequestDto
 import com.eatngo.file.dto.UploadResponseDto
+import jakarta.validation.Valid
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -14,7 +15,7 @@ class FileUploadController(
 ) {
 
     @PostMapping("/presigned-url")
-    fun upload(@RequestBody uploadRequestDto: UploadRequestDto): UploadResponseDto =
+    fun upload(@Valid @RequestBody uploadRequestDto: UploadRequestDto): UploadResponseDto =
         UploadResponseDto.from(
             fileUploadService.generatePreSignedUploadUrl(
                 uploadRequestDto.fileName,
