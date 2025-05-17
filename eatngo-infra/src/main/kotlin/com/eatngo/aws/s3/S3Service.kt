@@ -18,11 +18,12 @@ import java.util.*
 class S3Service(
     private val s3Client: S3Client,
     private val s3PreSigner: S3Presigner,
-    @Value("\${cloud.aws.s3.bucket}") private val bucket: String
+//    @Value("\${cloud.aws.s3.bucket}") private val bucket: String
 ) : FileStorageService {
     companion object {
         private val log = LoggerFactory.getLogger(S3Service::class.java)
         private val PRE_SIGNED_URL_DURATION = Duration.ofMinutes(10)
+        private const val BUCKET_NAME: String = "eatgoeatgo"
     }
 
     override fun generatePreSignedUploadUrl(
@@ -35,7 +36,7 @@ class S3Service(
 
         try {
             val putObjectRequest = PutObjectRequest.builder()
-                .bucket(bucket)
+                .bucket(BUCKET_NAME)
                 .key(s3Key)
                 .contentType(contentType)
                 .build()
@@ -80,7 +81,7 @@ class S3Service(
     override fun deleteFile(key: String) { // ex. images/uuid_filename.jpg"
         try {
             val deleteObjectRequest = DeleteObjectRequest.builder()
-                .bucket(bucket)
+                .bucket(BUCKET_NAME)
                 .key(key)
                 .build()
 
@@ -98,7 +99,7 @@ class S3Service(
 
         try {
             val getUrlRequest = GetUrlRequest.builder()
-                .bucket(bucket)
+                .bucket(BUCKET_NAME)
                 .key(key) // s3 key
                 .build()
 
