@@ -174,4 +174,8 @@ gradle-app.setting
 # Java heap dump
 *.hprof
 
+### Custom
+task-def-customer.json
+task-def-store-owner.json
+
 # End of https://www.toptal.com/developers/gitignore/api/kotlin,macos,intellij+iml,gradle

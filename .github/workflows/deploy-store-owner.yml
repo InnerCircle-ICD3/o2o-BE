@@ -64,6 +64,21 @@ jobs:
             --push \
             .
 
+      - name: Register new ECS task definition
+        run: |
+          IMAGE_URI="$ECR_URI:latest"
+
+          aws ecs describe-task-definition \
+            --task-definition eatngo-store-owner-api \
+            --query "taskDefinition" \
+            --region $AWS_REGION > task-def.json
+
+          jq ".containerDefinitions[0].image |= \"$IMAGE_URI\"" task-def.json > task-def-store-owner.json
+
+          aws ecs register-task-definition \
+            --cli-input-json file://task-def-store-owner.json \
+            --region $AWS_REGION
+
       - name: Update ECS service
         run: |
           aws ecs update-service \
