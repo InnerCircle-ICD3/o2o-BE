@@ -29,6 +29,12 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      # 이전 캐시로 인해 빌드 오류 발생 가능으로 인한 refresh
-      - name: Run tests with cache refresh and clean build
+      # 4. eatngo-common 모듈 클린 빌드
+      # eatngo-infra가 의존하는 eatngo-common 모듈을 먼저 빌드
+      - name: Clean build eatngo-common module
+        run: ./gradlew :eatngo-common:clean :eatngo-common:build --no-daemon
+
+      # 5. 모든 모듈을 다시 빌드하고 테스트를 실행합니다.
+      # 강제 새로고침 수행
+      - name: Run clean build for entire project with dependency refresh
         run: ./gradlew clean build --no-daemon --refresh-dependencies
