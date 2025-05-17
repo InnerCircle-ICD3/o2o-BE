@@ -91,6 +91,11 @@ jobs:
 
       - name: Update ECS service
         run: |
+          REVISION=$(aws ecs describe-task-definition \
+            --task-definition eatngo-store-owne-api \
+            --query "taskDefinition.revision" \
+            --region $AWS_REGION --output text)
+
           aws ecs update-service \
             --cluster eatngo-cluster \
             --service eatngo-store-owner-api-service \
