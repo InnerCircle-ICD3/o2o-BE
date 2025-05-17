@@ -94,7 +94,7 @@ jobs:
             --query "taskDefinition.revision" \
             --region $AWS_REGION --output text)
 
-          echo "STORE_OWNER_REVISION=STORE_OWNER_REVISION" >> $GITHUB_ENV
+          echo "STORE_OWNER_REVISION=$STORE_OWNER_REVISION" >> $GITHUB_ENV
 
       - name: Debug print REVISION
         run: echo "Task Revision is ${{ env.STORE_OWNER_REVISION }}"
