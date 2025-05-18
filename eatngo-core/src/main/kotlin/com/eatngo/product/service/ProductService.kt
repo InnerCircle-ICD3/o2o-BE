@@ -4,6 +4,8 @@ import com.eatngo.file.FileStorageService
 import com.eatngo.product.domain.*
 import com.eatngo.product.domain.Product.*
 import com.eatngo.product.domain.ProductSizeType.*
+import com.eatngo.product.dto.ProductAfterStockDto
+import com.eatngo.product.dto.ProductCurrentStockDto
 import com.eatngo.product.dto.ProductDto
 import com.eatngo.product.infra.ProductPersistence
 import org.springframework.stereotype.Service
@@ -95,5 +97,13 @@ class ProductService(
         productPersistence.findByIdAndStoreId(productId, storeId)
         productPersistence.deleteById(productId)
         // TODO storePersistence.deleteById(storeId)
+    }
+
+    fun toggleStock(productCurrentStockDto: ProductCurrentStockDto): ProductAfterStockDto {
+        val product: Product = (productPersistence.findById(productCurrentStockDto.id)
+            ?: throw IllegalArgumentException("상품을 찾을 수 없습니다."))
+        product.changeStock(productCurrentStockDto.action, productCurrentStockDto.amount)
+        val savedProduct = productPersistence.save(product)
+        return ProductAfterStockDto.create(savedProduct)
     }
 }

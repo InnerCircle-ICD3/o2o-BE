@@ -1,12 +1,15 @@
 package com.eatngo.product.domain
 
+import com.eatngo.product.domain.ProductSizeType.*
+import com.eatngo.product.domain.StockActionType.DECREASE
+import com.eatngo.product.domain.StockActionType.INCREASE
 import java.time.ZonedDateTime
 
 sealed class Product {
     abstract var id: Long?
     abstract val name: String
     abstract val description: String
-    abstract val inventory: Inventory
+    abstract var inventory: Inventory
     abstract val price: ProductPrice
     abstract val imageUrl: String?
     abstract val storeId: Long
@@ -17,11 +20,16 @@ sealed class Product {
 
     abstract fun getSize(): ProductSizeType
 
+    abstract fun changeStock(
+        action: String,
+        amount: Int
+    )
+
     data class LargeEatNGoBag(
         override var id: Long? = null,
         override val name: String,
         override val description: String,
-        override val inventory: Inventory,
+        override var inventory: Inventory,
         override val price: ProductPrice,
         override val imageUrl: String?,
         override val storeId: Long,
@@ -30,14 +38,25 @@ sealed class Product {
         override val createdAt: ZonedDateTime? = null,
         override val updatedAt: ZonedDateTime? = null,
     ) : Product() {
-        override fun getSize() = ProductSizeType.L
+        override fun getSize() = L
+
+        override fun changeStock(
+            action: String,
+            amount: Int
+        ) {
+            val changedInventory: Inventory = when (StockActionType.fromValue(action)) {
+                INCREASE -> inventory.increaseStock(amount)
+                DECREASE -> inventory.decreaseStock(amount)
+            }
+            this.inventory = changedInventory
+        }
     }
 
     data class MediumEatNGoBag(
         override var id: Long? = null,
         override val name: String,
         override val description: String,
-        override val inventory: Inventory,
+        override var inventory: Inventory,
         override val price: ProductPrice,
         override val imageUrl: String?,
         override val storeId: Long,
@@ -46,14 +65,25 @@ sealed class Product {
         override val createdAt: ZonedDateTime? = null,
         override val updatedAt: ZonedDateTime? = null,
     ) : Product() {
-        override fun getSize() = ProductSizeType.M
+        override fun getSize() = M
+
+        override fun changeStock(
+            action: String,
+            amount: Int
+        ) {
+            val changedInventory: Inventory = when (StockActionType.fromValue(action)) {
+                INCREASE -> inventory.increaseStock(amount)
+                DECREASE -> inventory.decreaseStock(amount)
+            }
+            this.inventory = changedInventory
+        }
     }
 
     data class SmallEatNGoBag(
         override var id: Long? = null,
         override val name: String,
         override val description: String,
-        override val inventory: Inventory,
+        override var inventory: Inventory,
         override val price: ProductPrice,
         override val imageUrl: String?,
         override val storeId: Long,
@@ -62,6 +92,17 @@ sealed class Product {
         override val createdAt: ZonedDateTime? = null,
         override val updatedAt: ZonedDateTime? = null,
     ) : Product() {
-        override fun getSize() = ProductSizeType.S
+        override fun getSize() = S
+
+        override fun changeStock(
+            action: String,
+            amount: Int
+        ) {
+            val changedInventory: Inventory = when (StockActionType.fromValue(action)) {
+                INCREASE -> inventory.increaseStock(amount)
+                DECREASE -> inventory.decreaseStock(amount)
+            }
+            this.inventory = changedInventory
+        }
     }
 }
