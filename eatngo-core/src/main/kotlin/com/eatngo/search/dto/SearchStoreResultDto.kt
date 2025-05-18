@@ -3,6 +3,7 @@ package com.eatngo.search.dto
 import com.eatngo.common.type.Point
 import com.eatngo.common.util.DistanceCalculator
 import com.eatngo.search.domain.SearchStore
+import java.time.LocalDateTime
 
 data class SearchStoreResultDto (
     val storeList: List<SearchStoreDto>,
@@ -19,6 +20,8 @@ data class SearchStoreDto (
     val stock: Int,                 // 재고 수량
     val roadAddress: String,        // 매장 주소(도로명 주소)
     val location: Point,            // 매장 위치(위도, 경도)
+    var openTime: LocalDateTime, // 매장 오픈 시간
+    var closeTime: LocalDateTime, // 매장 마감 시간
 
     // TODO: 리뷰, 찜 기능
     val reviewCount: Int?=0,         // 리뷰 수
@@ -40,9 +43,11 @@ data class SearchStoreDto (
                     to = userPoint,
                 ),
                 open = searchStore.open,
+                openTime = searchStore.openTime,
+                closeTime = searchStore.closeTime,
                 // TODO: 재고 수량은 Redis에서 가져와야 함(상품)
-                stock = 0,
-                )
+                stock = 0
+            )
         }
     }
 }
