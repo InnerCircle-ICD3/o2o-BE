@@ -7,16 +7,16 @@ import java.time.ZonedDateTime
 
 sealed class Product {
     abstract var id: Long?
-    abstract val name: String
-    abstract val description: String
+    abstract var name: String
+    abstract var description: String
     abstract var inventory: Inventory
-    abstract val price: ProductPrice
-    abstract val imageUrl: String?
+    abstract var price: ProductPrice
+    abstract var imageUrl: String?
     abstract val storeId: Long
-    abstract val foodTypes: FoodTypes
-    abstract val status: ProductStatus
-    abstract val createdAt: ZonedDateTime?
-    abstract val updatedAt: ZonedDateTime?
+    abstract var foodTypes: FoodTypes
+    abstract var status: ProductStatus
+    abstract var createdAt: ZonedDateTime?
+    abstract var updatedAt: ZonedDateTime?
 
     abstract fun getSize(): ProductSizeType
 
@@ -25,18 +25,28 @@ sealed class Product {
         amount: Int
     )
 
+    abstract fun modify(
+        name: String,
+        description: String,
+        inventory: Inventory,
+        price: ProductPrice,
+        imageUrl: String?,
+        foodTypes: FoodTypes,
+        status: ProductStatus,
+    )
+
     data class LargeEatNGoBag(
         override var id: Long? = null,
-        override val name: String,
-        override val description: String,
+        override var name: String,
+        override var description: String,
         override var inventory: Inventory,
-        override val price: ProductPrice,
-        override val imageUrl: String?,
-        override val storeId: Long,
-        override val foodTypes: FoodTypes,
-        override val status: ProductStatus = ProductStatus.ACTIVE,
-        override val createdAt: ZonedDateTime? = null,
-        override val updatedAt: ZonedDateTime? = null,
+        override var price: ProductPrice,
+        override var imageUrl: String?,
+        override var storeId: Long,
+        override var foodTypes: FoodTypes,
+        override var status: ProductStatus = ProductStatus.ACTIVE,
+        override var createdAt: ZonedDateTime? = null,
+        override var updatedAt: ZonedDateTime? = null,
     ) : Product() {
         override fun getSize() = L
 
@@ -50,20 +60,44 @@ sealed class Product {
             }
             this.inventory = changedInventory
         }
+
+        override fun modify(
+            name: String,
+            description: String,
+            inventory: Inventory,
+            price: ProductPrice,
+            imageUrl: String?,
+            foodTypes: FoodTypes,
+            status: ProductStatus,
+        ) {
+            this.name = name
+            this.description = description
+            this.inventory = Inventory(
+                quantity = inventory.quantity,
+                stock = inventory.stock
+            )
+            this.price = ProductPrice(
+                originalPrice = price.originalPrice,
+                discountRate = price.discountRate,
+            )
+            this.imageUrl = imageUrl
+            this.foodTypes = foodTypes
+            this.status = status
+        }
     }
 
     data class MediumEatNGoBag(
         override var id: Long? = null,
-        override val name: String,
-        override val description: String,
+        override var name: String,
+        override var description: String,
         override var inventory: Inventory,
-        override val price: ProductPrice,
-        override val imageUrl: String?,
+        override var price: ProductPrice,
+        override var imageUrl: String?,
         override val storeId: Long,
-        override val foodTypes: FoodTypes,
-        override val status: ProductStatus = ProductStatus.ACTIVE,
-        override val createdAt: ZonedDateTime? = null,
-        override val updatedAt: ZonedDateTime? = null,
+        override var foodTypes: FoodTypes,
+        override var status: ProductStatus = ProductStatus.ACTIVE,
+        override var createdAt: ZonedDateTime? = null,
+        override var updatedAt: ZonedDateTime? = null,
     ) : Product() {
         override fun getSize() = M
 
@@ -77,20 +111,44 @@ sealed class Product {
             }
             this.inventory = changedInventory
         }
+
+        override fun modify(
+            name: String,
+            description: String,
+            inventory: Inventory,
+            price: ProductPrice,
+            imageUrl: String?,
+            foodTypes: FoodTypes,
+            status: ProductStatus,
+        ) {
+            this.name = name
+            this.description = description
+            this.inventory = Inventory(
+                quantity = inventory.quantity,
+                stock = inventory.stock
+            )
+            this.price = ProductPrice(
+                originalPrice = price.originalPrice,
+                discountRate = price.discountRate,
+            )
+            this.imageUrl = imageUrl
+            this.foodTypes = foodTypes
+            this.status = status
+        }
     }
 
     data class SmallEatNGoBag(
         override var id: Long? = null,
-        override val name: String,
-        override val description: String,
+        override var name: String,
+        override var description: String,
         override var inventory: Inventory,
-        override val price: ProductPrice,
-        override val imageUrl: String?,
+        override var price: ProductPrice,
+        override var imageUrl: String?,
         override val storeId: Long,
-        override val foodTypes: FoodTypes,
-        override val status: ProductStatus = ProductStatus.ACTIVE,
-        override val createdAt: ZonedDateTime? = null,
-        override val updatedAt: ZonedDateTime? = null,
+        override var foodTypes: FoodTypes,
+        override var status: ProductStatus = ProductStatus.ACTIVE,
+        override var createdAt: ZonedDateTime? = null,
+        override var updatedAt: ZonedDateTime? = null,
     ) : Product() {
         override fun getSize() = S
 
@@ -103,6 +161,30 @@ sealed class Product {
                 DECREASE -> inventory.decreaseStock(amount)
             }
             this.inventory = changedInventory
+        }
+
+        override fun modify(
+            name: String,
+            description: String,
+            inventory: Inventory,
+            price: ProductPrice,
+            imageUrl: String?,
+            foodTypes: FoodTypes,
+            status: ProductStatus,
+        ) {
+            this.name = name
+            this.description = description
+            this.inventory = Inventory(
+                quantity = inventory.quantity,
+                stock = inventory.stock
+            )
+            this.price = ProductPrice(
+                originalPrice = price.originalPrice,
+                discountRate = price.discountRate,
+            )
+            this.imageUrl =imageUrl
+            this.foodTypes = foodTypes
+            this.status = status
         }
     }
 }

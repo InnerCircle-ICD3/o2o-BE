@@ -7,7 +7,7 @@ data class ToggleStockResponseDto(
     val stock: Int
 ) {
     companion object {
-        fun create(productAfterStockDto: ProductAfterStockDto): ToggleStockResponseDto {
+        fun from(productAfterStockDto: ProductAfterStockDto): ToggleStockResponseDto {
             return ToggleStockResponseDto(
                 id = productAfterStockDto.id,
                 storeId = productAfterStockDto.storeId,

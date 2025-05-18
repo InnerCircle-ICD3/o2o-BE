@@ -3,7 +3,6 @@ package com.eatngo.product
 import com.eatngo.product.dto.*
 import com.eatngo.product.service.ProductService
 import jakarta.validation.Valid
-import org.springdoc.webmvc.core.service.RequestService
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -65,7 +64,7 @@ class ProductController(
             throw IllegalArgumentException("잘못된 action type 입니다. ${request.action}")
         }
 
-        return ToggleStockResponseDto.create(
+        return ToggleStockResponseDto.from(
             productService.toggleStock(
                 ProductCurrentStockDto(
                     id = request.id,
@@ -75,4 +74,35 @@ class ProductController(
             )
         )
     }
+
+    @PostMapping("/stores/{store-id}/products/{product-id}")
+    fun updateProduct(
+        @PathVariable("store-id") storeId: Long,
+        @PathVariable("product-id") productId: Long,
+        @Valid @RequestBody updateProductRequestDto: UpdateProductRequestDto
+    ): UpdateProductResponseDto {
+        val productDto = productService.modifyProduct(
+            ProductDto(
+                id = productId,
+                name = updateProductRequestDto.name,
+                description = updateProductRequestDto.description,
+                size = updateProductRequestDto.size,
+                inventory = ProductInventoryDto(
+                    updateProductRequestDto.inventory.quantity,
+                    updateProductRequestDto.inventory.stock
+                ),
+                price = ProductPriceDto(
+                    updateProductRequestDto.price.originalPrice,
+                    updateProductRequestDto.price.discountRate
+                ),
+                imageUrl = updateProductRequestDto.image,
+                storeId = storeId,
+                foodTypes = updateProductRequestDto.foodType,
+                status = updateProductRequestDto.status
+            )
+        )
+
+        return UpdateProductResponseDto.from(productDto)
+    }
+
 }

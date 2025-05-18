@@ -106,4 +106,30 @@ class ProductService(
         val savedProduct = productPersistence.save(product)
         return ProductAfterStockDto.create(savedProduct)
     }
+
+    fun modifyProduct(productDto: ProductDto): ProductDto {
+        val product: Product = (productPersistence.findByIdAndStoreId(productDto.id!!, productDto.storeId)
+            ?: throw IllegalArgumentException("상품을 찾을 수 없습니다."))
+        product.modify(
+            name = productDto.name,
+            description = productDto.description,
+            inventory = Inventory(
+                productDto.inventory.quantity,
+                productDto.inventory.stock
+            ),
+            price = ProductPrice(
+                productDto.price.originalPrice,
+                productDto.price.discountRate
+            ),
+            imageUrl = productDto.imageUrl,
+            foodTypes = FoodTypes(productDto.foodTypes.map { Food(it) }),
+            status = ProductStatus.fromValue(productDto.status!!)
+        )
+
+        val savedProduct: Product = productPersistence.save(product)
+        return ProductDto.from(
+            savedProduct,
+            productDto.imageUrl?.let { fileStorageService.resolveImageUrl(it) }
+        )
+    }
 }
