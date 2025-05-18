@@ -2,7 +2,6 @@ package com.eatngo.auth.resolver
 
 import com.eatngo.auth.annotation.CustomerId
 import com.eatngo.auth.dto.LoginCustomer
-import com.eatngo.auth.dto.LoginUser
 import org.springframework.core.MethodParameter
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Component
@@ -28,6 +27,7 @@ class CustomerIdArgumentResolver : HandlerMethodArgumentResolver {
         val principal = authentication?.principal
 
         return when (principal) {
+            is String -> if (principal == "anonymousUser") null else principal.toLongOrNull()
             is LoginCustomer -> principal.customerId
             else -> null
         }

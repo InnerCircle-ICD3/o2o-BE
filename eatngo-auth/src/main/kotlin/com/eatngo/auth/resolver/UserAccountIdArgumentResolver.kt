@@ -27,7 +27,7 @@ class UserAccountIdArgumentResolver : HandlerMethodArgumentResolver {
         val principal = authentication?.principal
 
         return when (principal) {
-            is String -> principal.toLongOrNull()
+            is String -> if (principal == "anonymousUser") null else principal.toLongOrNull()
             is LoginUser -> principal.userAccountId
             else -> null
         }

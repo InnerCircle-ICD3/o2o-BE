@@ -9,6 +9,9 @@ import java.util.*
 class SecurityAuditorAware : AuditorAware<Long> {
     override fun getCurrentAuditor(): Optional<Long> {
         val authentication = SecurityContextHolder.getContext().authentication
+        if (authentication.name == "anonymousUser") {
+            return Optional.empty()
+        }
         return if (authentication != null && authentication.isAuthenticated) {
             Optional.of(authentication.name.toLong())
         } else {
