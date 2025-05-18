@@ -245,7 +245,7 @@ class SearchStoreRepositoryImpl(
 
         // MongoDB Atlas Search 쿼리 생성
         val score = Document(
-            "\$score",
+            "score",
             Document("function",
                 Document("distance",
                     Document("origin",
@@ -264,7 +264,7 @@ class SearchStoreRepositoryImpl(
                     Document("filter", filters)
                         .append("must", must)
                 )
-                .append("\$score", score)
+                .append("score", score)
         )
 
         return AggregationOperation { _: AggregationOperationContext -> searchQuery }
