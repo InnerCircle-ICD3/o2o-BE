@@ -8,7 +8,7 @@ import com.eatngo.store.dto.StoreSubscriptionDto
  */
 interface StoreSubscriptionService {
     /**
-     * 상점 구독 생성
+     * 상점 구독 생성/취소
      */
     suspend fun toggleSubscription(storeId: Long): StoreSubscriptionDto
 

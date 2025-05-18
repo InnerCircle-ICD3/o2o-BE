@@ -125,6 +125,7 @@ fun Store.toDto(): StoreDto {
  * 상점 구독 domain을 DTO로 변환
  */
 fun StoreSubscription.toDto(
+    userName: String,
     storeName: String,
     mainImageUrl: String?,
     status: StoreEnum.StoreStatus,
@@ -135,6 +136,7 @@ fun StoreSubscription.toDto(
     return StoreSubscriptionDto(
         id = this.id,
         userId = this.userId,
+        userName = userName,
         storeId = this.storeId,
         storeName = storeName,
         mainImageUrl = mainImageUrl,

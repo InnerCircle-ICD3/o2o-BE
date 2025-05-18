@@ -26,12 +26,11 @@ class StoreSubscriptionServiceImpl(
 
     override suspend fun toggleSubscription(storeId: Long): StoreSubscriptionDto {
         val userId = "임시사용자" // TODO: Security Context에서 가져오기
+        val userName = "임시사용자" // TODO: Security Context에서 가져오기
 
-        // 1. 매장 존재 여부 검증
         val store = storePersistence.findById(storeId)
             ?: throw StoreException.StoreNotFound(storeId)
 
-        // 2. 구독 토글 처리
         val subscription = storeSubscriptionPersistence.findByUserIdAndStoreId(userId, storeId)?.let {
             it.softDelete()
             storeSubscriptionPersistence.save(it)
@@ -42,6 +41,7 @@ class StoreSubscriptionServiceImpl(
 
         // 3. 하드코딩된 상품 정보 사용
         return subscription.toDto(
+            userName = userName,
             storeName = store.name,
             mainImageUrl = store.imageUrl,
             status = store.status,
@@ -52,6 +52,7 @@ class StoreSubscriptionServiceImpl(
     }
 
     override suspend fun getSubscriptionById(id: Long): StoreSubscriptionDto {
+        val userName = "임시사용자" // TODO: Security Context에서 가져오기
         val subscription = storeSubscriptionPersistence.findById(id)
             ?: throw StoreException.SubscriptionNotFound(id)
         val store = storePersistence.findById(subscription.storeId)
@@ -59,6 +60,7 @@ class StoreSubscriptionServiceImpl(
 
         // 하드코딩된 상품 정보 사용
         return subscription.toDto(
+            userName = userName,
             storeName = store.name,
             mainImageUrl = store.imageUrl,
             status = store.status,
@@ -70,10 +72,12 @@ class StoreSubscriptionServiceImpl(
 
     override suspend fun getMySubscriptions(): List<StoreSubscriptionDto> {
         val userId = "임시사용자"
+        val userName = "임시사용자" // TODO: Security Context에서 가져오기
         return storeSubscriptionPersistence.findByUserId(userId)
             .mapNotNull { subscription ->
                 val store = storePersistence.findById(subscription.storeId) ?: return@mapNotNull null
                 subscription.toDto(
+                    userName = userName,
                     storeName = store.name,
                     mainImageUrl = store.imageUrl,
                     status = store.status,
@@ -85,12 +89,14 @@ class StoreSubscriptionServiceImpl(
     }
 
     override suspend fun getSubscriptionsByStoreId(storeId: Long): List<StoreSubscriptionDto> {
+        val userName = "임시사용자" // TODO: Security Context에서 가져오기
         val store = storePersistence.findById(storeId)
             ?: throw StoreException.StoreNotFound(storeId)
 
         return storeSubscriptionPersistence.findByStoreId(storeId)
             .map { subscription ->
                 subscription.toDto(
+                    userName = userName,
                     storeName = store.name,
                     mainImageUrl = store.imageUrl,
                     status = store.status,

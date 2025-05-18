@@ -9,6 +9,7 @@ import java.time.LocalDateTime
 data class StoreSubscriptionDto(
     val id: Long,
     val userId: String,
+    val userName: String,
     val storeId: Long,
     val storeName: String,            // 매장명
     val mainImageUrl: String?,        // 매장 대표 이미지
