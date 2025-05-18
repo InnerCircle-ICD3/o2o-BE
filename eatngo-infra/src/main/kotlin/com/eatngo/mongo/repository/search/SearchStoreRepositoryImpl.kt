@@ -210,13 +210,13 @@ class SearchStoreRepositoryImpl(
             filters.add(
                 Document("range",
                     Document("path", "openTime")
-                        .append("gte", it)
+                        .append("lte", it)
                 )
             )
             filters.add(
                 Document("range",
                     Document("path", "closeTime")
-                        .append("lte", it)
+                        .append("gte", it)
                 )
             )
         }
