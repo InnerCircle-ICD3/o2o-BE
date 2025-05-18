@@ -1,6 +1,6 @@
 package com.eatngo.auth.handler
 
-import org.springframework.stereotype.Component
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 
 fun interface OAuth2SuccessPostProcessor {
 
@@ -9,7 +9,7 @@ fun interface OAuth2SuccessPostProcessor {
     )
 }
 
-@Component
+@ConditionalOnMissingBean(OAuth2SuccessPostProcessor::class)
 class DefaultOAuth2SuccessPostProcessor : OAuth2SuccessPostProcessor {
 
     override fun postProcess(userId: Long) {
