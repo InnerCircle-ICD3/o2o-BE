@@ -12,6 +12,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher
 
 @Configuration
 @EnableWebSecurity
@@ -52,10 +53,11 @@ class SecurityConfig(
             }
 
             .logout {
-                it.logoutUrl("/oauth2/authorization/**/logout")
+                it.logoutRequestMatcher(AntPathRequestMatcher("/oauth2/logout", "GET"))
                     .logoutSuccessUrl("/")
                     .invalidateHttpSession(true)
                     .deleteCookies(ACCESS_TOKEN)
+                // TODO logout api handler 추가하기
             }
 
         return http.build()

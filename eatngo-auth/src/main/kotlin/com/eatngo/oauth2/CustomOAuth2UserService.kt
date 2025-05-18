@@ -28,6 +28,7 @@ class CustomOAuth2UserService(
 
         val userAccount = userAccountPersistence.findByOauth(oauth2.id.toString(), provider)
             ?: userAccountPersistence.save(UserAccount.create(oauth2))
+        // TODO term fetch api 추가하기
 
         val authorities = handleRoles(userAccount)
             .map { SimpleGrantedAuthority(it.toString()) }
