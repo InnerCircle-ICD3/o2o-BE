@@ -10,27 +10,27 @@ import org.springframework.stereotype.Component
 @Component
 class StoreSubscriptionPersistenceImpl : StoreSubscriptionPersistence {
     
-    override suspend fun findById(id: String): StoreSubscription? {
+    override suspend fun findById(id: Long): StoreSubscription? {
         TODO("Not yet implemented")
     }
     
-    override suspend fun findByUserId(userId: String, limit: Int, offset: Int): List<StoreSubscription> {
+    override suspend fun findByUserId(userId: String): List<StoreSubscription> {
         TODO("Not yet implemented")
     }
     
-    override suspend fun findByStoreId(storeId: Long, limit: Int, offset: Int): List<StoreSubscription> {
+    override suspend fun findByStoreId(storeId: Long): List<StoreSubscription> {
         TODO("Not yet implemented")
     }
-    
-    override suspend fun findByUserIdAndStoreId(userId: String, storeId: Long): StoreSubscription? {
+
+    override suspend fun findByUserIdAndStoreId(userId: String, storeId: Long): StoreSubscription{
         TODO("Not yet implemented")
     }
-    
+
     override suspend fun save(subscription: StoreSubscription): StoreSubscription {
         TODO("Not yet implemented")
     }
     
-    override suspend fun softDelete(id: String): Boolean {
+    override suspend fun softDelete(id: Long): Boolean {
         TODO("Not yet implemented")
     }
 

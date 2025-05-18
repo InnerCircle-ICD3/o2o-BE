@@ -43,9 +43,15 @@ open class StoreException(
         mapOf("storeOwnerId" to storeOwnerId)
     )
 
+    class InvalidAddressException(missingFields: Map<String, String>) : StoreException(
+        BusinessErrorCode.STORE_VALIDATION_FAILED,
+        "주소 정보가 유효하지 않습니다. 필수 필드: ${missingFields.keys.joinToString()}",
+        mapOf("validationErrors" to missingFields)
+    )
+
 
     // 구독 관련 예외
-    class SubscriptionNotFound(subscriptionId: String) : StoreException(
+    class SubscriptionNotFound(subscriptionId: Long) : StoreException(
         BusinessErrorCode.SUBSCRIPTION_NOT_FOUND,
         "${BusinessErrorCode.SUBSCRIPTION_NOT_FOUND.message}: $subscriptionId",
         mapOf("subscriptionId" to subscriptionId)

@@ -1,5 +1,6 @@
 package com.eatngo.store.dto.extension
 
+import com.eatngo.store.constant.StoreEnum
 import com.eatngo.store.domain.Address
 import com.eatngo.store.domain.AdminAddress
 import com.eatngo.store.domain.BusinessHour
@@ -14,7 +15,6 @@ import com.eatngo.store.dto.LegalAddressDto
 import com.eatngo.store.dto.RoadAddressDto
 import com.eatngo.store.dto.StoreDto
 import com.eatngo.store.dto.StoreSubscriptionDto
-import com.eatngo.store.dto.StoreSubscriptionSummary
 
 /**
  * core 모듈의 dto를 domain으로 매핑
@@ -124,28 +124,30 @@ fun Store.toDto(): StoreDto {
 /**
  * 상점 구독 domain을 DTO로 변환
  */
-fun StoreSubscription.toResponseDto(subscription: StoreSubscription, store: Store? = null): StoreSubscriptionDto {
+fun StoreSubscription.toDto(
+    storeName: String,
+    mainImageUrl: String?,
+    status: StoreEnum.StoreStatus,
+    discountRate: Double,
+    originalPrice: Int,
+    discountedPrice: Int
+): StoreSubscriptionDto {
     return StoreSubscriptionDto(
-        id = subscription.id,
-        userId = subscription.userId,
-        storeId = subscription.storeId,
-        createdAt = subscription.createdAt,
-        updatedAt = subscription.updatedAt,
-        store = store?.toSummaryDto(),
-        subscribed = subscription.deletedAt == null
+        id = this.id,
+        userId = this.userId,
+        storeId = this.storeId,
+        storeName = storeName,
+        mainImageUrl = mainImageUrl,
+        status = status,
+        discountRate = discountRate,
+        originalPrice = originalPrice,
+        discountedPrice = discountedPrice,
+        createdAt = this.createdAt,
+        updatedAt = this.updatedAt,
+        deletedAt = this.deletedAt
     )
 }
 
 /**
- * 상점 구독 domain을 요약 DTO로 변환
+ * 상점 구독 DTO를 domain으로 변환
  */
-fun StoreSubscription.toSummaryDto(store: Store? = null): StoreSubscriptionSummary {
-    val storeDto = store?.toSummaryDto()
-    return StoreSubscriptionSummary(
-        id = id,
-        storeId = storeId,
-        userId = userId,
-        createdAt = createdAt,
-        store = storeDto
-    )
-}

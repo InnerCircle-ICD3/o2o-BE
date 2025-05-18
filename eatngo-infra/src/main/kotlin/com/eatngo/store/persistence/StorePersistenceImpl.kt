@@ -23,22 +23,6 @@ class StorePersistenceImpl : StorePersistence {
     override suspend fun findByOwnerId(ownerId: String): Store? {
         TODO("Not yet implemented")
     }
-    
-    override suspend fun findNearby(address: Address, radiusKm: Double, limit: Int, offset: Int): List<Store> {
-        TODO("Not yet implemented")
-    }
-    
-    override suspend fun findByNameContaining(name: String, limit: Int, offset: Int): List<Store> {
-        TODO("Not yet implemented")
-    }
-    
-    override suspend fun findByCategory(category: String, limit: Int, offset: Int): List<Store> {
-        TODO("Not yet implemented")
-    }
-    
-    override suspend fun findOpenStores(limit: Int, offset: Int): List<Store> {
-        TODO("Not yet implemented")
-    }
 
     override suspend fun save(store: Store): Store {
         TODO("Not yet implemented")

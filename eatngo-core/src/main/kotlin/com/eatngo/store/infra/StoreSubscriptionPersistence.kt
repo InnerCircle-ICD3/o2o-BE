@@ -7,19 +7,19 @@ import com.eatngo.store.domain.StoreSubscription
  */
 interface StoreSubscriptionPersistence {
     /**
-     * ID로 상점 구독 조회
+     * 구독 ID로 상점 구독 조회
      */
-    suspend fun findById(id: String): StoreSubscription?
+    suspend fun findById(id: Long): StoreSubscription?
 
     /**
      * 사용자 ID로 상점 구독 목록 조회
      */
-    suspend fun findByUserId(userId: String, limit: Int, offset: Int): List<StoreSubscription>
+    suspend fun findByUserId(userId: String): List<StoreSubscription>
 
     /**
      * 상점 ID로 상점 구독 목록 조회
      */
-    suspend fun findByStoreId(storeId: Long, limit: Int, offset: Int): List<StoreSubscription>
+    suspend fun findByStoreId(storeId: Long): List<StoreSubscription>
 
     /**
      * 사용자 ID와 상점 ID로 상점 구독 조회
@@ -34,7 +34,7 @@ interface StoreSubscriptionPersistence {
     /**
      * 상점 구독 삭제
      */
-    suspend fun softDelete(id: String): Boolean
+    suspend fun softDelete(id: Long): Boolean
 
     /**
      * 사용자 ID로 상점 구독 여부 조회

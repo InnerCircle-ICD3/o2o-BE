@@ -2,17 +2,12 @@ package com.eatngo.store.serviceImpl
 
 import com.eatngo.common.exception.StoreException
 import com.eatngo.store.domain.StoreSubscription
-import com.eatngo.store.dto.StoreDto
-import com.eatngo.store.dto.StoreSubscriptionCreateDto
 import com.eatngo.store.dto.StoreSubscriptionDto
-import com.eatngo.store.dto.StoreSubscriptionSummary
-import com.eatngo.store.dto.StoreSummary
-import com.eatngo.store.dto.SubscribedStoresResponse
+import com.eatngo.store.dto.extension.toDto
 import com.eatngo.store.infra.StorePersistence
 import com.eatngo.store.infra.StoreSubscriptionPersistence
 import com.eatngo.store.service.StoreSubscriptionService
 import org.springframework.stereotype.Service
-import java.time.ZonedDateTime
 
 /**
  * 상점 구독 서비스 구현체
@@ -22,80 +17,169 @@ class StoreSubscriptionServiceImpl(
     private val storeSubscriptionPersistence: StoreSubscriptionPersistence,
     private val storePersistence: StorePersistence
 ) : StoreSubscriptionService {
+    // 임시 상품 정보 (할인율 10%, 원가 10,000원, 할인가 9,000원)
+    private val tempProductInfo = object {
+        val discountRate = 0.1
+        val originalPrice = 10000
+        val discountedPrice = 9000
+    }
 
     override suspend fun toggleSubscription(storeId: Long): StoreSubscriptionDto {
-        val userId = "임시사용자" //TODO: 나중에 security context 에서 가져오는 유틸 생기면 바꾸기
+        val userId = "임시사용자" // TODO: Security Context에서 가져오기
 
-        // 매장 존재 확인
-        val store = storePersistence.findById(storeId) ?: throw StoreException.StoreNotFound(storeId)
+        // 1. 매장 존재 여부 검증
+        val store = storePersistence.findById(storeId)
+            ?: throw StoreException.StoreNotFound(storeId)
 
-        // 기존 구독 조회
-        val existingSubscription = storeSubscriptionPersistence.findByUserIdAndStoreId(userId, storeId)
-
-        return if (existingSubscription != null) {
-            existingSubscription.softDelete()
-            val saved = storeSubscriptionPersistence.save(existingSubscription)
-            StoreSubscriptionDto.from(saved, store)
-        } else {
-            val newSubscription = StoreSubscription(  // id와 updatedAt 자동 할당
-                userId = userId,
-                storeId = storeId
-            )
-            val saved = storeSubscriptionPersistence.save(newSubscription)
-            StoreSubscriptionDto.from(saved, store)
+        // 2. 구독 토글 처리
+        val subscription = storeSubscriptionPersistence.findByUserIdAndStoreId(userId, storeId)?.let {
+            it.softDelete()
+            storeSubscriptionPersistence.save(it)
+        } ?: run {
+            val newSubscription = StoreSubscription(userId = userId, storeId = storeId)
+            storeSubscriptionPersistence.save(newSubscription)
         }
-    }
 
-    override suspend fun getSubscriptionById(id: String): StoreSubscriptionDto {
-        val subscription = storeSubscriptionPersistence.findById(id) ?: throw StoreException.SubscriptionNotFound(id)
-
-        // 스토어 정보 조회 및 추가
-        val store = storePersistence.findById(subscription.storeId)
-        return StoreSubscriptionDto.from(subscription, store)
-    }
-
-    override suspend fun getSubscriptionsByUserId(userId: String, limit: Int, offset: Int): List<StoreSubscriptionSummary> {
-        val subscriptions = storeSubscriptionPersistence.findByUserId(userId, limit, offset)
-        return mapToSummaryResponses(subscriptions)
-    }
-
-    override suspend fun getSubscriptionsByStoreId(storeId: Long, limit: Int, offset: Int): List<StoreSubscriptionSummary> {
-        val subscriptions = storeSubscriptionPersistence.findByStoreId(storeId, limit, offset)
-        return mapToSummaryResponses(subscriptions)
-    }
-
-    override suspend fun getMySubscribedStores(userId: Long): List<StoreSummary> {
-        val subscriptions = storeSubscriptionPersistence.findByUserId(
-            userId = userId.toString(),
-            limit = 100,
-            offset = 0
+        // 3. 하드코딩된 상품 정보 사용
+        return subscription.toDto(
+            storeName = store.name,
+            mainImageUrl = store.imageUrl,
+            status = store.status,
+            discountRate = tempProductInfo.discountRate,
+            originalPrice = tempProductInfo.originalPrice,
+            discountedPrice = tempProductInfo.discountedPrice
         )
-
-        return storePersistence.findAllByIds(subscriptions.map { it.storeId.toString() })
-            .map { StoreSummary.from(it) }
     }
 
-    override suspend fun deleteSubscription(id: String): Boolean {
-        val subscription = storeSubscriptionPersistence.findById(id) ?: throw StoreException.SubscriptionNotFound(id)
+    override suspend fun getSubscriptionById(id: Long): StoreSubscriptionDto {
+        val subscription = storeSubscriptionPersistence.findById(id)
+            ?: throw StoreException.SubscriptionNotFound(id)
+        val store = storePersistence.findById(subscription.storeId)
+            ?: throw StoreException.StoreNotFound(subscription.storeId)
 
-        // Soft Delete 적용
-        val deletedSubscription = subscription.softDelete()
-        storeSubscriptionPersistence.save(deletedSubscription)
-
-        return true
+        // 하드코딩된 상품 정보 사용
+        return subscription.toDto(
+            storeName = store.name,
+            mainImageUrl = store.imageUrl,
+            status = store.status,
+            discountRate = tempProductInfo.discountRate,
+            originalPrice = tempProductInfo.originalPrice,
+            discountedPrice = tempProductInfo.discountedPrice
+        )
     }
 
-    /**
-     * 구독 목록을 SummaryResponse 목록으로 변환
-     */
-    private suspend fun mapToSummaryResponses(subscriptions: List<StoreSubscription>): List<StoreSubscriptionSummary> {
-        val responses = mutableListOf<StoreSubscriptionSummary>()
-
-        for (subscription in subscriptions) {
-            val store = storePersistence.findById(subscription.storeId)
-            responses.add(StoreSubscriptionSummary.from(subscription, store))
-        }
-
-        return responses
+    override suspend fun getMySubscriptions(): List<StoreSubscriptionDto> {
+        val userId = "임시사용자"
+        return storeSubscriptionPersistence.findByUserId(userId)
+            .mapNotNull { subscription ->
+                val store = storePersistence.findById(subscription.storeId) ?: return@mapNotNull null
+                subscription.toDto(
+                    storeName = store.name,
+                    mainImageUrl = store.imageUrl,
+                    status = store.status,
+                    discountRate = tempProductInfo.discountRate,
+                    originalPrice = tempProductInfo.originalPrice,
+                    discountedPrice = tempProductInfo.discountedPrice
+                )
+            }
     }
+
+    override suspend fun getSubscriptionsByStoreId(storeId: Long): List<StoreSubscriptionDto> {
+        val store = storePersistence.findById(storeId)
+            ?: throw StoreException.StoreNotFound(storeId)
+
+        return storeSubscriptionPersistence.findByStoreId(storeId)
+            .map { subscription ->
+                subscription.toDto(
+                    storeName = store.name,
+                    mainImageUrl = store.imageUrl,
+                    status = store.status,
+                    discountRate = tempProductInfo.discountRate,
+                    originalPrice = tempProductInfo.originalPrice,
+                    discountedPrice = tempProductInfo.discountedPrice
+                )
+            }
+    }
+//    override suspend fun toggleSubscription(storeId: Long): StoreSubscriptionDto {
+//        val userId = "임시사용자" // TODO: Security Context에서 가져오기
+//
+//        // 매장 정보 조회
+//        val store = storePersistence.findById(storeId) ?: throw StoreException.StoreNotFound(storeId)
+//        val productInfo = productPersistence.findByStoreId(storeId)
+//            ?: throw StoreException.StoreNotAvailable(storeId)
+//
+//        val existingSubscription = storeSubscriptionPersistence.findByUserIdAndStoreId(userId, storeId)
+//
+//        val subscription = if (existingSubscription != null) {
+//            existingSubscription.softDelete()
+//            storeSubscriptionPersistence.save(existingSubscription)
+//        } else {
+//            val newSubscription = StoreSubscription(userId = userId, storeId = storeId)
+//            storeSubscriptionPersistence.save(newSubscription)
+//        }
+//
+//        return subscription.toDto(
+//            storeName = store.name,
+//            mainImageUrl = store.imageUrl,
+//            status = store.status.name,
+//            discountRate = productInfo.discountRate,
+//            originalPrice = productInfo.originalPrice,
+//            discountedPrice = productInfo.discountedPrice
+//        )
+//    }
+//
+//    override suspend fun getSubscriptionById(id: String): StoreSubscriptionDto {
+//        val subscription = storeSubscriptionPersistence.findById(id)
+//            ?: throw StoreException.SubscriptionNotFound(id)
+//        val store = storePersistence.findById(subscription.storeId)
+//            ?: throw StoreException.StoreNotFound(subscription.storeId)
+//        val productInfo = productPersistence.findByStoreId(store.id)
+//            ?: throw StoreException.StoreNotAvailable(store.id)
+//
+//        return subscription.toDto(
+//            storeName = store.name,
+//            mainImageUrl = store.imageUrl,
+//            status = store.status.name,
+//            discountRate = productInfo.discountRate,
+//            originalPrice = productInfo.originalPrice,
+//            discountedPrice = productInfo.discountedPrice
+//        )
+//    }
+//
+//    override suspend fun getMySubscriptions(): List<StoreSubscriptionDto> {
+//        val userId = "임시사용자"
+//        val subscriptions = storeSubscriptionPersistence.findByUserId(userId)
+//        return subscriptions.mapNotNull { subscription ->
+//            val store = storePersistence.findById(subscription.storeId) ?: return@mapNotNull null
+//            val productInfo = productPersistence.findByStoreId(store.id) ?: return@mapNotNull null
+//
+//            subscription.toDto(
+//                storeName = store.name,
+//                mainImageUrl = store.imageUrl,
+//                status = store.status.name,
+//                discountRate = productInfo.discountRate,
+//                originalPrice = productInfo.originalPrice,
+//                discountedPrice = productInfo.discountedPrice
+//            )
+//        }
+//    }
+//
+//    override suspend fun getSubscriptionsByStoreId(storeId: Long): List<StoreSubscriptionDto> {
+//        val subscriptions = storeSubscriptionPersistence.findByStoreId(storeId)
+//        val store = storePersistence.findById(storeId) ?: throw StoreException.StoreNotFound(storeId)
+//        val productInfo = productPersistence.findByStoreId(store.id)
+//            ?: throw StoreException.StoreNotAvailable(store.id)
+//
+//        return subscriptions.map { subscription ->
+//            subscription.toDto(
+//                storeName = store.name,
+//                mainImageUrl = store.imageUrl,
+//                status = store.status.name,
+//                discountRate = productInfo.discountRate,
+//                originalPrice = productInfo.originalPrice,
+//                discountedPrice = productInfo.discountedPrice
+//            )
+//        }
+//    }
+
 }

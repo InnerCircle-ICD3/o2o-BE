@@ -1,8 +1,6 @@
 package com.eatngo.store.dto
 
 import com.eatngo.store.constant.StoreEnum
-import com.eatngo.store.domain.Store
-import com.eatngo.store.domain.StoreSubscription
 import java.time.LocalDateTime
 
 /**
@@ -12,35 +10,13 @@ data class StoreSubscriptionDto(
     val id: Long,
     val userId: String,
     val storeId: Long,
+    val storeName: String,            // 매장명
+    val mainImageUrl: String?,        // 매장 대표 이미지
+    val status: StoreEnum.StoreStatus,               // 매장 상태 (OPEN, CLOSED 등)
+    val discountRate: Double,         // 할인율 (10% → 0.1)
+    val originalPrice: Int,           // 원가
+    val discountedPrice: Int,         // 할인된 가격
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime,
     val deletedAt: LocalDateTime? = null,
-    val store: StoreSummary? = null,
-    val subscribed: Boolean = true
-) {
-    companion object {
-        fun from(subscription: StoreSubscription, store: Store? = null): StoreSubscriptionDto {
-            return subscription.toResponseDto(subscription, store)
-        }
-    }
-}
-
-/**
- * 상점 구독 요약 응답 DTO (목록 조회용)
- */
-data class StoreSubscriptionSummary(
-    val id: Long,
-    val storeId: Long,
-    val name: String,
-    val mainImageUrl: String?,
-    val status: StoreEnum.StoreStatus,
-    val isAvailableForPickup: Boolean, // 현재 픽업 가능한지 여부
-    val pickupAvailableForTomorrow: Boolean, // 내일 픽업 가능 여부
-    val distance: Double? = null
-) {
-    companion object {
-        fun from(subscription: StoreSubscription, store: Store? = null): StoreSubscriptionSummary {
-            return subscription.toSummaryDto(store)
-        }
-    }
-}
+)
