@@ -22,6 +22,11 @@ dependencies {
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.5")    // Swagger UI
     implementation("org.springdoc:springdoc-openapi-starter-common:2.8.5")       // Swagger 공통 기능
 
+    // AWS Parameter Store
+    implementation(platform("io.awspring.cloud:spring-cloud-aws-dependencies:3.2.1"))
+    implementation("io.awspring.cloud:spring-cloud-aws-starter-parameter-store")
+    implementation("io.awspring.cloud:spring-cloud-aws-starter")
+
     // 테스트 의존성
     testImplementation("io.kotest:kotest-runner-junit5:5.8.1")
     testImplementation("io.kotest:kotest-assertions-core:5.8.1")
