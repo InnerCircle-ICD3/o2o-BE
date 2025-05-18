@@ -1,11 +1,7 @@
 package com.eatngo.search
 
 import com.eatngo.common.type.Point
-import com.eatngo.search.dto.SearchFilter
-import com.eatngo.search.dto.SearchStoreMapResultDto
-import com.eatngo.search.dto.SearchStoreQueryDto
-import com.eatngo.search.dto.SearchStoreResultDto
-import com.eatngo.search.dto.StoreStatus
+import com.eatngo.search.dto.*
 import com.eatngo.search.service.SearchService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
@@ -13,7 +9,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
-import java.time.ZonedDateTime
+import java.time.LocalDateTime
 
 @Tag(name = "Search", description = "검색 API")
 @RestController
@@ -28,7 +24,7 @@ class SearchController (
                     @RequestParam lng: Double,
                     @RequestParam searchText: String?,
                     @RequestParam category: String?,
-                    @RequestParam time: ZonedDateTime?,
+                    @RequestParam time: LocalDateTime?,
                     @RequestParam status: StoreStatus= StoreStatus.ALL,
                     @RequestParam page: Int = 0,
                     @RequestParam size: Int = 20,
@@ -43,7 +39,7 @@ class SearchController (
                     category = category,
                     time = time,
                     searchText = searchText,
-                    status = status.statusCode
+                    status = status
                 )
             ),
             page = page,

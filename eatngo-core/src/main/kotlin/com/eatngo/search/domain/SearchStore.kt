@@ -2,7 +2,6 @@ package com.eatngo.search.domain
 
 import com.eatngo.common.type.Point
 import java.time.LocalDateTime
-import java.time.ZonedDateTime
 
 /**
  * SearchStore
