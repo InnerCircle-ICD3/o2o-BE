@@ -5,7 +5,7 @@ import com.eatngo.store.domain.*
 import com.eatngo.store.dto.extension.toDomain
 import java.time.DayOfWeek
 import java.time.LocalTime
-import java.time.ZonedDateTime
+import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 
@@ -29,8 +29,8 @@ data class StoreDto(
     val pickupAvailableForTomorrow: Boolean,
     val ratingAverage: Double,
     val ratingCount: Int,
-    val createdAt: ZonedDateTime,
-    val updatedAt: ZonedDateTime
+    val createdAt: LocalDateTime,
+    val updatedAt: LocalDateTime
 )
 
 data class AddressDto(
