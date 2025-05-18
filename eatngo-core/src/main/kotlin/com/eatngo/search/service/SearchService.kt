@@ -59,8 +59,8 @@ class SearchService (
     fun searchStoreMap(searchQuery: SearchStoreQueryDto): SearchStoreMapResultDto {
         // center 값을 기준으로 해당하는 box 좌표를 구한다.
         val box: Box = getBox(
-            lat = searchQuery.viewPoint.lat,
-            lng = searchQuery.viewPoint.lng
+            lng = searchQuery.viewPoint.lng,
+            lat = searchQuery.viewPoint.lat
         )
 
         // Redis에서 box 검색 결과를 가져온다. -> 위경도 기중 0.005 단위로 박스 매핑
@@ -99,17 +99,23 @@ class SearchService (
         return searchRecommendList
     }
 
-    fun getBox(lat: Double, lng: Double): Box {
-        // 위쪽(북쪽)으로 올림, 아래쪽(남쪽)으로 내림
-        val topLat = ceil(lat / cacheBoxSize) * cacheBoxSize
-        val bottomLat = floor(lat / cacheBoxSize) * cacheBoxSize
-
-        // 왼쪽(서쪽)으로 내림, 오른쪽(동쪽)으로 올림
+    /**
+     * 검색 쿼리에서 box 좌표(0.005단위로 캐싱)를 구하는 메서드
+     * @param lng 경도
+     * @param lat 위도
+     * @return Box 객체
+     */
+    fun getBox(lng: Double, lat: Double): Box {
+        // 경도: 왼쪽(서쪽)으로 내림, 오른쪽(동쪽)으로 올림
         val leftLng = floor(lng / cacheBoxSize) * cacheBoxSize
         val rightLng = ceil(lng / cacheBoxSize) * cacheBoxSize
 
-        val topLeft = Point(lat = topLat, lng = leftLng)
-        val bottomRight = Point(lat = bottomLat, lng = rightLng)
+        // 위도: 위쪽(북쪽)으로 올림, 아래쪽(남쪽)으로 내림
+        val topLat = ceil(lat / cacheBoxSize) * cacheBoxSize
+        val bottomLat = floor(lat / cacheBoxSize) * cacheBoxSize
+
+        val topLeft = Point(lng = leftLng, lat = topLat)           // 서쪽 + 북쪽
+        val bottomRight = Point(lng = rightLng, lat = bottomLat)   // 동쪽 + 남쪽
 
         return Box(topLeft, bottomRight)
     }
