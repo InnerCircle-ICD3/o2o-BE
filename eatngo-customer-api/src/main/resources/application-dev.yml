@@ -3,7 +3,9 @@ server:
 
 spring:
   config:
-    import: classpath:auth-common-application.yml,aws-parameterstore:/eatngo/
+    import:
+      - classpath:auth-common-application.yml
+      - aws-parameterstore:/eatngo/
   cloud:
     aws:
       credentials:
