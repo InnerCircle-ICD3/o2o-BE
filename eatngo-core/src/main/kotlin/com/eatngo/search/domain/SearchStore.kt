@@ -1,7 +1,7 @@
 package com.eatngo.search.domain
 
 import com.eatngo.common.type.Point
-import java.time.ZonedDateTime
+import java.time.LocalDateTime
 
 /**
  * SearchStore
@@ -17,8 +17,8 @@ class SearchStore (
     var foodCategory: List<String> = emptyList(),
     var roadAddress: String = "",
     var location: Point = Point(0.0, 0.0), // TODO: MongoDB GeoJSON으로 변환
-    var updatedAt: ZonedDateTime, // 마지막 업데이트 시간
-    var createdAt: ZonedDateTime, // 생성 시간
+    var updatedAt: LocalDateTime, // 마지막 업데이트 시간
+    var createdAt: LocalDateTime, // 생성 시간
 ) {
     companion object {
         fun create(): SearchStore {
@@ -30,8 +30,8 @@ class SearchStore (
                 foodCategory = emptyList(),
                 roadAddress = "",
                 location = Point(0.0, 0.0),
-                updatedAt = ZonedDateTime.now(),
-                createdAt = ZonedDateTime.now()
+                updatedAt = LocalDateTime.now(),
+                createdAt = LocalDateTime.now()
             )
         }
     }

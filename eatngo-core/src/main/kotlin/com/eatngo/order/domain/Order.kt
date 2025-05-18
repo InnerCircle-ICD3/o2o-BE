@@ -1,6 +1,6 @@
 package com.eatngo.order.domain
 
-import java.time.ZonedDateTime
+import java.time.LocalDateTime
 
 class Order(
     val id: Long = 0,
@@ -9,8 +9,8 @@ class Order(
     val customerId: Long,
     val storeId: Long,
     val status: Status,
-    val createdAt: ZonedDateTime,
-    val updatedAt: ZonedDateTime,
+    val createdAt: LocalDateTime,
+    val updatedAt: LocalDateTime,
 ) {
     companion object {
         fun create(customerId: Long, storeId: Long, orderNumber: Long, orderItems: List<OrderItem>): Order {
@@ -21,8 +21,8 @@ class Order(
                 customerId,
                 storeId,
                 Status.CREATED,
-                ZonedDateTime.now(),
-                ZonedDateTime.now()
+                LocalDateTime.now(),
+                LocalDateTime.now()
             )
         }
     }

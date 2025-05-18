@@ -4,7 +4,7 @@ import com.eatngo.user_account.domain.UserAccount
 import com.eatngo.user_account.oauth2.constants.Oauth2Provider
 import com.eatngo.user_account.oauth2.dto.Oauth2
 import com.eatngo.user_account.vo.EmailAddress
-import java.time.ZonedDateTime
+import java.time.LocalDateTime
 
 class UserAccountOauth2(
     val id: Long = 0,
@@ -13,10 +13,10 @@ class UserAccountOauth2(
     val nickname: String?,
     val provider: Oauth2Provider,
     val principal: String,
-    val createdAt: ZonedDateTime,
-    val updatedAt: ZonedDateTime,
+    val createdAt: LocalDateTime,
+    val updatedAt: LocalDateTime,
     val isDeleted: Boolean = false,
-    val deletedAt: ZonedDateTime? = null,
+    val deletedAt: LocalDateTime? = null,
 ) {
 
     private val _terms = mutableListOf<UserAccountOauth2Term>()
@@ -36,8 +36,8 @@ class UserAccountOauth2(
                 nickname = oauth2.nickname,
                 provider = oauth2.provider,
                 principal = oauth2.principal,
-                createdAt = ZonedDateTime.now(),
-                updatedAt = ZonedDateTime.now()
+                createdAt = LocalDateTime.now(),
+                updatedAt = LocalDateTime.now()
             )
             val newTerms = oauth2.terms.map {
                 UserAccountOauth2Term.of(

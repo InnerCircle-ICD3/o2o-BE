@@ -2,7 +2,7 @@ package com.eatngo.order.dto
 
 import com.eatngo.order.domain.Order
 import com.eatngo.order.domain.OrderItem
-import java.time.ZonedDateTime
+import java.time.LocalDateTime
 
 data class OrderDto(
     val id: Long,
@@ -11,8 +11,8 @@ data class OrderDto(
     val storeId: Long,
     val status: String,
     val orderItems: List<OrderItemDto>,
-    val createdAt: ZonedDateTime,
-    val updatedAt: ZonedDateTime,
+    val createdAt: LocalDateTime,
+    val updatedAt: LocalDateTime,
 ) {
     companion object {
         fun from(order: Order): OrderDto {

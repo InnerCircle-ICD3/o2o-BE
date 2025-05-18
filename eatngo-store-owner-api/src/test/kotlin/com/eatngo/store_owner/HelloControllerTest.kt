@@ -1,4 +1,4 @@
-package com.eatngo.storeowner
+package com.eatngo.store_owner
 
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
