@@ -44,13 +44,13 @@ class UserAccountOAuth2JpaEntity(
     @Column(length = 500)
     val scopes: String? = null,
 
-    @OneToMany(mappedBy = "userAccountOAuth2JpaEntity", fetch = FetchType.LAZY, cascade = [CascadeType.PERSIST])
+    @OneToMany(mappedBy = "userAccountOAuth2", fetch = FetchType.LAZY, cascade = [CascadeType.PERSIST])
     @Filter(name = DELETED_FILTER)
-    val terms: List<UserAccountOauth2TermJpaEntity> = emptyList(),
+    val terms: List<UserAccountOauth2TermJpaEntity> = mutableListOf(),
 ) : BaseJpaEntity() {
     companion object {
-        fun from(userAccountOauth2: UserAccountOauth2) =
-            UserAccountOAuth2JpaEntity(
+        fun from(userAccountOauth2: UserAccountOauth2): UserAccountOAuth2JpaEntity {
+            val userAccountOAuth2JpaEntity = UserAccountOAuth2JpaEntity(
                 id = userAccountOauth2.id,
                 userAccount = UserAccountJpaEntity.from(userAccountOauth2.userAccount),
                 email = userAccountOauth2.email.let { it?.toString() },
@@ -60,10 +60,14 @@ class UserAccountOAuth2JpaEntity(
                 accessToken = userAccountOauth2.accessToken,
                 expireAt = userAccountOauth2.expireAt,
                 scopes = userAccountOauth2.scopes,
-                terms = userAccountOauth2.terms.map {
-                    UserAccountOauth2TermJpaEntity.from(it)
+            ).also {
+                userAccountOauth2.terms.forEach { term ->
+                    it.terms.addLast(UserAccountOauth2TermJpaEntity.from(term))
                 }
-            )
+            }
+
+            return userAccountOAuth2JpaEntity
+        }
 
         fun toUserAccount(accountOauth2: UserAccountOAuth2JpaEntity) = with(accountOauth2) {
             val emailAddress = email?.let { EmailAddress.from(it) }

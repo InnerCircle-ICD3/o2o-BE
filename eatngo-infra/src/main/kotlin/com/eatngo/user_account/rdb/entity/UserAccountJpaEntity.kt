@@ -17,7 +17,7 @@ class UserAccountJpaEntity(
 
     @OneToMany(mappedBy = "userAccount", fetch = FetchType.LAZY, cascade = [CascadeType.PERSIST])
     @Filter(name = DELETED_FILTER)
-    val oauth2: List<UserAccountOAuth2JpaEntity> = emptyList(),
+    val oauth2: List<UserAccountOAuth2JpaEntity> = mutableListOf(),
 ) : BaseJpaEntity() {
     companion object {
         fun from(account: UserAccount): UserAccountJpaEntity {

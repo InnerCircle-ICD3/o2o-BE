@@ -10,7 +10,7 @@ class UserAccount(
     val id: Long = 0,
     val email: EmailAddress?,
     val nickname: String? = null,
-    var roles: List<Role> = emptyList(),
+    var roles: List<Role> = mutableListOf(),
     val createdAt: LocalDateTime? = null,
     var updatedAt: LocalDateTime? = null,
     var deletedAt: LocalDateTime? = null,

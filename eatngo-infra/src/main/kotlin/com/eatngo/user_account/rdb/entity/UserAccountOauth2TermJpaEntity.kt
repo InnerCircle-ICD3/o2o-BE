@@ -15,9 +15,9 @@ class UserAccountOauth2TermJpaEntity(
     val id: Long = 0,
     @Filter(name = DELETED_FILTER)
     @ManyToOne(fetch = FetchType.LAZY)
-    val userAccountOAuth2JpaEntity: UserAccountOAuth2JpaEntity,
+    val userAccountOAuth2: UserAccountOAuth2JpaEntity,
 
-    val tage: String,
+    val tag: String,
 
     val agreedAt: LocalDateTime,
 ) : SoftDeletableJpaEntity() {
@@ -25,8 +25,8 @@ class UserAccountOauth2TermJpaEntity(
     companion object {
         fun from(userAccountOauth2Term: UserAccountOauth2Term) =
             UserAccountOauth2TermJpaEntity(
-                userAccountOAuth2JpaEntity = UserAccountOAuth2JpaEntity.from(userAccountOauth2Term.userAccountOauth2),
-                tage = userAccountOauth2Term.tag,
+                userAccountOAuth2 = UserAccountOAuth2JpaEntity.from(userAccountOauth2Term.userAccountOauth2),
+                tag = userAccountOauth2Term.tag,
                 agreedAt = userAccountOauth2Term.agreedAt,
             )
     }
