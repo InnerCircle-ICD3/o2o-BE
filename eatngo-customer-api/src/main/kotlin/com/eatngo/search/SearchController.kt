@@ -21,8 +21,7 @@ class SearchController (
     private val searchService: SearchService
 ) {
 
-    // TODO : GET vs POST
-    // TODO : 공통 모듈로 묶기
+    // TODO : 공통 Response로 묶기
     @Operation(summary = "가게 검색 API", description = "매장 리스트 리턴 및 검색 API")
     @GetMapping("/api/v1/search/store")
     fun searchStore(@RequestParam lat: Double,
@@ -31,7 +30,8 @@ class SearchController (
                     @RequestParam category: String?,
                     @RequestParam time: ZonedDateTime?,
                     @RequestParam status: StoreStatus= StoreStatus.ALL,
-                    @RequestParam offset: Int = 0 // TODO: (storeId 아니면 위치??)
+                    @RequestParam page: Int = 0,
+                    @RequestParam size: Int = 20,
     ): ResponseEntity<SearchStoreResultDto> {
         val searchResult = searchService.searchStore(
             SearchStoreQueryDto(
@@ -46,7 +46,8 @@ class SearchController (
                     status = status.statusCode
                 )
             ),
-            offset = offset
+            page = page,
+            size = size
         )
         return ResponseEntity.ok(
             searchResult

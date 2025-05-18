@@ -18,14 +18,31 @@ class SearchService (
     private val searchMapRedisRepository: SearchMapRedisRepository
 ) {
 
-    fun searchStore(searchQuery: SearchStoreQueryDto, offset: Int): SearchStoreResultDto {
-        // TODO: 리스트 검색 로직 구현
-        val searchStore: SearchStore = SearchStore.create()
+    /**
+     * 가게 검색 API
+     * TODO: 검색 결과 캐싱 / page-size 방색에서 sort-offset 등 개선된 방식으로 변경
+     * @param searchQuery 검색 쿼리
+     * @param page 페이지 번호
+     * @param size 페이지 사이즈
+     * @return 검색 결과 DTO
+     */
+    fun searchStore(searchQuery: SearchStoreQueryDto, page: Int, size: Int): SearchStoreResultDto {
+        val searchStoreList: List<SearchStore> = searchStoreRepository.searchStore(
+            lng = searchQuery.viewPoint.lng,
+            lat = searchQuery.viewPoint.lat,
+            maxDistance = 3000.0,
+            searchFilter = searchQuery.filter,
+            page = page,
+            size = size
+        )
 
         return SearchStoreResultDto(
-            storeList = listOf(
-                SearchStoreDto.from(searchQuery.viewPoint, searchStore)
-            )
+            storeList = searchStoreList.map {
+                SearchStoreDto.from(
+                    userPoint = searchQuery.viewPoint,
+                    searchStore = it
+                )
+            }
         )
     }
 
