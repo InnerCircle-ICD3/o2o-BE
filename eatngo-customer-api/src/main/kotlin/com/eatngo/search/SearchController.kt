@@ -69,6 +69,11 @@ class SearchController (
         )
     }
 
+    /**
+     * 검색어 자동완성 API
+     * @param keyword 검색어
+     * @return 검색어 자동완성 리스트
+     */
     @Operation(summary = "검색어 자동완성 API", description = "검색어 자동완성 API ex: '치킨' -> '치킨, 치킨너겟'")
     @GetMapping("/api/v1/search/suggestions")
     fun searchSuggestions(@RequestParam keyword: String): ResponseEntity<List<String>> {

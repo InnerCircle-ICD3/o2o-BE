@@ -130,6 +130,33 @@ class SearchStoreRepositoryImpl(
         }
     }
 
+    /**
+     * TODO 검색어 자동완성 로직 수정 필요 -> DB를 탈지? -> 리서치 후 수정 일단 임시로...
+     */
+    override fun searchStoreRecommend(keyword: String, size: Int): List<String> {
+        val searchOp = getAutocompleteOperation(keyword)
+        val limitOp = Aggregation.limit(size.toLong())
+
+        val pipeline = Aggregation.newAggregation(
+            searchOp,
+            limitOp
+        )
+
+        val searchResult = mongoTemplate.aggregate(
+            pipeline,
+            "searchStore",
+            SearchStoreEntity::class.java
+        ).mappedResults
+
+        // 검색어 자동완성 결과 리턴
+        val result = searchResult.map {
+            it.storeName
+        }
+
+        return result
+
+    }
+
     fun makeSearchQuery(
         lng: Double,
         lat: Double,
@@ -191,6 +218,7 @@ class SearchStoreRepositoryImpl(
         }
 
         // MongoDB Atlas Search 쿼리 생성
+        // TODO: index 지정 문법 확인 필요
         val searchQuery = Document(
             "\$search",
             Document("compound",
@@ -215,4 +243,17 @@ class SearchStoreRepositoryImpl(
         return AggregationOperation { _: AggregationOperationContext -> searchQuery }
     }
 
+    fun getAutocompleteOperation(prefix: String): AggregationOperation {
+        return AggregationOperation {
+            Document(
+                "\$search", Document()
+                    .append("index", "store-autocomplete-index")
+                    .append("autocomplete", Document()
+                        .append("query", prefix)
+                        .append("path", "storeName")
+                        .append("fuzzy", Document("maxEdits", 1))  // 오타 허용
+                    )
+            )
+        }
+    }
 }

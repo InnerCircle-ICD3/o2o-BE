@@ -77,6 +77,9 @@ class SearchService (
     }
 
     fun searchSuggestions(keyword: String): List<String> {
-        return List(1) { "치킨" }
+        val searchRecommendList: List<String> = searchStoreRepository.searchStoreRecommend(
+            keyword = keyword
+        )
+        return searchRecommendList
     }
 }
