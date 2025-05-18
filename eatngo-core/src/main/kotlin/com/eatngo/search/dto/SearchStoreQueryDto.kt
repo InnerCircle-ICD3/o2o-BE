@@ -10,8 +10,8 @@ data class SearchStoreQueryDto(
 )
 
 data class SearchFilter (
-    val category: String?,   // 매장 카테고리
-    val time: LocalDateTime?,// 픽업 가능 시간
-    val searchText: String?,   // 검색어(대상 필드: 매장명, 음식명, 카테고리)
-    val status: Int,        // 매장 상태(0: 영업종료, 1: 영업중, 9: 전체 상태)
+    val category: String?,      // 매장 카테고리
+    val time: LocalDateTime?,   // 픽업 가능 시간
+    val searchText: String?,    // 검색어(대상 필드: 매장명, 음식명, 카테고리)
+    val status: Int,            // 매장 상태(0: 영업종료, 1: 영업중, 9: 전체 상태)
 )
