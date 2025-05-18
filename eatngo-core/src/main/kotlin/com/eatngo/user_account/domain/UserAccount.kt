@@ -1,5 +1,6 @@
 package com.eatngo.user_account.domain
 
+import com.eatngo.user_account.oauth2.constants.Role
 import com.eatngo.user_account.oauth2.domain.UserAccountOauth2
 import com.eatngo.user_account.oauth2.dto.Oauth2
 import com.eatngo.user_account.vo.EmailAddress
@@ -8,6 +9,7 @@ import java.time.LocalDateTime
 class UserAccount(
     val id: Long = 0,
     val email: EmailAddress,
+    var roles: List<Role> = emptyList(),
     val createdAt: LocalDateTime,
     var updatedAt: LocalDateTime,
     var isDeleted: Boolean = false,
@@ -24,7 +26,7 @@ class UserAccount(
 
         fun create(oauth2: Oauth2): UserAccount {
             val userAccount = UserAccount(
-                email = EmailAddress.from(oauth2.email),
+                email = oauth2.email.let { EmailAddress.from(it) },
                 createdAt = LocalDateTime.now(),
                 updatedAt = LocalDateTime.now()
             )
@@ -34,6 +36,7 @@ class UserAccount(
                     oauth2 = oauth2
                 )
             )
+            userAccount.roles = listOf(Role.USER)
 
             return userAccount
         }

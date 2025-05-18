@@ -20,18 +20,18 @@ class TokenProvider(
 ) {
     private val key: SecretKey = Keys.hmacShaKeyFor(Base64.getDecoder().decode(secret))
 
-    fun createAccessToken(userId: String): String {
+    fun createAccessToken(userId: Long): String {
         return Jwts.builder()
-            .subject(userId)
+            .subject(userId.toString())
             .issuedAt(Date())
             .expiration(Date(System.currentTimeMillis() + 1000 * 60 * 60)) // 1 hour
             .signWith(key)
             .compact()
     }
 
-    fun createRefreshToken(userId: String): String {
+    fun createRefreshToken(userId: Long): String {
         return Jwts.builder()
-            .subject(userId)
+            .subject(userId.toString())
             .issuedAt(Date())
             .expiration(Date(System.currentTimeMillis() + 1000L * 60 * 60 * 24 * 14)) // 14 days
             .signWith(key)
@@ -47,10 +47,6 @@ class TokenProvider(
         val authorities = roles.map { SimpleGrantedAuthority(it) }
 
         return UsernamePasswordAuthenticationToken(userId, null, authorities)
-    }
-
-    fun getUserIdFromToken(token: String): String {
-        return parseClaims(token).subject
     }
 
     fun parseClaims(token: String): Claims {

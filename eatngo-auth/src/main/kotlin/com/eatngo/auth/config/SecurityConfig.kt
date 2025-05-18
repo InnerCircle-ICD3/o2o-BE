@@ -44,6 +44,7 @@ class SecurityConfig(
 
             .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter::class.java)
 
+
             .oauth2Login {
                 it.userInfoEndpoint { userInfo -> userInfo.userService(oauth2UserService) }
                     .successHandler(authenticationSuccessHandler)

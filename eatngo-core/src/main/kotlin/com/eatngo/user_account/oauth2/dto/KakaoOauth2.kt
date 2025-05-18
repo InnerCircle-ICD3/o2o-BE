@@ -2,6 +2,7 @@ package com.eatngo.user_account.oauth2.dto
 
 import com.eatngo.user_account.oauth2.constants.Oauth2Provider
 
+
 data class KakaoOauth2(
     override val id: Long,
     override val email: String,
