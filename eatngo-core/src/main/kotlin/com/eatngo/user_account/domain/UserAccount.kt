@@ -8,11 +8,11 @@ import java.time.LocalDateTime
 
 class UserAccount(
     val id: Long = 0,
-    val email: EmailAddress,
+    val email: EmailAddress?,
+    val nickname: String? = null,
     var roles: List<Role> = emptyList(),
-    val createdAt: LocalDateTime,
-    var updatedAt: LocalDateTime,
-    var isDeleted: Boolean = false,
+    val createdAt: LocalDateTime? = null,
+    var updatedAt: LocalDateTime? = null,
     var deletedAt: LocalDateTime? = null,
 ) {
     private val _oauth2 = mutableListOf<UserAccountOauth2>()
@@ -27,8 +27,7 @@ class UserAccount(
         fun create(oauth2: Oauth2): UserAccount {
             val userAccount = UserAccount(
                 email = oauth2.email.let { EmailAddress.from(it) },
-                createdAt = LocalDateTime.now(),
-                updatedAt = LocalDateTime.now()
+                nickname = oauth2.nickname,
             )
             userAccount.addOauth2(
                 UserAccountOauth2.of(
@@ -40,13 +39,7 @@ class UserAccount(
 
             return userAccount
         }
+
     }
 
-    fun delete() {
-        if (isDeleted) {
-            throw IllegalStateException("Store owner is already deleted")
-        }
-        isDeleted = true
-        deletedAt = LocalDateTime.now()
-    }
 }
