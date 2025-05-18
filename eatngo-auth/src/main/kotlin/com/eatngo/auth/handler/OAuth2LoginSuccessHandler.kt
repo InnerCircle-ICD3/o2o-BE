@@ -29,6 +29,7 @@ class OAuth2LoginSuccessHandler(
         val accessToken = tokenProvider.createAccessToken(userId)
 
         response.addCookie(createHttpOnlyCookie(ACCESS_TOKEN, accessToken))
+        // TODO redis refresh token 추가하기
         response.contentType = "application/json"
     }
 

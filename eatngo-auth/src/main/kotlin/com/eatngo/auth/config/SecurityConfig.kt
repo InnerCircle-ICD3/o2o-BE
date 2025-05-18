@@ -46,7 +46,6 @@ class SecurityConfig(
 
             .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter::class.java)
 
-
             .oauth2Login {
                 it.userInfoEndpoint { userInfo -> userInfo.userService(oauth2UserService) }
                     .successHandler(authenticationSuccessHandler)
@@ -57,7 +56,7 @@ class SecurityConfig(
                     .logoutSuccessUrl("/")
                     .invalidateHttpSession(true)
                     .deleteCookies(ACCESS_TOKEN)
-                // TODO logout api handler 추가하기
+                // TODO logout handler 추가하기 (logout api + redis refresh token 삭제)
             }
 
         return http.build()
