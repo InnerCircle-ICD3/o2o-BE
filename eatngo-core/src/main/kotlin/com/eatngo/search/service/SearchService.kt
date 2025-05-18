@@ -11,6 +11,8 @@ import com.eatngo.search.dto.SearchStoreResultDto
 import com.eatngo.search.infra.SearchMapRedisRepository
 import com.eatngo.search.infra.SearchStoreRepository
 import org.springframework.stereotype.Service
+import kotlin.math.ceil
+import kotlin.math.floor
 
 @Service
 class SearchService (
@@ -98,14 +100,17 @@ class SearchService (
     }
 
     fun getBox(lat: Double, lng: Double): Box {
-        val topLeft = Point(
-            lat = lat + cacheBoxSize,
-            lng = lng - cacheBoxSize
-        )
-        val bottomRight = Point(
-            lat = lat - cacheBoxSize,
-            lng = lng + cacheBoxSize
-        )
+        // 위쪽(북쪽)으로 올림, 아래쪽(남쪽)으로 내림
+        val topLat = ceil(lat / cacheBoxSize) * cacheBoxSize
+        val bottomLat = floor(lat / cacheBoxSize) * cacheBoxSize
+
+        // 왼쪽(서쪽)으로 내림, 오른쪽(동쪽)으로 올림
+        val leftLng = floor(lng / cacheBoxSize) * cacheBoxSize
+        val rightLng = ceil(lng / cacheBoxSize) * cacheBoxSize
+
+        val topLeft = Point(lat = topLat, lng = leftLng)
+        val bottomRight = Point(lat = bottomLat, lng = rightLng)
+
         return Box(topLeft, bottomRight)
     }
 }
