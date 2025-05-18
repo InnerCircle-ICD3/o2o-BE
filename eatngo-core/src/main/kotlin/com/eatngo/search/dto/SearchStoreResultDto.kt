@@ -15,7 +15,7 @@ data class SearchStoreDto (
     val storeCategory: List<String>,
     val foodCategory: List<String>, // 대표 판매 음식 종류
     val distanceKm: Double,         // 검색하는 유저와 매장 간의 거리(km)
-    val isOpen: Boolean,            // 매장 오픈 여부
+    val open: Boolean,              // 매장 오픈 여부
     val stock: Int,                 // 재고 수량
     val roadAddress: String,        // 매장 주소(도로명 주소)
     val location: Point,            // 매장 위치(위도, 경도)
@@ -39,7 +39,7 @@ data class SearchStoreDto (
                     from = searchStore.location,
                     to = userPoint,
                 ),
-                isOpen = false,
+                open = false,
                 stock = 0,
                 )
         }

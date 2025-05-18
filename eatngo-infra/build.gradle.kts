@@ -24,6 +24,10 @@ dependencies {
 
     // jpa
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    // MongoDB
+    implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
+    // Redis
+    implementation("org.springframework.boot:spring-boot-starter-data-redis")
 }
 
 tasks.bootJar{
