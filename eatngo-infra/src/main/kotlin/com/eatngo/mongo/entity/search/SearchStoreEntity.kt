@@ -52,6 +52,8 @@ class SearchStoreEntity (
                 foodCategory = searchStore.foodCategory,
                 roadAddress = searchStore.roadAddress,
                 open = searchStore.open,
+                openTime = searchStore.openTime,
+                closeTime = searchStore.closeTime,
                 location = toGeoJsonPoint(
                     searchStore.location.lat,
                     searchStore.location.lng
