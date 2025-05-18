@@ -1,17 +1,21 @@
 package com.eatngo.order.rdb.entity
 
 import com.eatngo.common.BaseJpaEntity
+import com.eatngo.constants.DELETED_FILTER
 import com.eatngo.order.domain.Order
 import com.eatngo.order.domain.OrderItem
 import com.eatngo.order.domain.Status
 import jakarta.persistence.*
+import org.hibernate.annotations.Filter
 
+@Filter(name = DELETED_FILTER)
 @Entity
 class OrderJpaEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
     val orderNumber: Long,
+    @Filter(name = DELETED_FILTER)
     @OneToMany(mappedBy = "order", cascade = [CascadeType.ALL])
     val orderItems: MutableList<OrderItemJpaEntity> = mutableListOf(),
     val customerId: Long,

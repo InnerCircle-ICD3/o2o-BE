@@ -1,3 +1,10 @@
 package com.eatngo.aop
 
-annotation class SoftDeletedFilter()
+import org.springframework.transaction.annotation.Transactional
+
+
+@Transactional
+@Target(AnnotationTarget.FUNCTION)
+@Retention(AnnotationRetention.RUNTIME)
+@MustBeDocumented
+annotation class SoftDeletedFilter

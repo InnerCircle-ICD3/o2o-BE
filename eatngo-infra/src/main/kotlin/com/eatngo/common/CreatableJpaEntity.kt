@@ -12,7 +12,7 @@ import java.time.LocalDateTime
 abstract class CreatableJpaEntity(
 
     @CreatedBy
-    var createdBy: String? = null,
+    var createdBy: Long? = null,
 
     @CreatedDate
     var createdAt: LocalDateTime? = null

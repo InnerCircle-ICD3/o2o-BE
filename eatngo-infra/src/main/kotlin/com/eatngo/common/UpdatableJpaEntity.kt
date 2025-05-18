@@ -11,8 +11,8 @@ import java.time.LocalDateTime
 @EntityListeners(AuditingEntityListener::class)
 abstract class UpdatableJpaEntity(
     @LastModifiedBy
-    var updatedBy: String?,
+    var updatedBy: Long? = null,
 
     @LastModifiedDate
-    var updatedAt: LocalDateTime?
+    var updatedAt: LocalDateTime? = null,
 )

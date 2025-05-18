@@ -1,5 +1,6 @@
 package com.eatngo.aop
 
+import com.eatngo.constants.DELETED_FILTER
 import jakarta.persistence.EntityManager
 import jakarta.persistence.PersistenceContext
 import org.aspectj.lang.annotation.Aspect
@@ -15,6 +16,6 @@ class HibernateFilterAspect(
     @Before("@annotation(com.eatngo.aop.SoftDeletedFilter)")
     fun enableSoftDeleteFilter() {
         val session = entityManager.unwrap(Session::class.java)
-        session.enableFilter("deletedFilter").setParameter("deletedAt", false)
+        session.enableFilter(DELETED_FILTER)
     }
 }

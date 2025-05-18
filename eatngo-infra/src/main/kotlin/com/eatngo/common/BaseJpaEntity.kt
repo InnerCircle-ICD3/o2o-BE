@@ -13,17 +13,14 @@ import java.time.LocalDateTime
 @EntityListeners(AuditingEntityListener::class)
 abstract class BaseJpaEntity(
     @CreatedBy
-    var createdBy: String? = null,
+    var createdBy: Long? = null,
 
     @CreatedDate
     var createdAt: LocalDateTime = LocalDateTime.now(),
 
     @LastModifiedBy
-    var updatedBy: String? = null,
+    var updatedBy: Long? = null,
 
     @LastModifiedDate
     var updatedAt: LocalDateTime = LocalDateTime.now(),
-
-
-    var deletedAt: LocalDateTime? = null,
-)
+) : SoftDeletableJpaEntity()
