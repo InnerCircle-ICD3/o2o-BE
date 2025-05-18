@@ -1,28 +1,28 @@
 package com.eatngo.order.rdb.entity
 
+import com.eatngo.common.BaseJpaEntity
+import com.eatngo.constants.DELETED_FILTER
 import com.eatngo.order.domain.Order
 import com.eatngo.order.domain.OrderItem
 import com.eatngo.order.domain.Status
 import jakarta.persistence.*
-import java.time.ZonedDateTime
+import org.hibernate.annotations.Filter
 
+@Filter(name = DELETED_FILTER)
 @Entity
 class OrderJpaEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
     val orderNumber: Long,
+    @Filter(name = DELETED_FILTER)
     @OneToMany(mappedBy = "order", cascade = [CascadeType.ALL])
     val orderItems: MutableList<OrderItemJpaEntity> = mutableListOf(),
     val customerId: Long,
     val storeId: Long,
     @Enumerated(EnumType.STRING)
-    val status: Status,
-    @Column(name = "created_at")
-    val createdAt: ZonedDateTime,
-    @Column(name = "updated_at")
-    val updatedAt: ZonedDateTime,
-) {
+    val status: Status
+) : BaseJpaEntity() {
 
     companion object {
         fun from(order: Order): OrderJpaEntity {
@@ -31,9 +31,7 @@ class OrderJpaEntity(
                 orderNumber = order.orderNumber,
                 customerId = order.customerId,
                 storeId = order.storeId,
-                status = order.status,
-                createdAt = order.createdAt,
-                updatedAt = order.updatedAt,
+                status = order.status
             )
 
             order.orderItems.forEach { orderItem: OrderItem ->
@@ -45,7 +43,7 @@ class OrderJpaEntity(
             return orderJpaEntity
         }
 
-        fun toOrder(orderJpaEntity: OrderJpaEntity) = with(orderJpaEntity){
+        fun toOrder(orderJpaEntity: OrderJpaEntity) = with(orderJpaEntity) {
             Order(
                 id = id,
                 orderNumber = orderNumber,
@@ -54,7 +52,7 @@ class OrderJpaEntity(
                 storeId = storeId,
                 status = status,
                 createdAt = createdAt,
-                updatedAt = updatedAt,
+                updatedAt = updatedAt
             )
         }
     }

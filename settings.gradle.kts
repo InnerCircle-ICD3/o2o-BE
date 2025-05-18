@@ -10,10 +10,10 @@ include(
     "eatngo-store-owner-api",
     "eatngo-infra",
     "eatngo-common",
-    "eatngo-auth-common",
+    "eatngo-auth",
 )
 
 include(":eatngo-common:swagger")
 include(":eatngo-common:p6spy")
 include(":eatngo-common:logging")
-
+include(":eatngo-common:secrets")

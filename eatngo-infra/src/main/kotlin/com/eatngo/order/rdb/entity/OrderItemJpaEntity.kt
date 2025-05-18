@@ -1,10 +1,14 @@
 package com.eatngo.order.rdb.entity
 
+import com.eatngo.common.BaseJpaEntity
+import com.eatngo.constants.DELETED_FILTER
 import com.eatngo.order.domain.OrderItem
 import jakarta.persistence.*
+import org.hibernate.annotations.Filter
 
 
 @Entity
+@Filter(name = DELETED_FILTER)
 class OrderItemJpaEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -16,7 +20,7 @@ class OrderItemJpaEntity(
     @ManyToOne
     @JoinColumn(name = "order_id")
     val order: OrderJpaEntity
-) {
+) : BaseJpaEntity() {
     companion object {
         fun from(orderItem: OrderItem, order: OrderJpaEntity): OrderItemJpaEntity {
             return OrderItemJpaEntity(
@@ -30,7 +34,7 @@ class OrderItemJpaEntity(
         }
 
         fun toOrderItem(orderItemJpaEntity: OrderItemJpaEntity) =
-            with(orderItemJpaEntity){
+            with(orderItemJpaEntity) {
                 OrderItem(
                     id = id,
                     productId = productId,
