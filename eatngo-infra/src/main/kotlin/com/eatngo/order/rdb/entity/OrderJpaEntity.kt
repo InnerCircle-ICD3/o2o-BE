@@ -7,9 +7,11 @@ import com.eatngo.order.domain.OrderItem
 import com.eatngo.order.domain.Status
 import jakarta.persistence.*
 import org.hibernate.annotations.Filter
+import org.hibernate.annotations.Where
 
 @Filter(name = DELETED_FILTER)
 @Entity
+@Where(clause = "deleted_at is null")
 class OrderJpaEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

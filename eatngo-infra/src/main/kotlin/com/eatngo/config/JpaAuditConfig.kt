@@ -1,4 +1,4 @@
-package com.eatngo.order.rdb.config
+package com.eatngo.config
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
