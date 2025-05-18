@@ -1,19 +1,44 @@
 package com.eatngo.redis.repository.search
 
+import com.eatngo.common.type.Point
+import com.eatngo.search.dto.SearchStoreMap
 import com.eatngo.search.infra.SearchMapRedisRepository
+import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.stereotype.Repository
 
+/**
+ * 위치기반 검색 최적화를 위한 위경도 박스 단위 캐싱
+ * TODO: TTL 설정 필요
+ * Key : Box.topLeft
+ * Value : List<SearchStoreMap>
+ */
 @Repository
 class SearchMapMapRedisRepositoryImpl (
-    private val redisTemplate: RedisTemplate<String, String>
+    private val redisTemplate: RedisTemplate<String, String>,
+    private val objectMapper: ObjectMapper
 ) : SearchMapRedisRepository {
-    override fun save(key: String, value: String) {
-        redisTemplate.opsForValue().set(key, value)
+
+    override fun getKey(topLeft: Point): String {
+        val lat = topLeft.lat
+        val lng = topLeft.lng
+        return "searchMap:lat:$lat:lng:$lng"
     }
 
-    override fun findByKey(key: String): String? {
-        return redisTemplate.opsForValue().get(key)
+    override fun save(key: String, values: List<SearchStoreMap>) {
+        val ops = redisTemplate.opsForHash<String, String>()
+        values.forEach { storeMap ->
+            val json = objectMapper.writeValueAsString(storeMap)
+            ops.put(key, storeMap.storeID.toString(), json)
+        }
+    }
+
+    override fun findByKey(key: String): List<SearchStoreMap> {
+        val ops = redisTemplate.opsForHash<String, String>()
+        val allValues = ops.entries(key)
+        return allValues.values.map {
+            objectMapper.readValue(it, SearchStoreMap::class.java)
+        }
     }
 
     override fun deleteByKey(key: String) {

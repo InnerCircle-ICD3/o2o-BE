@@ -1,13 +1,12 @@
 package com.eatngo.search.infra
 
 import com.eatngo.search.domain.SearchStore
+import com.eatngo.search.dto.Box
 import com.eatngo.search.dto.SearchFilter
 
 interface SearchStoreRepository {
-    fun findByLocation(
-        lng: Double,
-        lat: Double,
-        maxDistance: Double
+    fun findBox(
+        box: Box,
     ): List<SearchStore>
 
     fun searchStore(

@@ -2,6 +2,7 @@ package com.eatngo.mongo.repository.search
 
 import com.eatngo.mongo.entity.search.SearchStoreEntity
 import com.eatngo.search.domain.SearchStore
+import com.eatngo.search.dto.Box as CoreBox
 import com.eatngo.search.dto.SearchFilter
 import com.eatngo.search.infra.SearchStoreRepository
 import org.springframework.data.mongodb.core.MongoTemplate
@@ -10,6 +11,8 @@ import org.springframework.data.mongodb.core.aggregation.AggregationOperationCon
 import org.springframework.data.mongodb.core.geo.GeoJsonPoint
 import org.bson.Document
 import org.bson.conversions.Bson
+import org.springframework.data.geo.Box
+import org.springframework.data.geo.Shape
 import org.springframework.data.mongodb.core.aggregation.Aggregation
 import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query
@@ -19,16 +22,19 @@ import org.springframework.stereotype.Component
 class SearchStoreRepositoryImpl(
     private val mongoTemplate: MongoTemplate,
 ): SearchStoreRepository {
-    override fun findByLocation(
-        lng: Double,
-        lat: Double,
-        maxDistance: Double
+
+    override fun findBox(
+        box: CoreBox
     ): List<SearchStore> {
+        val mongoBox: Shape = Box (
+            GeoJsonPoint(box.topLeft.lng, box.topLeft.lat),
+            GeoJsonPoint(box.bottomRight.lng, box.bottomRight.lat)
+        )
+
         val query = Query()
         query.addCriteria(
             Criteria.where("location")
-                .near(GeoJsonPoint(lng, lat))
-                .maxDistance(maxDistance)
+                .within(mongoBox)
         )
         return mongoTemplate.find(query, SearchStoreEntity::class.java).map {
             it.to()

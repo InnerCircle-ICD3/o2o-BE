@@ -17,6 +17,7 @@ class SearchService (
     private val searchStoreRepository: SearchStoreRepository,
     private val searchMapRedisRepository: SearchMapRedisRepository
 ) {
+    var CACHE_BOX_SIZE = 0.005
 
     /**
      * 가게 검색 API
@@ -46,40 +47,63 @@ class SearchService (
         )
     }
 
+    /**
+     * 지도 검색 API
+     * @param searchQuery 검색 쿼리
+     * @return 지도 검색 결과 DTO
+     */
     fun searchStoreMap(searchQuery: SearchStoreQueryDto): SearchStoreMapResultDto {
-        val searchStoreList: List<SearchStore> = searchStoreRepository.findByLocation(
-            lng = searchQuery.viewPoint.lng,
+        // center 값을 기준으로 해당하는 box 좌표를 구한다.
+        val box: Box = getBox(
             lat = searchQuery.viewPoint.lat,
-            maxDistance = 500.0
+            lng = searchQuery.viewPoint.lng
         )
 
-        val box: Box = Box(
-            topLeft = Point(
-                lat = 36.456789,
-                lng = 127.012345
-            ),
-            bottomRight =  Point(
-                lat = 36.456789,
-                lng = 127.012345
-            ),
-        )
+        // Redis에서 box 검색 결과를 가져온다. -> 위경도 기중 0.005 단위로 박스 매핑
+        val redisKey = searchMapRedisRepository.getKey(box.topLeft)
+        val seachStoreMapList: List<SearchStoreMap> = searchMapRedisRepository.findByKey(redisKey)
+
+        // 검색 결과가 없으면 MongoDB에서 검색하여 가져온 뒤 캐싱한다
+        if (seachStoreMapList.isEmpty()) {
+            val searchStoreList: List<SearchStore> = searchStoreRepository.findBox(box)
+
+            // Redis에 저장
+            searchMapRedisRepository.save(
+                key = redisKey,
+                value = searchStoreList.map {
+                    SearchStoreMap.from(it)
+                }
+            )
+        }
 
         return SearchStoreMapResultDto(
             box = box,
-            storeList = searchStoreList.map {
-                SearchStoreMap(
-                    storeID = it.storeId,
-                    storeName = it.storeName,
-                    stock = 0
-                )
-            }
+            storeList = seachStoreMapList
         )
     }
 
+    /**
+     * 검색어 자동완성 API
+     * TODO : 로직 전체 점검, 자동완성 범위(매장명, 카테고리 등) 점검
+     * @param keyword 검색어
+     * @return 검색어 자동완성 리스트
+     */
     fun searchSuggestions(keyword: String): List<String> {
         val searchRecommendList: List<String> = searchStoreRepository.searchStoreRecommend(
             keyword = keyword
         )
         return searchRecommendList
+    }
+
+    fun getBox(lat: Double, lng: Double): Box {
+        val topLeft = Point(
+            lat = lat + CACHE_BOX_SIZE,
+            lng = lng - CACHE_BOX_SIZE
+        )
+        val bottomRight = Point(
+            lat = lat - CACHE_BOX_SIZE,
+            lng = lng + CACHE_BOX_SIZE
+        )
+        return Box(topLeft, bottomRight)
     }
 }
