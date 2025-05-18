@@ -1,4 +1,4 @@
-package com.eatngo.order.rdb.entity.common
+package com.eatngo.common
 
 import jakarta.persistence.EntityListeners
 import jakarta.persistence.MappedSuperclass

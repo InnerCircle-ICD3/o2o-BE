@@ -37,8 +37,6 @@ class OrderPersistenceImplUnitTest : StringSpec({
             customerId = 1L,
             storeId = 1L,
             orderNumber = 99L,
-            createdAt = domainOrder.createdAt,
-            updatedAt = domainOrder.updatedAt,
             status = Status.CREATED
         )
 

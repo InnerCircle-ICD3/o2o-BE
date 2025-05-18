@@ -1,9 +1,9 @@
 package com.eatngo.order.rdb.entity
 
+import com.eatngo.common.BaseJpaEntity
 import com.eatngo.order.domain.Order
 import com.eatngo.order.domain.OrderItem
 import com.eatngo.order.domain.Status
-import com.eatngo.order.rdb.entity.common.BaseJpaEntity
 import jakarta.persistence.*
 
 @Entity

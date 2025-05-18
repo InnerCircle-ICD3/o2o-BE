@@ -1,4 +1,4 @@
-package com.eatngo.storeowner
+package com.eatngo.store_owner
 
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
