@@ -28,10 +28,12 @@ class SearchService (
      * @return 검색 결과 DTO
      */
     fun searchStore(searchQuery: SearchStoreQueryDto, page: Int, size: Int): SearchStoreResultDto {
+        val searchDistance = 2000.0 // 2km 검색 반경
+
         val searchStoreList: List<SearchStore> = searchStoreRepository.searchStore(
             lng = searchQuery.viewPoint.lng,
             lat = searchQuery.viewPoint.lat,
-            maxDistance = 3000.0,
+            maxDistance = searchDistance,
             searchFilter = searchQuery.filter,
             page = page,
             size = size
