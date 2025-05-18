@@ -6,7 +6,7 @@ import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.geo.GeoJsonPoint
 import org.springframework.data.mongodb.core.index.GeoSpatialIndexed
 import org.springframework.data.mongodb.core.mapping.Document
-import java.time.ZonedDateTime
+import java.time.LocalDateTime
 
 @Document(collection = "SearchStore")
 class SearchStoreEntity (
@@ -17,11 +17,13 @@ class SearchStoreEntity (
     var storeCategory: List<String> = emptyList(),
     var foodCategory: List<String> = emptyList(),
     var open: Boolean = true,  // 매장 오픈 여부
+    var openTime: LocalDateTime = LocalDateTime.now(), // 매장 오픈 시간
+    var closeTime: LocalDateTime = LocalDateTime.now(), // 매장 마감 시간
     var roadAddress: String = "",
     @GeoSpatialIndexed
     var location: GeoJsonPoint = GeoJsonPoint(0.0, 0.0),
-    var updatedAt: ZonedDateTime = ZonedDateTime.now(), // 마지막 업데이트 시간
-    var createdAt: ZonedDateTime = ZonedDateTime.now() // 생성 시간
+    var updatedAt: LocalDateTime = LocalDateTime.now(), // 마지막 업데이트 시간
+    var createdAt: LocalDateTime = LocalDateTime.now() // 생성 시간
 ) {
     fun to(): SearchStore {
         return SearchStore(
@@ -31,6 +33,8 @@ class SearchStoreEntity (
             storeCategory = storeCategory,
             foodCategory = foodCategory,
             open = open,
+            openTime = openTime,
+            closeTime = closeTime,
             roadAddress = roadAddress,
             location = toPoint(location),
             updatedAt = updatedAt,
