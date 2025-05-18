@@ -1,4 +1,4 @@
-package com.eatngo.order.rdb.entity
+package com.eatngo.order.rdb.entity.common
 
 import jakarta.persistence.EntityListeners
 import jakarta.persistence.MappedSuperclass
@@ -7,7 +7,7 @@ import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedBy
 import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
-import java.time.ZonedDateTime
+import java.time.LocalDateTime
 
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener::class)
@@ -16,13 +16,14 @@ abstract class BaseJpaEntity(
     var createdBy: String? = null,
 
     @CreatedDate
-    var createdAt: ZonedDateTime? = null,
+    var createdAt: LocalDateTime = LocalDateTime.now(),
 
     @LastModifiedBy
     var updatedBy: String? = null,
 
     @LastModifiedDate
-    var updatedAt: ZonedDateTime? = null,
+    var updatedAt: LocalDateTime = LocalDateTime.now(),
 
-    var deletedAt: ZonedDateTime? = null,
+
+    var deletedAt: LocalDateTime? = null,
 )
