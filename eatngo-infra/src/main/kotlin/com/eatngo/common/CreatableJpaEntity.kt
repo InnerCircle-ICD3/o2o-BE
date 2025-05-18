@@ -15,5 +15,5 @@ abstract class CreatableJpaEntity(
     var createdBy: Long? = null,
 
     @CreatedDate
-    var createdAt: LocalDateTime? = null
+    var createdAt: LocalDateTime = LocalDateTime.now(),
 )

@@ -16,11 +16,11 @@ abstract class BaseJpaEntity(
     var createdBy: Long? = null,
 
     @CreatedDate
-    var createdAt: LocalDateTime? = null,
+    var createdAt: LocalDateTime = LocalDateTime.now(),
 
     @LastModifiedBy
     var updatedBy: Long? = null,
 
     @LastModifiedDate
-    var updatedAt: LocalDateTime? = null,
+    var updatedAt: LocalDateTime = LocalDateTime.now(),
 ) : SoftDeletableJpaEntity()

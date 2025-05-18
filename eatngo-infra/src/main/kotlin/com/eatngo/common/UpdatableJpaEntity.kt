@@ -14,5 +14,5 @@ abstract class UpdatableJpaEntity(
     var updatedBy: Long? = null,
 
     @LastModifiedDate
-    var updatedAt: LocalDateTime? = null,
+    var updatedAt: LocalDateTime = LocalDateTime.now(),
 )
