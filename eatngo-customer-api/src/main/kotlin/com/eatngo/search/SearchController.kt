@@ -39,7 +39,7 @@ class SearchController (
                     category = category,
                     time = time,
                     searchText = searchText,
-                    status = status.statusCode
+                    status = status
                 )
             ),
             offset = offset
