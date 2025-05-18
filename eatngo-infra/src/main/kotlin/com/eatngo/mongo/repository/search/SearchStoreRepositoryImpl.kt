@@ -4,6 +4,7 @@ import com.eatngo.mongo.entity.search.SearchStoreEntity
 import com.eatngo.search.domain.SearchStore
 import com.eatngo.search.dto.Box as CoreBox
 import com.eatngo.search.dto.SearchFilter
+import com.eatngo.search.dto.StoreStatus
 import com.eatngo.search.infra.SearchStoreRepository
 import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation
@@ -22,6 +23,8 @@ import org.springframework.stereotype.Component
 class SearchStoreRepositoryImpl(
     private val mongoTemplate: MongoTemplate,
 ): SearchStoreRepository {
+
+    val searchStoreIndex = "search-store"
 
     override fun findBox(
         box: CoreBox
@@ -44,6 +47,7 @@ class SearchStoreRepositoryImpl(
     /**
      * {
      *       "$search": {
+     *         "index": "search-store",
      *         "compound": {
      *           "filter": [
      *             {
@@ -54,25 +58,33 @@ class SearchStoreRepositoryImpl(
      *                     "coordinates": [lng, lat]
      *                   },
      *                   "radius": {
-     *                     "$numberDouble": "3000"
+     *                     "$numberDouble": "2000"
      *                   }
      *                 },
      *                 "path": "location"
      *               }
      *             },
-     *             // 선택적으로 조건 추가 (존재할 경우에만)
+     *             // 선택적으로 조건 추가 (category 존재할 경우에만)
      *             {
-     *               "text": {
+     *               "equals": {
      *                 "query": "카페",
      *                 "path": "category"
      *               }
      *             },
+     *             // 선택적으로 조건 추가 (time 존재할 경우에만)
      *             {
      *               "range": {
-     *                 "path": "pickupTime",
+     *                 "path": "openTime",
+     *                 "lte": "2025-05-18T12:00:00Z"
+     *               }
+     *             },
+     *             {
+     *               "range": {
+     *                 "path": "closeTime",
      *                 "gte": "2025-05-18T12:00:00Z"
      *               }
      *             },
+     *             // 선택적으로 조건 추가 (status 존재할 경우에만)
      *             {
      *               "equals": {
      *                 "value": 1,
@@ -197,20 +209,28 @@ class SearchStoreRepositoryImpl(
         searchFilter?.time?.let {
             filters.add(
                 Document("range",
-                    Document("path", "pickupTime")
+                    Document("path", "openTime")
                         .append("gte", it)
+                )
+            )
+            filters.add(
+                Document("range",
+                    Document("path", "closeTime")
+                        .append("lte", it)
                 )
             )
         }
 
         // 선택적: 상태 필터
         searchFilter?.status?.let {
-            filters.add(
-                Document("equals",
-                    Document("value", it)
-                        .append("path", "status")
+            if (it == StoreStatus.OPEN.statusCode) {
+                filters.add(
+                    Document("equals",
+                        Document("value", true)
+                            .append("path", "open")
+                    )
                 )
-            )
+            }
         }
 
         // 선택적: 검색어 필터
@@ -224,14 +244,6 @@ class SearchStoreRepositoryImpl(
         }
 
         // MongoDB Atlas Search 쿼리 생성
-        // TODO: index 지정 문법 확인 필요
-        val searchQuery = Document(
-            "\$search",
-            Document("compound",
-                Document("filter", filters)
-                    .append("must", must)
-            )
-        )
         val score = Document(
             "\$score",
             Document("function",
@@ -244,7 +256,16 @@ class SearchStoreRepositoryImpl(
                 )
             )
         )
-        searchQuery.append("\$score", score)
+        val searchQuery = Document(
+            "\$search",
+            Document()
+                .append("index", searchStoreIndex)
+                .append("compound",
+                    Document("filter", filters)
+                        .append("must", must)
+                )
+                .append("\$score", score)
+        )
 
         return AggregationOperation { _: AggregationOperationContext -> searchQuery }
     }
