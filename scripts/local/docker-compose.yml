@@ -34,7 +34,7 @@ services:
       - "6379:6379"
     command: redis-server --requirepass eatngolocal
     volumes:
-        - redis_data:/data/redis
+        - redis_data:/data
     restart: unless-stopped
 
 volumes:
