@@ -12,14 +12,9 @@ class CustomerOAuth2SuccessPostProcessor(
 ) : OAuth2SuccessPostProcessor {
 
     override fun postProcess(userId: Long) {
-        customerPersistence.findByUserId(userId)
-            ?: {
-                userAccountPersistence.getByIdOrThrow(userId)
-                    .let { userAccount ->
-                        Customer.create(userAccount)
-                    }.let { customer ->
-                        customerPersistence.save(customer)
-                    }
-            }
+        customerPersistence.findByUserId(userId) ?: run {
+            val userAccount = userAccountPersistence.getByIdOrThrow(userId)
+            customerPersistence.save(Customer.create(userAccount))
+        }
     }
 }

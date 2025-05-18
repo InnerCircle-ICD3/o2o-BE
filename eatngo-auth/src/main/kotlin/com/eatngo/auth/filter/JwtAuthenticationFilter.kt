@@ -1,5 +1,6 @@
 package com.eatngo.auth.filter
 
+import com.eatngo.auth.constants.AuthenticationConstants.ACCESS_TOKEN
 import com.eatngo.auth.token.TokenProvider
 import io.jsonwebtoken.ExpiredJwtException
 import jakarta.servlet.FilterChain
@@ -19,7 +20,7 @@ class JwtAuthenticationFilter(
         response: HttpServletResponse,
         filterChain: FilterChain
     ) {
-        val accessToken = request.cookies?.firstOrNull { it.name == "access_token" }?.value
+        val accessToken = request.cookies?.firstOrNull { it.name == ACCESS_TOKEN }?.value
 
         if (!accessToken.isNullOrBlank()) {
             try {

@@ -5,8 +5,10 @@ import com.eatngo.store_owner.infra.StoreOwnerPersistence
 import com.eatngo.store_owner.rdb.entity.StoreOwnerJpaEntity
 import com.eatngo.store_owner.rdb.repository.StoreOwnerRdbRepository
 import org.springframework.stereotype.Component
+import org.springframework.transaction.annotation.Transactional
 
 @Component
+@Transactional
 class StoreOwnerPersistenceImpl(
     private val storeOwnerRdbRepository: StoreOwnerRdbRepository,
 ) : StoreOwnerPersistence {

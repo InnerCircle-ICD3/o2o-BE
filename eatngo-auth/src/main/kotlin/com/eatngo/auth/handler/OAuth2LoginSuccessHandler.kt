@@ -1,10 +1,12 @@
 package com.eatngo.auth.handler
 
+import com.eatngo.auth.constants.AuthenticationConstants.ACCESS_TOKEN
 import com.eatngo.auth.token.TokenProvider
 import jakarta.servlet.http.Cookie
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.security.core.Authentication
+import org.springframework.security.oauth2.core.user.OAuth2User
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler
 import org.springframework.stereotype.Component
 
@@ -19,13 +21,14 @@ class OAuth2LoginSuccessHandler(
         response: HttpServletResponse,
         authentication: Authentication
     ) {
-        val userId = authentication.principal as Long
-
+        val oAuth2User = authentication.principal as OAuth2User
+        val userId = oAuth2User.name.toLongOrNull()
+            ?: throw IllegalArgumentException("User ID not found")
         postProcessor.postProcess(userId)
 
         val accessToken = tokenProvider.createAccessToken(userId)
 
-        response.addCookie(createHttpOnlyCookie("accessToken", accessToken))
+        response.addCookie(createHttpOnlyCookie(ACCESS_TOKEN, accessToken))
         response.contentType = "application/json"
     }
 

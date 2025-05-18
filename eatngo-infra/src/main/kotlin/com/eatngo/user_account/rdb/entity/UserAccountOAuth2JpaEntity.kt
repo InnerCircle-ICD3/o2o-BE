@@ -49,24 +49,23 @@ class UserAccountOAuth2JpaEntity(
     val terms: List<UserAccountOauth2TermJpaEntity> = mutableListOf(),
 ) : BaseJpaEntity() {
     companion object {
-        fun from(userAccountOauth2: UserAccountOauth2): UserAccountOAuth2JpaEntity {
-            val userAccountOAuth2JpaEntity = UserAccountOAuth2JpaEntity(
-                id = userAccountOauth2.id,
-                userAccount = UserAccountJpaEntity.from(userAccountOauth2.userAccount),
-                email = userAccountOauth2.email.let { it?.toString() },
-                nickname = userAccountOauth2.nickname,
-                provider = userAccountOauth2.provider,
-                userKey = userAccountOauth2.userKey,
-                accessToken = userAccountOauth2.accessToken,
-                expireAt = userAccountOauth2.expireAt,
-                scopes = userAccountOauth2.scopes,
-            ).also {
-                userAccountOauth2.terms.forEach { term ->
-                    it.terms.addLast(UserAccountOauth2TermJpaEntity.from(term))
-                }
+        fun of(
+            userAccountOauth2: UserAccountOauth2,
+            accountJpaEntity: UserAccountJpaEntity
+        ) = UserAccountOAuth2JpaEntity(
+            id = userAccountOauth2.id,
+            userAccount = accountJpaEntity,
+            email = userAccountOauth2.email.let { it?.toString() },
+            nickname = userAccountOauth2.nickname,
+            provider = userAccountOauth2.provider,
+            userKey = userAccountOauth2.userKey,
+            accessToken = userAccountOauth2.accessToken,
+            expireAt = userAccountOauth2.expireAt,
+            scopes = userAccountOauth2.scopes,
+        ).also {
+            userAccountOauth2.terms.forEach { term ->
+                it.terms.addLast(UserAccountOauth2TermJpaEntity.of(term, it))
             }
-
-            return userAccountOAuth2JpaEntity
         }
 
         fun toUserAccount(accountOauth2: UserAccountOAuth2JpaEntity) = with(accountOauth2) {

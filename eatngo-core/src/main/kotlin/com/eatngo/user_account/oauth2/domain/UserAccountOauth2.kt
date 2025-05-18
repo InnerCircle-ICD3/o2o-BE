@@ -34,7 +34,7 @@ class UserAccountOauth2(
         ): UserAccountOauth2 {
             val userAccountOauth2 = UserAccountOauth2(
                 userAccount = account,
-                email = oauth2.email.let { EmailAddress.from(it) },
+                email = oauth2.email.let { it?.let { EmailAddress(it) } },
                 nickname = oauth2.nickname,
                 provider = oauth2.provider,
                 userKey = oauth2.principal,

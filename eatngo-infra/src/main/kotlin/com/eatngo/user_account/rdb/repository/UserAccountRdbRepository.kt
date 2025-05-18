@@ -20,8 +20,8 @@ interface UserAccountRdbRepository : JpaRepository<UserAccountJpaEntity, Long> {
     @Query(
         """
         SELECT u FROM UserAccountJpaEntity u
-        JOIN u.oauth2 o2
-        WHERE o2.provider = :provider AND o2.userKey = :userKey
+        JOIN UserAccountOAuth2JpaEntity o2 on o2.provider = :provider
+        and o2.userKey = :userKey
     """
     )
     fun findByOAuth2Key(userKey: String, provider: Oauth2Provider): UserAccountJpaEntity?

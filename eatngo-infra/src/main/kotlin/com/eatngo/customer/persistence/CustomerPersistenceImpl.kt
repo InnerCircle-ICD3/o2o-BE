@@ -5,8 +5,10 @@ import com.eatngo.customer.infra.CustomerPersistence
 import com.eatngo.customer.rdb.entity.CustomerJpaEntity
 import com.eatngo.customer.rdb.repository.CustomerRdbRepository
 import org.springframework.stereotype.Component
+import org.springframework.transaction.annotation.Transactional
 
 @Component
+@Transactional
 class CustomerPersistenceImpl(
     private val customerRdbRepository: CustomerRdbRepository,
 ) : CustomerPersistence {

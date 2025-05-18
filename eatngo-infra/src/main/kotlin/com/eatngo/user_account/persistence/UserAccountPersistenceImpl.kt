@@ -6,8 +6,10 @@ import com.eatngo.user_account.oauth2.constants.Oauth2Provider
 import com.eatngo.user_account.rdb.entity.UserAccountJpaEntity
 import com.eatngo.user_account.rdb.repository.UserAccountRdbRepository
 import org.springframework.stereotype.Component
+import org.springframework.transaction.annotation.Transactional
 
 @Component
+@Transactional
 class UserAccountPersistenceImpl(
     private val userAccountRdbRepository: UserAccountRdbRepository,
 ) : UserAccountPersistence {

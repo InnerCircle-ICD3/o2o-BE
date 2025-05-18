@@ -4,12 +4,17 @@ import com.eatngo.user_account.oauth2.constants.Oauth2Provider
 
 
 data class KakaoOauth2(
-    override val id: Long,
-    override val email: String,
-    override val terms: List<OauthTerm> = mutableListOf(),
-    override val principal: String,
-    override val nickname: String?,
-) : Oauth2 {
+    private val attributes: Map<String, Any>,
     override val provider: Oauth2Provider
-        get() = Oauth2Provider.KAKAO
+) : Oauth2 {
+
+    override val id: Long = (attributes["id"] as? Number)?.toLong() ?: 0L
+
+    private val kakaoAccount = attributes["kakao_account"] as? Map<*, *> ?: emptyMap<Any, Any>()
+    private val profile = kakaoAccount["profile"] as? Map<*, *> ?: emptyMap<Any, Any>()
+
+    override val email: String? = kakaoAccount["email"] as? String
+    override val nickname: String? = profile["nickname"] as? String
+    override val principal: String = id.toString()
+    override val terms: List<OauthTerm> = emptyList()
 }

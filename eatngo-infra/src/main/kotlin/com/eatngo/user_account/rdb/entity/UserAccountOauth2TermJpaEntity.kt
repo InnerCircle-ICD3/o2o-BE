@@ -23,11 +23,13 @@ class UserAccountOauth2TermJpaEntity(
 ) : SoftDeletableJpaEntity() {
 
     companion object {
-        fun from(userAccountOauth2Term: UserAccountOauth2Term) =
-            UserAccountOauth2TermJpaEntity(
-                userAccountOAuth2 = UserAccountOAuth2JpaEntity.from(userAccountOauth2Term.userAccountOauth2),
-                tag = userAccountOauth2Term.tag,
-                agreedAt = userAccountOauth2Term.agreedAt,
-            )
+        fun of(
+            userAccountOauth2Term: UserAccountOauth2Term,
+            accountOAuth2JpaEntity: UserAccountOAuth2JpaEntity,
+        ) = UserAccountOauth2TermJpaEntity(
+            userAccountOAuth2 = accountOAuth2JpaEntity,
+            tag = userAccountOauth2Term.tag,
+            agreedAt = userAccountOauth2Term.agreedAt,
+        )
     }
 }

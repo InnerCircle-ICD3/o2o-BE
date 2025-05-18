@@ -1,8 +1,10 @@
 package com.eatngo.oauth2
 
+import com.eatngo.auth.constants.AuthenticationConstants.PRINCIPAL_KEY
 import com.eatngo.user_account.domain.UserAccount
 import com.eatngo.user_account.oauth2.constants.Oauth2Provider
 import com.eatngo.user_account.oauth2.constants.Role.*
+import com.eatngo.user_account.oauth2.dto.KakaoOauth2
 import com.eatngo.user_account.oauth2.dto.Oauth2
 import com.eatngo.user_account.persistence.UserAccountPersistenceImpl
 import org.springframework.security.core.authority.SimpleGrantedAuthority
@@ -21,29 +23,41 @@ class CustomOAuth2UserService(
         val delegate = DefaultOAuth2UserService()
         val oAuth2User = delegate.loadUser(userRequest)
 
-        val provider = Oauth2Provider.valueOf(userRequest.clientRegistration.registrationId)
-        val attributes = oAuth2User.attributes as Oauth2
+        val provider = Oauth2Provider.valueOfIgnoreCase(userRequest.clientRegistration.registrationId)
+        val oauth2: Oauth2 = handleOauth2Attributes(provider, oAuth2User)
 
-        val userKey = oAuth2User.getAttribute<String>("id") ?: throw Exception("no id")
+        val userAccount = userAccountPersistence.findByOauth(oauth2.id.toString(), provider)
+            ?: userAccountPersistence.save(UserAccount.create(oauth2))
 
-        val userAccount = userAccountPersistence.findByOauth(userKey, provider)
-            ?: userAccountPersistence.save(UserAccount.create(attributes))
+        val authorities = handleRoles(userAccount)
+            .map { SimpleGrantedAuthority(it.toString()) }
 
-        val userType = USER
-        val roles = when (userType) {
-            ADMIN -> listOf(USER, STORE_OWNER, CUSTOMER, ADMIN)
-            STORE_OWNER -> listOf(USER, STORE_OWNER)
-            CUSTOMER -> listOf(USER, CUSTOMER)
-            else -> listOf(USER)
+        val oAuth2UserAttributesMap = oAuth2User.attributes.toMutableMap()
+        oAuth2UserAttributesMap.put(PRINCIPAL_KEY, userAccount.id.toString())
+
+        return DefaultOAuth2User(
+            authorities,
+            oAuth2UserAttributesMap,
+            PRINCIPAL_KEY
+        )
+
+    }
+
+    private fun handleRoles(userAccount: UserAccount) =
+        userAccount.roles.map {
+            when (it) {
+                ADMIN -> listOf(USER, STORE_OWNER, CUSTOMER, ADMIN)
+                STORE_OWNER -> listOf(USER, STORE_OWNER)
+                CUSTOMER -> listOf(USER, CUSTOMER)
+                else -> listOf(USER)
+            }
         }
 
-        val authorities = roles.map { SimpleGrantedAuthority(it.roleName) }
-        val userNameAttributeName = userRequest.clientRegistration.providerDetails
-            .userInfoEndpoint.userNameAttributeName
-        return DefaultOAuth2User(
-            authorities.toSet(),
-            oAuth2User.attributes,
-            userNameAttributeName
-        )
+    private fun handleOauth2Attributes(
+        provider: Oauth2Provider,
+        oAuth2User: OAuth2User
+    ) = when (provider) {
+        Oauth2Provider.KAKAO -> KakaoOauth2(oAuth2User.attributes, provider)
+        else -> throw IllegalArgumentException("Unsupported provider: $provider")
     }
 }

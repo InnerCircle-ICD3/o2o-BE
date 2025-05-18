@@ -26,7 +26,7 @@ class UserAccount(
 
         fun create(oauth2: Oauth2): UserAccount {
             val userAccount = UserAccount(
-                email = oauth2.email.let { EmailAddress.from(it) },
+                email = oauth2.email.let { it?.let { EmailAddress(it) } },
                 nickname = oauth2.nickname,
             )
             userAccount.addOauth2(

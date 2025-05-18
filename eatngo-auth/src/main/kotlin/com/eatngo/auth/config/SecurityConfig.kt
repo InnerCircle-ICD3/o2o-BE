@@ -1,5 +1,6 @@
 package com.eatngo.auth.config
 
+import com.eatngo.auth.constants.AuthenticationConstants.ACCESS_TOKEN
 import com.eatngo.auth.filter.JwtAuthenticationFilter
 import com.eatngo.auth.handler.OAuth2LoginSuccessHandler
 import com.eatngo.auth.token.TokenProvider
@@ -48,6 +49,13 @@ class SecurityConfig(
             .oauth2Login {
                 it.userInfoEndpoint { userInfo -> userInfo.userService(oauth2UserService) }
                     .successHandler(authenticationSuccessHandler)
+            }
+
+            .logout {
+                it.logoutUrl("/oauth2/authorization/**/logout")
+                    .logoutSuccessUrl("/")
+                    .invalidateHttpSession(true)
+                    .deleteCookies(ACCESS_TOKEN)
             }
 
         return http.build()
