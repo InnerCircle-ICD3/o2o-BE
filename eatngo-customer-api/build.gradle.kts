@@ -6,9 +6,9 @@ plugins {
 dependencies {
     // 내부 모듈 의존성
     implementation(project(":eatngo-common:swagger"))
-    implementation(project(":eatngo-auth-common"))
+    implementation(project(":eatngo-auth"))
 
-    // core 모듈 의존성
+    // core, infra 모듈 의존성
     implementation(project(":eatngo-core"))
     implementation(project(":eatngo-infra"))
 

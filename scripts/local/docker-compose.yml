@@ -1,0 +1,43 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:17
+    container_name: eatngo-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: eatngo
+      POSTGRES_USER: eatngo_user
+      POSTGRES_PASSWORD: eatngolocal
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  mongodb:
+    image: mongo:8
+    container_name: eatngo-mongodb
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: APP
+      MONGO_INITDB_ROOT_USERNAME: eatngo-owner
+      MONGO_INITDB_ROOT_PASSWORD: eatngolocal
+    volumes:
+      - mongo_data:/data/db
+    restart: unless-stopped
+
+  redis:
+    image: redis:7.2.4
+    container_name: eatngo-redis
+    ports:
+      - "6379:6379"
+    command: redis-server --requirepass eatngolocal
+    volumes:
+        - redis_data:/data
+    restart: unless-stopped
+
+volumes:
+  pg_data:
+  mongo_data:
+  redis_data:
