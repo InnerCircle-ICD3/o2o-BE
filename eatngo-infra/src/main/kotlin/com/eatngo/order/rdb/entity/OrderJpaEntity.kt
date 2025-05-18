@@ -3,8 +3,8 @@ package com.eatngo.order.rdb.entity
 import com.eatngo.order.domain.Order
 import com.eatngo.order.domain.OrderItem
 import com.eatngo.order.domain.Status
+import com.eatngo.order.rdb.entity.common.BaseJpaEntity
 import jakarta.persistence.*
-import java.time.ZonedDateTime
 
 @Entity
 class OrderJpaEntity(
@@ -17,12 +17,8 @@ class OrderJpaEntity(
     val customerId: Long,
     val storeId: Long,
     @Enumerated(EnumType.STRING)
-    val status: Status,
-    @Column(name = "created_at")
-    val createdAt: ZonedDateTime,
-    @Column(name = "updated_at")
-    val updatedAt: ZonedDateTime,
-) {
+    val status: Status
+) : BaseJpaEntity() {
 
     companion object {
         fun from(order: Order): OrderJpaEntity {
@@ -31,9 +27,7 @@ class OrderJpaEntity(
                 orderNumber = order.orderNumber,
                 customerId = order.customerId,
                 storeId = order.storeId,
-                status = order.status,
-                createdAt = order.createdAt,
-                updatedAt = order.updatedAt,
+                status = order.status
             )
 
             order.orderItems.forEach { orderItem: OrderItem ->
@@ -45,7 +39,7 @@ class OrderJpaEntity(
             return orderJpaEntity
         }
 
-        fun toOrder(orderJpaEntity: OrderJpaEntity) = with(orderJpaEntity){
+        fun toOrder(orderJpaEntity: OrderJpaEntity) = with(orderJpaEntity) {
             Order(
                 id = id,
                 orderNumber = orderNumber,
