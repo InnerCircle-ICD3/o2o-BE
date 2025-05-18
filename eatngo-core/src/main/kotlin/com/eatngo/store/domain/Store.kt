@@ -3,7 +3,7 @@ package com.eatngo.store.domain
 import com.eatngo.store.constant.StoreEnum
 import java.time.DayOfWeek
 import java.time.LocalTime
-import java.time.ZonedDateTime
+import java.time.LocalDateTime
 
 /**
  * 매장(가게) 도메인 모델
@@ -25,9 +25,9 @@ data class Store(
     val pickupAvailableForTomorrow: Boolean = false, // 내일 픽업 가능 여부(확장성 고려한 필드)
     val ratingAverage: Double = 0.0,    // 평균 별점
     val ratingCount: Int = 0,           // 별점 개수
-    val createdAt: ZonedDateTime,       // 생성일
-    val updatedAt: ZonedDateTime,       // 수정일
-    var deletedAt: ZonedDateTime? = null, // 삭제일(softDel용, 삭제 시간이 존재하면 softDel)
+    val createdAt: LocalDateTime,       // 생성일
+    val updatedAt: LocalDateTime,       // 수정일
+    var deletedAt: LocalDateTime? = null, // 삭제일(softDel용, 삭제 시간이 존재하면 softDel)
 ) {
     companion object {
         fun create(
@@ -47,9 +47,9 @@ data class Store(
             pickupAvailableForTomorrow: Boolean = false,
             ratingAverage: Double = 0.0,
             ratingCount: Int = 0,
-            createdAt: ZonedDateTime = ZonedDateTime.now(),
-            updatedAt: ZonedDateTime = createdAt,
-            deletedAt: ZonedDateTime? = null
+            createdAt: LocalDateTime = LocalDateTime.now(),
+            updatedAt: LocalDateTime = createdAt,
+            deletedAt: LocalDateTime? = null
         ): Store {
             require(name.isNotBlank()) { "매장명은 필수입니다." }
             require(businessNumber.isNotBlank()) { "사업자등록번호는 필수입니다." }
@@ -114,7 +114,7 @@ data class Store(
             ratingAverage = this.ratingAverage,
             ratingCount = this.ratingCount,
             createdAt = this.createdAt,
-            updatedAt = ZonedDateTime.now(),
+            updatedAt = LocalDateTime.now(),
             deletedAt = this.deletedAt
         )
     }
@@ -123,7 +123,7 @@ data class Store(
      * Soft Delete를 위한 메서드
      */
     fun softDelete(): Store {
-        val now = ZonedDateTime.now()
+        val now = LocalDateTime.now()
         this.deletedAt = now
         return this
     }
@@ -132,7 +132,7 @@ data class Store(
      * 현재 픽업 가능한지 확인 (매장 상태와 픽업 시간 기준)
      * 매장이 OPEN 상태이고 현재 시간이 픽업 가능 시간 내에 있는지 확인
      */
-    fun isAvailableForPickup(now: ZonedDateTime = ZonedDateTime.now()): Boolean {
+    fun isAvailableForPickup(now: LocalDateTime = LocalDateTime.now()): Boolean {
         // 매장 상태가 OPEN이 아니면 픽업 불가
         if (status != StoreEnum.StoreStatus.OPEN) {
             return false
@@ -155,7 +155,7 @@ data class Store(
     fun updateStatus(newStatus: StoreEnum.StoreStatus): Store {
         return this.copy(
             status = newStatus,
-            updatedAt = ZonedDateTime.now()
+            updatedAt = LocalDateTime.now()
         )
     }
 
