@@ -17,7 +17,7 @@ class SearchService (
     private val searchStoreRepository: SearchStoreRepository,
     private val searchMapRedisRepository: SearchMapRedisRepository
 ) {
-    var CACHE_BOX_SIZE = 0.005
+    var cacheBoxSize = 0.005
 
     /**
      * 가게 검색 API
@@ -99,12 +99,12 @@ class SearchService (
 
     fun getBox(lat: Double, lng: Double): Box {
         val topLeft = Point(
-            lat = lat + CACHE_BOX_SIZE,
-            lng = lng - CACHE_BOX_SIZE
+            lat = lat + cacheBoxSize,
+            lng = lng - cacheBoxSize
         )
         val bottomRight = Point(
-            lat = lat - CACHE_BOX_SIZE,
-            lng = lng + CACHE_BOX_SIZE
+            lat = lat - cacheBoxSize,
+            lng = lng + cacheBoxSize
         )
         return Box(topLeft, bottomRight)
     }
