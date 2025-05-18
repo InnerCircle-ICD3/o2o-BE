@@ -20,7 +20,7 @@ services:
     ports:
       - "27017:27017"
     environment:
-      MONGO_INITDB_DATABASE: APP
+      MONGO_INITDB_DATABASE: eatngo
       MONGO_INITDB_ROOT_USERNAME: eatngo-owner
       MONGO_INITDB_ROOT_PASSWORD: eatngolocal
     volumes:
