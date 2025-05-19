@@ -7,5 +7,5 @@ interface CustomerAddressPersistence {
 
     fun findByCustomerId(customerId: Long): List<CustomerAddress>
 
-    fun deleteById(id: Long)
+    fun deleteById(id: Long): Boolean
 }
