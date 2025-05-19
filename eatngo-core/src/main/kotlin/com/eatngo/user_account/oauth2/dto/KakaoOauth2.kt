@@ -8,11 +8,10 @@ data class KakaoOauth2(
     override val provider: Oauth2Provider
 ) : Oauth2 {
 
-    override val id: Long = (attributes["id"] as? Number)?.toLong() ?: 0L
-
+    override val id: Long = (attributes["id"] as? Number)?.toLong()
+        ?: throw IllegalStateException("Kakao OAuth2 response does not contain 'id'")
     private val kakaoAccount = attributes["kakao_account"] as? Map<*, *> ?: emptyMap<Any, Any>()
     private val profile = kakaoAccount["profile"] as? Map<*, *> ?: emptyMap<Any, Any>()
-
     override val email: String? = kakaoAccount["email"] as? String
     override val nickname: String? = profile["nickname"] as? String
     override val principal: String = id.toString()

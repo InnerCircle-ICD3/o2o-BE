@@ -14,7 +14,6 @@ class UserAccountRoleJpaEntity(
     val id: Long = 0,
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @Filter(name = DELETED_FILTER)
     val account: UserAccountJpaEntity,
 
     @Enumerated(EnumType.STRING)

@@ -13,21 +13,23 @@ class UserAccountJpaEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
-    val email: String,
+
+    @Column(nullable = true, length = 255)
+    val email: String?,
 
     @OneToMany(mappedBy = "userAccount", fetch = FetchType.LAZY, cascade = [CascadeType.PERSIST])
     @Filter(name = DELETED_FILTER)
-    val oauth2: List<UserAccountOAuth2JpaEntity> = mutableListOf(),
+    val oauth2: MutableList<UserAccountOAuth2JpaEntity> = mutableListOf(),
 
     @OneToMany(mappedBy = "account", fetch = FetchType.LAZY, cascade = [CascadeType.PERSIST])
     @Filter(name = DELETED_FILTER)
-    val roles: List<UserAccountRoleJpaEntity> = mutableListOf(),
+    val roles: MutableList<UserAccountRoleJpaEntity> = mutableListOf(),
 ) : BaseJpaEntity() {
 
     companion object {
         fun from(account: UserAccount) = UserAccountJpaEntity(
             id = account.id,
-            email = account.email.toString(),
+            email = account.email?.let { toString() },
         ).also {
             account.oauth2.forEach { oauth2 ->
                 it.oauth2.addLast(UserAccountOAuth2JpaEntity.of(oauth2, it))
@@ -40,7 +42,7 @@ class UserAccountJpaEntity(
         fun toUserAccount(account: UserAccountJpaEntity) = with(account) {
             UserAccount(
                 id = id,
-                email = EmailAddress.from(email),
+                email = email?.let { EmailAddress.from(it) },
                 createdAt = createdAt,
                 updatedAt = updatedAt,
                 deletedAt = deletedAt,

@@ -23,7 +23,7 @@ class UserAccountOAuth2JpaEntity(
     @JoinColumn(name = "user_account_id", nullable = false)
     val userAccount: UserAccountJpaEntity,
 
-    @Column(nullable = false, length = 255)
+    @Column(nullable = true, length = 255)
     val email: String? = null,
 
     @Column(length = 100)
@@ -46,7 +46,7 @@ class UserAccountOAuth2JpaEntity(
 
     @OneToMany(mappedBy = "userAccountOAuth2", fetch = FetchType.LAZY, cascade = [CascadeType.PERSIST])
     @Filter(name = DELETED_FILTER)
-    val terms: List<UserAccountOauth2TermJpaEntity> = mutableListOf(),
+    val terms: MutableList<UserAccountOauth2TermJpaEntity> = mutableListOf(),
 ) : BaseJpaEntity() {
     companion object {
         fun of(
@@ -68,10 +68,10 @@ class UserAccountOAuth2JpaEntity(
             }
         }
 
-        fun toUserAccount(accountOauth2: UserAccountOAuth2JpaEntity) = with(accountOauth2) {
+        fun toUserAccount(accountOauth2: UserAccountOAuth2JpaEntity): UserAccount = with(accountOauth2) {
             val emailAddress = email?.let { EmailAddress.from(it) }
             val userAccount = UserAccount(
-                id = id,
+                id = userAccount.id,
                 email = emailAddress,
                 nickname = nickname,
                 createdAt = createdAt,
@@ -92,6 +92,7 @@ class UserAccountOAuth2JpaEntity(
                     scopes = scopes
                 )
             )
+            userAccount
         }
     }
 }
