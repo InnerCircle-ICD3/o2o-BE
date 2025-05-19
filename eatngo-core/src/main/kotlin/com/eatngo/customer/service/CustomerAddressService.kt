@@ -1,21 +1,21 @@
 package com.eatngo.customer.service
 
-import com.eatngo.common.type.Point
-import com.eatngo.customer.domain.AddressType
 import com.eatngo.customer.domain.CustomerAddress
+import com.eatngo.customer.dto.CustomerAddressDto
 import com.eatngo.customer.infra.CustomerAddressPersistence
 import org.springframework.stereotype.Service
 
 @Service
-class CustomerAddressService (
-    private val customerAddressPersistence: CustomerAddressPersistence
+class CustomerAddressService(
+    private val customerAddressPersistence: CustomerAddressPersistence,
 ) {
-    fun getAddressList(): List<CustomerAddress> {
+    fun getAddressList(): List<CustomerAddressDto> {
         // TODO : Redis 캐시 조회
         // TODO : 캐시 미스 시 DB 조회
-        val res = customerAddressPersistence.findByCustomerId(1L)
-        // TODO : DTO 변환
-        return res
+        val addressList = customerAddressPersistence.findByCustomerId(1L)
+        return addressList.map {
+            CustomerAddressDto.from(it)
+        }
     }
 
     fun addAddress(address: CustomerAddress): Long {

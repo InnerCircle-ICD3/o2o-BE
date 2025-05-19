@@ -17,5 +17,4 @@ class CustomerAddressPersistenceImpl : CustomerAddressPersistence {
     override fun deleteById(id: Long) {
         TODO("Not yet implemented")
     }
-
 }
