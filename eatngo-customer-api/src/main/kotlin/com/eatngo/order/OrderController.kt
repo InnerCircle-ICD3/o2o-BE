@@ -7,7 +7,7 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import java.time.ZonedDateTime
+import java.time.LocalDateTime
 
 @Tag(name = "주문", description = "주문 관련 API")
 @RestController
@@ -63,8 +63,8 @@ class OrderController(
                             price = 1000
                         )
                     ),
-                    createdAt = ZonedDateTime.now(),
-                    updatedAt = ZonedDateTime.now()
+                    createdAt = LocalDateTime.now(),
+                    updatedAt = LocalDateTime.now()
                 ),
                 OrderDto(
                     id = 2L,
@@ -81,8 +81,8 @@ class OrderController(
                             price = 1000
                         )
                     ),
-                    createdAt = ZonedDateTime.now(),
-                    updatedAt = ZonedDateTime.now()
+                    createdAt = LocalDateTime.now(),
+                    updatedAt = LocalDateTime.now()
                 ),
                 OrderDto(
                     id = 3L,
@@ -99,8 +99,8 @@ class OrderController(
                             price = 1000
                         )
                     ),
-                    createdAt = ZonedDateTime.now(),
-                    updatedAt = ZonedDateTime.now()
+                    createdAt = LocalDateTime.now(),
+                    updatedAt = LocalDateTime.now()
                 ),
                 OrderDto(
                     id = 4L,
@@ -117,8 +117,8 @@ class OrderController(
                             price = 1000
                         )
                     ),
-                    createdAt = ZonedDateTime.now(),
-                    updatedAt = ZonedDateTime.now()
+                    createdAt = LocalDateTime.now(),
+                    updatedAt = LocalDateTime.now()
                 )
             )
         )
