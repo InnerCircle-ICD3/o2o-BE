@@ -5,6 +5,7 @@ import com.eatngo.product.service.ProductService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
 @Tag(name = "상품", description = "상품 관련 API")
@@ -17,7 +18,7 @@ class ProductController(
     fun createProduct(
         @PathVariable("store-id") storeId: Long,
         @RequestBody createProductRequestDto: CreateProductRequestDto
-    ): GetProductDetailsResponseDto {
+    ): ResponseEntity<GetProductDetailsResponseDto> {
         val productDto: ProductDto = productService.createProduct(
             ProductDto(
                 name = createProductRequestDto.name,
@@ -31,7 +32,7 @@ class ProductController(
             )
         )
 
-        return CreateProductResponseDto.from(productDto)
+        return ResponseEntity.ok(CreateProductResponseDto.from(productDto))
     }
 
     @GetMapping("/stores/{store-id}/products/{product-id}")
@@ -39,40 +40,48 @@ class ProductController(
     fun getProductDetails(
         @PathVariable("store-id") storeId: Long,
         @PathVariable("product-id") productId: Long
-    ): GetProductDetailsResponseDto = GetProductDetailsResponseDto.from(
-        productService.getProductDetails(storeId, productId)
+    ): ResponseEntity<GetProductDetailsResponseDto> = ResponseEntity.ok(
+        GetProductDetailsResponseDto.from(
+            productService.getProductDetails(storeId, productId)
+        )
     )
 
     @GetMapping("/stores/{store-id}/products")
     @Operation(summary = "상품 목록 조회", description = "상품 목록 조회")
     fun getAllProducts(
         @PathVariable("store-id") storeId: Long
-    ): List<GetProductDetailsResponseDto> = productService.findAllProducts(storeId)
-        .map { GetProductDetailsResponseDto.from(it) }
+    ): ResponseEntity<List<GetProductDetailsResponseDto>> = ResponseEntity.ok(
+        productService.findAllProducts(storeId)
+            .map { GetProductDetailsResponseDto.from(it) }
+    )
 
     @DeleteMapping("/stores/{store-id}/products/{product-id}")
     @Operation(summary = "상품 삭제", description = "상품 삭제")
     fun deleteProduct(
         @PathVariable("store-id") storeId: Long,
         @PathVariable("product-id") productId: Long,
-    ): Unit = productService.deleteProduct(storeId, productId)
+    ): ResponseEntity<Unit> = ResponseEntity.ok(
+        productService.deleteProduct(storeId, productId)
+    )
 
     @PostMapping("/stores/{store-id}/products/inventory")
     @Operation(summary = "상품 재고 증가/감소 기능", description = "상품 재고 증가/감소 기능")
     fun toggleStock(
         @PathVariable("store-id") storeId: Long,
         @Valid @RequestBody request: ToggleStockRequestDto
-    ): ToggleStockResponseDto {
+    ): ResponseEntity<ToggleStockResponseDto> {
         if (request.action !in listOf("increase", "decrease")) {
             throw IllegalArgumentException("잘못된 action type 입니다. ${request.action}")
         }
 
-        return ToggleStockResponseDto.from(
-            productService.toggleStock(
-                ProductCurrentStockDto(
-                    id = request.id,
-                    action = request.action,
-                    amount = request.amount
+        return ResponseEntity.ok(
+            ToggleStockResponseDto.from(
+                productService.toggleStock(
+                    ProductCurrentStockDto(
+                        id = request.id,
+                        action = request.action,
+                        amount = request.amount
+                    )
                 )
             )
         )
@@ -84,7 +93,7 @@ class ProductController(
         @PathVariable("store-id") storeId: Long,
         @PathVariable("product-id") productId: Long,
         @Valid @RequestBody updateProductRequestDto: UpdateProductRequestDto
-    ): UpdateProductResponseDto {
+    ): ResponseEntity<UpdateProductResponseDto> {
         val productDto = productService.modifyProduct(
             ProductDto(
                 id = productId,
@@ -106,7 +115,7 @@ class ProductController(
             )
         )
 
-        return UpdateProductResponseDto.from(productDto)
+        return ResponseEntity.ok(UpdateProductResponseDto.from(productDto))
     }
 
 }
