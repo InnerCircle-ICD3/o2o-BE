@@ -2,14 +2,18 @@ package com.eatngo.product
 
 import com.eatngo.product.dto.*
 import com.eatngo.product.service.ProductService
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import org.springframework.web.bind.annotation.*
 
+@Tag(name = "상품", description = "상품 관련 API")
 @RestController
 class ProductController(
     private val productService: ProductService,
 ) {
     @PostMapping("/stores/{store-id}/products")
+    @Operation(summary = "상품 생성", description = "상품 생성")
     fun createProduct(
         @PathVariable("store-id") storeId: Long,
         @RequestBody createProductRequestDto: CreateProductRequestDto
@@ -31,6 +35,7 @@ class ProductController(
     }
 
     @GetMapping("/stores/{store-id}/products/{product-id}")
+    @Operation(summary = "상품 상세 조회", description = "상품 상세 조회")
     fun getProductDetails(
         @PathVariable("store-id") storeId: Long,
         @PathVariable("product-id") productId: Long
@@ -39,18 +44,21 @@ class ProductController(
     )
 
     @GetMapping("/stores/{store-id}/products")
+    @Operation(summary = "상품 목록 조회", description = "상품 목록 조회")
     fun getAllProducts(
         @PathVariable("store-id") storeId: Long
     ): List<GetProductDetailsResponseDto> = productService.findAllProducts(storeId)
         .map { GetProductDetailsResponseDto.from(it) }
 
     @DeleteMapping("/stores/{store-id}/products/{product-id}")
+    @Operation(summary = "상품 삭제", description = "상품 삭제")
     fun deleteProduct(
         @PathVariable("store-id") storeId: Long,
         @PathVariable("product-id") productId: Long,
     ): Unit = productService.deleteProduct(storeId, productId)
 
     @PostMapping("/stores/{store-id}/products/inventory")
+    @Operation(summary = "상품 재고 증가/감소 기능", description = "상품 재고 증가/감소 기능")
     fun toggleStock(
         @PathVariable("store-id") storeId: Long,
         @Valid @RequestBody request: ToggleStockRequestDto
@@ -71,6 +79,7 @@ class ProductController(
     }
 
     @PostMapping("/stores/{store-id}/products/{product-id}")
+    @Operation(summary = "상품 수정", description = "상품 수정")
     fun updateProduct(
         @PathVariable("store-id") storeId: Long,
         @PathVariable("product-id") productId: Long,

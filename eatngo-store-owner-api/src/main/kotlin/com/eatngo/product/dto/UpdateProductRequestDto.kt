@@ -1,7 +1,5 @@
 package com.eatngo.product.dto
 
-import java.time.LocalDateTime
-
 data class UpdateProductRequestDto(
     val name: String,
     val description: String,
@@ -11,8 +9,6 @@ data class UpdateProductRequestDto(
     val foodType: List<String>,
     val image: String?,
     val status: String?,
-    val createdAt: LocalDateTime?,
-    val updatedAt: LocalDateTime?
 )
 
 data class UpdateProductInventoryRequestDto(
