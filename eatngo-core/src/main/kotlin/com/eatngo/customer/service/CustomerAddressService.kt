@@ -3,24 +3,32 @@ package com.eatngo.customer.service
 import com.eatngo.common.type.Point
 import com.eatngo.customer.domain.AddressType
 import com.eatngo.customer.domain.CustomerAddress
+import com.eatngo.customer.infra.CustomerAddressPersistence
 import org.springframework.stereotype.Service
 
 @Service
-class CustomerAddressService {
+class CustomerAddressService (
+    private val customerAddressPersistence: CustomerAddressPersistence
+) {
     fun getAddressList(): List<CustomerAddress> {
-        // TODO : 주소 조회 구현
-        return List(1) {
-            CustomerAddress.create()
-        }
+        // TODO : Redis 캐시 조회
+        // TODO : 캐시 미스 시 DB 조회
+        val res = customerAddressPersistence.findByCustomerId(1L)
+        // TODO : DTO 변환
+        return res
     }
 
     fun addAddress(address: CustomerAddress): Long {
-        // TODO : 주소 등록 구현
-        return 1L // 등록된 주소 ID 반환
+        // TODO : 주소 검증(위경도 <-> 주소 변환) 구현
+        // TODO : 주소 중복 체크 구현
+        val saveRes = customerAddressPersistence.save(address)
+        // TODO : 캐시 등록
+        return saveRes.addressId
     }
 
     fun deleteAddress(addressId: Long): Boolean {
-        // TODO : 주소 삭제 구현
+        // TODO : 캐시 삭제 구현
+        customerAddressPersistence.deleteById(addressId)
         return true
     }
 }

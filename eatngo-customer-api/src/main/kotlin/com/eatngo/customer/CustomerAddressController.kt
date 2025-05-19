@@ -22,6 +22,7 @@ class CustomerAddressController (
     @Operation(summary = "주소 목록 API", description = "유저의 주소 목록을 조회하는 API")
     @GetMapping("/api/v1/customer/address")
     fun getAddressList(): ResponseEntity<List<CustomerAddress>> {
+        // TODO : 고객 ID를 어떻게 받을지
         return  ResponseEntity.ok(customerAddressService.getAddressList())
     }
 
