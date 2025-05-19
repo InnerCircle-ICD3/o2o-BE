@@ -13,9 +13,4 @@ value class EmailAddress(val value: String) {
         return value
     }
 
-    companion object {
-        fun from(email: String): EmailAddress {
-            return EmailAddress(email)
-        }
-    }
 }

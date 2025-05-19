@@ -42,7 +42,7 @@ class UserAccountJpaEntity(
         fun toUserAccount(account: UserAccountJpaEntity) = with(account) {
             UserAccount(
                 id = id,
-                email = email?.let { EmailAddress.from(it) },
+                email = email?.let { EmailAddress(it) },
                 createdAt = createdAt,
                 updatedAt = updatedAt,
                 deletedAt = deletedAt,

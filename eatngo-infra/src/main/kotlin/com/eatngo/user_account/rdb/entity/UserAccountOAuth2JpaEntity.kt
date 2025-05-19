@@ -69,7 +69,7 @@ class UserAccountOAuth2JpaEntity(
         }
 
         fun toUserAccount(accountOauth2: UserAccountOAuth2JpaEntity): UserAccount = with(accountOauth2) {
-            val emailAddress = email?.let { EmailAddress.from(it) }
+            val emailAddress = email?.let { EmailAddress(it) }
             val userAccount = UserAccount(
                 id = userAccount.id,
                 email = emailAddress,
