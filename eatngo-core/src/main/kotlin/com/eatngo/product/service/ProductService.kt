@@ -8,6 +8,8 @@ import com.eatngo.product.dto.ProductAfterStockDto
 import com.eatngo.product.dto.ProductCurrentStockDto
 import com.eatngo.product.dto.ProductDto
 import com.eatngo.product.infra.ProductPersistence
+import com.eatngo.product.infra.findByIdAndStoreIdOrElseThrow
+import com.eatngo.product.infra.findByIdOrThrow
 import org.springframework.stereotype.Service
 
 @Service
@@ -76,8 +78,7 @@ class ProductService(
         productId: Long
     ): ProductDto {
         // TODO storePersistence.findById(storeId)
-        val product: Product = (productPersistence.findById(productId)
-            ?: throw IllegalArgumentException("상품을 찾을 수 없습니다."))
+        val product: Product = productPersistence.findByIdOrThrow(productId)
 
         return ProductDto.from(
             product,
@@ -94,24 +95,21 @@ class ProductService(
         }
 
     fun deleteProduct(storeId: Long, productId: Long) {
-        val product: Product = productPersistence.findByIdAndStoreId(productId, storeId)
-            ?: throw IllegalArgumentException("상품을 찾을 수 없습니다.")
+        val product: Product = productPersistence.findByIdOrThrow(productId)
         product.remove()
         productPersistence.save(product)
         // TODO storePersistence.deleteById(storeId)
     }
 
     fun toggleStock(productCurrentStockDto: ProductCurrentStockDto): ProductAfterStockDto {
-        val product: Product = (productPersistence.findById(productCurrentStockDto.id)
-            ?: throw IllegalArgumentException("상품을 찾을 수 없습니다."))
+        val product: Product = productPersistence.findByIdOrThrow(productCurrentStockDto.id)
         product.changeStock(productCurrentStockDto.action, productCurrentStockDto.amount)
         val savedProduct = productPersistence.save(product)
         return ProductAfterStockDto.create(savedProduct)
     }
 
     fun modifyProduct(productDto: ProductDto): ProductDto {
-        val product: Product = (productPersistence.findByIdAndStoreId(productDto.id!!, productDto.storeId)
-            ?: throw IllegalArgumentException("상품을 찾을 수 없습니다."))
+        val product: Product = productPersistence.findByIdAndStoreIdOrElseThrow(productDto.id!!, productDto.storeId)
         product.modify(
             name = productDto.name,
             description = productDto.description,
