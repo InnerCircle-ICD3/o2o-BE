@@ -1,5 +1,8 @@
 package com.eatngo.auth.token
 
+import com.eatngo.auth.dto.LoginCustomer
+import com.eatngo.auth.dto.LoginStoreOwner
+import com.eatngo.auth.dto.LoginUser
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.ExpiredJwtException
 import io.jsonwebtoken.Jwts
@@ -20,18 +23,30 @@ class TokenProvider(
 ) {
     private val key: SecretKey = Keys.hmacShaKeyFor(Base64.getDecoder().decode(secret))
 
-    fun createAccessToken(userId: Long): String {
+    fun createAccessToken(loginUser: LoginUser): String {
+        val customerId = if (loginUser is LoginCustomer) loginUser.customerId else null
+        val storeOwnerId = if (loginUser is LoginStoreOwner) loginUser.storeOwnerId else null
+
         return Jwts.builder()
-            .subject(userId.toString())
+            .subject(loginUser.userAccountId.toString())
+            .claim("roles", loginUser.roles)
+            .claim("customerId", customerId)
+            .claim("storeOwnerId", storeOwnerId)
             .issuedAt(Date())
             .expiration(Date(System.currentTimeMillis() + 1000 * 60 * 60)) // 1 hour
             .signWith(key)
             .compact()
     }
 
-    fun createRefreshToken(userId: Long): String {
+    fun createRefreshToken(loginUser: LoginUser): String {
+        val customerId = if (loginUser is LoginCustomer) loginUser.customerId else null
+        val storeOwnerId = if (loginUser is LoginStoreOwner) loginUser.storeOwnerId else null
+
         return Jwts.builder()
-            .subject(userId.toString())
+            .subject(loginUser.userAccountId.toString())
+            .claim("roles", loginUser.roles)
+            .claim("customerId", customerId)
+            .claim("storeOwnerId", storeOwnerId)
             .issuedAt(Date())
             .expiration(Date(System.currentTimeMillis() + 1000L * 60 * 60 * 24 * 14)) // 14 days
             .signWith(key)

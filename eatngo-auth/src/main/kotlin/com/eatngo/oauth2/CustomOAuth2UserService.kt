@@ -31,14 +31,14 @@ class CustomOAuth2UserService(
             ?: userAccountPersistence.save(UserAccount.create(oauth2))
         // TODO term fetch api 추가하기
 
-        val authorities = handleRoles(userAccount)
+        val roles = handleRoles(userAccount)
             .map { SimpleGrantedAuthority(it.toString()) }
 
         val oAuth2UserAttributesMap = oAuth2User.attributes.toMutableMap()
         oAuth2UserAttributesMap.put(PRINCIPAL_KEY, userAccount.id.toString())
 
         return DefaultOAuth2User(
-            authorities,
+            roles,
             oAuth2UserAttributesMap,
             PRINCIPAL_KEY
         )

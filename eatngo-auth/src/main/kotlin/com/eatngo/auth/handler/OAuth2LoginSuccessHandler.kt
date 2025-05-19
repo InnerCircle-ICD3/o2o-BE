@@ -25,10 +25,9 @@ class OAuth2LoginSuccessHandler(
         val attributes = (authentication.principal as OAuth2User).attributes
         val userId = attributes[PRINCIPAL_KEY]?.toString()?.toLongOrNull()
             ?: throw IllegalArgumentException("User ID not found")
-        
-        postProcessor.postProcess(userId)
 
-        val accessToken = tokenProvider.createAccessToken(userId)
+        val loginUser = postProcessor.postProcess(userId)
+        val accessToken = tokenProvider.createAccessToken(loginUser)
 
         val responseCookie = createHttpOnlyCookie(ACCESS_TOKEN, accessToken)
         response.addHeader("Set-Cookie", responseCookie.toString())
