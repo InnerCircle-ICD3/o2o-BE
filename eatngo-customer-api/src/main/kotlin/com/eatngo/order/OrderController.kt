@@ -19,11 +19,11 @@ class OrderController(
 ) {
     @PostMapping("/api/v1/orders")
     @Operation(summary = "주문 생성", description = "주문 생성")
-    fun createOrder(@RequestBody requestDto: CreateOrderRequestDto): ResponseEntity<OrderDto> {
+    fun createOrder(@RequestBody requestDto: CreateOrderRequestDto, @CustomerId customerId: Long): ResponseEntity<OrderDto> {
         return ResponseEntity.ok(
             orderCreateUseCase.create(
                 OrderCreateDto(
-                    customerId = 1L,
+                    customerId = customerId,
                     storeId = requestDto.storeId,
                     orderItems = requestDto.orderItems.map {
                         OrderItemCreateDto(
