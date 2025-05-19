@@ -1,6 +1,6 @@
 package com.eatngo.product.dto
 
-import java.time.ZonedDateTime
+import java.time.LocalDateTime
 
 data class UpdateProductResponseDto(
     val id: Long?,
@@ -11,8 +11,8 @@ data class UpdateProductResponseDto(
     val inventory: UpdateProductInventoryResponseDto,
     val foodType: List<String>,
     val status: String?,
-    val createdAt: ZonedDateTime?,
-    val updatedAt: ZonedDateTime?
+    val createdAt: LocalDateTime?,
+    val updatedAt: LocalDateTime?
 ) {
     companion object {
         fun from(productDto: ProductDto): UpdateProductResponseDto {

@@ -3,7 +3,7 @@ package com.eatngo.product.domain
 import com.eatngo.product.domain.ProductSizeType.*
 import com.eatngo.product.domain.StockActionType.DECREASE
 import com.eatngo.product.domain.StockActionType.INCREASE
-import java.time.ZonedDateTime
+import java.time.LocalDateTime
 
 sealed class Product {
     abstract var id: Long?
@@ -15,8 +15,8 @@ sealed class Product {
     abstract val storeId: Long
     abstract var foodTypes: FoodTypes
     abstract var status: ProductStatus
-    abstract var createdAt: ZonedDateTime?
-    abstract var updatedAt: ZonedDateTime?
+    abstract var createdAt: LocalDateTime?
+    abstract var updatedAt: LocalDateTime?
 
     abstract fun getSize(): ProductSizeType
 
@@ -45,8 +45,8 @@ sealed class Product {
         override var storeId: Long,
         override var foodTypes: FoodTypes,
         override var status: ProductStatus = ProductStatus.ACTIVE,
-        override var createdAt: ZonedDateTime? = null,
-        override var updatedAt: ZonedDateTime? = null,
+        override var createdAt: LocalDateTime? = null,
+        override var updatedAt: LocalDateTime? = null,
     ) : Product() {
         override fun getSize() = L
 
@@ -96,8 +96,8 @@ sealed class Product {
         override val storeId: Long,
         override var foodTypes: FoodTypes,
         override var status: ProductStatus = ProductStatus.ACTIVE,
-        override var createdAt: ZonedDateTime? = null,
-        override var updatedAt: ZonedDateTime? = null,
+        override var createdAt: LocalDateTime? = null,
+        override var updatedAt: LocalDateTime? = null,
     ) : Product() {
         override fun getSize() = M
 
@@ -147,8 +147,8 @@ sealed class Product {
         override val storeId: Long,
         override var foodTypes: FoodTypes,
         override var status: ProductStatus = ProductStatus.ACTIVE,
-        override var createdAt: ZonedDateTime? = null,
-        override var updatedAt: ZonedDateTime? = null,
+        override var createdAt: LocalDateTime? = null,
+        override var updatedAt: LocalDateTime? = null,
     ) : Product() {
         override fun getSize() = S
 

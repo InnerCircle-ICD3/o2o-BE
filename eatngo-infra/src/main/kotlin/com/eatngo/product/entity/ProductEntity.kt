@@ -4,7 +4,7 @@ import com.eatngo.product.domain.ProductStatus
 import jakarta.persistence.*
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
-import java.time.ZonedDateTime
+import java.time.LocalDateTime
 
 @Entity
 @Table(name = "products")
@@ -47,10 +47,10 @@ data class ProductEntity(
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
-    var createdAt: ZonedDateTime = ZonedDateTime.now(),
+    var createdAt: LocalDateTime = LocalDateTime.now(),
 
     @UpdateTimestamp
     @Column(nullable = false)
-    var updatedAt: ZonedDateTime? = ZonedDateTime.now()
+    var updatedAt: LocalDateTime? = LocalDateTime.now()
 ) {
 }
