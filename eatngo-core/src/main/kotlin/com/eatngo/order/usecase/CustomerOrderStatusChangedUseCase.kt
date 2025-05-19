@@ -15,7 +15,7 @@ class CustomerOrderStatusChangedUseCase(
 ) {
     fun change(dto: OrderStatusChangedDto){
         val customer = customerService.getCustomerById(dto.userId)
-        val order = orderService.findById(dto.orderId)
+        val order = orderService.getById(dto.orderId)
 
         when (dto.status) {
             Status.CANCELED -> order.toCancel(customer)

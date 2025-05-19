@@ -32,7 +32,7 @@ class OrderService(
         return orderPersistence.save(order)
     }
 
-    fun findById(orderId: Long): Order {
+    fun getById(orderId: Long): Order {
         return orderPersistence.findById(orderId).orThrow { OrderException.OrderNotFound(orderId) }
     }
 
