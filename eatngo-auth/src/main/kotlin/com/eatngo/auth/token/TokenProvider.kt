@@ -33,7 +33,7 @@ class TokenProvider(
             .claim("customerId", customerId)
             .claim("storeOwnerId", storeOwnerId)
             .issuedAt(Date())
-            .expiration(Date(System.currentTimeMillis() + 1000 * 60 * 60)) // 1 hour
+            .expiration(Date(System.currentTimeMillis() + 1000L * 60 * 60 * 24 * 14)) // 14 days -- 레디스 없어서 일단 길게~! //TODO 짧게 변경하기
             .signWith(key)
             .compact()
     }
