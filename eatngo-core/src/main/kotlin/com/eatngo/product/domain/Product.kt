@@ -12,9 +12,10 @@ sealed class Product {
     abstract var inventory: Inventory
     abstract var price: ProductPrice
     abstract var imageUrl: String?
-    abstract val storeId: Long
+    abstract var storeId: Long?
     abstract var foodTypes: FoodTypes
     abstract var status: ProductStatus
+    abstract var deletedStatus: DeletedStatus
     abstract var createdAt: LocalDateTime?
     abstract var updatedAt: LocalDateTime?
 
@@ -35,6 +36,8 @@ sealed class Product {
         status: ProductStatus,
     )
 
+    abstract fun remove()
+
     data class LargeEatNGoBag(
         override var id: Long? = null,
         override var name: String,
@@ -42,9 +45,10 @@ sealed class Product {
         override var inventory: Inventory,
         override var price: ProductPrice,
         override var imageUrl: String?,
-        override var storeId: Long,
+        override var storeId: Long?,
         override var foodTypes: FoodTypes,
         override var status: ProductStatus = ProductStatus.ACTIVE,
+        override var deletedStatus: DeletedStatus = DeletedStatus.ACTIVE,
         override var createdAt: LocalDateTime? = null,
         override var updatedAt: LocalDateTime? = null,
     ) : Product() {
@@ -84,6 +88,11 @@ sealed class Product {
             this.foodTypes = foodTypes
             this.status = status
         }
+
+        override fun remove() {
+            this.deletedStatus = DeletedStatus.DELETED
+            this.storeId = null
+        }
     }
 
     data class MediumEatNGoBag(
@@ -93,9 +102,10 @@ sealed class Product {
         override var inventory: Inventory,
         override var price: ProductPrice,
         override var imageUrl: String?,
-        override val storeId: Long,
+        override var storeId: Long?,
         override var foodTypes: FoodTypes,
         override var status: ProductStatus = ProductStatus.ACTIVE,
+        override var deletedStatus: DeletedStatus = DeletedStatus.ACTIVE,
         override var createdAt: LocalDateTime? = null,
         override var updatedAt: LocalDateTime? = null,
     ) : Product() {
@@ -135,6 +145,11 @@ sealed class Product {
             this.foodTypes = foodTypes
             this.status = status
         }
+
+        override fun remove() {
+            this.deletedStatus = DeletedStatus.DELETED
+            this.storeId = null
+        }
     }
 
     data class SmallEatNGoBag(
@@ -144,9 +159,10 @@ sealed class Product {
         override var inventory: Inventory,
         override var price: ProductPrice,
         override var imageUrl: String?,
-        override val storeId: Long,
+        override var storeId: Long?,
         override var foodTypes: FoodTypes,
         override var status: ProductStatus = ProductStatus.ACTIVE,
+        override var deletedStatus: DeletedStatus = DeletedStatus.ACTIVE,
         override var createdAt: LocalDateTime? = null,
         override var updatedAt: LocalDateTime? = null,
     ) : Product() {
@@ -182,9 +198,14 @@ sealed class Product {
                 originalPrice = price.originalPrice,
                 discountRate = price.discountRate,
             )
-            this.imageUrl =imageUrl
+            this.imageUrl = imageUrl
             this.foodTypes = foodTypes
             this.status = status
+        }
+
+        override fun remove() {
+            this.deletedStatus = DeletedStatus.DELETED
+            this.storeId = null
         }
     }
 }

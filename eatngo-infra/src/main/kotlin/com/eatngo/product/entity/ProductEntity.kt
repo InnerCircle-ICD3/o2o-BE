@@ -3,11 +3,14 @@ package com.eatngo.product.entity
 import com.eatngo.product.domain.ProductStatus
 import jakarta.persistence.*
 import org.hibernate.annotations.CreationTimestamp
+import org.hibernate.annotations.SoftDelete
+import org.hibernate.annotations.SoftDeleteType
 import org.hibernate.annotations.UpdateTimestamp
 import java.time.LocalDateTime
 
 @Entity
 @Table(name = "products")
+@SoftDelete
 // TODO 이후 DType 추가 필요!
 data class ProductEntity(
     @Id
@@ -44,6 +47,9 @@ data class ProductEntity(
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     var productType: ProductType,
+
+    @Enumerated(EnumType.STRING)
+    var deleteStatus: SoftDeleteType,
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)

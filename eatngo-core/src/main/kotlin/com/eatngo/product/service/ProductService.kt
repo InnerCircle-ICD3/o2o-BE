@@ -94,8 +94,10 @@ class ProductService(
         }
 
     fun deleteProduct(storeId: Long, productId: Long) {
-        productPersistence.findByIdAndStoreId(productId, storeId)
-        productPersistence.deleteById(productId)
+        val product: Product = productPersistence.findByIdAndStoreId(productId, storeId)
+            ?: throw IllegalArgumentException("상품을 찾을 수 없습니다.")
+        product.remove()
+        productPersistence.save(product)
         // TODO storePersistence.deleteById(storeId)
     }
 

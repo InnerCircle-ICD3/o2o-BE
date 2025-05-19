@@ -31,8 +31,4 @@ class ProductPersistenceImpl(
             ProductMapper.toDomain(it)
         }.orElse(null)
     }
-
-    override fun deleteById(productId: Long) {
-        productRepository.deleteById(productId)
-    }
 }

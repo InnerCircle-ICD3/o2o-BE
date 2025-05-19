@@ -33,7 +33,7 @@ data class ProductDto(
                 inventory = ProductInventoryDto.from(product.inventory),
                 price = ProductPriceDto.from(product.price),
                 imageUrl = imageUrl,
-                storeId = product.storeId,
+                storeId = product.storeId!!,
                 foodTypes = product.foodTypes.foods.map { it.name },
                 status = product.status.name,
                 createdAt = product.createdAt,

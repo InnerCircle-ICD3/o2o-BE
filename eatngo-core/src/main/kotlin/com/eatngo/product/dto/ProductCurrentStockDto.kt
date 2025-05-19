@@ -18,7 +18,7 @@ data class ProductAfterStockDto(
         fun create(product: Product): ProductAfterStockDto {
             return ProductAfterStockDto(
                 id = product.id!!,
-                storeId = product.storeId,
+                storeId = product.storeId!!,
                 quantity = product.inventory.quantity,
                 stock = product.inventory.stock
             )
