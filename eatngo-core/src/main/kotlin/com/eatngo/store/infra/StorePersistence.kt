@@ -1,7 +1,6 @@
 package com.eatngo.store.infra
 
-import com.eatngo.store.constant.StoreEnum
-import com.eatngo.store.domain.Address
+import com.eatngo.common.constant.StoreEnum
 import com.eatngo.store.domain.Store
 
 /**

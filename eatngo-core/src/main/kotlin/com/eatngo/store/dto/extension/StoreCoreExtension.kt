@@ -1,6 +1,6 @@
 package com.eatngo.store.dto.extension
 
-import com.eatngo.store.constant.StoreEnum
+import com.eatngo.common.constant.StoreEnum
 import com.eatngo.store.domain.Address
 import com.eatngo.store.domain.AdminAddress
 import com.eatngo.store.domain.BusinessHour

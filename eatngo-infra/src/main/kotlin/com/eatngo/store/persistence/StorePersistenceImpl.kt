@@ -1,6 +1,6 @@
 package com.eatngo.store.persistence
 
-import com.eatngo.store.constant.StoreEnum
+import com.eatngo.common.constant.StoreEnum
 import com.eatngo.store.domain.Address
 import com.eatngo.store.domain.Store
 import com.eatngo.store.infra.StorePersistence

@@ -1,12 +1,9 @@
 package com.eatngo.store.dto
 
-import com.eatngo.store.constant.StoreEnum
-import com.eatngo.store.domain.*
-import com.eatngo.store.dto.extension.toDomain
+import com.eatngo.common.constant.StoreEnum
 import java.time.DayOfWeek
 import java.time.LocalTime
 import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 
 
 /**
