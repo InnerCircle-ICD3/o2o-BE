@@ -1,5 +1,6 @@
 package com.eatngo.store.serviceImpl
 
+import com.eatngo.common.constant.StoreEnum
 import com.eatngo.common.exception.StoreException
 import com.eatngo.store.domain.Address
 import com.eatngo.store.domain.Store
@@ -86,9 +87,14 @@ class StoreServiceImpl(
         return savedStore.toDto()
     }
 
-    override suspend fun updateStoreStatus(id: Long, request: StatusUpdateRequest): StoreDto {
+    override suspend fun updateStoreStatus(id: Long, status: String): StoreDto {
+        val storeStatus = try {
+            StoreEnum.StoreStatus.valueOf(status.uppercase())
+        } catch (e: IllegalArgumentException) {
+            throw StoreException.StoreStatusInvalid(status)
+        }
         val existingStore = storePersistence.findById(id) ?: throw StoreException.StoreNotFound(id)
-        val updatedStore = existingStore.updateStatus(request.status)
+        val updatedStore = existingStore.updateStatus(storeStatus)
         val savedStore = storePersistence.save(updatedStore)
         return savedStore.toDto()
     }

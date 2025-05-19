@@ -6,7 +6,7 @@ import java.time.LocalTime
  * 상점 생성 요청 DTO
  */
 data class StoreCreateDto(
-    val storeOwnerId: String,
+    val storeOwnerId: Long,
     val name: String,
     val address: AddressDto,
     val businessNumber: String,
@@ -14,9 +14,7 @@ data class StoreCreateDto(
     val contactNumber: String?,
     val description: String?,
     val imageUrl: String?,
-    val pickupStartTime: LocalTime,
-    val pickupEndTime: LocalTime,
-    val pickupAvailableForTomorrow: Boolean,
-    val storeCategory: List<String>,
-    val foodCategory: List<String> = emptyList(),
+    val pickUpInfo: PickUpInfoDto,
+    val storeCategoryInfo: StoreCategoryInfoDto,
+    val reviewInfo: ReviewInfoDto
 )

@@ -19,7 +19,7 @@ interface StoreService {
     /**
      * 상점 상태 변경
      */
-    suspend fun updateStoreStatus(id: Long, request: StatusUpdateRequest): StoreDto
+    suspend fun updateStoreStatus(id: Long, status: String): StoreDto
     
     /**
      * 상점 픽업 정보 변경

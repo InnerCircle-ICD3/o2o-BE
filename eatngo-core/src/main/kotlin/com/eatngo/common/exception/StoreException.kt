@@ -49,6 +49,12 @@ open class StoreException(
         mapOf("validationErrors" to missingFields)
     )
 
+    // 매장 상태 관련 예외
+    class StoreStatusInvalid(status: String) : StoreException(
+        BusinessErrorCode.STORE_STATUS_INVALID,
+        "${BusinessErrorCode.STORE_STATUS_INVALID.message}: $status",
+        mapOf("status" to status)
+    )
 
     // 구독 관련 예외
     class SubscriptionNotFound(subscriptionId: Long) : StoreException(
@@ -56,7 +62,7 @@ open class StoreException(
         "${BusinessErrorCode.SUBSCRIPTION_NOT_FOUND.message}: $subscriptionId",
         mapOf("subscriptionId" to subscriptionId)
     )
-    
+
     class SubscriptionUpdateFailed(subscriptionId: String) : StoreException(
         BusinessErrorCode.SUBSCRIPTION_UPDATE_FAILED,
         "${BusinessErrorCode.SUBSCRIPTION_UPDATE_FAILED.message}: $subscriptionId",

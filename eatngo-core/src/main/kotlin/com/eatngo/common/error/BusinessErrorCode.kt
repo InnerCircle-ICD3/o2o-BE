@@ -42,6 +42,9 @@ enum class BusinessErrorCode(
     // 매장 생성 관련 오류
     STORE_VALIDATION_FAILED("S006", "매장 정보 검증에 실패했습니다."),
 
+    // 매장 상태 관련 오류
+    STORE_STATUS_INVALID("S012", "유효하지 않은 매장 상태입니다"),
+
     // 매장 점주 관련 오류
     STORE_OWNER_NOT_FOUND("S007", "점주 정보를 찾을 수 없습니다."),
     STORE_OWNER_ALREADY_EXISTS("S008", "이미 등록된 점주입니다."),

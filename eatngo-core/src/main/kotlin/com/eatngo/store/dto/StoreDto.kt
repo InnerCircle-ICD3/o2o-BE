@@ -11,7 +11,7 @@ import java.time.LocalDateTime
  */
 data class StoreDto(
     val storeId: Long,
-    val storeOwnerId: String,
+    val storeOwnerId: Long,
     val name: String,
     val description: String?,
     val address: AddressDto,
@@ -19,14 +19,10 @@ data class StoreDto(
     val contactNumber: String?,
     val imageUrl: String?,
     val businessHours: List<BusinessHourDto> = emptyList(),
-    val storeCategory: List<String>,
-    val foodCategory: List<String> = emptyList(),
+    val storeCategoryInfo: StoreCategoryInfoDto,
     val status: StoreEnum.StoreStatus,
-    val pickupStartTime: LocalTime,
-    val pickupEndTime: LocalTime,
-    val pickupAvailableForTomorrow: Boolean,
-    val ratingAverage: Double,
-    val ratingCount: Int,
+    val pickUpInfo: PickUpInfoDto,
+    val reviewInfo: ReviewInfoDto,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime
 )
@@ -38,7 +34,7 @@ data class AddressDto(
     val roadAddress: RoadAddressDto,
     val legalAddress: LegalAddressDto?,
     val adminAddress: AdminAddressDto?,
-    val coordinate: Coordinate,
+    val coordinate: CoordinateDto,
 )
 
 /**
@@ -75,7 +71,32 @@ data class AdminAddressDto(
 /**
  *  위도, 경도 좌표 DTO
  */
-data class Coordinate(
+data class CoordinateDto(
     val latitude: Double,
     val longitude: Double
+)
+
+/**
+ * 픽업과 관련된 정보 DTO
+ */
+data class PickUpInfoDto(
+    val pickupStartTime: LocalTime,
+    val pickupEndTime: LocalTime,
+    val pickupAvailableForTomorrow: Boolean = false,
+)
+
+/**
+ * 리뷰 정보 DTO
+ */
+data class ReviewInfoDto(
+    val ratingAverage: Double = 0.0,
+    val ratingCount: Int = 0,
+)
+
+/**
+ * 매장의 카테고리 정보(분류와 사용자 입력 카테고리) DTO
+ */
+data class StoreCategoryInfoDto(
+    val storeCategory: List<String>,
+    val foodCategory: List<String>?
 )

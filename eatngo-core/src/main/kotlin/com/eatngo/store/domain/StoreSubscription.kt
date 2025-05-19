@@ -1,4 +1,5 @@
 package com.eatngo.store.domain
+
 import java.time.LocalDateTime
 
 /**
@@ -7,7 +8,7 @@ import java.time.LocalDateTime
  */
 class StoreSubscription(
     val id: Long = 0,               // 구독 정보의 고유 id
-    val userId: String,             // 구독한 사용자의 계정 id
+    val userId: Long,               // 구독한 사용자의 계정 id
     val storeId: Long,              // 구독된 매장의 매장 id
     val createdAt: LocalDateTime = LocalDateTime.now(), // 생성일
     val updatedAt: LocalDateTime = createdAt,           // 수정일
@@ -15,11 +16,9 @@ class StoreSubscription(
 ) {
     companion object {
         fun create(
-            userId: String,
+            userId: Long,
             storeId: Long
         ): StoreSubscription {
-            require(userId.isNotBlank()) { "사용자 ID는 필수입니다." }
-
             return StoreSubscription(
                 id = 0,
                 userId = userId,

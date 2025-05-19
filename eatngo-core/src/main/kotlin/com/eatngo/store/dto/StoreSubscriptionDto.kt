@@ -8,7 +8,7 @@ import java.time.LocalDateTime
  */
 data class StoreSubscriptionDto(
     val id: Long,
-    val userId: String,
+    val userId: Long,
     val userName: String,
     val storeId: Long,
     val storeName: String,            // 매장명
