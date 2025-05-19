@@ -1,5 +1,7 @@
 package com.eatngo.order.service
 
+import com.eatngo.common.exception.OrderException
+import com.eatngo.extension.orThrow
 import com.eatngo.order.domain.Order
 import com.eatngo.order.domain.OrderItem
 import com.eatngo.order.dto.OrderCreateDto
@@ -29,5 +31,13 @@ class OrderService(
         )
 
         return OrderDto.from(orderPersistence.save(order))
+    }
+
+    fun findById(orderId: Long): Order {
+        return orderPersistence.findById(orderId).orThrow { OrderException.OrderNotFound(orderId) }
+    }
+
+    fun update(order: Order): Order {
+        return orderPersistence.save(order)
     }
 }
