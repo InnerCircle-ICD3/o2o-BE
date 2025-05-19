@@ -30,10 +30,13 @@ class CustomerAddressController (
     fun addAddress(@RequestBody address: AddAddressRequestDto): ResponseEntity<Long/*AddressID*/> {
         return ResponseEntity.ok(customerAddressService.addAddress(
             CustomerAddress(
-                id = 0L,
-                address = address.address,
+                addressId = 0L,
+                customerId = address.customerId,
                 point = address.point,
-                addressType = address.addressType
+                address = address.address,
+                addressType = address.addressType,
+                customerAddressType = address.customerAddressType,
+                addressTypeDesc = address.addressTypeDesc
             )
         ))
     }
