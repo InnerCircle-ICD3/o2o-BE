@@ -12,7 +12,6 @@ import com.eatngo.store.dto.StoreSubscriptionDto
 import com.eatngo.store.dto.StoreUpdateDto
 import com.eatngo.store.dto.StoreUpdateRequest
 import com.eatngo.store.dto.SubscriptionResponseForStoreOwner
-import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
@@ -27,14 +26,11 @@ fun StoreCreateRequest.toCoreDto(storeOwnerId: String): StoreCreateDto {
         address = AddressDto(
             roadAddress = RoadAddressDto(
                 fullAddress = this.roadFullAddress,
-                zoneNo = this.roadZoneNo,
-                buildingName = this.roadBuildingName
+                zoneNo = this.roadZoneNo
             ),
             legalAddress = if (this.legalFullAddress != null && this.legalMainAddressNo != null) {
                 LegalAddressDto(
-                    fullAddress = this.legalFullAddress,
-                    mainAddressNo = this.legalMainAddressNo,
-                    subAddressNo = this.legalSubAddressNo
+                    fullAddress = this.legalFullAddress
                 )
             } else null,
             adminAddress = this.adminFullAddress?.let { AdminAddressDto(it) },
@@ -49,22 +45,20 @@ fun StoreCreateRequest.toCoreDto(storeOwnerId: String): StoreCreateDto {
         pickupStartTime = LocalTime.parse(this.pickupStartTime),
         pickupEndTime = LocalTime.parse(this.pickupEndTime),
         pickupAvailableForTomorrow = this.pickupAvailableForTomorrow,
-        categories = this.categories
+        foodCategory = this.foodCategory,
+        storeCategory = this.storeCategory
     )
 }
 
 fun StoreUpdateRequest.toCoreDto(): StoreUpdateDto {
     val roadAddress = RoadAddressDto(
         fullAddress = roadFullAddress!!,
-        zoneNo = roadZoneNo!!,
-        buildingName = roadBuildingName
+        zoneNo = roadZoneNo!!
     )
 
     val legalAddress = if (legalFullAddress != null && legalMainAddressNo != null) {
         LegalAddressDto(
-            fullAddress = legalFullAddress,
-            mainAddressNo = legalMainAddressNo,
-            subAddressNo = legalSubAddressNo
+            fullAddress = legalFullAddress
         )
     } else null
 
@@ -118,7 +112,8 @@ fun StoreDto.toDetailResponse(): StoreDetailResponse {
         status = this.status.name,
         ratingAverage = this.ratingAverage,
         ratingCount = this.ratingCount,
-        categories = this.categories
+        foodCategory = this.foodCategory,
+        storeCategory = this.storeCategory,
     )
 }
 

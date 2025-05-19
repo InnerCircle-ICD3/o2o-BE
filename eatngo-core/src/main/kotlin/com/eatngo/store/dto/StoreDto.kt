@@ -22,7 +22,8 @@ data class StoreDto(
     val contactNumber: String?,
     val imageUrl: String?,
     val businessHours: List<BusinessHourDto> = emptyList(),
-    val categories: List<String> = emptyList(),
+    val storeCategory: List<String>,
+    val foodCategory: List<String> = emptyList(),
     val status: StoreEnum.StoreStatus,
     val pickupStartTime: LocalTime,
     val pickupEndTime: LocalTime,
@@ -33,14 +34,19 @@ data class StoreDto(
     val updatedAt: LocalDateTime
 )
 
+/**
+ * 주소 관련 정보를 담은 DTO
+ */
 data class AddressDto(
     val roadAddress: RoadAddressDto,
     val legalAddress: LegalAddressDto?,
     val adminAddress: AdminAddressDto?,
-    val latitude: Double,
-    val longitude: Double
+    val coordinate: Coordinate,
 )
 
+/**
+ * 영업시간 정보를 담은 DTO
+ */
 data class BusinessHourDto(
     val dayOfWeek: DayOfWeek,
     val openTime: LocalTime,
@@ -48,26 +54,31 @@ data class BusinessHourDto(
 )
 
 /**
- * 도로명 주소 DTO - 도메인 모델과 동일한 구조
+ * 도로명 주소 DTO
  */
 data class RoadAddressDto(
     val fullAddress: String,
-    val zoneNo: String,
-    val buildingName: String? = null
+    val zoneNo: String
 )
 
 /**
- * 법정동 주소 DTO - 도메인 모델과 동일한 구조
+ * 법정동 주소 DTO
  */
 data class LegalAddressDto(
-    val fullAddress: String,
-    val mainAddressNo: String? = null,
-    val subAddressNo: String? = null
+    val fullAddress: String
 )
 
 /**
- * 행정동 주소 DTO - 도메인 모델과 동일한 구조
+ * 행정동 주소 DTO
  */
 data class AdminAddressDto(
     val fullAddress: String? = null
+)
+
+/**
+ *  위도, 경도 좌표 DTO
+ */
+data class Coordinate(
+    val latitude: Double,
+    val longitude: Double
 )

@@ -22,5 +22,6 @@ data class StoreCreateDto(
     val pickupStartTime: LocalTime,
     val pickupEndTime: LocalTime,
     val pickupAvailableForTomorrow: Boolean,
-    val categories: List<String>
+    val storeCategory: List<String>,
+    val foodCategory: List<String> = emptyList(),
 )

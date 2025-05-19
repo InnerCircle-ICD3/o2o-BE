@@ -18,7 +18,8 @@ data class Store(
     val contactNumber: String?,         // 매장 or 점주 전화번호
     val imageUrl: String?,              // 대표 이미지 url(카드뷰에 보이는 이미지)
     val businessHours: List<BusinessHour?>?, // 영업시간(픽업시간과는 다름, 단순 정보제공용 및 확장성 고려해 추가)
-    val categories: List<String?>?,     // 카테고리(ex. 햄버거, 소금빵, 모카빵 ...)
+    val storeCategory: List<String>,     // 매장의 카테고리(ex. 빵, 카페, 분식 ...)
+    val foodCategory : List<String>?,     // 음식의 카테고리(ex. 햄버거, 소금빵, 모카빵 ...)
     val status: StoreEnum.StoreStatus = StoreEnum.StoreStatus.PENDING, // 매장 상태(기본: 승인대기중)
     val pickupStartTime: LocalTime,     // 픽업 시작 시간 (필수) (HH:mm)
     val pickupEndTime: LocalTime,       // 픽업 종료 시간 (필수) (HH:mm)
@@ -37,12 +38,12 @@ data class Store(
             businessNumber: String,
             pickupStartTime: LocalTime,
             pickupEndTime: LocalTime,
-            // 이하 선택적/nullable 필드는 기본값 또는 파라미터로 받음
             description: String? = null,
             contactNumber: String? = null,
             imageUrl: String? = null,
             businessHours: List<BusinessHour?>? = null,
-            categories: List<String?>? = null,
+            storeCategory: List<String>,
+            foodCategory : List<String>? = emptyList(),
             status: StoreEnum.StoreStatus = StoreEnum.StoreStatus.PENDING,
             pickupAvailableForTomorrow: Boolean = false,
             ratingAverage: Double = 0.0,
@@ -51,8 +52,6 @@ data class Store(
             updatedAt: LocalDateTime = createdAt,
             deletedAt: LocalDateTime? = null
         ): Store {
-            require(name.isNotBlank()) { "매장명은 필수입니다." }
-            require(businessNumber.isNotBlank()) { "사업자등록번호는 필수입니다." }
             return Store(
                 id = 0L,
                 storeOwnerId = storeOwnerId,
@@ -63,7 +62,8 @@ data class Store(
                 contactNumber = contactNumber,
                 imageUrl = imageUrl,
                 businessHours = businessHours,
-                categories = categories,
+                storeCategory = storeCategory,
+                foodCategory = foodCategory,
                 status = status,
                 pickupStartTime = pickupStartTime,
                 pickupEndTime = pickupEndTime,
@@ -88,25 +88,24 @@ data class Store(
         contactNumber: String? = null,
         imageUrl: String? = null,
         businessHours: List<BusinessHour?>? = null,
-        categories: List<String?>? = null,
+        storeCategory: List<String>,
+        foodCategory : List<String>? = emptyList(),
         pickupStartTime: LocalTime? = null,
         pickupEndTime: LocalTime? = null,
         pickupAvailableForTomorrow: Boolean? = null
     ): Store {
-        val newName = name?.takeIf { it.isNotBlank() } ?: this.name
-        val newBusinessNumber = businessNumber?.takeIf { it.isNotBlank() } ?: this.businessNumber
-
         return Store(
             id = id,
             storeOwnerId = this.storeOwnerId,
-            name = newName,
+            name = name ?: this.name,
             description = description ?: this.description,
             address = address ?: this.address,
-            businessNumber = newBusinessNumber,
+            businessNumber = businessNumber ?: this.businessNumber,
             contactNumber = contactNumber ?: this.contactNumber,
             imageUrl = imageUrl ?: this.imageUrl,
             businessHours = businessHours ?: this.businessHours,
-            categories = categories ?: this.categories,
+            storeCategory = storeCategory,
+            foodCategory = foodCategory ?: this.foodCategory,
             status = this.status,
             pickupStartTime = pickupStartTime ?: this.pickupStartTime,
             pickupEndTime = pickupEndTime ?: this.pickupEndTime,
@@ -231,7 +230,6 @@ data class BusinessHour(
 data class RoadAddress(
     val fullAddress: String,      // 전체 도로명 주소
     val zoneNo: String,           // 우편번호
-    val buildingName: String? = null  // 건물명 (선택)
 )
 
 /**
@@ -239,8 +237,6 @@ data class RoadAddress(
  */
 data class LegalAddress(
     val fullAddress: String,              // 전체 지번 주소
-    val mainAddressNo: String? = null,   // 본번
-    val subAddressNo: String? = null      // 부번
 )
 
 /**

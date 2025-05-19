@@ -2,7 +2,6 @@ package com.eatngo.store.serviceImpl
 
 import com.eatngo.common.exception.StoreException
 import com.eatngo.store.domain.Address
-import com.eatngo.store.domain.BusinessHour
 import com.eatngo.store.domain.Store
 import com.eatngo.store.dto.PickupInfoUpdateRequest
 import com.eatngo.store.dto.StatusUpdateRequest
@@ -12,10 +11,8 @@ import com.eatngo.store.dto.StoreUpdateDto
 import com.eatngo.store.dto.extension.toDomain
 import com.eatngo.store.dto.extension.toDto
 import com.eatngo.store.infra.StorePersistence
-import com.eatngo.store.infra.StoreSubscriptionPersistence
 import com.eatngo.store.service.StoreService
 import org.springframework.stereotype.Service
-import java.time.DayOfWeek
 import java.time.LocalTime
 
 /**
@@ -24,7 +21,6 @@ import java.time.LocalTime
 @Service
 class StoreServiceImpl(
     private val storePersistence: StorePersistence,
-    private val storeSubscriptionPersistence: StoreSubscriptionPersistence
 ) : StoreService {
     /**
      * 상점 생성
@@ -51,7 +47,8 @@ class StoreServiceImpl(
             contactNumber = request.contactNumber,
             imageUrl = request.imageUrl,
             businessHours = businessHours,
-            categories = request.categories,
+            storeCategory = request.storeCategory,
+            foodCategory = request.foodCategory,
             pickupAvailableForTomorrow = request.pickupAvailableForTomorrow
         )
 
@@ -77,7 +74,8 @@ class StoreServiceImpl(
             contactNumber = request.contactNumber,
             imageUrl = request.mainImageUrl,
             businessHours = businessHours,
-            categories = request.categories,
+            storeCategory = request.storeCategory,
+            foodCategory = request.foodCategory,
             pickupStartTime = request.pickupStartTime,
             pickupEndTime = request.pickupEndTime,
             pickupAvailableForTomorrow = request.pickupAvailableForTomorrow

@@ -12,17 +12,18 @@ import java.time.format.DateTimeFormatter
  * 상점 수정 요청 DTO
  */
 data class StoreUpdateDto(
-    val name: String? = null,
+    val name: String,
     val address: AddressDto,
-    val businessNumber: String? = null,
+    val businessNumber: String,
     val businessHours: List<BusinessHourDto>? = null,
     val contactNumber: String? = null,
     val description: String? = null,
-    val pickupStartTime: LocalTime? = null,
-    val pickupEndTime: LocalTime? = null,
-    val pickupAvailableForTomorrow: Boolean? = null,
+    val pickupStartTime: LocalTime,
+    val pickupEndTime: LocalTime,
+    val pickupAvailableForTomorrow: Boolean,
     val mainImageUrl: String? = null,
-    val categories: List<String>? = null
+    val storeCategory: List<String>,
+    val foodCategory: List<String> = emptyList(),
 )
 
 /**
