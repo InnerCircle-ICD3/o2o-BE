@@ -1,8 +1,21 @@
 package com.eatngo.order.domain
 
 enum class Status {
-    CREATED,
-    CONFIRMED,
+    CREATED {
+        override fun confirm(): Status = CONFIRMED
+        override fun cancel(): Status = CANCELED
+    },
+    CONFIRMED {
+        override fun done(): Status = DONE
+        override fun cancel(): Status = CANCELED
+    },
     CANCELED,
-    DONE,
+    DONE;
+
+    open fun confirm(): Status = invalidTransition("confirm")
+    open fun cancel(): Status = invalidTransition("cancel")
+    open fun done(): Status = invalidTransition("done")
+
+    private fun invalidTransition(action: String): Status =
+        throw IllegalStateException("Cannot '$action' when status is '$this'")
 }
