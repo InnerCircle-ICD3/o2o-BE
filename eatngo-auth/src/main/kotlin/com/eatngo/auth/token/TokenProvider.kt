@@ -56,12 +56,31 @@ class TokenProvider(
     @Suppress("UNCHECKED_CAST")
     fun getAuthentication(token: String): Authentication {
         val claims = parseClaims(token)
-        val userId = claims.subject
 
-        val roles = claims["roles"] as? List<String> ?: listOf("ROLE_USER")
-        val authorities = roles.map { SimpleGrantedAuthority(it) }
+        val userAccountId = claims.subject.toLong()
+        val roles = claims["roles"] as? List<*> ?: emptyList<Any>()
+        val authorities = roles.map { SimpleGrantedAuthority(it.toString()) }
 
-        return UsernamePasswordAuthenticationToken(userId, null, authorities)
+        val customerId = (claims["customerId"] as? Number)?.toLong()
+        val storeOwnerId = (claims["storeOwnerId"] as? Number)?.toLong()
+
+        val loginUser: LoginUser = when {
+            customerId != null -> LoginCustomer(
+                userAccountId = userAccountId,
+                roles = roles.map { it.toString() },
+                customerId = customerId
+            )
+
+            storeOwnerId != null -> LoginStoreOwner(
+                userAccountId = userAccountId,
+                roles = roles.map { it.toString() },
+                storeOwnerId = storeOwnerId
+            )
+
+            else -> throw IllegalArgumentException("Invalid token claims")
+        }
+
+        return UsernamePasswordAuthenticationToken(loginUser, null, authorities)
     }
 
     fun parseClaims(token: String): Claims {
