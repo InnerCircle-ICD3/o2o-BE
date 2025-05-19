@@ -4,9 +4,11 @@ import com.eatngo.order.domain.Status
 import com.eatngo.order.dto.OrderStatusChangedDto
 import com.eatngo.order.service.OrderService
 import com.eatngo.store_owner.service.StoreOwnerService
+import jakarta.transaction.Transactional
 import org.springframework.stereotype.Service
 
 @Service
+@Transactional
 class StoreOrderStatusChangedUseCase(
     private val orderService: OrderService,
     private val storeService: StoreOwnerService
