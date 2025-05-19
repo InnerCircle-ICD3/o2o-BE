@@ -5,7 +5,6 @@ import com.eatngo.extension.orThrow
 import com.eatngo.order.domain.Order
 import com.eatngo.order.domain.OrderItem
 import com.eatngo.order.dto.OrderCreateDto
-import com.eatngo.order.dto.OrderDto
 import com.eatngo.order.infra.OrderPersistence
 import com.github.f4b6a3.tsid.TsidCreator
 import org.springframework.stereotype.Service
@@ -15,7 +14,7 @@ import org.springframework.stereotype.Service
 class OrderService(
     private val orderPersistence: OrderPersistence
 ) {
-    fun createOrder(orderDto: OrderCreateDto): OrderDto {
+    fun createOrder(orderDto: OrderCreateDto): Order {
         val order: Order = Order.create(
             orderNumber = TsidCreator.getTsid().toLong(),
             customerId = orderDto.customerId,
@@ -30,7 +29,7 @@ class OrderService(
             }
         )
 
-        return OrderDto.from(orderPersistence.save(order))
+        return orderPersistence.save(order)
     }
 
     fun findById(orderId: Long): Order {

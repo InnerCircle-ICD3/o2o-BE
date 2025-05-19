@@ -1,8 +1,11 @@
 package com.eatngo.order
 
+import com.eatngo.auth.annotaion.StoreOwnerId
 import com.eatngo.order.domain.Status
 import com.eatngo.order.dto.OrderDto
 import com.eatngo.order.dto.OrderItemDto
+import com.eatngo.order.dto.OrderStatusChangedDto
+import com.eatngo.order.usecase.StoreOrderStatusChangedUseCase
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.ResponseEntity
@@ -14,14 +17,26 @@ import java.time.LocalDateTime
 
 @Tag(name = "주문", description = "주문 관련 API")
 @RestController
-class OrderController {
+class OrderController(
+    private val orderStatusChangedUseCase: StoreOrderStatusChangedUseCase
+) {
     @PostMapping("/api/v1/orders/{orderId}/cancel")
     @Operation(summary = "주문 취소", description = "주문 취소")
-    fun cancelOrder(@PathVariable orderId: Long) = ResponseEntity.ok(Unit)
+    fun cancelOrder(@PathVariable orderId: Long, @StoreOwnerId storeOwnerId: Long): ResponseEntity<Unit> =
+        ResponseEntity.ok(
+            orderStatusChangedUseCase.change(
+                OrderStatusChangedDto(orderId, storeOwnerId, Status.CANCELED)
+            )
+        )
 
     @PostMapping("/api/v1/orders/{orderId}/confirm")
     @Operation(summary = "주문 승인", description = "주문 승인")
-    fun confirmOrder(@PathVariable orderId: Long) = ResponseEntity.ok(Unit)
+    fun confirmOrder(@PathVariable orderId: Long, @StoreOwnerId storeOwnerId: Long): ResponseEntity<Unit> =
+        ResponseEntity.ok(
+            orderStatusChangedUseCase.change(
+                OrderStatusChangedDto(orderId, storeOwnerId, Status.CONFIRMED)
+            )
+        )
 
     @GetMapping("/api/v1/store/{storeId}/orders")
     @Operation(summary = "상점 주문 조회", description = "상점 주문 조회")
