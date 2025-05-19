@@ -8,3 +8,12 @@ dependencies {
     implementation("io.awspring.cloud:spring-cloud-aws-starter-parameter-store")
     implementation("io.awspring.cloud:spring-cloud-aws-starter")
 }
+
+tasks.bootJar{
+    enabled = false
+}
+
+tasks.jar{
+    enabled = true
+    archiveFileName.set("${project.name}.jar")
+}
