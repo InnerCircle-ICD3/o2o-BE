@@ -1,4 +1,4 @@
-package com.eatngo.store.constant
+package com.eatngo.common.constant
 
 object StoreEnum {
     /**

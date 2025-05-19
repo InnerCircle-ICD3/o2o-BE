@@ -1,11 +1,6 @@
 package com.eatngo.store.dto
 
-import com.eatngo.store.constant.StoreEnum
-import com.eatngo.store.domain.*
-import java.time.DayOfWeek
 import java.time.LocalTime
-import java.time.ZonedDateTime
-import java.time.format.DateTimeFormatter
 
 /**
  * 상점 생성 요청 DTO
