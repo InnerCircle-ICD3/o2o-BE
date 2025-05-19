@@ -39,6 +39,12 @@ datastore:
     username: eatngo-owner
     password: eatngolocal
 
+cloud:
+  aws:
+    credentials:
+      access-key: ${AWS_ACCESS_KEY}
+      secret-key: ${AWS_SECRET_KEY}
+
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
