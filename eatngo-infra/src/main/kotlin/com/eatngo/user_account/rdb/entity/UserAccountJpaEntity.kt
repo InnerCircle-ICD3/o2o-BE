@@ -29,7 +29,7 @@ class UserAccountJpaEntity(
     companion object {
         fun from(account: UserAccount) = UserAccountJpaEntity(
             id = account.id,
-            email = account.email?.let { toString() },
+            email = account.email?.value,
         ).also {
             account.oauth2.forEach { oauth2 ->
                 it.oauth2.addLast(UserAccountOAuth2JpaEntity.of(oauth2, it))
