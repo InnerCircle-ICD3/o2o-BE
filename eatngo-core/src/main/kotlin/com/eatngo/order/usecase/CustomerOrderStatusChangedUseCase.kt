@@ -8,11 +8,11 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
-@Transactional
 class CustomerOrderStatusChangedUseCase(
     private val orderService: OrderService,
     private val customerService: CustomerService
 ) {
+    @Transactional
     fun change(dto: OrderStatusChangedDto){
         val customer = customerService.getCustomerById(dto.userId)
         val order = orderService.getById(dto.orderId)

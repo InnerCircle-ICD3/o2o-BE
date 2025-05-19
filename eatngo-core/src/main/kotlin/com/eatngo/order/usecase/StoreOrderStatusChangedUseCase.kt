@@ -8,19 +8,21 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
-@Transactional
 class StoreOrderStatusChangedUseCase(
     private val orderService: OrderService,
     private val storeService: StoreOwnerService
 ) {
-    fun change(dto: OrderStatusChangedDto){
+    @Transactional
+    fun change(dto: OrderStatusChangedDto) {
         val store = storeService.getStoreOwnerById(dto.userId)
         val order = orderService.getById(dto.orderId)
 
         when (dto.status) {
             Status.CANCELED -> order.toCancel(store)
             Status.CONFIRMED -> order.toConfirm(store)
-            else -> {  throw IllegalStateException("Cannot '${dto.status}' when status is '${order.status}'")}
+            else -> {
+                throw IllegalStateException("Cannot '${dto.status}' when status is '${order.status}'")
+            }
         }
 
         orderService.update(order)
