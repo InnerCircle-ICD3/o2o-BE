@@ -183,37 +183,7 @@ data class Address(
     val adminAddress: AdminAddress? = null, // 행정동 주소
     val latitude: Double,                   // 위도
     val longitude: Double                   // 경도
-) {
-    /**
-     * 두 위치 사이의 거리 계산(km 단위, 좌표 기준 계산)
-     */
-    fun distanceTo(other: Address): Double {
-        val earthRadius = 6371.0 // 지구 반지름 (km)
-
-        val lat1Rad = Math.toRadians(this.latitude)
-        val lat2Rad = Math.toRadians(other.latitude)
-        val lon1Rad = Math.toRadians(this.longitude)
-        val lon2Rad = Math.toRadians(other.longitude)
-
-        val dLat = lat2Rad - lat1Rad
-        val dLon = lon2Rad - lon1Rad
-
-        val a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-                Math.cos(lat1Rad) * Math.cos(lat2Rad) *
-                Math.sin(dLon / 2) * Math.sin(dLon / 2)
-
-        val c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
-
-        return earthRadius * c
-    }
-
-    /**
-     * 특정 반경(km) 내에 위치하는지 확인
-     */
-    fun isWithinRadius(other: Address, radiusKm: Double): Boolean {
-        return distanceTo(other) <= radiusKm
-    }
-}
+)
 
 /**
  * 영업시간 정보 (정보 표시용)
