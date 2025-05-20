@@ -16,11 +16,11 @@ class StorePersistenceImpl : StorePersistence {
         TODO("Not yet implemented")
     }
 
-    override suspend fun findAllByIds(storeIds: List<String>): List<Store> {
+    override suspend fun findAllByIds(storeIds: List<Long>): List<Store> {
         TODO("Not yet implemented")
     }
     
-    override suspend fun findByOwnerId(ownerId: String): Store? {
+    override suspend fun findByOwnerId(storeOwnerId: Long): List<Store> {
         TODO("Not yet implemented")
     }
 
@@ -34,10 +34,5 @@ class StorePersistenceImpl : StorePersistence {
     
     override suspend fun updateStatus(id: Long, status: StoreEnum.StoreStatus): Boolean {
         TODO("Not yet implemented")
-    }
-    
-    // 거리 계산 헬퍼 메서드
-    private fun calculateDistance(customerLocation: Address, storeLocation: Address): Double {
-        TODO("Not yet")
     }
 }

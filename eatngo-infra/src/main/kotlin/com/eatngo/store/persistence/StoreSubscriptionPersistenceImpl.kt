@@ -14,7 +14,7 @@ class StoreSubscriptionPersistenceImpl : StoreSubscriptionPersistence {
         TODO("Not yet implemented")
     }
     
-    override suspend fun findByUserId(userId: String): List<StoreSubscription> {
+    override suspend fun findByUserId(userId: Long): List<StoreSubscription> {
         TODO("Not yet implemented")
     }
     
@@ -22,7 +22,7 @@ class StoreSubscriptionPersistenceImpl : StoreSubscriptionPersistence {
         TODO("Not yet implemented")
     }
 
-    override suspend fun findByUserIdAndStoreId(userId: String, storeId: Long): StoreSubscription{
+    override suspend fun findByUserIdAndStoreId(userId: Long, storeId: Long): StoreSubscription?{
         TODO("Not yet implemented")
     }
 
@@ -34,7 +34,7 @@ class StoreSubscriptionPersistenceImpl : StoreSubscriptionPersistence {
         TODO("Not yet implemented")
     }
 
-    override suspend fun existsByUserIdAndStoreId(userId: String, storeId: Long): Boolean {
+    override suspend fun existsByUserIdAndStoreId(userId: Long, storeId: Long): Boolean {
         TODO("Not yet implemented")
     }
 }

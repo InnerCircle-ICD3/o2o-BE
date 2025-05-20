@@ -1,6 +1,7 @@
 package com.eatngo.store.domain
 
 import com.eatngo.common.constant.StoreEnum
+import com.eatngo.store.vo.*
 import java.time.DayOfWeek
 import java.time.LocalTime
 import java.time.LocalDateTime
@@ -11,12 +12,12 @@ import java.time.LocalDateTime
 data class Store(
     val id: Long,                       // 매장의 고유 id
     val storeOwnerId: Long,             // 해당 매장을 소유한 점주계정 id(매장:계정 1:1)
-    val name: String,                   // 매장명
+    val name: StoreName,                // 매장명
     val description: String?,           // 매장 설명
     val address: Address,               // 매장 주소
-    val businessNumber: String,         // 사업자등록 번호
-    val contactNumber: String?,         // 매장 or 점주 전화번호
-    val imageUrl: String?,              // 대표 이미지 url(카드뷰에 보이는 이미지)
+    val businessNumber: BusinessNumber, // 사업자등록 번호
+    val contactNumber: ContactNumber?,  // 매장 or 점주 전화번호
+    val imageUrl: ImageUrl?,            // 대표 이미지 url(카드뷰에 보이는 이미지)
     val businessHours: List<BusinessHour>?, // 영업시간(픽업시간과는 다름, 단순 정보제공용 및 확장성 고려해 추가)
     val storeCategoryInfo: StoreCategoryInfo, // 매장의 카테고리 정보들
     val status: StoreEnum.StoreStatus = StoreEnum.StoreStatus.PENDING, // 매장 상태(기본: 승인대기중)
@@ -37,7 +38,6 @@ data class Store(
             imageUrl: String? = null,
             businessHours: List<BusinessHour>? = emptyList(),
             storeCategoryInfo: StoreCategoryInfo,
-            status: StoreEnum.StoreStatus = StoreEnum.StoreStatus.PENDING,
             pickUpInfo: PickUpInfo,
             reviewInfo: ReviewInfo,
             createdAt: LocalDateTime = LocalDateTime.now(),
@@ -47,15 +47,15 @@ data class Store(
             return Store(
                 id = 0L,
                 storeOwnerId = storeOwnerId,
-                name = name,
+                name = StoreName.from(name),
                 description = description,
                 address = address,
-                businessNumber = businessNumber,
-                contactNumber = contactNumber,
-                imageUrl = imageUrl,
+                businessNumber = BusinessNumber.from(businessNumber),
+                contactNumber = contactNumber?.let { ContactNumber.from(it) },
+                imageUrl = imageUrl?.let { ImageUrl.from(it) },
                 businessHours = businessHours,
                 storeCategoryInfo = storeCategoryInfo,
-                status = status,
+                status = StoreEnum.StoreStatus.PENDING,
                 pickUpInfo = pickUpInfo,
                 reviewInfo = reviewInfo,
                 createdAt = createdAt,
@@ -81,12 +81,12 @@ data class Store(
         return Store(
             id = id,
             storeOwnerId = this.storeOwnerId,
-            name = name ?: this.name,
+            name = name?.let { StoreName.from(it) } ?: this.name,
             description = description ?: this.description,
             address = address ?: this.address,
             businessNumber = this.businessNumber,
-            contactNumber = contactNumber ?: this.contactNumber,
-            imageUrl = imageUrl ?: this.imageUrl,
+            contactNumber = contactNumber?.let { ContactNumber.from(it) } ?: this.contactNumber,
+            imageUrl = imageUrl?.let { ImageUrl.from(it) } ?: this.imageUrl,
             businessHours = businessHours ?: this.businessHours,
             storeCategoryInfo = storeCategoryInfo,
             status = this.status,
@@ -96,15 +96,6 @@ data class Store(
             updatedAt = LocalDateTime.now(),
             deletedAt = this.deletedAt
         )
-    }
-
-    /**
-     * Soft Delete를 위한 메서드
-     */
-    fun softDelete(): Store {
-        val now = LocalDateTime.now()
-        this.deletedAt = now
-        return this
     }
 
     /**
@@ -225,6 +216,6 @@ data class ReviewInfo(
  * 매장의 카테고리 정보(분류와 사용자 입력 카테고리)
  */
 data class StoreCategoryInfo(
-    val storeCategory: List<String>,    // 매장의 카테고리(ex. 빵, 카페, 분식 ...)
-    val foodCategory: List<String>?     // 음식의 카테고리(ex. 햄버거, 소금빵, 모카빵 ...)
+    val storeCategory: List<StoreCategory>,    // 매장의 카테고리(ex. 빵, 카페, 분식 ...)
+    val foodCategory: List<FoodCategory>?     // 음식의 카테고리(ex. 햄버거, 소금빵, 모카빵 ...)
 )

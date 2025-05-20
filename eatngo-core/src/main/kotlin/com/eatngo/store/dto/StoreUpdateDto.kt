@@ -1,8 +1,5 @@
 package com.eatngo.store.dto
 
-import com.eatngo.common.constant.StoreEnum
-import java.time.LocalTime
-
 
 /**
  * 상점 수정 요청 DTO
@@ -15,5 +12,5 @@ data class StoreUpdateDto(
     val description: String? = null,
     val mainImageUrl: String? = null,
     val pickUpInfo: PickUpInfoDto,
-    val storeCategoryInfo: StoreCategoryInfoDto,
+    val storeCategoryInfo: StoreCategoryInfoDto
 )

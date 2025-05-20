@@ -19,17 +19,17 @@ interface StoreService {
     /**
      * 상점 상태 변경
      */
-    suspend fun updateStoreStatus(id: Long, status: String): StoreDto
+    suspend fun updateStoreStatus(id: Long, request: String): StoreDto
     
     /**
      * 상점 픽업 정보 변경
      */
-    suspend fun updateStorePickupInfo(id: Long, request: PickupInfoUpdateRequest): StoreDto
+    suspend fun updateStorePickupInfo(id: Long, request: PickUpInfoDto): StoreDto
 
     /**
      * 상점 삭제 (Soft Delete)
      */
-    suspend fun deleteStore(id: Long): Boolean
+//    suspend fun deleteStore(id: Long): Boolean
 
     /**
      * ID로 상점 조회
@@ -39,6 +39,6 @@ interface StoreService {
     /**
      * 점주 ID로 상점 조회
      */
-    suspend fun getStoreByOwnerId(ownerId: String): StoreDto?
+    suspend fun getStoreByOwnerId(storeOwnerId: Long): List<StoreDto>
 
 } 

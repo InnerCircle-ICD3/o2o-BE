@@ -14,7 +14,7 @@ interface StoreSubscriptionPersistence {
     /**
      * 사용자 ID로 상점 구독 목록 조회
      */
-    suspend fun findByUserId(userId: String): List<StoreSubscription>
+    suspend fun findByUserId(userId: Long): List<StoreSubscription>
 
     /**
      * 상점 ID로 상점 구독 목록 조회
@@ -24,7 +24,7 @@ interface StoreSubscriptionPersistence {
     /**
      * 사용자 ID와 상점 ID로 상점 구독 조회
      */
-    suspend fun findByUserIdAndStoreId(userId: String, storeId: Long): StoreSubscription?
+    suspend fun findByUserIdAndStoreId(userId: Long, storeId: Long): StoreSubscription?
 
     /**
      * 상점 구독 저장
@@ -39,5 +39,5 @@ interface StoreSubscriptionPersistence {
     /**
      * 사용자 ID로 상점 구독 여부 조회
      */
-    suspend fun existsByUserIdAndStoreId(userId: String, storeId: Long): Boolean
+    suspend fun existsByUserIdAndStoreId(userId: Long, storeId: Long): Boolean
 } 

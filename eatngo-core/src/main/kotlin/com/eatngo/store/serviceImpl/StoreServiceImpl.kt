@@ -4,8 +4,7 @@ import com.eatngo.common.constant.StoreEnum
 import com.eatngo.common.exception.StoreException
 import com.eatngo.store.domain.Address
 import com.eatngo.store.domain.Store
-import com.eatngo.store.dto.PickupInfoUpdateRequest
-import com.eatngo.store.dto.StatusUpdateRequest
+import com.eatngo.store.dto.PickUpInfoDto
 import com.eatngo.store.dto.StoreCreateDto
 import com.eatngo.store.dto.StoreDto
 import com.eatngo.store.dto.StoreUpdateDto
@@ -14,7 +13,6 @@ import com.eatngo.store.dto.extension.toDto
 import com.eatngo.store.infra.StorePersistence
 import com.eatngo.store.service.StoreService
 import org.springframework.stereotype.Service
-import java.time.LocalTime
 
 /**
  * 상점 서비스 구현체
@@ -31,8 +29,7 @@ class StoreServiceImpl(
             roadAddress = request.address.roadAddress.toDomain(),
             legalAddress = request.address.legalAddress?.toDomain(),
             adminAddress = request.address.adminAddress?.toDomain(),
-            latitude = request.address.latitude,
-            longitude = request.address.longitude
+            coordinate = request.address.coordinate.toDomain(),
         )
 
         val businessHours = request.businessHours?.map { it.toDomain() } ?: emptyList()
@@ -42,15 +39,13 @@ class StoreServiceImpl(
             name = request.name,
             address = address,
             businessNumber = request.businessNumber,
-            pickupStartTime = request.pickupStartTime,
-            pickupEndTime = request.pickupEndTime,
             description = request.description,
             contactNumber = request.contactNumber,
             imageUrl = request.imageUrl,
             businessHours = businessHours,
-            storeCategory = request.storeCategory,
-            foodCategory = request.foodCategory,
-            pickupAvailableForTomorrow = request.pickupAvailableForTomorrow
+            storeCategoryInfo = request.storeCategoryInfo.toDomain(),
+            pickUpInfo = request.pickUpInfo.toDomain(),
+            reviewInfo = request.reviewInfo.toDomain(),
         )
 
         val savedStore = storePersistence.save(store)
@@ -60,38 +55,26 @@ class StoreServiceImpl(
     override suspend fun updateStore(id: Long, request: StoreUpdateDto): StoreDto {
         val existingStore = storePersistence.findById(id) ?: throw StoreException.StoreNotFound(id)
 
-        // 1. BusinessHourDto → BusinessHour 변환
-        val businessHours = request.businessHours?.map { it.toDomain() }
-
-        // 2. AddressDto → Address 변환 (조건부)
-        val address = request.address.toDomain()
-
-        // 3. 도메인 객체 업데이트
         val updatedStore = existingStore.update(
             name = request.name,
             description = request.description,
-            address = address,
-            businessNumber = request.businessNumber,
+            address = request.address.toDomain(),
             contactNumber = request.contactNumber,
             imageUrl = request.mainImageUrl,
-            businessHours = businessHours,
-            storeCategory = request.storeCategory,
-            foodCategory = request.foodCategory,
-            pickupStartTime = request.pickupStartTime,
-            pickupEndTime = request.pickupEndTime,
-            pickupAvailableForTomorrow = request.pickupAvailableForTomorrow
+            businessHours = request.businessHours?.toDomain(),
+            storeCategoryInfo = request.storeCategoryInfo.toDomain(),
+            pickUpInfo = request.pickUpInfo.toDomain(),
         )
 
-        // 4. 저장 후 DTO 변환
         val savedStore = storePersistence.save(updatedStore)
         return savedStore.toDto()
     }
 
-    override suspend fun updateStoreStatus(id: Long, status: String): StoreDto {
+    override suspend fun updateStoreStatus(id: Long, request: String): StoreDto {
         val storeStatus = try {
-            StoreEnum.StoreStatus.valueOf(status.uppercase())
+            StoreEnum.StoreStatus.valueOf(request.uppercase())
         } catch (e: IllegalArgumentException) {
-            throw StoreException.StoreStatusInvalid(status)
+            throw StoreException.StoreStatusInvalid(request)
         }
         val existingStore = storePersistence.findById(id) ?: throw StoreException.StoreNotFound(id)
         val updatedStore = existingStore.updateStatus(storeStatus)
@@ -99,16 +82,12 @@ class StoreServiceImpl(
         return savedStore.toDto()
     }
 
-    override suspend fun updateStorePickupInfo(id: Long, request: PickupInfoUpdateRequest): StoreDto {
+    override suspend fun updateStorePickupInfo(id: Long, request: PickUpInfoDto): StoreDto {
         val existingStore = storePersistence.findById(id) ?: throw StoreException.StoreNotFound(id)
 
-        // 픽업 시간 파싱 (DTO → 도메인 변환)
-        val pickupStartTime = request.pickupStartTime.let { LocalTime.parse(it) }
-        val pickupEndTime = request.pickupEndTime.let { LocalTime.parse(it) }
-
         val updatedStore = existingStore.updatePickupInfo(
-            startTime = pickupStartTime,
-            endTime = pickupEndTime,
+            startTime = request.pickupStartTime,
+            endTime = request.pickupEndTime,
             availableForTomorrow = request.pickupAvailableForTomorrow
         )
 
@@ -116,20 +95,20 @@ class StoreServiceImpl(
         return savedStore.toDto()
     }
 
-    override suspend fun getStoreDetail(storeId: Long): StoreDto {
-        val store = storePersistence.findById(storeId) ?: throw StoreException.StoreNotFound(storeId)
+    override suspend fun getStoreDetail(storeOwnerId: Long): StoreDto {
+        val store = storePersistence.findById(storeOwnerId) ?: throw StoreException.StoreNotFound(storeOwnerId)
         return store.toDto()
     }
 
-    override suspend fun getStoreByOwnerId(ownerId: String): StoreDto? {
-        val store = storePersistence.findByOwnerId(ownerId) ?: throw StoreException.StoreNotFoundByStoreOwner(ownerId)
-        return store.toDto()
+    override suspend fun getStoreByOwnerId(storeOwnerId: Long): List<StoreDto> {
+        val store = storePersistence.findByOwnerId(storeOwnerId)
+        return store.map { it.toDto() }
     }
 
-    override suspend fun deleteStore(id: Long): Boolean {
-        val store = storePersistence.findById(id) ?: throw StoreException.StoreNotFound(id)
-        val deletedStore = store.softDelete()
-        storePersistence.save(deletedStore)
-        return true
-    }
+//    override suspend fun deleteStore(id: Long): Boolean {
+//        val store = storePersistence.findById(id) ?: throw StoreException.StoreNotFound(id)
+//        val deletedStore = store.softDelete()
+//        storePersistence.save(deletedStore)
+//        return true
+//    }
 }

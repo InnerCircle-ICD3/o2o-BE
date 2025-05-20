@@ -47,7 +47,7 @@ class StoreController(
     @PatchMapping("/{storeId}/status")
     suspend fun updateStoreStatus(
         @PathVariable storeId: Long,
-        @RequestBody request: StatusUpdateRequest,
+        @RequestBody request: String,
     ): ApiResponse<StoreDto> {
         val response = storeService.updateStoreStatus(storeId, request)
         return ApiResponse.success(response)

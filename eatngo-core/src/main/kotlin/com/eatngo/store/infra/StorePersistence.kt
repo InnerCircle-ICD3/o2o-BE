@@ -15,12 +15,12 @@ interface StorePersistence {
     /**
      * ID들로 매장들 조회
      */
-    suspend fun findAllByIds(storeIds: List<String>): List<Store>
+    suspend fun findAllByIds(storeIds: List<Long>): List<Store>
 
     /**
      * 점주 ID로 매장 목록 조회
      */
-    suspend fun findByOwnerId(ownerId: String): Store?
+    suspend fun findByOwnerId(storeOwnerId: Long): List<Store>
 
     /**
      * 매장 저장

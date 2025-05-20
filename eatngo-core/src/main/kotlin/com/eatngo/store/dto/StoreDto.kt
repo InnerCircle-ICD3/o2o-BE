@@ -1,6 +1,7 @@
 package com.eatngo.store.dto
 
 import com.eatngo.common.constant.StoreEnum
+import com.eatngo.store.vo.*
 import java.time.DayOfWeek
 import java.time.LocalTime
 import java.time.LocalDateTime
@@ -34,7 +35,7 @@ data class AddressDto(
     val roadAddress: RoadAddressDto,
     val legalAddress: LegalAddressDto?,
     val adminAddress: AdminAddressDto?,
-    val coordinate: CoordinateDto,
+    val coordinate: CoordinateDto
 )
 
 /**
@@ -58,7 +59,7 @@ data class RoadAddressDto(
  * 법정동 주소 DTO
  */
 data class LegalAddressDto(
-    val fullAddress: String
+    val fullAddress: String? = null
 )
 
 /**
