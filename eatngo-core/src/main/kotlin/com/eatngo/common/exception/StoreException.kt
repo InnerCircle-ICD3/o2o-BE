@@ -37,7 +37,7 @@ open class StoreException(
         mapOf("validationErrors" to errors)
     )
 
-    class StoreNotFoundByStoreOwner(storeOwnerId: String) : StoreException(
+    class StoreNotFoundByStoreOwner(storeOwnerId: Long) : StoreException(
         BusinessErrorCode.STORE_NOT_FOUND,
         "${BusinessErrorCode.STORE_NOT_FOUND.message} (StoreOwnerId: $storeOwnerId)",
         mapOf("storeOwnerId" to storeOwnerId)
@@ -63,7 +63,7 @@ open class StoreException(
         mapOf("subscriptionId" to subscriptionId)
     )
 
-    class SubscriptionUpdateFailed(subscriptionId: String) : StoreException(
+    class SubscriptionUpdateFailed(subscriptionId: Long) : StoreException(
         BusinessErrorCode.SUBSCRIPTION_UPDATE_FAILED,
         "${BusinessErrorCode.SUBSCRIPTION_UPDATE_FAILED.message}: $subscriptionId",
         mapOf("subscriptionId" to subscriptionId)
