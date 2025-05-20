@@ -1,6 +1,7 @@
 package com.eatngo.search.domain
 
 import com.eatngo.common.type.Point
+import com.eatngo.search.constant.StoreEnum
 import com.eatngo.search.dto.BusinessHoursDto
 import java.time.LocalDateTime
 
@@ -13,7 +14,7 @@ class SearchStore(
     val storeId: Long = 0L,
     val storeName: String = "",
     val storeImage: String = "", // 매장 이미지 S3 URL
-    val category: List<String> = emptyList(),
+    val category: List<StoreEnum.StoreCategory> = emptyList(),
     val roadAddress: String = "",
     val location: Point = Point(0.0, 0.0),
     val open: Boolean = false, // 매장 오픈 여부

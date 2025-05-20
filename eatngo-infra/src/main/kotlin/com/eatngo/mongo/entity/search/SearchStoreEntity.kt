@@ -1,6 +1,7 @@
 package com.eatngo.mongo.entity.search
 
 import com.eatngo.common.type.Point
+import com.eatngo.search.constant.StoreEnum
 import com.eatngo.search.domain.SearchStore
 import com.eatngo.search.dto.BusinessHoursDto
 import org.springframework.data.annotation.Id
@@ -17,7 +18,7 @@ class SearchStoreEntity(
     var storeId: Long = 0L,
     var storeName: String = "",
     var storeImage: String = "", // 매장 이미지 S3 URL
-    var category: List<String> = emptyList(),
+    var category: List<StoreEnum.StoreCategory> = emptyList(),
     var open: Boolean = true, // 매장 오픈 여부
     var openTime: LocalDateTime = LocalDateTime.of(LocalDate.now(), LocalTime.of(9, 0)), // 매장 오픈 시간
     var closeTime: LocalDateTime = LocalDateTime.of(LocalDate.now(), LocalTime.of(22, 0)), // 매장 마감 시간

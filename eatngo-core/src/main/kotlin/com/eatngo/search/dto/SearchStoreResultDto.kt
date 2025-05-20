@@ -2,6 +2,7 @@ package com.eatngo.search.dto
 
 import com.eatngo.common.type.Point
 import com.eatngo.common.util.DistanceCalculator
+import com.eatngo.search.constant.StoreEnum
 import com.eatngo.search.domain.SearchStore
 import java.time.LocalDateTime
 
@@ -13,7 +14,7 @@ data class SearchStoreDto(
     val storeId: Long,
     val storeName: String,
     val storeImage: String = "", // 매장 이미지 URL
-    val category: List<String>, // 대표 판매 음식 종류
+    val category: List<StoreEnum.StoreCategory>, // 대표 판매 음식 종류
     val distanceKm: Double, // 검색하는 유저와 매장 간의 거리(km)
     val open: Boolean, // 매장 오픈 여부
     val stock: Int, // 재고 수량
