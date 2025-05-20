@@ -1,0 +1,120 @@
+package com.eatngo.store.vo
+
+import java.time.DayOfWeek
+import java.time.LocalTime
+
+@JvmInline
+value class StoreName(val value: String) {
+    init {
+        require(value.isNotBlank()) { "매장명은 비어있을 수 없습니다" }
+        require(value.length in 1..50) { "매장명은 1~50자 사이여야 합니다" }
+    }
+
+    companion object {
+        fun from(name: String): StoreName = StoreName(name)
+    }
+}
+
+@JvmInline
+value class BusinessNumber(val value: String) {
+    init {
+        require(value.matches(Regex("^\\d{10}$"))) { "사업자등록번호는 10자리 숫자여야 합니다" }
+    }
+
+    companion object {
+        fun from(number: String): BusinessNumber = BusinessNumber(number)
+    }
+}
+
+@JvmInline
+value class ContactNumber(val value: String) {
+    init {
+        require(value.matches(Regex("^\\d{2,3}-\\d{3,4}-\\d{4}$"))) { 
+            "올바른 전화번호 형식이 아닙니다 (예: 02-123-4567)" 
+        }
+    }
+
+    companion object {
+        fun from(number: String): ContactNumber = ContactNumber(number)
+    }
+}
+
+@JvmInline
+value class ImageUrl(val value: String) {
+    init {
+        require(value.matches(Regex("^https?://.*"))) { "올바른 URL 형식이 아닙니다" }
+    }
+
+    companion object {
+        fun from(url: String): ImageUrl = ImageUrl(url)
+    }
+}
+
+@JvmInline
+value class BusinessHour(val value: Pair<LocalTime, LocalTime>) {
+    init {
+        require(value.first.isBefore(value.second)) { "영업 종료 시간은 시작 시간보다 이후여야 합니다" }
+    }
+
+    val openTime: LocalTime get() = value.first
+    val closeTime: LocalTime get() = value.second
+
+    companion object {
+        fun from(dayOfWeek: DayOfWeek, openTime: LocalTime, closeTime: LocalTime): BusinessHour = 
+            BusinessHour(Pair(openTime, closeTime))
+    }
+}
+
+@JvmInline
+value class PickUpTime(val value: Pair<LocalTime, LocalTime>) {
+    init {
+        require(value.first.isBefore(value.second)) { "픽업 종료 시간은 시작 시간보다 이후여야 합니다" }
+    }
+
+    val startTime: LocalTime get() = value.first
+    val endTime: LocalTime get() = value.second
+
+    companion object {
+        fun from(startTime: LocalTime, endTime: LocalTime): PickUpTime = 
+            PickUpTime(Pair(startTime, endTime))
+    }
+}
+
+@JvmInline
+value class StoreCategory(val value: String) {
+    init {
+        require(value.isNotBlank()) { "매장 카테고리는 비어있을 수 없습니다" }
+        require(value.length in 1..10) { "매장 카테고리는 1~10자 사이여야 합니다" }
+    }
+
+    companion object {
+        fun from(category: String): StoreCategory = StoreCategory(category)
+    }
+}
+
+@JvmInline
+value class FoodCategory(val value: String) {
+    init {
+        require(value.isNotBlank()) { "음식 카테고리는 비어있을 수 없습니다" }
+    }
+
+    companion object {
+        fun from(category: String): FoodCategory = FoodCategory(category)
+    }
+}
+
+@JvmInline
+value class Coordinate(val value: Pair<Double, Double>) {
+    init {
+        require(value.first in -90.0..90.0) { "위도는 -90에서 90 사이여야 합니다" }
+        require(value.second in -180.0..180.0) { "경도는 -180에서 180 사이여야 합니다" }
+    }
+
+    val latitude: Double get() = value.first
+    val longitude: Double get() = value.second
+
+    companion object {
+        fun from(latitude: Double, longitude: Double): Coordinate = 
+            Coordinate(Pair(latitude, longitude))
+    }
+} 
