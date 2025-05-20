@@ -27,6 +27,7 @@ class StoreOwnerIdArgumentResolver : HandlerMethodArgumentResolver {
         val principal = authentication?.principal
 
         return when (principal) {
+            is String -> if (principal == "anonymousUser") null else principal.toLongOrNull()
             is LoginStoreOwner -> principal.storeOwnerId
             else -> null
         }

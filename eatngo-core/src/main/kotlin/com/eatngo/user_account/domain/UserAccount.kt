@@ -1,17 +1,19 @@
 package com.eatngo.user_account.domain
 
+import com.eatngo.user_account.oauth2.constants.Role
 import com.eatngo.user_account.oauth2.domain.UserAccountOauth2
 import com.eatngo.user_account.oauth2.dto.Oauth2
 import com.eatngo.user_account.vo.EmailAddress
-import java.time.ZonedDateTime
+import java.time.LocalDateTime
 
 class UserAccount(
     val id: Long = 0,
-    val email: EmailAddress,
-    val createdAt: ZonedDateTime,
-    var updatedAt: ZonedDateTime,
-    var isDeleted: Boolean = false,
-    var deletedAt: ZonedDateTime? = null,
+    val email: EmailAddress?,
+    val nickname: String? = null,
+    var roles: List<Role> = mutableListOf(),
+    val createdAt: LocalDateTime? = null,
+    var updatedAt: LocalDateTime? = null,
+    var deletedAt: LocalDateTime? = null,
 ) {
     private val _oauth2 = mutableListOf<UserAccountOauth2>()
     val oauth2: List<UserAccountOauth2> get() = _oauth2
@@ -24,9 +26,8 @@ class UserAccount(
 
         fun create(oauth2: Oauth2): UserAccount {
             val userAccount = UserAccount(
-                email = EmailAddress.from(oauth2.email),
-                createdAt = ZonedDateTime.now(),
-                updatedAt = ZonedDateTime.now()
+                email = oauth2.email.let { it?.let { EmailAddress(it) } },
+                nickname = oauth2.nickname,
             )
             userAccount.addOauth2(
                 UserAccountOauth2.of(
@@ -34,16 +35,11 @@ class UserAccount(
                     oauth2 = oauth2
                 )
             )
+            userAccount.roles = listOf(Role.USER)
 
             return userAccount
         }
+
     }
 
-    fun delete() {
-        if (isDeleted) {
-            throw IllegalStateException("Store owner is already deleted")
-        }
-        isDeleted = true
-        deletedAt = ZonedDateTime.now()
-    }
 }

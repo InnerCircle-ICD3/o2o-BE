@@ -1,15 +1,14 @@
 package com.eatngo.user_account.oauth2.domain
 
-import java.time.ZonedDateTime
+import java.time.LocalDateTime
 
 class UserAccountOauth2Term(
     val id: Long = 0,
     val userAccountOauth2: UserAccountOauth2,
     val tag: String,
-    val agreedAt: ZonedDateTime,
-    val createdAt: ZonedDateTime,
-    val isDeleted: Boolean = false,
-    val deletedAt: ZonedDateTime? = null,
+    val agreedAt: LocalDateTime,
+    val createdAt: LocalDateTime? = null,
+    val deletedAt: LocalDateTime? = null,
 ) {
     companion object {
         fun of(
@@ -18,9 +17,7 @@ class UserAccountOauth2Term(
             return UserAccountOauth2Term(
                 userAccountOauth2 = userAccountOauth2,
                 tag = tag,
-                agreedAt = ZonedDateTime.now(),
-                createdAt = ZonedDateTime.now(
-                )
+                agreedAt = userAccountOauth2.createdAt ?: LocalDateTime.now(),
             )
         }
     }

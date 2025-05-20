@@ -32,6 +32,7 @@ class MockOrderPersistenceImpl : OrderPersistence {
             updatedAt = order.updatedAt,
         )
     }
+
 }
 
 class OrderServiceTest : BehaviorSpec({

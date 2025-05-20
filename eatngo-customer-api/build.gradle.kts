@@ -6,7 +6,7 @@ plugins {
 dependencies {
     // 내부 모듈 의존성
     implementation(project(":eatngo-common:swagger"))
-    implementation(project(":eatngo-auth-common"))
+    implementation(project(":eatngo-auth"))
 
     // core, infra 모듈 의존성
     implementation(project(":eatngo-core"))
@@ -21,6 +21,11 @@ dependencies {
     // API 문서화
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.5")    // Swagger UI
     implementation("org.springdoc:springdoc-openapi-starter-common:2.8.5")       // Swagger 공통 기능
+
+    // AWS Parameter Store
+    implementation(platform("io.awspring.cloud:spring-cloud-aws-dependencies:3.2.1"))
+    implementation("io.awspring.cloud:spring-cloud-aws-starter-parameter-store")
+    implementation("io.awspring.cloud:spring-cloud-aws-starter")
 
     // 테스트 의존성
     testImplementation("io.kotest:kotest-runner-junit5:5.8.1")

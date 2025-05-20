@@ -1,6 +1,5 @@
 package com.eatngo.store_owner.infra
 
-import com.eatngo.customer.domain.Customer
 import com.eatngo.store_owner.domain.StoreOwner
 
 interface StoreOwnerPersistence {
@@ -11,4 +10,5 @@ interface StoreOwnerPersistence {
 
     fun findById(id: Long): StoreOwner?
     fun deleteById(id: Long)
+    fun findByUserId(userId: Long): StoreOwner?
 }

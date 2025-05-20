@@ -3,7 +3,7 @@ server:
 
 spring:
   config:
-    import: classpath:auth-common-application.yml
+    import: classpath:auth-application.yml
   application:
     name: eatngo-store-owner-api
   datasource:
@@ -25,6 +25,18 @@ spring:
   h2:
     console:
       enabled: true
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: eatngolocal
+
+datastore:
+  mongodb:
+    uri: mongodb://localhost:27017/eatngo
+    database: eatngo
+    username: eatngo-owner
+    password: eatngolocal
 
 springdoc:
   swagger-ui:
