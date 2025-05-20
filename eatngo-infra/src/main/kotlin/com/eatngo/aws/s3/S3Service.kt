@@ -31,7 +31,7 @@ class S3Service(
         contentType: String,
         folderPath: String
     ): Pair<String, String> {
-        val image: Image = Image(fileName, contentType, folderPath)
+        val image = Image(fileName, contentType, folderPath)
         val s3Key: String = createS3Key(image)
 
         try {

@@ -5,12 +5,12 @@ class Inventory(
     val stock: Int, // 현재 재고량
 ) {
     fun increaseStock(amount: Int): Inventory {
-        return Inventory(this.stock + amount, this.stock)
+        return Inventory(this.quantity, this.stock + amount)
     }
 
     fun decreaseStock(amount: Int): Inventory {
         validateStock(amount)
-        return Inventory(this.stock - amount, this.stock)
+        return Inventory(this.quantity, this.quantity - amount)
     }
 
     private fun validateStock(amount: Int) {
