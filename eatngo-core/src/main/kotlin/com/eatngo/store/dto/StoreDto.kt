@@ -81,9 +81,9 @@ data class CoordinateDto(
  * 픽업과 관련된 정보 DTO
  */
 data class PickUpInfoDto(
-    val pickupStartTime: LocalTime,
-    val pickupEndTime: LocalTime,
-    val pickupAvailableForTomorrow: Boolean = false,
+    val pickupStartTime: LocalTime?,
+    val pickupEndTime: LocalTime?,
+    val pickupAvailableForTomorrow: Boolean? = false,
 )
 
 /**
@@ -98,6 +98,6 @@ data class ReviewInfoDto(
  * 매장의 카테고리 정보(분류와 사용자 입력 카테고리) DTO
  */
 data class StoreCategoryInfoDto(
-    val storeCategory: List<String>,
+    val storeCategory: List<String>?,
     val foodCategory: List<String>?
 )

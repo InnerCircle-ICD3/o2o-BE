@@ -11,6 +11,6 @@ data class StoreUpdateDto(
     val contactNumber: String? = null,
     val description: String? = null,
     val mainImageUrl: String? = null,
-    val pickUpInfo: PickUpInfoDto,
+    val pickUpInfo: PickUpInfoDto? = null,
     val storeCategoryInfo: StoreCategoryInfoDto? = null,
 )

@@ -57,12 +57,12 @@ class StoreServiceImpl(
         val updatedStore = existingStore.update(
             name = request.name,
             description = request.description,
-            address = request.address.toDomain(),
+            address = request.address?.toDomain(),
             contactNumber = request.contactNumber,
             imageUrl = request.mainImageUrl,
             businessHours = request.businessHours?.toDomain(),
-            storeCategoryInfo = request.storeCategoryInfo.toDomain(),
-            pickUpInfo = request.pickUpInfo.toDomain(),
+            storeCategoryInfo = request.storeCategoryInfo?.toDomain()!!,
+            pickUpInfo = request.pickUpInfo?.toDomain()!!,
         )
 
         val savedStore = storePersistence.save(updatedStore)
@@ -85,9 +85,9 @@ class StoreServiceImpl(
         val existingStore = storePersistence.findById(id) ?: throw StoreException.StoreNotFound(id)
 
         val updatedStore = existingStore.updatePickupInfo(
-            startTime = request.pickupStartTime,
-            endTime = request.pickupEndTime,
-            availableForTomorrow = request.pickupAvailableForTomorrow
+            startTime = request.pickupStartTime!!,
+            endTime = request.pickupEndTime!!,
+            availableForTomorrow = request.pickupAvailableForTomorrow!!
         )
 
         val savedStore = storePersistence.save(updatedStore)

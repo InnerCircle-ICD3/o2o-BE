@@ -24,8 +24,8 @@ data class StoreUpdateRequest(
     val longitude: Double? = null,
 
     // 운영 정보
-    val pickupStartTime: LocalTime,
-    val pickupEndTime: LocalTime,
+    val pickupStartTime: LocalTime? = null,
+    val pickupEndTime: LocalTime? = null,
     val pickupAvailableForTomorrow: Boolean? = null,
 
     // 부가 정보
@@ -33,6 +33,6 @@ data class StoreUpdateRequest(
     val contact: String? = null,
     val description: String? = null,
     val mainImageUrl: String? = null,
-    val storeCategory: List<String> = emptyList(),
-    val foodCategory: List<String> = emptyList()
+    val storeCategory: List<String>? = null,
+    val foodCategory: List<String>? = null
 )

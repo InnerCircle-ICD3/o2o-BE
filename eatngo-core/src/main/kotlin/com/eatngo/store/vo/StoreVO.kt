@@ -2,6 +2,7 @@ package com.eatngo.store.vo
 
 import java.time.DayOfWeek
 import java.time.LocalTime
+import kotlin.text.isNotBlank
 
 @JvmInline
 value class StoreName(val value: String) {
@@ -18,6 +19,7 @@ value class StoreName(val value: String) {
 @JvmInline
 value class BusinessNumber(val value: String) {
     init {
+        require(value.isNotBlank()) { "사업자등록번호는 비어있을 수 없습니다" }
         require(value.matches(Regex("^\\d{10}$"))) { "사업자등록번호는 10자리 숫자여야 합니다" }
     }
 
@@ -51,17 +53,18 @@ value class ImageUrl(val value: String) {
 }
 
 @JvmInline
-value class BusinessHour(val value: Pair<LocalTime, LocalTime>) {
+value class BusinessHour(val value: Triple<DayOfWeek, LocalTime, LocalTime>) {
     init {
-        require(value.first.isBefore(value.second)) { "영업 종료 시간은 시작 시간보다 이후여야 합니다" }
+        require(value.second.isBefore(value.third)) { "영업 종료 시간은 시작 시간보다 이후여야 합니다" }
     }
 
-    val openTime: LocalTime get() = value.first
-    val closeTime: LocalTime get() = value.second
+    val dayOfWeek: DayOfWeek get() = value.first
+    val openTime: LocalTime get() = value.second
+    val closeTime: LocalTime get() = value.third
 
     companion object {
-        fun from(dayOfWeek: DayOfWeek, openTime: LocalTime, closeTime: LocalTime): BusinessHour = 
-            BusinessHour(Pair(openTime, closeTime))
+        fun from(dayOfWeek: DayOfWeek, openTime: LocalTime, closeTime: LocalTime): BusinessHour =
+            BusinessHour(Triple(dayOfWeek, openTime, closeTime))
     }
 }
 
@@ -117,4 +120,37 @@ value class Coordinate(val value: Pair<Double, Double>) {
         fun from(latitude: Double, longitude: Double): Coordinate = 
             Coordinate(Pair(latitude, longitude))
     }
-} 
+}
+
+@JvmInline
+value class Description(val value: String) {
+    init {
+        require(value.length <= 500) { "설명은 500자를 초과할 수 없습니다" }
+    }
+
+    companion object {
+        fun from(description: String?): Description? = description?.let { Description(it) }
+    }
+}
+
+@JvmInline
+value class FullAddressVO(val value: String) {
+    init {
+        require(value.isNotBlank()) { "도로명 주소는 비어있을 수 없습니다" }
+    }
+
+    companion object {
+        fun from(address: String?): FullAddressVO = FullAddressVO(address ?: "")
+    }
+}
+
+@JvmInline
+value class ZoneNoVO(val value: String) {
+    init {
+        require(value.isNotBlank()) { "우편번호는 비어있을 수 없습니다" }
+    }
+
+    companion object {
+        fun from(zoneNo: String?): ZoneNoVO = ZoneNoVO(zoneNo ?: "")
+    }
+}

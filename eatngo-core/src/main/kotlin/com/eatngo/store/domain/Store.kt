@@ -13,7 +13,7 @@ data class Store(
     val id: Long,                       // 매장의 고유 id
     val storeOwnerId: Long,             // 해당 매장을 소유한 점주계정 id(매장:계정 1:1)
     val name: StoreName,                // 매장명
-    val description: String?,           // 매장 설명
+    val description: Description?,           // 매장 설명
     val address: Address,               // 매장 주소
     val businessNumber: BusinessNumber, // 사업자등록 번호
     val contactNumber: ContactNumber?,  // 매장 or 점주 전화번호
@@ -47,7 +47,7 @@ data class Store(
                 id = 0L,
                 storeOwnerId = storeOwnerId,
                 name = StoreName.from(name),
-                description = description,
+                description = Description.from(description),
                 address = address,
                 businessNumber = BusinessNumber.from(businessNumber),
                 contactNumber = contactNumber?.let { ContactNumber.from(it) },
@@ -81,7 +81,7 @@ data class Store(
             id = id,
             storeOwnerId = this.storeOwnerId,
             name = name?.let { StoreName.from(it) } ?: this.name,
-            description = description ?: this.description,
+            description = description?.let { Description.from(it) }  ?: this.description,
             address = address ?: this.address,
             businessNumber = this.businessNumber,
             contactNumber = contactNumber?.let { ContactNumber.from(it) } ?: this.contactNumber,
@@ -168,8 +168,8 @@ data class BusinessHour(
  * 도로명 주소
  */
 data class RoadAddress(
-    val fullAddress: String,      // 전체 도로명 주소
-    val zoneNo: String,           // 우편번호
+    val fullAddress: FullAddressVO,      // 전체 도로명 주소
+    val zoneNo: ZoneNoVO,           // 우편번호
 )
 
 /**

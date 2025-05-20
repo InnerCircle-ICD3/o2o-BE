@@ -2,6 +2,7 @@ package com.eatngo.store.dto.extension
 
 import com.eatngo.store.dto.AddressDto
 import com.eatngo.store.dto.AdminAddressDto
+import com.eatngo.store.dto.BusinessHourResponse
 import com.eatngo.store.dto.CoordinateDto
 import com.eatngo.store.dto.LegalAddressDto
 import com.eatngo.store.dto.PickUpInfoDto
@@ -119,13 +120,17 @@ fun StoreDto.toDetailResponse(): StoreDetailResponse {
         contact = this.contactNumber ?: "",
         description = this.description ?: "",
         businessNumber = this.businessNumber,
-        businessHour = this.businessHours.map {
-            "${it.dayOfWeek.name} ${it.openTime.format(timeFormatter)}~${it.closeTime.format(timeFormatter)}"
+        businessHours = this.businessHours.map { hour ->
+            BusinessHourResponse(
+                dayOfWeek = hour.dayOfWeek.name,
+                openTime = hour.openTime.format(timeFormatter),
+                closeTime = hour.closeTime.format(timeFormatter),
+            )
         },
         latitude = this.address.coordinate.latitude,
         longitude = this.address.coordinate.longitude,
-        pickupStartTime = this.pickUpInfo.pickupStartTime.format(timeFormatter),
-        pickupEndTime = this.pickUpInfo.pickupEndTime.format(timeFormatter),
+        pickupStartTime = this.pickUpInfo.pickupStartTime?.format(timeFormatter)!!,
+        pickupEndTime = this.pickUpInfo.pickupEndTime?.format(timeFormatter)!!,
         pickupAvailableForTomorrow = this.pickUpInfo.pickupAvailableForTomorrow,
         status = this.status.name,
         ratingAverage = this.reviewInfo.ratingAverage,

@@ -24,7 +24,9 @@ import com.eatngo.store.dto.StoreCategoryInfoDto
 import com.eatngo.store.dto.StoreDto
 import com.eatngo.store.dto.StoreSubscriptionDto
 import com.eatngo.store.vo.FoodCategory
+import com.eatngo.store.vo.FullAddressVO
 import com.eatngo.store.vo.StoreCategory
+import com.eatngo.store.vo.ZoneNoVO
 
 /**
  * core 모듈의 dto를 domain으로 매핑
@@ -42,8 +44,8 @@ fun List<BusinessHourDto>.toDomain(): List<BusinessHour> {
 
 // RoadAddressDto → RoadAddress
 fun RoadAddressDto.toDomain(): RoadAddress = RoadAddress(
-    fullAddress = this.fullAddress,
-    zoneNo = this.zoneNo
+    fullAddress = FullAddressVO.from(fullAddress),
+    zoneNo = ZoneNoVO.from(zoneNo)
 )
 
 // LegalAddressDto → LegalAddress
@@ -73,16 +75,16 @@ fun CoordinateDto.toDomain(): Coordinate = Coordinate(
 
 fun StoreCategoryInfoDto.toDomain(): StoreCategoryInfo {
     return StoreCategoryInfo(
-        storeCategory = this.storeCategory.map { StoreCategory.from(it) },
+        storeCategory = this.storeCategory?.map { StoreCategory.from(it) }!!,
         foodCategory = this.foodCategory?.map { FoodCategory.from(it) }
     )
 }
 
 fun PickUpInfoDto.toDomain(): PickUpInfo {
     return PickUpInfo(
-        pickupStartTime = this.pickupStartTime,
-        pickupEndTime = this.pickupEndTime,
-        pickupAvailableForTomorrow = this.pickupAvailableForTomorrow,
+        pickupStartTime = this.pickupStartTime!!,
+        pickupEndTime = this.pickupEndTime!!,
+        pickupAvailableForTomorrow = this.pickupAvailableForTomorrow!!,
     )
 }
 
@@ -107,8 +109,8 @@ fun Address.toDto(): AddressDto {
 
 fun RoadAddress.toDto(): RoadAddressDto {
     return RoadAddressDto(
-        fullAddress = this.fullAddress,
-        zoneNo = this.zoneNo
+        fullAddress = this.fullAddress.value,
+        zoneNo = this.zoneNo.value
     )
 }
 
@@ -170,7 +172,7 @@ fun Store.toDto(): StoreDto {
         storeId = this.id,
         storeOwnerId = this.storeOwnerId,
         name = this.name.value,
-        description = this.description,
+        description = this.description?.value,
         address = this.address.toDto(),
         businessNumber = this.businessNumber.value,
         contactNumber = this.contactNumber?.value,

@@ -33,7 +33,7 @@ class StoreController(
     
     @Operation(summary = "상점 수정", description = "점주가 상점 정보를 수정합니다.")
     @PutMapping("/{storeId}")
-    suspend fun updateStore( @Valid
+    suspend fun updateStore(
         @PathVariable storeId: Long,
         @RequestBody request: StoreUpdateRequest
     ): ApiResponse<StoreDto> {

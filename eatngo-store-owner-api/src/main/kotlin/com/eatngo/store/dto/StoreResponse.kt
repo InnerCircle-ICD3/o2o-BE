@@ -11,15 +11,21 @@ data class StoreDetailResponse(
     val contact: String,
     val description: String,
     val businessNumber: String,
-    val businessHour: List<String>,
+    val businessHours: List<BusinessHourResponse>,
     val latitude: Double,
     val longitude: Double,
     val pickupStartTime: String,
     val pickupEndTime: String,
-    val pickupAvailableForTomorrow: Boolean,
+    val pickupAvailableForTomorrow: Boolean?,
     val status: String,
     val ratingAverage: Double,
     val ratingCount: Int,
     val foodCategory: List<String>?,
-    val storeCategory: List<String>
+    val storeCategory: List<String>?
+)
+
+data class BusinessHourResponse(
+    val dayOfWeek: String,  // 요일 (MONDAY, TUESDAY, ...)
+    val openTime: String,   // 영업 시작 시간 (HH:MM 형식)
+    val closeTime: String,  // 영업 종료 시간 (HH:MM 형식)
 )
