@@ -94,8 +94,8 @@ class StoreServiceImpl(
         return savedStore.toDto()
     }
 
-    override suspend fun getStoreDetail(storeOwnerId: Long): StoreDto {
-        val store = storePersistence.findById(storeOwnerId) ?: throw StoreException.StoreNotFound(storeOwnerId)
+    override suspend fun getStoreDetail(storeId: Long): StoreDto {
+        val store = storePersistence.findById(storeId) ?: throw StoreException.StoreNotFound(storeId)
         return store.toDto()
     }
 
