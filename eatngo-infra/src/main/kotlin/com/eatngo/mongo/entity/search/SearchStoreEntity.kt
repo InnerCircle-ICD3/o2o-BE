@@ -2,6 +2,7 @@ package com.eatngo.mongo.entity.search
 
 import com.eatngo.common.type.Point
 import com.eatngo.search.domain.SearchStore
+import com.eatngo.search.dto.BusinessHoursDto
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.geo.GeoJsonPoint
 import org.springframework.data.mongodb.core.index.GeoSpatialIndexed
@@ -33,8 +34,11 @@ class SearchStoreEntity(
             storeImage = storeImage,
             category = category,
             open = open,
-            openTime = openTime,
-            closeTime = closeTime,
+            businessHours =
+                BusinessHoursDto(
+                    openTime = openTime,
+                    closeTime = closeTime,
+                ),
             roadAddress = roadAddress,
             location = toPoint(location),
             updatedAt = updatedAt,
@@ -50,8 +54,8 @@ class SearchStoreEntity(
                 category = searchStore.category,
                 roadAddress = searchStore.roadAddress,
                 open = searchStore.open,
-                openTime = searchStore.openTime,
-                closeTime = searchStore.closeTime,
+                openTime = searchStore.businessHours.openTime,
+                closeTime = searchStore.businessHours.closeTime,
                 location =
                     toGeoJsonPoint(
                         searchStore.location.lat,
