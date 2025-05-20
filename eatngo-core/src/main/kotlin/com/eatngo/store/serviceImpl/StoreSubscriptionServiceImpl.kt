@@ -25,7 +25,7 @@ class StoreSubscriptionServiceImpl(
     }
 
     override suspend fun toggleSubscription(storeId: Long): StoreSubscriptionDto {
-        val userId = "임시사용자" // TODO: Security Context에서 가져오기
+        val userId = 1L // TODO: Security Context에서 가져오기
         val userName = "임시사용자" // TODO: Security Context에서 가져오기
 
         val store = storePersistence.findById(storeId)
@@ -42,8 +42,8 @@ class StoreSubscriptionServiceImpl(
         // 3. 하드코딩된 상품 정보 사용
         return subscription.toDto(
             userName = userName,
-            storeName = store.name,
-            mainImageUrl = store.imageUrl,
+            storeName = store.name.value,
+            mainImageUrl = store.imageUrl?.value,
             status = store.status,
             discountRate = tempProductInfo.discountRate,
             originalPrice = tempProductInfo.originalPrice,
@@ -61,8 +61,8 @@ class StoreSubscriptionServiceImpl(
         // 하드코딩된 상품 정보 사용
         return subscription.toDto(
             userName = userName,
-            storeName = store.name,
-            mainImageUrl = store.imageUrl,
+            storeName = store.name.value,
+            mainImageUrl = store.imageUrl?.value,
             status = store.status,
             discountRate = tempProductInfo.discountRate,
             originalPrice = tempProductInfo.originalPrice,
@@ -71,15 +71,15 @@ class StoreSubscriptionServiceImpl(
     }
 
     override suspend fun getMySubscriptions(): List<StoreSubscriptionDto> {
-        val userId = "임시사용자"
+        val userId = 1L
         val userName = "임시사용자" // TODO: Security Context에서 가져오기
         return storeSubscriptionPersistence.findByUserId(userId)
             .mapNotNull { subscription ->
                 val store = storePersistence.findById(subscription.storeId) ?: return@mapNotNull null
                 subscription.toDto(
                     userName = userName,
-                    storeName = store.name,
-                    mainImageUrl = store.imageUrl,
+                    storeName = store.name.value,
+                    mainImageUrl = store.imageUrl?.value,
                     status = store.status,
                     discountRate = tempProductInfo.discountRate,
                     originalPrice = tempProductInfo.originalPrice,
@@ -97,8 +97,8 @@ class StoreSubscriptionServiceImpl(
             .map { subscription ->
                 subscription.toDto(
                     userName = userName,
-                    storeName = store.name,
-                    mainImageUrl = store.imageUrl,
+                    storeName = store.name.value,
+                    mainImageUrl = store.imageUrl?.value,
                     status = store.status,
                     discountRate = tempProductInfo.discountRate,
                     originalPrice = tempProductInfo.originalPrice,
