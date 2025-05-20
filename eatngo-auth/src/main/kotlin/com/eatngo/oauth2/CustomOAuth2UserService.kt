@@ -1,6 +1,13 @@
 package com.eatngo.oauth2
 
-import com.eatngo.auth.constants.Role.*
+import com.eatngo.auth.constants.AuthenticationConstants.PRINCIPAL_KEY
+import com.eatngo.user_account.domain.UserAccount
+import com.eatngo.user_account.infra.UserAccountPersistence
+import com.eatngo.user_account.oauth2.constants.Oauth2Provider
+import com.eatngo.user_account.oauth2.constants.Role
+import com.eatngo.user_account.oauth2.constants.Role.*
+import com.eatngo.user_account.oauth2.dto.KakaoOauth2
+import com.eatngo.user_account.oauth2.dto.Oauth2
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest
@@ -10,37 +17,49 @@ import org.springframework.security.oauth2.core.user.OAuth2User
 import org.springframework.stereotype.Service
 
 @Service
-class CustomOAuth2UserService : OAuth2UserService<OAuth2UserRequest, OAuth2User> {
+class CustomOAuth2UserService(
+    private val userAccountPersistence: UserAccountPersistence,
+) : OAuth2UserService<OAuth2UserRequest, OAuth2User> {
     override fun loadUser(userRequest: OAuth2UserRequest): OAuth2User {
         val delegate = DefaultOAuth2UserService()
         val oAuth2User = delegate.loadUser(userRequest)
 
-        val registrationId = userRequest.clientRegistration.registrationId // ex: google, kakao
-        val attributes = oAuth2User.attributes
+        val provider = Oauth2Provider.valueOfIgnoreCase(userRequest.clientRegistration.registrationId)
+        val oauth2: Oauth2 = handleOauth2Attributes(provider, oAuth2User)
 
-        println("OAuth provider: $registrationId")
-        println("User attributes: $attributes")
+        val userAccount = userAccountPersistence.findByOauth(oauth2.id.toString(), provider)
+            ?: userAccountPersistence.save(UserAccount.create(oauth2))
+        // TODO term fetch api 추가하기
 
-        val email = oAuth2User.getAttribute<String>("email") ?: throw Exception("no email")
-        val userKey = oAuth2User.getAttribute<String>("id") ?: throw Exception("no id")
+        val roles = handleRoles(userAccount)
+            .map { SimpleGrantedAuthority(it.toString()) }
 
-        // 사용자 DB에서 userId 조회 후 사용자 타입 판별 (ex: 고객 / 점주 / 관리자)
-        // val userType = userRepository.findByOauthId(userId)?.type  // 예: "ADMIN", "STORE_OWNER" 등 // TODO 도메인 로직 연동하기
-        val userType = USER
-        val roles = when (userType) {
-            ADMIN -> listOf(USER, STORE_OWNER, CUSTOMER, ADMIN)
-            STORE_OWNER -> listOf(USER, STORE_OWNER)
-            CUSTOMER -> listOf(USER, CUSTOMER)
-            else -> listOf(USER)
-        }
+        val oAuth2UserAttributesMap = oAuth2User.attributes.toMutableMap()
+        oAuth2UserAttributesMap.put(PRINCIPAL_KEY, userAccount.id.toString())
 
-        val authorities = roles.map { SimpleGrantedAuthority(it.roleName) }
-        val userNameAttributeName = userRequest.clientRegistration.providerDetails
-            .userInfoEndpoint.userNameAttributeName
         return DefaultOAuth2User(
-            authorities.toSet(),
-            oAuth2User.attributes,
-            userNameAttributeName
+            roles,
+            oAuth2UserAttributesMap,
+            PRINCIPAL_KEY
         )
+
+    }
+
+    private fun handleRoles(userAccount: UserAccount): List<Role> =
+        userAccount.roles.flatMap {
+            when (it) {
+                ADMIN -> listOf(USER, STORE_OWNER, CUSTOMER, ADMIN)
+                STORE_OWNER -> listOf(USER, STORE_OWNER)
+                CUSTOMER -> listOf(USER, CUSTOMER)
+                else -> listOf(USER)
+            }
+        }.distinct()
+
+    private fun handleOauth2Attributes(
+        provider: Oauth2Provider,
+        oAuth2User: OAuth2User
+    ) = when (provider) {
+        Oauth2Provider.KAKAO -> KakaoOauth2(oAuth2User.attributes, provider)
+        else -> throw IllegalArgumentException("Unsupported provider: $provider")
     }
 }

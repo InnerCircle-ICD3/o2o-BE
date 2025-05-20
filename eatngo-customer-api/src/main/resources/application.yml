@@ -4,7 +4,7 @@ server:
 
 spring:
   config:
-    import: classpath:auth-common-application.yml
+    import: classpath:auth-application.yml
   application:
     name: eatngo-customer-api
   datasource:

@@ -10,4 +10,5 @@ interface CustomerPersistence {
 
     fun findById(id: Long): Customer?
     fun deleteById(id: Long)
+    fun findByUserId(userId: Long): (Customer)?
 }

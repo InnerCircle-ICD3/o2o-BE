@@ -1,5 +1,6 @@
 package com.eatngo.auth.config
 
+import com.eatngo.auth.constants.AuthenticationConstants.ACCESS_TOKEN
 import com.eatngo.auth.filter.JwtAuthenticationFilter
 import com.eatngo.auth.handler.OAuth2LoginSuccessHandler
 import com.eatngo.auth.token.TokenProvider
@@ -11,6 +12,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher
 
 @Configuration
 @EnableWebSecurity
@@ -47,6 +49,14 @@ class SecurityConfig(
             .oauth2Login {
                 it.userInfoEndpoint { userInfo -> userInfo.userService(oauth2UserService) }
                     .successHandler(authenticationSuccessHandler)
+            }
+
+            .logout {
+                it.logoutRequestMatcher(AntPathRequestMatcher("/oauth2/logout", "GET"))
+                    .logoutSuccessUrl("/")
+                    .invalidateHttpSession(true)
+                    .deleteCookies(ACCESS_TOKEN)
+                // TODO logout handler 추가하기 (logout api + redis refresh token 삭제)
             }
 
         return http.build()
