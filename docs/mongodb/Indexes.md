@@ -19,11 +19,7 @@ TODO: store category, food category 인덱스 analyzer 개선
         "type": "string",
         "analyzer": "lucene.nori"
       },
-      "storeCategory": {
-        "type": "string",
-        "analyzer": "lucene.keyword"
-      },
-      "foodCategory": {
+      "category": {
         "type": "string",
         "analyzer": "lucene.keyword"
       },
