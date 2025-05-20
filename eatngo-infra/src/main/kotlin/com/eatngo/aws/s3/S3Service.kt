@@ -1,6 +1,7 @@
 package com.eatngo.aws.s3
 
 import com.eatngo.file.FileStorageService
+import com.eatngo.product.domain.Image
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import software.amazon.awssdk.services.s3.S3Client
@@ -30,8 +31,8 @@ class S3Service(
         contentType: String,
         folderPath: String
     ): Pair<String, String> {
-        validatePreSignedUrl(fileName, contentType)
-        val s3Key = createS3Key(fileName, folderPath)
+        val image: Image = Image(fileName, contentType, folderPath)
+        val s3Key: String = createS3Key(image)
 
         try {
             val putObjectRequest = PutObjectRequest.builder()
@@ -57,24 +58,14 @@ class S3Service(
         }
     }
 
-    private fun validatePreSignedUrl(fileName: String, contentType: String) {
-        if (fileName.isBlank()) {
-            throw IllegalArgumentException("파일 이름은 비어있을 수 없습니다.")
-        }
-
-        if (contentType.isBlank()) {
-            throw IllegalArgumentException("콘텐츠 타입은 비어있을 수 없습니다.")
-        }
-    }
-
-    private fun createS3Key(originalImage: String, folderPath: String?): String {
-        var cleanedFolderPath = folderPath ?: ""
+    private fun createS3Key(image: Image): String {
+        var cleanedFolderPath = image.folderPath ?: ""
 
         if (cleanedFolderPath.isNotEmpty() && !cleanedFolderPath.endsWith("/")) {
             cleanedFolderPath += "/"
         }
 
-        return cleanedFolderPath + UUID.randomUUID() + "_" + originalImage
+        return cleanedFolderPath + UUID.randomUUID() + "_" + image.fileName
     }
 
     override fun deleteFile(key: String) { // ex. images/uuid_filename.jpg"
