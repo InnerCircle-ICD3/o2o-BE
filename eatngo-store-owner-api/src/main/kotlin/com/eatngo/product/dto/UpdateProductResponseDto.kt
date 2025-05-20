@@ -3,7 +3,7 @@ package com.eatngo.product.dto
 import java.time.LocalDateTime
 
 data class UpdateProductResponseDto(
-    val id: Long?,
+    val id: Long,
     val name: String,
     val storeId: Long,
     val price: UpdateProductPriceResponseDto,
@@ -17,7 +17,7 @@ data class UpdateProductResponseDto(
     companion object {
         fun from(productDto: ProductDto): UpdateProductResponseDto {
             return UpdateProductResponseDto(
-                id = productDto.id,
+                id = productDto.id!!,
                 name = productDto.name,
                 storeId = productDto.storeId,
                 price = UpdateProductPriceResponseDto.from(productDto.price),

@@ -11,8 +11,10 @@ import com.eatngo.product.infra.ProductPersistence
 import com.eatngo.product.infra.findByIdAndStoreIdOrElseThrow
 import com.eatngo.product.infra.findByIdOrThrow
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
+@Transactional
 class ProductService(
     private val productPersistence: ProductPersistence,
     private val fileStorageService: FileStorageService
@@ -69,7 +71,7 @@ class ProductService(
 
         return ProductDto.from(
             savedProduct,
-            productDto.imageUrl?.let { fileStorageService.resolveImageUrl(it) }
+            savedProduct.imageUrl?.let { fileStorageService.resolveImageUrl(it) }
         )
     }
 
@@ -129,7 +131,7 @@ class ProductService(
         val savedProduct: Product = productPersistence.save(product)
         return ProductDto.from(
             savedProduct,
-            productDto.imageUrl?.let { fileStorageService.resolveImageUrl(it) }
+            savedProduct.imageUrl?.let { fileStorageService.resolveImageUrl(it) }
         )
     }
 }

@@ -16,9 +16,11 @@ data class ProductAfterStockDto(
 ) {
     companion object {
         fun create(product: Product): ProductAfterStockDto {
+            val productId = requireNotNull(product.id) { "productId 가 비어있습니다." }
+            val storeId = requireNotNull(product.storeId) { "product의 storeId가 비어있습니다." }
             return ProductAfterStockDto(
-                id = product.id!!,
-                storeId = product.storeId!!,
+                id = productId,
+                storeId = storeId,
                 quantity = product.inventory.quantity,
                 stock = product.inventory.stock
             )

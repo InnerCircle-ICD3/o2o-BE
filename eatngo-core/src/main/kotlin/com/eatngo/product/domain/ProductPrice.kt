@@ -1,9 +1,8 @@
 package com.eatngo.product.domain
 
-class ProductPrice(
+data class ProductPrice(
     val originalPrice: Int,
     val discountRate: Double = 0.5,
-    val finalPrice: Int = (originalPrice * (1 - discountRate)).toInt()
 ) {
 
     init {
@@ -18,4 +17,7 @@ class ProductPrice(
             )
         }
     }
+
+    val finalPrice: Int
+        get() = (originalPrice * (1 - discountRate)).toInt()
 }

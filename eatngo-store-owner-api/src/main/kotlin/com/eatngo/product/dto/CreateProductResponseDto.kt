@@ -6,17 +6,17 @@ data class CreateProductResponseDto(
     val id: Long?,
     val name: String,
     val storeId: Long,
-    val price: GetProductPriceResponseDto,
+    val price: CreateProductPriceResponseDto,
     val size: String,
-    val inventory: GetProductInventoryResponseDto,
+    val inventory: CreateProductInventoryResponseDto,
     val foodType: List<String>,
     val status: String?,
     val createdAt: LocalDateTime?,
     val updatedAt: LocalDateTime?
 ) {
     companion object {
-        fun from(productDto: ProductDto): GetProductDetailsResponseDto {
-            return GetProductDetailsResponseDto(
+        fun from(productDto: ProductDto): CreateProductResponseDto {
+            return CreateProductResponseDto(
                 id = productDto.id,
                 name = productDto.name,
                 storeId = productDto.storeId,
@@ -37,8 +37,8 @@ data class CreateProductInventoryResponseDto(
     val stock: Int,
 ) {
     companion object {
-        fun from(inventoryDto: ProductInventoryDto): GetProductInventoryResponseDto {
-            return GetProductInventoryResponseDto(
+        fun from(inventoryDto: ProductInventoryDto): CreateProductInventoryResponseDto {
+            return CreateProductInventoryResponseDto(
                 quantity = inventoryDto.quantity,
                 stock = inventoryDto.stock,
             )
@@ -52,8 +52,8 @@ data class CreateProductPriceResponseDto(
     val finalPrice: Int
 ) {
     companion object {
-        fun from(priceDto: ProductPriceDto): GetProductPriceResponseDto {
-            return GetProductPriceResponseDto(
+        fun from(priceDto: ProductPriceDto): CreateProductPriceResponseDto {
+            return CreateProductPriceResponseDto(
                 originalPrice = priceDto.originalPrice,
                 discountRate = priceDto.discountRate,
                 finalPrice = priceDto.finalPrice

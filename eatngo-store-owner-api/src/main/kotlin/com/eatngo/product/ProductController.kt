@@ -1,5 +1,8 @@
 package com.eatngo.product
 
+import com.eatngo.product.domain.StockActionType
+import com.eatngo.product.domain.StockActionType.DECREASE
+import com.eatngo.product.domain.StockActionType.INCREASE
 import com.eatngo.product.dto.*
 import com.eatngo.product.service.ProductService
 import io.swagger.v3.oas.annotations.Operation
@@ -18,7 +21,7 @@ class ProductController(
     fun createProduct(
         @PathVariable("store-id") storeId: Long,
         @RequestBody createProductRequestDto: CreateProductRequestDto
-    ): ResponseEntity<GetProductDetailsResponseDto> {
+    ): ResponseEntity<CreateProductResponseDto> {
         val productDto: ProductDto = productService.createProduct(
             ProductDto(
                 name = createProductRequestDto.name,
@@ -70,7 +73,7 @@ class ProductController(
         @PathVariable("store-id") storeId: Long,
         @Valid @RequestBody request: ToggleStockRequestDto
     ): ResponseEntity<ToggleStockResponseDto> {
-        if (request.action !in listOf("increase", "decrease")) {
+        if (StockActionType.fromValue(request.action) !in listOf(INCREASE, DECREASE)) {
             throw IllegalArgumentException("잘못된 action type 입니다. ${request.action}")
         }
 
