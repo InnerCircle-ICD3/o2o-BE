@@ -52,7 +52,7 @@ class SecurityConfig(
             }
 
             .logout {
-                it.logoutRequestMatcher(AntPathRequestMatcher("/oauth2/logout", "GET"))
+                it.logoutRequestMatcher(AntPathRequestMatcher("/oauth2/logout", "POST"))
                     .logoutSuccessUrl("/")
                     .invalidateHttpSession(true)
                     .deleteCookies(ACCESS_TOKEN)

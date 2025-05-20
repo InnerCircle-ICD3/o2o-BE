@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RestController
 
 @Tag(name = "OAuth2", description = "OAuth2 관련 인증(회원가입/로그인), 로그아웃 API")
@@ -67,7 +68,7 @@ class OAuth2DocController {
             )
         ]
     )
-    @GetMapping("/oauth2/logout")
+    @PostMapping("/oauth2/logout")
     fun logOut() {
         // 실제 리디렉션은 Spring Security가 수행하므로 여기는 비어 있음
     }
