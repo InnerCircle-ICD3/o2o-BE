@@ -16,6 +16,5 @@ data class StoreCreateDto(
     val description: String?,
     val imageUrl: String?,
     val pickUpInfo: PickUpInfoDto,
-    val storeCategoryInfo: StoreCategoryInfoDto,
-    val reviewInfo: ReviewInfoDto
+    val storeCategoryInfo: StoreCategoryInfoDto
 )

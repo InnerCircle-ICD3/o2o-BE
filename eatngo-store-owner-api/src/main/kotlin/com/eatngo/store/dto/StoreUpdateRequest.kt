@@ -1,5 +1,7 @@
 package com.eatngo.store.dto
 
+import java.time.LocalTime
+
 /**
  * 매장 수정 요청용 dto
  */
@@ -22,8 +24,8 @@ data class StoreUpdateRequest(
     val longitude: Double? = null,
 
     // 운영 정보
-    val pickupStartTime: String? = null,
-    val pickupEndTime: String? = null,
+    val pickupStartTime: LocalTime,
+    val pickupEndTime: LocalTime,
     val pickupAvailableForTomorrow: Boolean? = null,
 
     // 부가 정보
@@ -31,5 +33,6 @@ data class StoreUpdateRequest(
     val contact: String? = null,
     val description: String? = null,
     val mainImageUrl: String? = null,
-    val categories: List<String>? = null
+    val storeCategory: List<String> = emptyList(),
+    val foodCategory: List<String> = emptyList()
 )

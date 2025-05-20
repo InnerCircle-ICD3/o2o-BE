@@ -2,8 +2,12 @@ package com.eatngo.store.dto.extension
 
 import com.eatngo.store.dto.AddressDto
 import com.eatngo.store.dto.AdminAddressDto
+import com.eatngo.store.dto.CoordinateDto
 import com.eatngo.store.dto.LegalAddressDto
+import com.eatngo.store.dto.PickUpInfoDto
+import com.eatngo.store.dto.ReviewInfoDto
 import com.eatngo.store.dto.RoadAddressDto
+import com.eatngo.store.dto.StoreCategoryInfoDto
 import com.eatngo.store.dto.StoreCreateRequest
 import com.eatngo.store.dto.StoreCreateDto
 import com.eatngo.store.dto.StoreDetailResponse
@@ -19,7 +23,7 @@ import java.time.format.DateTimeFormatter
  * request -> dto
  */
 
-fun StoreCreateRequest.toCoreDto(storeOwnerId: String): StoreCreateDto {
+fun StoreCreateRequest.toCoreDto(storeOwnerId: Long): StoreCreateDto {
     return StoreCreateDto(
         storeOwnerId = storeOwnerId,
         name = this.name,
@@ -34,19 +38,25 @@ fun StoreCreateRequest.toCoreDto(storeOwnerId: String): StoreCreateDto {
                 )
             } else null,
             adminAddress = this.adminFullAddress?.let { AdminAddressDto(it) },
-            latitude = this.latitude,
-            longitude = this.longitude
+            coordinate = CoordinateDto(
+                longitude = this.longitude,
+                latitude = this.latitude
+            ),
         ),
         businessNumber = this.businessNumber,
         businessHours = this.businessHours,
         contactNumber = this.contact,
         description = this.description,
         imageUrl = this.mainImageUrl,
-        pickupStartTime = LocalTime.parse(this.pickupStartTime),
-        pickupEndTime = LocalTime.parse(this.pickupEndTime),
-        pickupAvailableForTomorrow = this.pickupAvailableForTomorrow,
-        foodCategory = this.foodCategory,
-        storeCategory = this.storeCategory
+        pickUpInfo = PickUpInfoDto(
+            pickupStartTime = this.pickupStartTime,
+            pickupEndTime = this.pickupEndTime,
+            pickupAvailableForTomorrow = this.pickupAvailableForTomorrow,
+        ),
+        storeCategoryInfo = StoreCategoryInfoDto(
+            storeCategory = this.storeCategory,
+            foodCategory = this.foodCategory,
+        )
     )
 }
 
@@ -64,26 +74,34 @@ fun StoreUpdateRequest.toCoreDto(): StoreUpdateDto {
 
     val adminAddress = adminFullAddress?.let { AdminAddressDto(it) }
 
+    val coordinate = CoordinateDto(
+        latitude = latitude!!,
+        longitude = longitude!!,
+    )
+
     val address = AddressDto(
         roadAddress = roadAddress,
         legalAddress = legalAddress,
         adminAddress = adminAddress,
-        latitude = latitude!!,
-        longitude = longitude!!
+        coordinate = coordinate
     )
 
     return StoreUpdateDto(
         name = name,
         address = address,
-        businessNumber = businessNumber,
         businessHours = businessHours,
         contactNumber = contact,
         description = description,
-        pickupStartTime = pickupStartTime?.let { LocalTime.parse(it) },
-        pickupEndTime = pickupEndTime?.let { LocalTime.parse(it) },
-        pickupAvailableForTomorrow = pickupAvailableForTomorrow,
+        pickUpInfo = PickUpInfoDto(
+            pickupStartTime = this.pickupStartTime,
+            pickupEndTime = this.pickupEndTime,
+            pickupAvailableForTomorrow = this.pickupAvailableForTomorrow ?: false,
+        ),
         mainImageUrl = mainImageUrl,
-        categories = categories
+        storeCategoryInfo = StoreCategoryInfoDto(
+            storeCategory = this.storeCategory,
+            foodCategory = this.foodCategory,
+        )
     )
 }
 
@@ -104,16 +122,16 @@ fun StoreDto.toDetailResponse(): StoreDetailResponse {
         businessHour = this.businessHours.map {
             "${it.dayOfWeek.name} ${it.openTime.format(timeFormatter)}~${it.closeTime.format(timeFormatter)}"
         },
-        latitude = this.address.latitude,
-        longitude = this.address.longitude,
-        pickupStartTime = this.pickupStartTime.format(timeFormatter),
-        pickupEndTime = this.pickupEndTime.format(timeFormatter),
-        pickupAvailableForTomorrow = this.pickupAvailableForTomorrow,
+        latitude = this.address.coordinate.latitude,
+        longitude = this.address.coordinate.longitude,
+        pickupStartTime = this.pickUpInfo.pickupStartTime.format(timeFormatter),
+        pickupEndTime = this.pickUpInfo.pickupEndTime.format(timeFormatter),
+        pickupAvailableForTomorrow = this.pickUpInfo.pickupAvailableForTomorrow,
         status = this.status.name,
-        ratingAverage = this.ratingAverage,
-        ratingCount = this.ratingCount,
-        foodCategory = this.foodCategory,
-        storeCategory = this.storeCategory,
+        ratingAverage = this.reviewInfo.ratingAverage,
+        ratingCount = this.reviewInfo.ratingCount,
+        foodCategory = this.storeCategoryInfo.foodCategory,
+        storeCategory = this.storeCategoryInfo.storeCategory,
     )
 }
 

@@ -1,9 +1,8 @@
 package com.eatngo.store.controller
 
 import com.eatngo.common.response.ApiResponse
+import com.eatngo.store.dto.PickUpInfoDto
 import com.eatngo.store.dto.StoreCreateRequest
-import com.eatngo.store.dto.PickupInfoUpdateRequest
-import com.eatngo.store.dto.StatusUpdateRequest
 import com.eatngo.store.dto.StoreDetailResponse
 import com.eatngo.store.dto.StoreDto
 import com.eatngo.store.dto.StoreUpdateRequest
@@ -26,7 +25,7 @@ class StoreController(
     suspend fun createStore(
         @RequestBody request: StoreCreateRequest,
     ): ApiResponse<StoreDto> {
-        val storeOwnerId = "점주아이디임시"  //TODO: 현재 로그인 점주 아이디 추후 가져오기
+        val storeOwnerId = 1L  //TODO: 현재 로그인 점주 아이디 추후 가져오기
         val coreDto = request.toCoreDto(storeOwnerId)
         val response = storeService.createStore(coreDto)
         return ApiResponse.success(response)
@@ -57,20 +56,20 @@ class StoreController(
     @PatchMapping("/{storeId}/pickup-info")
     suspend fun updateStorePickupInfo(
         @PathVariable storeId: Long,
-        @RequestBody request: PickupInfoUpdateRequest,
+        @RequestBody request: PickUpInfoDto,
     ): ApiResponse<StoreDto> {
         val response = storeService.updateStorePickupInfo(storeId, request)
         return ApiResponse.success(response)
     }
     
-    @Operation(summary = "상점 삭제", description = "점주가 등록된 상점을 삭제합니다.")
-    @DeleteMapping("/{storeId}")
-    suspend fun deleteStore(
-        @PathVariable storeId: Long,
-    ): ApiResponse<Boolean> {
-        val response = storeService.deleteStore(storeId)
-        return ApiResponse.success(response)
-    }
+//    @Operation(summary = "상점 삭제", description = "점주가 등록된 상점을 삭제합니다.")
+//    @DeleteMapping("/{storeId}")
+//    suspend fun deleteStore(
+//        @PathVariable storeId: Long,
+//    ): ApiResponse<Boolean> {
+//        val response = storeService.deleteStore(storeId)
+//        return ApiResponse.success(response)
+//    }
     
     @Operation(summary = "상점 상세 조회", description = "등록된 상점 상세 정보를 조회합니다.")
     @GetMapping("/{storeId}")

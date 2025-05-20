@@ -1,6 +1,6 @@
 package com.eatngo.store.dto
 
-import jakarta.validation.constraints.NotBlank
+import java.time.LocalTime
 
 /**
  * 매장 생성 요청용 dto
@@ -12,9 +12,7 @@ data class StoreCreateRequest(
     val businessNumber: String,
 
     // 주소 정보 (Flat 구조)
-    @field:NotBlank
     val roadFullAddress: String,
-    @field:NotBlank
     val roadZoneNo: String,
     val roadBuildingName: String? = null,
     val legalFullAddress: String? = null,
@@ -23,14 +21,12 @@ data class StoreCreateRequest(
     val adminFullAddress: String? = null,
 
     // 위치 정보
-    @field:NotBlank
     val latitude: Double,
-    @field:NotBlank
     val longitude: Double,
 
     // 운영 정보
-    val pickupStartTime: String,
-    val pickupEndTime: String,
+    val pickupStartTime: LocalTime,
+    val pickupEndTime: LocalTime,
     val pickupAvailableForTomorrow: Boolean = false,
 
     // 부가 정보
@@ -38,5 +34,6 @@ data class StoreCreateRequest(
     val contact: String? = null,
     val description: String? = null,
     val mainImageUrl: String? = null,
-    val categories: List<String> = emptyList()
+    val storeCategory: List<String> = emptyList(),
+    val foodCategory: List<String> = emptyList()
 )

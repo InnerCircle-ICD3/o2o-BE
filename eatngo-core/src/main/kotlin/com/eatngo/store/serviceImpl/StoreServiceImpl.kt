@@ -44,8 +44,7 @@ class StoreServiceImpl(
             imageUrl = request.imageUrl,
             businessHours = businessHours,
             storeCategoryInfo = request.storeCategoryInfo.toDomain(),
-            pickUpInfo = request.pickUpInfo.toDomain(),
-            reviewInfo = request.reviewInfo.toDomain(),
+            pickUpInfo = request.pickUpInfo.toDomain()
         )
 
         val savedStore = storePersistence.save(store)

@@ -39,7 +39,6 @@ data class Store(
             businessHours: List<BusinessHour>? = emptyList(),
             storeCategoryInfo: StoreCategoryInfo,
             pickUpInfo: PickUpInfo,
-            reviewInfo: ReviewInfo,
             createdAt: LocalDateTime = LocalDateTime.now(),
             updatedAt: LocalDateTime = createdAt,
             deletedAt: LocalDateTime? = null
@@ -57,7 +56,7 @@ data class Store(
                 storeCategoryInfo = storeCategoryInfo,
                 status = StoreEnum.StoreStatus.PENDING,
                 pickUpInfo = pickUpInfo,
-                reviewInfo = reviewInfo,
+                reviewInfo = ReviewInfo(),
                 createdAt = createdAt,
                 updatedAt = updatedAt,
                 deletedAt = deletedAt

@@ -11,7 +11,7 @@ data class StoreDetailResponse(
     val contact: String,
     val description: String,
     val businessNumber: String,
-    val businessHour: List<String?>,
+    val businessHour: List<String>,
     val latitude: Double,
     val longitude: Double,
     val pickupStartTime: String,
@@ -20,5 +20,6 @@ data class StoreDetailResponse(
     val status: String,
     val ratingAverage: Double,
     val ratingCount: Int,
-    val categories: List<String>
+    val foodCategory: List<String>?,
+    val storeCategory: List<String>
 )
