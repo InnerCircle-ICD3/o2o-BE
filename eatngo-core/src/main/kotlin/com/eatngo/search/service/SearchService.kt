@@ -20,7 +20,6 @@ class SearchService(
     private val searchMapRedisRepository: SearchMapRedisRepository,
 ) {
     val cacheBoxSize = 0.005
-    val searchDistance = 2000.0 // 2km 검색 반경
 
     /**
      * 가게 검색 API
@@ -32,9 +31,13 @@ class SearchService(
      */
     fun searchStore(
         searchQuery: SearchStoreQueryDto,
+        // TODO: 검색반경, 페이징 방식 프론트와 논의 필요
+        searchDistance: Double = 2000.0,
         page: Int,
         size: Int,
     ): SearchStoreResultDto {
+        // TODO : 검색 반경, 검색 쿼리 등 검증 필요
+
         val searchStoreList: List<SearchStore> =
             searchStoreRepository.searchStore(
                 lng = searchQuery.viewPoint.lng,

@@ -27,6 +27,7 @@ class SearchController(
         @RequestParam category: String?,
         @RequestParam time: LocalDateTime?,
         @RequestParam status: StoreStatus = StoreStatus.ALL,
+        // TODO : page-size 방색에서 sort-offset 등 페이징 방식 논의 필요
         @RequestParam page: Int = 0,
         @RequestParam size: Int = 20,
     ): ResponseEntity<SearchStoreResultDto> {
