@@ -12,7 +12,7 @@ class Order(
     val storeId: Long,
     var status: Status,
     val createdAt: LocalDateTime,
-    var updatedAt: LocalDateTime,
+    val updatedAt: LocalDateTime,
 ) {
     private fun isEditable(customer: Customer){
         require(customer.id == this.customerId) { "Customer can't edit this order" }
@@ -25,25 +25,21 @@ class Order(
     fun toCancel(customer: Customer){
         isEditable(customer)
         status = status.cancel()
-        updatedAt = LocalDateTime.now()
     }
 
     fun toCancel(store: StoreOwner){
         isEditable(store)
         status = status.cancel()
-        updatedAt = LocalDateTime.now()
     }
 
     fun toConfirm(store: StoreOwner){
         isEditable(store)
         status = status.confirm()
-        updatedAt = LocalDateTime.now()
     }
 
     fun toDone(customer: Customer){
         isEditable(customer)
         status = status.done()
-        updatedAt = LocalDateTime.now()
     }
 
     companion object {

@@ -3,14 +3,17 @@ package com.eatngo.order.usecase
 import com.eatngo.customer.service.CustomerService
 import com.eatngo.order.domain.Status
 import com.eatngo.order.dto.OrderStatusChangedDto
+import com.eatngo.order.event.OrderEvent
 import com.eatngo.order.service.OrderService
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
 class CustomerOrderStatusChangedUseCase(
     private val orderService: OrderService,
-    private val customerService: CustomerService
+    private val customerService: CustomerService,
+    private val eventPublisher: ApplicationEventPublisher
 ) {
     @Transactional
     fun change(dto: OrderStatusChangedDto){
@@ -24,5 +27,8 @@ class CustomerOrderStatusChangedUseCase(
         }
 
         orderService.update(order)
+
+        OrderEvent.from(order, customer.id)
+            ?.let { eventPublisher.publishEvent(it) }
     }
 }
