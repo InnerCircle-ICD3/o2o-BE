@@ -1,5 +1,6 @@
 package com.eatngo.store.dto
 
+import com.eatngo.store.domain.PickUpInfo
 import java.time.LocalTime
 
 /**
@@ -21,19 +22,19 @@ data class StoreCreateRequest(
     val adminFullAddress: String? = null,
 
     // 위치 정보
-    val latitude: Double,
-    val longitude: Double,
+    val latitude: Double? = null,
+    val longitude: Double? = null,
 
     // 운영 정보
     val pickupStartTime: LocalTime,
     val pickupEndTime: LocalTime,
-    val pickupAvailableForTomorrow: Boolean = false,
+    val pickupDay: String,
 
     // 부가 정보
     val businessHours: List<BusinessHourDto>? = null,
     val contact: String? = null,
     val description: String? = null,
     val mainImageUrl: String? = null,
-    val storeCategory: List<String> = emptyList(),
-    val foodCategory: List<String> = emptyList()
+    val storeCategory: List<String>? = null,
+    val foodCategory: List<String>?  = null,
 )

@@ -1,5 +1,6 @@
 package com.eatngo.store.vo
 
+import com.eatngo.common.constant.StoreEnum
 import java.time.DayOfWeek
 import java.time.LocalTime
 import kotlin.text.isNotBlank
@@ -69,17 +70,19 @@ value class BusinessHour(val value: Triple<DayOfWeek, LocalTime, LocalTime>) {
 }
 
 @JvmInline
-value class PickUpTime(val value: Pair<LocalTime, LocalTime>) {
+value class PickUpInfo(val value: Triple<StoreEnum.PickupDay, LocalTime, LocalTime>) {
     init {
-        require(value.first.isBefore(value.second)) { "픽업 종료 시간은 시작 시간보다 이후여야 합니다" }
+        requireNotNull(value.first) { "pickupDay는 null일 수 없습니다." }
+        require(value.second.isBefore(value.third)) { "픽업 종료 시간은 시작 시간보다 이후여야 합니다" }
     }
 
-    val startTime: LocalTime get() = value.first
-    val endTime: LocalTime get() = value.second
+    val pickupDay: StoreEnum.PickupDay get() = value.first
+    val startTime: LocalTime get() = value.second
+    val endTime: LocalTime get() = value.third
 
     companion object {
-        fun from(startTime: LocalTime, endTime: LocalTime): PickUpTime = 
-            PickUpTime(Pair(startTime, endTime))
+        fun from(pickupDay: StoreEnum.PickupDay, startTime: LocalTime, endTime: LocalTime): PickUpInfo =
+            PickUpInfo(Triple(pickupDay, startTime, endTime))
     }
 }
 

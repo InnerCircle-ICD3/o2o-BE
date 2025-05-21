@@ -19,6 +19,11 @@ object StoreEnum {
         PENDING     // 승인 대기
     }
 
+    enum class PickupDay {
+        TODAY,   // 오늘 픽업
+        TOMORROW // 내일 픽업
+    }
+
     /**
      * 알림 유형
      */

@@ -1,8 +1,5 @@
 package com.eatngo.store.dto
 
-import com.eatngo.store.vo.*
-import java.time.LocalTime
-
 /**
  * 상점 생성 요청 DTO
  */

@@ -72,8 +72,8 @@ data class AdminAddressDto(
  *  위도, 경도 좌표 DTO
  */
 data class CoordinateDto(
-    val latitude: Double,
-    val longitude: Double
+    val latitude: Double? = 0.0,
+    val longitude: Double? = 0.0
 )
 
 /**
@@ -82,7 +82,7 @@ data class CoordinateDto(
 data class PickUpInfoDto(
     val pickupStartTime: LocalTime?,
     val pickupEndTime: LocalTime?,
-    val pickupAvailableForTomorrow: Boolean? = false,
+    val pickupDay: StoreEnum.PickupDay?,
 )
 
 /**

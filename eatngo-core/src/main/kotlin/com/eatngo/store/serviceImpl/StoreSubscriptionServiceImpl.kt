@@ -81,19 +81,22 @@ class StoreSubscriptionServiceImpl(
     override suspend fun getMySubscriptions(): List<StoreSubscriptionDto> {
         val userId = 1L
         val userName = "임시사용자" // TODO: Security Context에서 가져오기
-        return storeSubscriptionPersistence.findByUserId(userId)
-            .mapNotNull { subscription ->
-                val store = storePersistence.findById(subscription.storeId) ?: return@mapNotNull null
-                subscription.toDto(
-                    userName = userName,
-                    storeName = store.name.value,
-                    mainImageUrl = store.imageUrl?.value,
-                    status = store.status,
-                    discountRate = tempProductInfo.discountRate,
-                    originalPrice = tempProductInfo.originalPrice,
-                    discountedPrice = tempProductInfo.discountedPrice
-                )
-            }
+        val subscriptions = storeSubscriptionPersistence.findByUserId(userId)
+        val storeIds = subscriptions.map { it.storeId }
+        val stores = storePersistence.findAllByIds(storeIds).associateBy { it.id }
+
+        return subscriptions.map { subscription ->
+            val store = stores[subscription.storeId] ?: throw StoreException.StoreNotFound(subscription.storeId)
+            subscription.toDto(
+                userName = userName,
+                storeName = store.name.value,
+                mainImageUrl = store.imageUrl?.value,
+                status = store.status,
+                discountRate = tempProductInfo.discountRate,
+                originalPrice = tempProductInfo.originalPrice,
+                discountedPrice = tempProductInfo.discountedPrice
+            )
+        }
     }
 
     override suspend fun getSubscriptionsByStoreId(storeId: Long): List<StoreSubscriptionDto> {

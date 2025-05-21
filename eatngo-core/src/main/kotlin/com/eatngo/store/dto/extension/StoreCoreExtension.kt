@@ -84,7 +84,7 @@ fun PickUpInfoDto.toDomain(): PickUpInfo {
     return PickUpInfo(
         pickupStartTime = this.pickupStartTime!!,
         pickupEndTime = this.pickupEndTime!!,
-        pickupAvailableForTomorrow = this.pickupAvailableForTomorrow!!,
+        pickupDay = this.pickupDay!!,
     )
 }
 
@@ -149,7 +149,7 @@ fun PickUpInfo.toDto(): PickUpInfoDto {
     return PickUpInfoDto(
         pickupStartTime = this.pickupStartTime,
         pickupEndTime = this.pickupEndTime,
-        pickupAvailableForTomorrow = this.pickupAvailableForTomorrow,
+        pickupDay = this.pickupDay,
     )
 }
 

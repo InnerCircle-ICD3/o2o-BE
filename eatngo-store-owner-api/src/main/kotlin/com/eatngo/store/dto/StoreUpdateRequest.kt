@@ -26,7 +26,7 @@ data class StoreUpdateRequest(
     // 운영 정보
     val pickupStartTime: LocalTime? = null,
     val pickupEndTime: LocalTime? = null,
-    val pickupAvailableForTomorrow: Boolean? = null,
+    val pickupDay: String? = null,
 
     // 부가 정보
     val businessHours: List<BusinessHourDto>? = null,

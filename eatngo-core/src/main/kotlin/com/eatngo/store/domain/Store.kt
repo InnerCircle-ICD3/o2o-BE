@@ -21,7 +21,7 @@ class Store(
     val businessHours: List<BusinessHour>?, // 영업시간(픽업시간과는 다름, 단순 정보제공용 및 확장성 고려해 추가)
     val storeCategoryInfo: StoreCategoryInfo, // 매장의 카테고리 정보들
     var status: StoreEnum.StoreStatus = StoreEnum.StoreStatus.PENDING, // 매장 상태(기본: 승인대기중)
-    var pickUpInfo: PickUpInfo,         // 픽업과 관련된 정보(픽업시간 from to, 내일 픽업 가능 여부)
+    var pickUpInfo: PickUpInfo,         // 픽업과 관련된 정보(픽업시간 from to, 오늘/내일 픽업)
     val reviewInfo: ReviewInfo,         // 리뷰와 관련된 정보(평균 별점, 리뷰 개수)
     val createdAt: LocalDateTime,       // 생성일
     var updatedAt: LocalDateTime,       // 수정일
@@ -75,7 +75,7 @@ class Store(
         imageUrl: String? = null,
         businessHours: List<BusinessHour>? = emptyList(),
         storeCategoryInfo: StoreCategoryInfo,
-        pickUpInfo: PickUpInfo
+        pickUpInfo: PickUpInfo,
     ): Store {
         return Store(
             id = id,
@@ -98,45 +98,47 @@ class Store(
     }
 
     /**
-     * 현재 픽업 가능한지 확인 (매장 상태와 픽업 시간 기준)
-     * 매장이 OPEN 상태이고 현재 시간이 픽업 가능 시간 내에 있는지 확인
+     * 활성화된 픽업 시간이 정확히 되었는지(=알림 시점) 반환
      */
-    fun isAvailableForPickup(now: LocalDateTime = LocalDateTime.now()): Boolean {
-        // 매장 상태가 OPEN이 아니면 픽업 불가
-        if (status != StoreEnum.StoreStatus.OPEN) {
-            return false
-        }
-
+    fun isPickupTime(now: LocalDateTime = LocalDateTime.now()): Boolean {
         val currentTime = now.toLocalTime()
-        val result = if (pickUpInfo.pickupEndTime.isBefore(pickUpInfo.pickupStartTime)) {
-            currentTime.isAfter(pickUpInfo.pickupStartTime) || currentTime.isBefore(pickUpInfo.pickupEndTime)
-        } else {
-            currentTime.isAfter(pickUpInfo.pickupStartTime) && currentTime.isBefore(pickUpInfo.pickupEndTime)
-        }
-
-        return result
+        return currentTime == pickUpInfo.pickupStartTime
     }
 
     /**
      * 매장 상태만 업데이트
      */
-    fun updateStatus(newStatus: StoreEnum.StoreStatus) {
+    fun updateOnlyStoreStatus(newStatus: StoreEnum.StoreStatus) {
         status = newStatus
         updatedAt = LocalDateTime.now()
+    }
+
+    /**
+     * 매장 상태를 자동으로 전환 (재고, 시간 등)
+     * - hasStock: 재고가 있는지 여부
+     */
+    fun updateStoreStatus(now: LocalDateTime = LocalDateTime.now(), hasStock: Boolean) {
+        val currentTime = now.toLocalTime()
+        status = when {
+            !hasStock -> StoreEnum.StoreStatus.CLOSED
+            currentTime.isBefore(pickUpInfo.pickupStartTime) -> StoreEnum.StoreStatus.CLOSED
+            currentTime.isAfter(pickUpInfo.pickupEndTime) -> StoreEnum.StoreStatus.CLOSED
+            else -> StoreEnum.StoreStatus.OPEN
+        }
     }
 
     /**
      * 픽업 정보만 업데이트
      */
     fun updatePickupInfo(
-        startTime: LocalTime,
-        endTime: LocalTime,
-        availableForTomorrow: Boolean
+        pickupStartTime: LocalTime,
+        pickupEndTime: LocalTime,
+        pickupDay: StoreEnum.PickupDay
     ) {
         pickUpInfo = PickUpInfo(
-            pickupStartTime = startTime,
-            pickupEndTime = endTime,
-            pickupAvailableForTomorrow = availableForTomorrow
+                pickupStartTime = pickupStartTime,
+                pickupEndTime = pickupEndTime,
+                pickupDay = pickupDay
         )
         updatedAt = LocalDateTime.now()
     }
@@ -196,17 +198,17 @@ data class AdminAddress(
  *  위도, 경도 좌표
  */
 data class Coordinate(
-    val latitude: Double,          // 위도
-    val longitude: Double          // 경도
+    val latitude: Double?,          // 위도
+    val longitude: Double?          // 경도
 )
 
 /**
  * 픽업과 관련된 정보
  */
 data class PickUpInfo(
+    val pickupDay: StoreEnum.PickupDay,       // 픽업 가능 일자 (TODAY, TOMORROW) (확장성 고려한 필드)
     val pickupStartTime: LocalTime,     // 픽업 시작 시간 (필수) (HH:mm)
     val pickupEndTime: LocalTime,       // 픽업 종료 시간 (필수) (HH:mm)
-    val pickupAvailableForTomorrow: Boolean = false, // 내일 픽업 가능 여부(확장성 고려한 필드)
 )
 
 /**

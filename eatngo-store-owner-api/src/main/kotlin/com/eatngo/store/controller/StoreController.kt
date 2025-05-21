@@ -11,7 +11,6 @@ import com.eatngo.store.dto.extension.toDetailResponse
 import com.eatngo.store.service.StoreService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
-import jakarta.validation.Valid
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -44,11 +43,11 @@ class StoreController(
     
     @Operation(summary = "상점 상태 변경", description = "점주가 상점의 영업 상태를 변경합니다.")
     @PatchMapping("/{storeId}/status")
-    suspend fun updateStoreStatus(
+    suspend fun updateStoreOnlyStatus(
         @PathVariable storeId: Long,
         @RequestBody request: String,
     ): ApiResponse<StoreDto> {
-        val response = storeService.updateStoreStatus(storeId, request)
+        val response = storeService.updateStoreOnlyStatus(storeId, request)
         return ApiResponse.success(response)
     }
     
@@ -62,14 +61,14 @@ class StoreController(
         return ApiResponse.success(response)
     }
     
-//    @Operation(summary = "상점 삭제", description = "점주가 등록된 상점을 삭제합니다.")
-//    @DeleteMapping("/{storeId}")
-//    suspend fun deleteStore(
-//        @PathVariable storeId: Long,
-//    ): ApiResponse<Boolean> {
-//        val response = storeService.deleteStore(storeId)
-//        return ApiResponse.success(response)
-//    }
+    @Operation(summary = "상점 삭제", description = "점주가 등록된 상점을 삭제합니다.")
+    @DeleteMapping("/{storeId}")
+    suspend fun deleteStore(
+        @PathVariable storeId: Long,
+    ): ApiResponse<Boolean> {
+        val response = storeService.deleteStore(storeId)
+        return ApiResponse.success(response)
+    }
     
     @Operation(summary = "상점 상세 조회", description = "등록된 상점 상세 정보를 조회합니다.")
     @GetMapping("/{storeId}")

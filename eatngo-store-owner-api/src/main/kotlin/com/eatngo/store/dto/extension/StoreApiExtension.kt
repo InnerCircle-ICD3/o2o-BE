@@ -1,12 +1,12 @@
 package com.eatngo.store.dto.extension
 
+import com.eatngo.common.constant.StoreEnum
 import com.eatngo.store.dto.AddressDto
 import com.eatngo.store.dto.AdminAddressDto
 import com.eatngo.store.dto.BusinessHourResponse
 import com.eatngo.store.dto.CoordinateDto
 import com.eatngo.store.dto.LegalAddressDto
 import com.eatngo.store.dto.PickUpInfoDto
-import com.eatngo.store.dto.ReviewInfoDto
 import com.eatngo.store.dto.RoadAddressDto
 import com.eatngo.store.dto.StoreCategoryInfoDto
 import com.eatngo.store.dto.StoreCreateRequest
@@ -17,7 +17,6 @@ import com.eatngo.store.dto.StoreSubscriptionDto
 import com.eatngo.store.dto.StoreUpdateDto
 import com.eatngo.store.dto.StoreUpdateRequest
 import com.eatngo.store.dto.SubscriptionResponseForStoreOwner
-import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
 /**
@@ -52,7 +51,7 @@ fun StoreCreateRequest.toCoreDto(storeOwnerId: Long): StoreCreateDto {
         pickUpInfo = PickUpInfoDto(
             pickupStartTime = this.pickupStartTime,
             pickupEndTime = this.pickupEndTime,
-            pickupAvailableForTomorrow = this.pickupAvailableForTomorrow,
+            pickupDay = StoreEnum.PickupDay.valueOf(this.pickupDay.uppercase())
         ),
         storeCategoryInfo = StoreCategoryInfoDto(
             storeCategory = this.storeCategory,
@@ -96,7 +95,7 @@ fun StoreUpdateRequest.toCoreDto(): StoreUpdateDto {
         pickUpInfo = PickUpInfoDto(
             pickupStartTime = this.pickupStartTime,
             pickupEndTime = this.pickupEndTime,
-            pickupAvailableForTomorrow = this.pickupAvailableForTomorrow ?: false,
+            pickupDay = StoreEnum.PickupDay.valueOf(this.pickupDay?.uppercase()!!)
         ),
         mainImageUrl = mainImageUrl,
         storeCategoryInfo = StoreCategoryInfoDto(
@@ -129,9 +128,9 @@ fun StoreDto.toDetailResponse(): StoreDetailResponse {
         },
         latitude = this.address.coordinate.latitude,
         longitude = this.address.coordinate.longitude,
-        pickupStartTime = this.pickUpInfo.pickupStartTime?.format(timeFormatter)!!,
-        pickupEndTime = this.pickUpInfo.pickupEndTime?.format(timeFormatter)!!,
-        pickupAvailableForTomorrow = this.pickUpInfo.pickupAvailableForTomorrow,
+        pickupStartTime = this.pickUpInfo.pickupStartTime,
+        pickupEndTime = this.pickUpInfo.pickupEndTime,
+        pickupDay = this.pickUpInfo.pickupDay?.name,
         status = this.status.name,
         ratingAverage = this.reviewInfo.ratingAverage,
         ratingCount = this.reviewInfo.ratingCount,

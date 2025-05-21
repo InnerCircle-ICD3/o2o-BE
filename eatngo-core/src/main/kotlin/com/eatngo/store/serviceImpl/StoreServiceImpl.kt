@@ -13,6 +13,7 @@ import com.eatngo.store.dto.extension.toDto
 import com.eatngo.store.infra.StorePersistence
 import com.eatngo.store.service.StoreService
 import org.springframework.stereotype.Service
+import java.time.LocalDateTime
 
 /**
  * 상점 서비스 구현체
@@ -69,33 +70,39 @@ class StoreServiceImpl(
         return savedStore.toDto()
     }
 
-    override suspend fun updateStoreStatus(id: Long, request: String): StoreDto {
-        val storeStatus = try {
-            StoreEnum.StoreStatus.valueOf(request.uppercase())
-        } catch (e: IllegalArgumentException) {
-            throw StoreException.StoreStatusInvalid(request)
-        }
+    override suspend fun updateStoreStatus(id: Long, hasStock: Boolean, now: LocalDateTime): StoreDto {
         val existingStore = storePersistence.findById(id) ?: throw StoreException.StoreNotFound(id)
-        val updatedStore = existingStore.updateStatus(storeStatus)
-        val savedStore = storePersistence.save(updatedStore)
+        existingStore.updateStoreStatus(now, hasStock)
+        return storePersistence.save(existingStore).toDto()
+    }
+
+    override suspend fun updateStoreOnlyStatus(id: Long, newStatus: String): StoreDto {
+        val existingStore = storePersistence.findById(id)
+            ?: throw StoreException.StoreNotFound(id)
+        val enumStatus = try {
+            StoreEnum.StoreStatus.valueOf(newStatus.uppercase())
+        } catch (e: IllegalArgumentException) {
+            throw StoreException.StoreStatusInvalid(newStatus)
+        }
+        existingStore.updateOnlyStoreStatus(enumStatus)
+        val savedStore = storePersistence.save(existingStore)
         return savedStore.toDto()
     }
 
     override suspend fun updateStorePickupInfo(id: Long, request: PickUpInfoDto): StoreDto {
         val existingStore = storePersistence.findById(id) ?: throw StoreException.StoreNotFound(id)
 
-        val updatedStore = existingStore.updatePickupInfo(
-            startTime = request.pickupStartTime!!,
-            endTime = request.pickupEndTime!!,
-            availableForTomorrow = request.pickupAvailableForTomorrow!!
+        existingStore.updatePickupInfo(
+            pickupStartTime = request.pickupStartTime!!,
+            pickupEndTime = request.pickupEndTime!!,
+            pickupDay = request.pickupDay!!
         )
 
-        val savedStore = storePersistence.save(updatedStore)
-        return savedStore.toDto()
+        return storePersistence.save(existingStore).toDto()
     }
 
-    override suspend fun getStoreDetail(storeId: Long): StoreDto {
-        val store = storePersistence.findById(storeId) ?: throw StoreException.StoreNotFound(storeId)
+    override suspend fun getStoreDetail(id: Long): StoreDto {
+        val store = storePersistence.findById(id) ?: throw StoreException.StoreNotFound(id)
         return store.toDto()
     }
 
@@ -104,10 +111,10 @@ class StoreServiceImpl(
         return store.map { it.toDto() }
     }
 
-//    override suspend fun deleteStore(id: Long): Boolean {
-//        val store = storePersistence.findById(id) ?: throw StoreException.StoreNotFound(id)
-//        val deletedStore = store.softDelete()
-//        storePersistence.save(deletedStore)
-//        return true
-//    }
+    override suspend fun deleteStore(id: Long): Boolean {
+        val store = storePersistence.findById(id) ?: throw StoreException.StoreNotFound(id)
+        store.softDelete()
+        storePersistence.save(store)
+        return true
+    }
 }
