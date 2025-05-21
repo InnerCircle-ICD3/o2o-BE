@@ -1,10 +1,10 @@
 package com.eatngo.store.controller
 
 import com.eatngo.common.response.ApiResponse
-import com.eatngo.store.dto.StoreSubscriptionDto
 import com.eatngo.store.dto.StoreSubscriptionResponse
 import com.eatngo.store.dto.SubscriptionToggleResponse
 import com.eatngo.store.dto.extension.toResponse
+import com.eatngo.store.dto.extension.toToggleResponse
 import com.eatngo.store.service.StoreSubscriptionService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
@@ -21,15 +21,9 @@ class StoreSubscriptionController(
     suspend fun toggleSubscription(
         @PathVariable storeId: Long
     ): ApiResponse<SubscriptionToggleResponse> {
-        val dto = storeSubscriptionService.toggleSubscription(storeId)
+        val response = storeSubscriptionService.toggleSubscription(storeId)
         return ApiResponse.success(
-            SubscriptionToggleResponse(
-                id = dto.id,
-                storeId = dto.storeId,
-                userId = dto.userId,
-                subscribed = dto.deletedAt == null,
-                actionTime = dto.updatedAt
-            )
+            response.toToggleResponse()
         )
     }
 

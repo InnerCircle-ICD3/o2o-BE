@@ -6,6 +6,7 @@ import com.eatngo.store.dto.StoreDto
 import com.eatngo.store.dto.StoreResponse
 import com.eatngo.store.dto.StoreSubscriptionDto
 import com.eatngo.store.dto.StoreSubscriptionResponse
+import com.eatngo.store.dto.SubscriptionToggleResponse
 import java.time.format.DateTimeFormatter
 
 /**
@@ -64,5 +65,15 @@ fun StoreSubscriptionDto.toResponse(): StoreSubscriptionResponse {
         originalPrice = this.originalPrice,
         discountedPrice = this.discountedPrice,
         subscribedAt = this.createdAt
+    )
+}
+
+fun StoreSubscriptionDto.toToggleResponse(): SubscriptionToggleResponse {
+    return SubscriptionToggleResponse(
+        id = this.id,
+        userId = this.userId,
+        storeId = this.storeId,
+        subscribed = this.deletedAt == null,
+        actionTime = this.updatedAt
     )
 }

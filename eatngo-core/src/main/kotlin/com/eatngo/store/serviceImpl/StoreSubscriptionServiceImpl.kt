@@ -15,7 +15,9 @@ import org.springframework.stereotype.Service
 @Service
 class StoreSubscriptionServiceImpl(
     private val storeSubscriptionPersistence: StoreSubscriptionPersistence,
-    private val storePersistence: StorePersistence
+    private val storePersistence: StorePersistence,
+//    private val productPersistence: ProductPersistence
+    //   TODO: 상품 관련 영속성 merge 이후 리팩토링 시 가져와서 사용 + 아래 주석 활성화
 ) : StoreSubscriptionService {
     // 임시 상품 정보 (할인율 10%, 원가 10,000원, 할인가 9,000원)
     private val tempProductInfo = object {
@@ -39,7 +41,6 @@ class StoreSubscriptionServiceImpl(
             storeSubscriptionPersistence.save(newSubscription)
         }
 
-        // 3. 하드코딩된 상품 정보 사용
         return subscription.toDto(
             userName = userName,
             storeName = store.name.value,
@@ -58,7 +59,6 @@ class StoreSubscriptionServiceImpl(
         val store = storePersistence.findById(subscription.storeId)
             ?: throw StoreException.StoreNotFound(subscription.storeId)
 
-        // 하드코딩된 상품 정보 사용
         return subscription.toDto(
             userName = userName,
             storeName = store.name.value,
