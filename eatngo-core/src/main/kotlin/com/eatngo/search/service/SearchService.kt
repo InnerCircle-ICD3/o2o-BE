@@ -1,8 +1,8 @@
 package com.eatngo.search.service
 
-import com.eatngo.search.dto.Box
 import com.eatngo.common.type.Point
 import com.eatngo.search.domain.SearchStore
+import com.eatngo.search.dto.Box
 import com.eatngo.search.dto.SearchStoreDto
 import com.eatngo.search.dto.SearchStoreMap
 import com.eatngo.search.dto.SearchStoreMapResultDto
@@ -15,11 +15,12 @@ import kotlin.math.ceil
 import kotlin.math.floor
 
 @Service
-class SearchService (
+class SearchService(
     private val searchStoreRepository: SearchStoreRepository,
-    private val searchMapRedisRepository: SearchMapRedisRepository
+    private val searchMapRedisRepository: SearchMapRedisRepository,
 ) {
-    var cacheBoxSize = 0.005
+    val cacheBoxSize = 0.005
+    val searchDistance = 2000.0 // 2km 검색 반경
 
     /**
      * 가게 검색 API
@@ -29,25 +30,29 @@ class SearchService (
      * @param size 페이지 사이즈
      * @return 검색 결과 DTO
      */
-    fun searchStore(searchQuery: SearchStoreQueryDto, page: Int, size: Int): SearchStoreResultDto {
-        val searchDistance = 2000.0 // 2km 검색 반경
-
-        val searchStoreList: List<SearchStore> = searchStoreRepository.searchStore(
-            lng = searchQuery.viewPoint.lng,
-            lat = searchQuery.viewPoint.lat,
-            maxDistance = searchDistance,
-            searchFilter = searchQuery.filter,
-            page = page,
-            size = size
-        )
+    fun searchStore(
+        searchQuery: SearchStoreQueryDto,
+        page: Int,
+        size: Int,
+    ): SearchStoreResultDto {
+        val searchStoreList: List<SearchStore> =
+            searchStoreRepository.searchStore(
+                lng = searchQuery.viewPoint.lng,
+                lat = searchQuery.viewPoint.lat,
+                maxDistance = searchDistance,
+                searchFilter = searchQuery.filter,
+                page = page,
+                size = size,
+            )
 
         return SearchStoreResultDto(
-            storeList = searchStoreList.map {
-                SearchStoreDto.from(
-                    userPoint = searchQuery.viewPoint,
-                    searchStore = it
-                )
-            }
+            storeList =
+                searchStoreList.map {
+                    SearchStoreDto.from(
+                        userPoint = searchQuery.viewPoint,
+                        searchStore = it,
+                    )
+                },
         )
     }
 
@@ -58,10 +63,11 @@ class SearchService (
      */
     fun searchStoreMap(searchQuery: SearchStoreQueryDto): SearchStoreMapResultDto {
         // center 값을 기준으로 해당하는 box 좌표를 구한다.
-        val box: Box = getBox(
-            lng = searchQuery.viewPoint.lng,
-            lat = searchQuery.viewPoint.lat
-        )
+        val box: Box =
+            getBox(
+                lng = searchQuery.viewPoint.lng,
+                lat = searchQuery.viewPoint.lat,
+            )
 
         // Redis에서 box 검색 결과를 가져온다. -> 위경도 기중 0.005 단위로 박스 매핑
         val redisKey = searchMapRedisRepository.getKey(box.topLeft)
@@ -74,15 +80,16 @@ class SearchService (
             // Redis에 저장
             searchMapRedisRepository.save(
                 key = redisKey,
-                value = searchStoreList.map {
-                    SearchStoreMap.from(it)
-                }
+                value =
+                    searchStoreList.map {
+                        SearchStoreMap.from(it)
+                    },
             )
         }
 
         return SearchStoreMapResultDto(
             box = box,
-            storeList = seachStoreMapList
+            storeList = seachStoreMapList,
         )
     }
 
@@ -93,9 +100,10 @@ class SearchService (
      * @return 검색어 자동완성 리스트
      */
     fun searchSuggestions(keyword: String): List<String> {
-        val searchRecommendList: List<String> = searchStoreRepository.searchStoreRecommend(
-            keyword = keyword
-        )
+        val searchRecommendList: List<String> =
+            searchStoreRepository.searchStoreRecommend(
+                keyword = keyword,
+            )
         return searchRecommendList
     }
 
@@ -105,7 +113,10 @@ class SearchService (
      * @param lat 위도
      * @return Box 객체
      */
-    fun getBox(lng: Double, lat: Double): Box {
+    fun getBox(
+        lng: Double,
+        lat: Double,
+    ): Box {
         // 경도: 왼쪽(서쪽)으로 내림, 오른쪽(동쪽)으로 올림
         val leftLng = floor(lng / cacheBoxSize) * cacheBoxSize
         val rightLng = ceil(lng / cacheBoxSize) * cacheBoxSize
@@ -114,8 +125,8 @@ class SearchService (
         val topLat = ceil(lat / cacheBoxSize) * cacheBoxSize
         val bottomLat = floor(lat / cacheBoxSize) * cacheBoxSize
 
-        val topLeft = Point(lng = leftLng, lat = topLat)           // 서쪽 + 북쪽
-        val bottomRight = Point(lng = rightLng, lat = bottomLat)   // 동쪽 + 남쪽
+        val topLeft = Point(lng = leftLng, lat = topLat) // 서쪽 + 북쪽
+        val bottomRight = Point(lng = rightLng, lat = bottomLat) // 동쪽 + 남쪽
 
         return Box(topLeft, bottomRight)
     }
