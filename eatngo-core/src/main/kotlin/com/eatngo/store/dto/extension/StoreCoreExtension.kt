@@ -23,9 +23,11 @@ import com.eatngo.store.dto.RoadAddressDto
 import com.eatngo.store.dto.StoreCategoryInfoDto
 import com.eatngo.store.dto.StoreDto
 import com.eatngo.store.dto.StoreSubscriptionDto
-import com.eatngo.store.vo.FoodCategory
+import com.eatngo.store.vo.BusinessHourVO
+import com.eatngo.store.vo.FoodCategoryVO
 import com.eatngo.store.vo.FullAddressVO
-import com.eatngo.store.vo.StoreCategory
+import com.eatngo.store.vo.PickUpInfoVO
+import com.eatngo.store.vo.StoreCategoryVO
 import com.eatngo.store.vo.ZoneNoVO
 
 /**
@@ -75,8 +77,8 @@ fun CoordinateDto.toDomain(): Coordinate = Coordinate(
 
 fun StoreCategoryInfoDto.toDomain(): StoreCategoryInfo {
     return StoreCategoryInfo(
-        storeCategory = this.storeCategory?.map { StoreCategory.from(it) }!!,
-        foodCategory = this.foodCategory?.map { FoodCategory.from(it) }
+        storeCategory = this.storeCategory?.map { StoreCategoryVO.from(it) }!!,
+        foodCategory = this.foodCategory?.map { FoodCategoryVO.from(it) }
     )
 }
 
@@ -134,22 +136,10 @@ fun BusinessHour.toDto(): BusinessHourDto {
     )
 }
 
-fun List<BusinessHour>.toDto(): List<BusinessHourDto> {
-    return this.map { it.toDto() }
-}
-
 fun Coordinate.toDto(): CoordinateDto {
     return CoordinateDto(
         latitude = this.latitude,
         longitude = this.longitude
-    )
-}
-
-fun PickUpInfo.toDto(): PickUpInfoDto {
-    return PickUpInfoDto(
-        pickupStartTime = this.pickupStartTime,
-        pickupEndTime = this.pickupEndTime,
-        pickupDay = this.pickupDay,
     )
 }
 
@@ -185,6 +175,29 @@ fun Store.toDto(): StoreDto {
         createdAt = this.createdAt,
         updatedAt = this.updatedAt
     )
+}
+
+/**
+ * VO -> DTO
+ */
+fun PickUpInfoVO.toDto(): PickUpInfoDto {
+    return PickUpInfoDto(
+        pickupDay = this.pickupDay,
+        pickupStartTime = this.pickupStartTime,
+        pickupEndTime = this.pickupEndTime
+    )
+}
+
+fun BusinessHourVO.toDto(): BusinessHourDto {
+    return BusinessHourDto(
+        dayOfWeek = this.dayOfWeek,
+        openTime = this.openTime,
+        closeTime = this.closeTime
+    )
+}
+
+fun List<BusinessHourVO>.toDto(): List<BusinessHourDto> {
+    return this.map { it.toDto() }
 }
 
 /**

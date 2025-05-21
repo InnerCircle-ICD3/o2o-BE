@@ -92,11 +92,7 @@ class StoreServiceImpl(
     override suspend fun updateStorePickupInfo(id: Long, request: PickUpInfoDto): StoreDto {
         val existingStore = storePersistence.findById(id) ?: throw StoreException.StoreNotFound(id)
 
-        existingStore.updatePickupInfo(
-            pickupStartTime = request.pickupStartTime!!,
-            pickupEndTime = request.pickupEndTime!!,
-            pickupDay = request.pickupDay!!
-        )
+        existingStore.updatePickupInfo(request.toDomain())
 
         return storePersistence.save(existingStore).toDto()
     }

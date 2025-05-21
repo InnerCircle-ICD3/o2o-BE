@@ -12,16 +12,16 @@ import java.time.LocalDateTime
 class Store(
     val id: Long,                       // 매장의 고유 id
     val storeOwnerId: Long,             // 해당 매장을 소유한 점주계정 id(매장:계정 1:1)
-    val name: StoreName,                // 매장명
-    val description: Description?,           // 매장 설명
+    val name: StoreNameVO,                // 매장명
+    val description: DescriptionVO?,           // 매장 설명
     val address: Address,               // 매장 주소
-    val businessNumber: BusinessNumber, // 사업자등록 번호
-    val contactNumber: ContactNumber?,  // 매장 or 점주 전화번호
-    val imageUrl: ImageUrl?,            // 대표 이미지 url(카드뷰에 보이는 이미지)
-    val businessHours: List<BusinessHour>?, // 영업시간(픽업시간과는 다름, 단순 정보제공용 및 확장성 고려해 추가)
+    val businessNumber: BusinessNumberVO, // 사업자등록 번호
+    val contactNumber: ContactNumberVO?,  // 매장 or 점주 전화번호
+    val imageUrl: ImageUrlVO?,            // 대표 이미지 url(카드뷰에 보이는 이미지)
+    val businessHours: List<BusinessHourVO>?, // 영업시간(픽업시간과는 다름, 단순 정보제공용 및 확장성 고려해 추가)
     val storeCategoryInfo: StoreCategoryInfo, // 매장의 카테고리 정보들
     var status: StoreEnum.StoreStatus = StoreEnum.StoreStatus.PENDING, // 매장 상태(기본: 승인대기중)
-    var pickUpInfo: PickUpInfo,         // 픽업과 관련된 정보(픽업시간 from to, 오늘/내일 픽업)
+    var pickUpInfo: PickUpInfoVO,         // 픽업과 관련된 정보(픽업시간 from to, 오늘/내일 픽업)
     val reviewInfo: ReviewInfo,         // 리뷰와 관련된 정보(평균 별점, 리뷰 개수)
     val createdAt: LocalDateTime,       // 생성일
     var updatedAt: LocalDateTime,       // 수정일
@@ -46,16 +46,18 @@ class Store(
             return Store(
                 id = 0L,
                 storeOwnerId = storeOwnerId,
-                name = StoreName.from(name),
-                description = Description.from(description),
+                name = StoreNameVO.from(name),
+                description = DescriptionVO.from(description),
                 address = address,
-                businessNumber = BusinessNumber.from(businessNumber),
-                contactNumber = contactNumber?.let { ContactNumber.from(it) },
-                imageUrl = imageUrl?.let { ImageUrl.from(it) },
-                businessHours = businessHours,
+                businessNumber = BusinessNumberVO.from(businessNumber),
+                contactNumber = contactNumber?.let { ContactNumberVO.from(it) },
+                imageUrl = imageUrl?.let { ImageUrlVO.from(it) },
+                businessHours = BusinessHourVO.fromList(businessHours),
                 storeCategoryInfo = storeCategoryInfo,
                 status = StoreEnum.StoreStatus.PENDING,
-                pickUpInfo = pickUpInfo,
+                pickUpInfo = pickUpInfo.let {
+                    PickUpInfoVO.from(it.pickupDay, it.pickupStartTime, it.pickupEndTime)
+                },
                 reviewInfo = ReviewInfo(),
                 createdAt = createdAt,
                 updatedAt = updatedAt,
@@ -80,16 +82,18 @@ class Store(
         return Store(
             id = id,
             storeOwnerId = this.storeOwnerId,
-            name = name?.let { StoreName.from(it) } ?: this.name,
-            description = description?.let { Description.from(it) }  ?: this.description,
+            name = name?.let { StoreNameVO.from(it) } ?: this.name,
+            description = description?.let { DescriptionVO.from(it) }  ?: this.description,
             address = address ?: this.address,
             businessNumber = this.businessNumber,
-            contactNumber = contactNumber?.let { ContactNumber.from(it) } ?: this.contactNumber,
-            imageUrl = imageUrl?.let { ImageUrl.from(it) } ?: this.imageUrl,
-            businessHours = businessHours ?: this.businessHours,
+            contactNumber = contactNumber?.let { ContactNumberVO.from(it) } ?: this.contactNumber,
+            imageUrl = imageUrl?.let { ImageUrlVO.from(it) } ?: this.imageUrl,
+            businessHours = BusinessHourVO.fromList(businessHours),
             storeCategoryInfo = storeCategoryInfo,
             status = this.status,
-            pickUpInfo = pickUpInfo,
+            pickUpInfo = pickUpInfo.let {
+                PickUpInfoVO.from(it.pickupDay, it.pickupStartTime, it.pickupEndTime)
+            },
             reviewInfo = this.reviewInfo,
             createdAt = this.createdAt,
             updatedAt = LocalDateTime.now(),
@@ -102,7 +106,9 @@ class Store(
      */
     fun isPickupTime(now: LocalDateTime = LocalDateTime.now()): Boolean {
         val currentTime = now.toLocalTime()
-        return currentTime == pickUpInfo.pickupStartTime
+        val startWindow = pickUpInfo.pickupStartTime.minusMinutes(1)
+        val endWindow = pickUpInfo.pickupStartTime.plusMinutes(1)
+        return currentTime.isAfter(startWindow) && currentTime.isBefore(endWindow)
     }
 
     /**
@@ -130,19 +136,14 @@ class Store(
     /**
      * 픽업 정보만 업데이트
      */
-    fun updatePickupInfo(
-        pickupStartTime: LocalTime,
-        pickupEndTime: LocalTime,
-        pickupDay: StoreEnum.PickupDay
-    ) {
-        pickUpInfo = PickUpInfo(
-                pickupStartTime = pickupStartTime,
-                pickupEndTime = pickupEndTime,
-                pickupDay = pickupDay
+    fun updatePickupInfo(pickUpInfo: PickUpInfo) {
+        this.pickUpInfo = PickUpInfoVO.from(
+            pickUpInfo.pickupDay,
+            pickUpInfo.pickupStartTime,
+            pickUpInfo.pickupEndTime
         )
         updatedAt = LocalDateTime.now()
     }
-
 
     /**
      * Soft Delete를 위한 메서드
@@ -223,6 +224,6 @@ data class ReviewInfo(
  * 매장의 카테고리 정보(분류와 사용자 입력 카테고리)
  */
 data class StoreCategoryInfo(
-    val storeCategory: List<StoreCategory>,    // 매장의 카테고리(ex. 빵, 카페, 분식 ...)
-    val foodCategory: List<FoodCategory>?     // 음식의 카테고리(ex. 햄버거, 소금빵, 모카빵 ...)
+    val storeCategory: List<StoreCategoryVO>,    // 매장의 카테고리(ex. 빵, 카페, 분식 ...)
+    val foodCategory: List<FoodCategoryVO>?     // 음식의 카테고리(ex. 햄버거, 소금빵, 모카빵 ...)
 )
