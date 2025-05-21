@@ -1,8 +1,10 @@
 package com.eatngo.order
 
+import com.eatngo.auth.annotation.CustomerId
 import com.eatngo.order.domain.Status
 import com.eatngo.order.dto.*
-import com.eatngo.order.service.OrderService
+import com.eatngo.order.usecase.CustomerOrderStatusChangedUseCase
+import com.eatngo.order.usecase.OrderCreateUseCase
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.ResponseEntity
@@ -12,15 +14,16 @@ import java.time.LocalDateTime
 @Tag(name = "주문", description = "주문 관련 API")
 @RestController
 class OrderController(
-    private val orderService: OrderService
+    private val orderCreateUseCase: OrderCreateUseCase,
+    private val orderStatusChangedUseCase: CustomerOrderStatusChangedUseCase
 ) {
     @PostMapping("/api/v1/orders")
     @Operation(summary = "주문 생성", description = "주문 생성")
-    fun createOrder(@RequestBody requestDto: CreateOrderRequestDto): ResponseEntity<OrderDto> {
+    fun createOrder(@RequestBody requestDto: CreateOrderRequestDto, @CustomerId customerId: Long): ResponseEntity<OrderDto> {
         return ResponseEntity.ok(
-            orderService.createOrder(
+            orderCreateUseCase.create(
                 OrderCreateDto(
-                    customerId = 1L,
+                    customerId = customerId,
                     storeId = requestDto.storeId,
                     orderItems = requestDto.orderItems.map {
                         OrderItemCreateDto(
@@ -37,11 +40,21 @@ class OrderController(
 
     @PostMapping("/api/v1/orders/{orderId}/cancel")
     @Operation(summary = "주문 취소", description = "주문 취소")
-    fun cancelOrder(@PathVariable orderId: Long) = ResponseEntity.ok(Unit)
+    fun cancelOrder(@PathVariable orderId: Long, @CustomerId customerId: Long): ResponseEntity<Unit> =
+        ResponseEntity.ok(
+            orderStatusChangedUseCase.change(
+                OrderStatusChangedDto(orderId, customerId, Status.CANCELED)
+            )
+        )
 
     @PostMapping("/api/v1/orders/{orderId}/done")
     @Operation(summary = "주문 완료", description = "주문 완료")
-    fun doneOrder(@PathVariable orderId: Long) = ResponseEntity.ok(Unit)
+    fun doneOrder(@PathVariable orderId: Long, @CustomerId customerId: Long): ResponseEntity<Unit> =
+        ResponseEntity.ok(
+            orderStatusChangedUseCase.change(
+                OrderStatusChangedDto(orderId, customerId, Status.DONE)
+            )
+        )
 
     @GetMapping("/api/v1/customers/{customerId}/orders")
     @Operation(summary = "내 주문 조회", description = "내 주문 이력 조회")
