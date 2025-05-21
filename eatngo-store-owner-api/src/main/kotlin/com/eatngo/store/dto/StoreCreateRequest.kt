@@ -1,6 +1,5 @@
 package com.eatngo.store.dto
 
-import com.eatngo.store.domain.PickUpInfo
 import java.time.LocalTime
 
 /**

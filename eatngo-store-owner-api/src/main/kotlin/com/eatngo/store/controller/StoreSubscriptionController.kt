@@ -1,7 +1,6 @@
 package com.eatngo.store.controller
 
 import com.eatngo.common.response.ApiResponse
-import com.eatngo.store.dto.StoreSubscriptionDto
 import com.eatngo.store.dto.SubscriptionResponseForStoreOwner
 import com.eatngo.store.dto.extension.toResponse
 import com.eatngo.store.service.StoreSubscriptionService

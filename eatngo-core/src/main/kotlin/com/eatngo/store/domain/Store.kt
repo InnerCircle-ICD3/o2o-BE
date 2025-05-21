@@ -1,9 +1,10 @@
 package com.eatngo.store.domain
 
 import com.eatngo.common.constant.StoreEnum
+import com.eatngo.store.dto.StoreCreateDto
+import com.eatngo.store.dto.StoreDto
+import com.eatngo.store.dto.StoreUpdateDto
 import com.eatngo.store.vo.*
-import java.time.DayOfWeek
-import java.time.LocalTime
 import java.time.LocalDateTime
 
 /**
@@ -22,46 +23,91 @@ class Store(
     val storeCategoryInfo: StoreCategoryInfo, // 매장의 카테고리 정보들
     var status: StoreEnum.StoreStatus = StoreEnum.StoreStatus.PENDING, // 매장 상태(기본: 승인대기중)
     var pickUpInfo: PickUpInfoVO,         // 픽업과 관련된 정보(픽업시간 from to, 오늘/내일 픽업)
-    val reviewInfo: ReviewInfo,         // 리뷰와 관련된 정보(평균 별점, 리뷰 개수)
+    val reviewInfo: ReviewInfoVO,         // 리뷰와 관련된 정보(평균 별점, 리뷰 개수)
     val createdAt: LocalDateTime,       // 생성일
     var updatedAt: LocalDateTime,       // 수정일
     var deletedAt: LocalDateTime? = null, // 삭제일(softDel용, 삭제 시간이 존재하면 softDel)
 ) {
     companion object {
-        fun create(
-            storeOwnerId: Long,
-            name: String,
-            address: Address,
-            businessNumber: String,
-            description: String? = null,
-            contactNumber: String? = null,
-            imageUrl: String? = null,
-            businessHours: List<BusinessHour>? = emptyList(),
-            storeCategoryInfo: StoreCategoryInfo,
-            pickUpInfo: PickUpInfo,
-            createdAt: LocalDateTime = LocalDateTime.now(),
-            updatedAt: LocalDateTime = createdAt,
-            deletedAt: LocalDateTime? = null
-        ): Store {
+        fun from(dto: StoreDto): Store {
+            return Store(
+                id = dto.storeId,
+                storeOwnerId = dto.storeOwnerId,
+                name = StoreNameVO.from(dto.name),
+                description = DescriptionVO.from(dto.description),
+                address = Address(
+                    roadAddress = RoadAddressVO.from(
+                        fullAddress = dto.address.roadAddress.fullAddress,
+                        zoneNo =dto.address.roadAddress.zoneNo
+                    ),
+                    legalAddress = dto.address.legalAddress?.fullAddress?.let { LegalAddress(it) },
+                    adminAddress = dto.address.adminAddress?.fullAddress?.let { AdminAddress(it) },
+                    coordinate = CoordinateVO.from(
+                        dto.address.coordinate.latitude ?: 0.0,
+                        dto.address.coordinate.longitude ?: 0.0
+                    )
+                ),
+                businessNumber = BusinessNumberVO.from(dto.businessNumber),
+                contactNumber = dto.contactNumber?.let { ContactNumberVO.from(it) },
+                imageUrl = dto.imageUrl?.let { ImageUrlVO.from(it) },
+                businessHours = BusinessHourVO.fromList(dto.businessHours),
+                storeCategoryInfo = StoreCategoryInfo(
+                    storeCategory = dto.storeCategoryInfo.storeCategory?.map { StoreCategoryVO.from(it) } ?: emptyList(),
+                    foodCategory = dto.storeCategoryInfo.foodCategory?.map { FoodCategoryVO.from(it) }
+                ),
+                status = dto.status,
+                pickUpInfo = PickUpInfoVO.from(
+                    dto.pickUpInfo.pickupDay!!,
+                    dto.pickUpInfo.pickupStartTime!!,
+                    dto.pickUpInfo.pickupEndTime!!
+                ),
+                reviewInfo = ReviewInfoVO.from(
+                    dto.reviewInfo.ratingAverage,
+                    dto.reviewInfo.ratingCount
+                ),
+                createdAt = dto.createdAt,
+                updatedAt = dto.updatedAt,
+                deletedAt = null
+            )
+        }
+        fun create(request: StoreCreateDto): Store {
             return Store(
                 id = 0L,
-                storeOwnerId = storeOwnerId,
-                name = StoreNameVO.from(name),
-                description = DescriptionVO.from(description),
-                address = address,
-                businessNumber = BusinessNumberVO.from(businessNumber),
-                contactNumber = contactNumber?.let { ContactNumberVO.from(it) },
-                imageUrl = imageUrl?.let { ImageUrlVO.from(it) },
-                businessHours = BusinessHourVO.fromList(businessHours),
-                storeCategoryInfo = storeCategoryInfo,
+                storeOwnerId = request.storeOwnerId,
+                name = StoreNameVO.from(request.name),
+                description = DescriptionVO.from(request.description),
+                address = Address(
+                    roadAddress = RoadAddressVO.from(
+                        request.address.roadAddress.fullAddress,
+                        request.address.roadAddress.zoneNo
+                    ),
+                    legalAddress = request.address.legalAddress?.fullAddress?.let { LegalAddress(it) },
+                    adminAddress = request.address.adminAddress?.fullAddress?.let { AdminAddress(it) },
+                    coordinate = CoordinateVO.from(
+                        request.address.coordinate.latitude ?: 0.0,
+                        request.address.coordinate.longitude ?: 0.0
+                    )
+                ),
+                businessNumber = BusinessNumberVO.from(request.businessNumber),
+                contactNumber = request.contactNumber?.let { ContactNumberVO.from(it) },
+                imageUrl = request.imageUrl?.let { ImageUrlVO.from(it) },
+                businessHours = request.businessHours?.map {
+                    BusinessHourVO.from(it.dayOfWeek, it.openTime, it.closeTime)
+                } ?: emptyList(),
+                storeCategoryInfo = StoreCategoryInfo(
+                    storeCategory = request.storeCategoryInfo.storeCategory?.map { StoreCategoryVO.from(it) } ?: emptyList(),
+                    foodCategory = request.storeCategoryInfo.foodCategory?.map { FoodCategoryVO.from(it) }
+                ),
                 status = StoreEnum.StoreStatus.PENDING,
-                pickUpInfo = pickUpInfo.let {
-                    PickUpInfoVO.from(it.pickupDay, it.pickupStartTime, it.pickupEndTime)
-                },
-                reviewInfo = ReviewInfo(),
-                createdAt = createdAt,
-                updatedAt = updatedAt,
-                deletedAt = deletedAt
+                pickUpInfo = PickUpInfoVO.from(
+                    request.pickUpInfo.pickupDay!!,
+                    request.pickUpInfo.pickupStartTime!!,
+                    request.pickUpInfo.pickupEndTime!!
+                ),
+                reviewInfo = ReviewInfoVO.from(0.0, 0),
+                createdAt = LocalDateTime.now(),
+                updatedAt = LocalDateTime.now(),
+                deletedAt = null
             )
         }
     }
@@ -69,31 +115,46 @@ class Store(
     /**
      * 매장 정보 업데이트
      */
-    fun update(
-        name: String? = null,
-        description: String? = null,
-        address: Address? = null,
-        contactNumber: String? = null,
-        imageUrl: String? = null,
-        businessHours: List<BusinessHour>? = emptyList(),
-        storeCategoryInfo: StoreCategoryInfo,
-        pickUpInfo: PickUpInfo,
-    ): Store {
+    fun update(request: StoreUpdateDto): Store {
         return Store(
             id = id,
             storeOwnerId = this.storeOwnerId,
-            name = name?.let { StoreNameVO.from(it) } ?: this.name,
-            description = description?.let { DescriptionVO.from(it) }  ?: this.description,
-            address = address ?: this.address,
+            name = request.name?.let { StoreNameVO.from(it) } ?: this.name,
+            description = request.description?.let { DescriptionVO.from(it) } ?: this.description,
+            address = request.address?.let { addr ->
+                Address(
+                    roadAddress = RoadAddressVO.from(
+                        fullAddress = addr.roadAddress.fullAddress,
+                        zoneNo = addr.roadAddress.zoneNo
+                    ),
+                    legalAddress = addr.legalAddress?.fullAddress?.let { LegalAddress(it) },
+                    adminAddress = addr.adminAddress?.fullAddress?.let { AdminAddress(it) },
+                    coordinate = CoordinateVO.from(
+                        addr.coordinate.latitude ?: 0.0,
+                        addr.coordinate.longitude ?: 0.0
+                    )
+                )
+            } ?: this.address,
             businessNumber = this.businessNumber,
-            contactNumber = contactNumber?.let { ContactNumberVO.from(it) } ?: this.contactNumber,
-            imageUrl = imageUrl?.let { ImageUrlVO.from(it) } ?: this.imageUrl,
-            businessHours = BusinessHourVO.fromList(businessHours),
-            storeCategoryInfo = storeCategoryInfo,
+            contactNumber = request.contactNumber?.let { ContactNumberVO.from(it) } ?: this.contactNumber,
+            imageUrl = request.mainImageUrl?.let { ImageUrlVO.from(it) } ?: this.imageUrl,
+            businessHours = request.businessHours?.map {
+                BusinessHourVO.from(it.dayOfWeek, it.openTime, it.closeTime)
+            } ?: this.businessHours,
+            storeCategoryInfo = request.storeCategoryInfo?.let { info ->
+                StoreCategoryInfo(
+                    storeCategory = info.storeCategory?.map { StoreCategoryVO.from(it) } ?: emptyList(),
+                    foodCategory = info.foodCategory?.map { FoodCategoryVO.from(it) }
+                )
+            } ?: this.storeCategoryInfo,
             status = this.status,
-            pickUpInfo = pickUpInfo.let {
-                PickUpInfoVO.from(it.pickupDay, it.pickupStartTime, it.pickupEndTime)
-            },
+            pickUpInfo = request.pickUpInfo?.let { info ->
+                PickUpInfoVO.from(
+                    info.pickupDay!!,
+                    info.pickupStartTime!!,
+                    info.pickupEndTime!!
+                )
+            } ?: this.pickUpInfo,
             reviewInfo = this.reviewInfo,
             createdAt = this.createdAt,
             updatedAt = LocalDateTime.now(),
@@ -125,18 +186,31 @@ class Store(
      */
     fun updateStoreStatus(now: LocalDateTime = LocalDateTime.now(), hasStock: Boolean) {
         val currentTime = now.toLocalTime()
-        status = when {
-            !hasStock -> StoreEnum.StoreStatus.CLOSED
-            currentTime.isBefore(pickUpInfo.pickupStartTime) -> StoreEnum.StoreStatus.CLOSED
-            currentTime.isAfter(pickUpInfo.pickupEndTime) -> StoreEnum.StoreStatus.CLOSED
-            else -> StoreEnum.StoreStatus.OPEN
+        val start = pickUpInfo.pickupStartTime
+        val end = pickUpInfo.pickupEndTime
+
+        val isOpen = if (isAfterMidnight()) {
+            // 자정 넘김: (시작 시간과 같거나 이후) 또는 (종료 시간과 같거나 이전)
+            currentTime >= start || currentTime <= end
+        } else {
+            // 일반: 시작 시간과 같거나 이후이고, 종료 시간과 같거나 이전
+            currentTime >= start && currentTime <= end
         }
+
+        status = if (!hasStock || !isOpen) StoreEnum.StoreStatus.CLOSED else StoreEnum.StoreStatus.OPEN
+    }
+
+    /**
+     * 픽업 시간이 자정을 넘어가는지 확인
+     */
+    private fun isAfterMidnight(): Boolean {
+        return pickUpInfo.pickupEndTime.isBefore(pickUpInfo.pickupStartTime)
     }
 
     /**
      * 픽업 정보만 업데이트
      */
-    fun updatePickupInfo(pickUpInfo: PickUpInfo) {
+    fun updatePickupInfo(pickUpInfo: PickUpInfoVO) {
         this.pickUpInfo = PickUpInfoVO.from(
             pickUpInfo.pickupDay,
             pickUpInfo.pickupStartTime,
@@ -158,27 +232,10 @@ class Store(
  * 매장 위치 정보
  */
 data class Address(
-    val roadAddress: RoadAddress,           // 도로명 주소 (필수)
+    val roadAddress: RoadAddressVO,           // 도로명 주소 (필수)
     val legalAddress: LegalAddress? = null, // 법정동 주소
     val adminAddress: AdminAddress? = null, // 행정동 주소
-    val coordinate: Coordinate              // 위도, 경도
-)
-
-/**
- * 영업시간 정보 (정보 표시용)
- */
-data class BusinessHour(
-    val dayOfWeek: DayOfWeek,
-    val openTime: LocalTime,
-    val closeTime: LocalTime
-)
-
-/**
- * 도로명 주소
- */
-data class RoadAddress(
-    val fullAddress: FullAddressVO,      // 전체 도로명 주소
-    val zoneNo: ZoneNoVO,           // 우편번호
+    val coordinate: CoordinateVO              // 위도, 경도
 )
 
 /**
@@ -193,31 +250,6 @@ data class LegalAddress(
  */
 data class AdminAddress(
     val fullAddress: String?       // 전체 행정동 주소
-)
-
-/**
- *  위도, 경도 좌표
- */
-data class Coordinate(
-    val latitude: Double?,          // 위도
-    val longitude: Double?          // 경도
-)
-
-/**
- * 픽업과 관련된 정보
- */
-data class PickUpInfo(
-    val pickupDay: StoreEnum.PickupDay,       // 픽업 가능 일자 (TODAY, TOMORROW) (확장성 고려한 필드)
-    val pickupStartTime: LocalTime,     // 픽업 시작 시간 (필수) (HH:mm)
-    val pickupEndTime: LocalTime,       // 픽업 종료 시간 (필수) (HH:mm)
-)
-
-/**
- * 리뷰 정보
- */
-data class ReviewInfo(
-    val ratingAverage: Double = 0.0,    // 평균 별점
-    val ratingCount: Int = 0,           // 별점 개수
 )
 
 /**

@@ -1,7 +1,7 @@
 package com.eatngo.store.vo
 
 import com.eatngo.common.constant.StoreEnum
-import com.eatngo.store.domain.BusinessHour
+import com.eatngo.store.dto.BusinessHourDto
 import java.time.DayOfWeek
 import java.time.LocalTime
 import kotlin.text.isNotBlank
@@ -68,7 +68,7 @@ value class BusinessHourVO(val value: Triple<DayOfWeek, LocalTime, LocalTime>) {
         fun from(dayOfWeek: DayOfWeek, openTime: LocalTime, closeTime: LocalTime): BusinessHourVO =
             BusinessHourVO(Triple(dayOfWeek, openTime, closeTime))
 
-        fun fromList(list: List<BusinessHour>?): List<BusinessHourVO> =
+        fun fromList(list: List<BusinessHourDto>?): List<BusinessHourVO> =
             list?.map { from(it.dayOfWeek, it.openTime, it.closeTime) } ?: emptyList()
     }
 }
@@ -141,23 +141,31 @@ value class DescriptionVO(val value: String) {
 }
 
 @JvmInline
-value class FullAddressVO(val value: String) {
+value class RoadAddressVO(val value: Pair<String, String>) {
     init {
-        require(value.isNotBlank()) { "도로명 주소는 비어있을 수 없습니다" }
+        require(value.first.isNotBlank()) { "도로명 주소는 비어있을 수 없습니다" }
+        require(value.second.isNotBlank()) { "우편번호는 비어있을 수 없습니다" }
     }
 
+    val fullAddress: String get() = value.first
+    val zoneNo: String get() = value.second
+
     companion object {
-        fun from(address: String?): FullAddressVO = FullAddressVO(address ?: "")
+        fun from(fullAddress: String?, zoneNo: String?): RoadAddressVO {
+            requireNotNull(fullAddress) { "도로명 주소는 null일 수 없습니다" }
+            requireNotNull(zoneNo) { "우편번호는 null일 수 없습니다" }
+            return RoadAddressVO(Pair(fullAddress, zoneNo))
+        }
     }
 }
 
 @JvmInline
-value class ZoneNoVO(val value: String) {
-    init {
-        require(value.isNotBlank()) { "우편번호는 비어있을 수 없습니다" }
-    }
+value class ReviewInfoVO(val value: Pair<Double, Int>) {
+    val ratingAverage: Double get() = value.first
+    val ratingCount: Int get() = value.second
 
     companion object {
-        fun from(zoneNo: String?): ZoneNoVO = ZoneNoVO(zoneNo ?: "")
+        fun from(ratingAverage: Double, ratingCount: Int): ReviewInfoVO =
+            ReviewInfoVO(Pair(ratingAverage, ratingCount))
     }
 }

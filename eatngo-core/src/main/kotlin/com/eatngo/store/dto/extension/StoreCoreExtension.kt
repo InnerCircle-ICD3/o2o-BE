@@ -3,52 +3,24 @@ package com.eatngo.store.dto.extension
 import com.eatngo.common.constant.StoreEnum
 import com.eatngo.store.domain.Address
 import com.eatngo.store.domain.AdminAddress
-import com.eatngo.store.domain.BusinessHour
-import com.eatngo.store.domain.Coordinate
 import com.eatngo.store.domain.LegalAddress
-import com.eatngo.store.domain.PickUpInfo
-import com.eatngo.store.domain.ReviewInfo
-import com.eatngo.store.domain.RoadAddress
 import com.eatngo.store.domain.Store
 import com.eatngo.store.domain.StoreCategoryInfo
 import com.eatngo.store.domain.StoreSubscription
 import com.eatngo.store.dto.AddressDto
 import com.eatngo.store.dto.AdminAddressDto
 import com.eatngo.store.dto.BusinessHourDto
-import com.eatngo.store.dto.CoordinateDto
 import com.eatngo.store.dto.LegalAddressDto
 import com.eatngo.store.dto.PickUpInfoDto
-import com.eatngo.store.dto.ReviewInfoDto
-import com.eatngo.store.dto.RoadAddressDto
 import com.eatngo.store.dto.StoreCategoryInfoDto
 import com.eatngo.store.dto.StoreDto
 import com.eatngo.store.dto.StoreSubscriptionDto
 import com.eatngo.store.vo.BusinessHourVO
-import com.eatngo.store.vo.FoodCategoryVO
-import com.eatngo.store.vo.FullAddressVO
 import com.eatngo.store.vo.PickUpInfoVO
-import com.eatngo.store.vo.StoreCategoryVO
-import com.eatngo.store.vo.ZoneNoVO
 
 /**
  * core 모듈의 dto를 domain으로 매핑
  */
-fun BusinessHourDto.toDomain(): BusinessHour = BusinessHour(
-    dayOfWeek = this.dayOfWeek,
-    openTime = this.openTime,
-    closeTime = this.closeTime
-)
-
-
-fun List<BusinessHourDto>.toDomain(): List<BusinessHour> {
-    return this.map { it.toDomain() }
-}
-
-// RoadAddressDto → RoadAddress
-fun RoadAddressDto.toDomain(): RoadAddress = RoadAddress(
-    fullAddress = FullAddressVO.from(fullAddress),
-    zoneNo = ZoneNoVO.from(zoneNo)
-)
 
 // LegalAddressDto → LegalAddress
 fun LegalAddressDto.toDomain(): LegalAddress = LegalAddress(
@@ -59,43 +31,6 @@ fun LegalAddressDto.toDomain(): LegalAddress = LegalAddress(
 fun AdminAddressDto.toDomain(): AdminAddress = AdminAddress(
     fullAddress = this.fullAddress
 )
-
-// AddressDto -> Address
-fun AddressDto.toDomain(): Address {
-    return Address(
-        roadAddress = this.roadAddress.toDomain(),
-        legalAddress = this.legalAddress?.toDomain(),
-        adminAddress = this.adminAddress?.toDomain(),
-        coordinate = this.coordinate.toDomain(),
-    )
-}
-
-fun CoordinateDto.toDomain(): Coordinate = Coordinate(
-    latitude = this.latitude,
-    longitude = this.longitude
-)
-
-fun StoreCategoryInfoDto.toDomain(): StoreCategoryInfo {
-    return StoreCategoryInfo(
-        storeCategory = this.storeCategory?.map { StoreCategoryVO.from(it) }!!,
-        foodCategory = this.foodCategory?.map { FoodCategoryVO.from(it) }
-    )
-}
-
-fun PickUpInfoDto.toDomain(): PickUpInfo {
-    return PickUpInfo(
-        pickupStartTime = this.pickupStartTime!!,
-        pickupEndTime = this.pickupEndTime!!,
-        pickupDay = this.pickupDay!!,
-    )
-}
-
-fun ReviewInfoDto.toDomain(): ReviewInfo {
-    return ReviewInfo(
-        ratingAverage = this.ratingAverage,
-        ratingCount = this.ratingCount,
-    )
-}
 
 /**
  * core 모듈의 domain을 dto로 매핑
@@ -109,13 +44,6 @@ fun Address.toDto(): AddressDto {
     )
 }
 
-fun RoadAddress.toDto(): RoadAddressDto {
-    return RoadAddressDto(
-        fullAddress = this.fullAddress.value,
-        zoneNo = this.zoneNo.value
-    )
-}
-
 fun LegalAddress.toDto(): LegalAddressDto {
     return LegalAddressDto(
         fullAddress = this.fullAddress
@@ -125,40 +53,6 @@ fun LegalAddress.toDto(): LegalAddressDto {
 fun AdminAddress.toDto(): AdminAddressDto {
     return AdminAddressDto(
         fullAddress = this.fullAddress
-    )
-}
-
-//fun BusinessHour.toDto(): BusinessHourDto {
-//    return BusinessHourDto(
-//        dayOfWeek = this.dayOfWeek,
-//        openTime = this.openTime,
-//        closeTime = this.closeTime
-//    )
-//}
-//
-//fun List<BusinessHour>.toDto(): List<BusinessHourDto> {
-//    return this.map { it.toDto() }
-//}
-
-fun Coordinate.toDto(): CoordinateDto {
-    return CoordinateDto(
-        latitude = this.latitude,
-        longitude = this.longitude
-    )
-}
-
-//fun PickUpInfo.toDto(): PickUpInfoDto {
-//    return PickUpInfoDto(
-//        pickupDay = this.pickupDay,
-//        pickupStartTime = this.pickupStartTime,
-//        pickupEndTime = this.pickupEndTime,
-//    )
-//}
-
-fun ReviewInfo.toDto(): ReviewInfoDto {
-    return ReviewInfoDto(
-        ratingAverage = this.ratingAverage,
-        ratingCount = this.ratingCount,
     )
 }
 
