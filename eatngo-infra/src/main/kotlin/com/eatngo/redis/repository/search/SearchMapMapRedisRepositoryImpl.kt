@@ -1,6 +1,8 @@
 package com.eatngo.redis.repository.search
 
 import com.eatngo.common.type.Point
+import com.eatngo.redis.utils.readValueFromJson
+import com.eatngo.redis.utils.writeValueToJson
 import com.eatngo.search.dto.SearchStoreMap
 import com.eatngo.search.infra.SearchMapRedisRepository
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -14,21 +16,23 @@ import org.springframework.stereotype.Repository
  * Value : List<SearchStoreMap>
  */
 @Repository
-class SearchMapMapRedisRepositoryImpl (
+class SearchMapMapRedisRepositoryImpl(
     private val redisTemplate: RedisTemplate<String, String>,
-    private val objectMapper: ObjectMapper
+    private val objectMapper: ObjectMapper,
 ) : SearchMapRedisRepository {
-
     override fun getKey(topLeft: Point): String {
         val lat = topLeft.lat
         val lng = topLeft.lng
         return "searchMap:lat:$lat:lng:$lng"
     }
 
-    override fun save(key: String, values: List<SearchStoreMap>) {
+    override fun save(
+        key: String,
+        values: List<SearchStoreMap>,
+    ) {
         val ops = redisTemplate.opsForHash<String, String>()
         values.forEach { storeMap ->
-            val json = objectMapper.writeValueAsString(storeMap)
+            val json = objectMapper.writeValueToJson(storeMap)
             ops.put(key, storeMap.storeID.toString(), json)
         }
     }
@@ -37,7 +41,7 @@ class SearchMapMapRedisRepositoryImpl (
         val ops = redisTemplate.opsForHash<String, String>()
         val allValues = ops.entries(key)
         return allValues.values.map {
-            objectMapper.readValue(it, SearchStoreMap::class.java)
+            objectMapper.readValueFromJson(it)
         }
     }
 
