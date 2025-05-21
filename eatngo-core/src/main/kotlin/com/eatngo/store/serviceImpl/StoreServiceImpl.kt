@@ -82,7 +82,7 @@ class StoreServiceImpl(
         val enumStatus = try {
             StoreEnum.StoreStatus.valueOf(newStatus.uppercase())
         } catch (e: IllegalArgumentException) {
-            throw StoreException.StoreStatusInvalid(newStatus)
+            throw StoreException.StoreStatusInvalid(newStatus).initCause(e)
         }
         existingStore.updateOnlyStoreStatus(enumStatus)
         val savedStore = storePersistence.save(existingStore)

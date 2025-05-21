@@ -128,13 +128,17 @@ fun AdminAddress.toDto(): AdminAddressDto {
     )
 }
 
-fun BusinessHour.toDto(): BusinessHourDto {
-    return BusinessHourDto(
-        dayOfWeek = this.dayOfWeek,
-        openTime = this.openTime,
-        closeTime = this.closeTime
-    )
-}
+//fun BusinessHour.toDto(): BusinessHourDto {
+//    return BusinessHourDto(
+//        dayOfWeek = this.dayOfWeek,
+//        openTime = this.openTime,
+//        closeTime = this.closeTime
+//    )
+//}
+//
+//fun List<BusinessHour>.toDto(): List<BusinessHourDto> {
+//    return this.map { it.toDto() }
+//}
 
 fun Coordinate.toDto(): CoordinateDto {
     return CoordinateDto(
@@ -142,6 +146,14 @@ fun Coordinate.toDto(): CoordinateDto {
         longitude = this.longitude
     )
 }
+
+//fun PickUpInfo.toDto(): PickUpInfoDto {
+//    return PickUpInfoDto(
+//        pickupDay = this.pickupDay,
+//        pickupStartTime = this.pickupStartTime,
+//        pickupEndTime = this.pickupEndTime,
+//    )
+//}
 
 fun ReviewInfo.toDto(): ReviewInfoDto {
     return ReviewInfoDto(
@@ -180,25 +192,19 @@ fun Store.toDto(): StoreDto {
 /**
  * VO -> DTO
  */
-fun PickUpInfoVO.toDto(): PickUpInfoDto {
-    return PickUpInfoDto(
-        pickupDay = this.pickupDay,
-        pickupStartTime = this.pickupStartTime,
-        pickupEndTime = this.pickupEndTime
-    )
-}
+fun BusinessHourVO.toDto(): BusinessHourDto = BusinessHourDto(
+    dayOfWeek = this.dayOfWeek,
+    openTime = this.openTime,
+    closeTime = this.closeTime
+)
 
-fun BusinessHourVO.toDto(): BusinessHourDto {
-    return BusinessHourDto(
-        dayOfWeek = this.dayOfWeek,
-        openTime = this.openTime,
-        closeTime = this.closeTime
-    )
-}
+fun List<BusinessHourVO>?.toDto(): List<BusinessHourDto>? = this?.map { it.toDto() }
 
-fun List<BusinessHourVO>.toDto(): List<BusinessHourDto> {
-    return this.map { it.toDto() }
-}
+fun PickUpInfoVO.toDto(): PickUpInfoDto = PickUpInfoDto(
+    pickupDay = this.pickupDay,
+    pickupStartTime = this.pickupStartTime,
+    pickupEndTime = this.pickupEndTime
+)
 
 /**
  * 상점 구독 domain을 DTO로 변환
