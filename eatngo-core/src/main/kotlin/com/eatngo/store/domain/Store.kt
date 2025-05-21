@@ -6,6 +6,7 @@ import com.eatngo.store.dto.StoreDto
 import com.eatngo.store.dto.StoreUpdateDto
 import com.eatngo.store.vo.*
 import java.time.LocalDateTime
+import java.time.LocalTime
 
 /**
  * 매장(가게) 도메인 모델
@@ -210,11 +211,11 @@ class Store(
     /**
      * 픽업 정보만 업데이트
      */
-    fun updatePickupInfo(pickUpInfo: PickUpInfoVO) {
+    fun updatePickupInfo(pickupDay: StoreEnum.PickupDay?, startTime: LocalTime?, endTime: LocalTime?) {
         this.pickUpInfo = PickUpInfoVO.from(
-            pickUpInfo.pickupDay,
-            pickUpInfo.pickupStartTime,
-            pickUpInfo.pickupEndTime
+            pickupDay!!,
+            startTime!!,
+            endTime!!
         )
         updatedAt = LocalDateTime.now()
     }

@@ -1,6 +1,7 @@
 package com.eatngo.store.dto
 
 import com.eatngo.common.constant.StoreEnum
+import com.eatngo.store.domain.Store
 import java.time.DayOfWeek
 import java.time.LocalTime
 import java.time.LocalDateTime
@@ -25,7 +26,52 @@ data class StoreDto(
     val reviewInfo: ReviewInfoDto,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime
-)
+){
+    companion object {
+        fun from(store: Store): StoreDto {
+            return StoreDto(
+                storeId = store.id,
+                storeOwnerId = store.storeOwnerId,
+                name = store.name.value,
+                description = store.description?.value,
+                address = AddressDto(
+                    roadAddress = RoadAddressDto(
+                        fullAddress = store.address.roadAddress.fullAddress,
+                        zoneNo = store.address.roadAddress.zoneNo
+                    ),
+                    legalAddress = store.address.legalAddress?.fullAddress?.let { LegalAddressDto(it) },
+                    adminAddress = store.address.adminAddress?.fullAddress?.let { AdminAddressDto(it) },
+                    coordinate = CoordinateDto(
+                        latitude = store.address.coordinate.latitude,
+                        longitude = store.address.coordinate.longitude
+                    )
+                ),
+                businessNumber = store.businessNumber.value,
+                contactNumber = store.contactNumber?.value,
+                imageUrl = store.imageUrl?.value,
+                businessHours = store.businessHours?.map {
+                    BusinessHourDto(it.dayOfWeek, it.openTime, it.closeTime)
+                } ?: emptyList(),
+                storeCategoryInfo = StoreCategoryInfoDto(
+                    storeCategory = store.storeCategoryInfo.storeCategory.map { it.value },
+                    foodCategory = store.storeCategoryInfo.foodCategory?.map { it.value }
+                ),
+                status = store.status,
+                pickUpInfo = PickUpInfoDto(
+                    pickupStartTime = store.pickUpInfo.pickupStartTime,
+                    pickupEndTime = store.pickUpInfo.pickupEndTime,
+                    pickupDay = store.pickUpInfo.pickupDay
+                ),
+                reviewInfo = ReviewInfoDto(
+                    ratingAverage = store.reviewInfo.ratingAverage,
+                    ratingCount = store.reviewInfo.ratingCount
+                ),
+                createdAt = store.createdAt,
+                updatedAt = store.updatedAt
+            )
+        }
+    }
+}
 
 /**
  * 주소 관련 정보를 담은 DTO

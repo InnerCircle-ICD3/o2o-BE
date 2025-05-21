@@ -2,14 +2,11 @@ package com.eatngo.store.serviceImpl
 
 import com.eatngo.common.constant.StoreEnum
 import com.eatngo.common.exception.StoreException
-import com.eatngo.store.domain.Address
 import com.eatngo.store.domain.Store
 import com.eatngo.store.dto.PickUpInfoDto
 import com.eatngo.store.dto.StoreCreateDto
 import com.eatngo.store.dto.StoreDto
 import com.eatngo.store.dto.StoreUpdateDto
-import com.eatngo.store.dto.extension.toDomain
-import com.eatngo.store.dto.extension.toDto
 import com.eatngo.store.infra.StorePersistence
 import com.eatngo.store.service.StoreService
 import org.springframework.stereotype.Service
@@ -26,33 +23,18 @@ class StoreServiceImpl(
      * 상점 생성
      */
     override fun createStore(request: StoreCreateDto): StoreDto {
-        val store = Store.create(request)
-        val savedStore = storePersistence.save(store)
-        return Store.from(savedStore).toDto()
+        return StoreDto.from(storePersistence.save(Store.create(request)))
     }
 
     override fun updateStore(id: Long, request: StoreUpdateDto): StoreDto {
         val existingStore = storePersistence.findById(id) ?: throw StoreException.StoreNotFound(id)
-
-        val updatedStore = existingStore.update(
-            name = request.name,
-            description = request.description,
-            address = request.address?.toDomain(),
-            contactNumber = request.contactNumber,
-            imageUrl = request.mainImageUrl,
-            businessHours = request.businessHours?.toDomain(),
-            storeCategoryInfo = request.storeCategoryInfo?.toDomain()!!,
-            pickUpInfo = request.pickUpInfo?.toDomain()!!,
-        )
-
-        val savedStore = storePersistence.save(updatedStore)
-        return savedStore.toDto()
+        return StoreDto.from(storePersistence.save(existingStore.update(request)))
     }
 
     override fun updateStoreStatus(id: Long, hasStock: Boolean, now: LocalDateTime): StoreDto {
         val existingStore = storePersistence.findById(id) ?: throw StoreException.StoreNotFound(id)
         existingStore.updateStoreStatus(now, hasStock)
-        return storePersistence.save(existingStore).toDto()
+        return StoreDto.from(storePersistence.save(existingStore))
     }
 
     override fun updateStoreOnlyStatus(id: Long, newStatus: String): StoreDto {
@@ -64,26 +46,26 @@ class StoreServiceImpl(
             throw StoreException.StoreStatusInvalid(newStatus).initCause(e)
         }
         existingStore.updateOnlyStoreStatus(enumStatus)
-        val savedStore = storePersistence.save(existingStore)
-        return savedStore.toDto()
+        return StoreDto.from(storePersistence.save(existingStore))
     }
 
     override fun updateStorePickupInfo(id: Long, request: PickUpInfoDto): StoreDto {
         val existingStore = storePersistence.findById(id) ?: throw StoreException.StoreNotFound(id)
-
-        existingStore.updatePickupInfo(request.toDomain())
-
-        return storePersistence.save(existingStore).toDto()
+        existingStore.updatePickupInfo(
+            request.pickupDay,
+            request.pickupStartTime,
+            request.pickupEndTime
+        )
+        return StoreDto.from(storePersistence.save(existingStore))
     }
 
     override fun getStoreDetail(id: Long): StoreDto {
         val store = storePersistence.findById(id) ?: throw StoreException.StoreNotFound(id)
-        return store.toDto()
+        return StoreDto.from(store)
     }
 
     override fun getStoreByOwnerId(storeOwnerId: Long): List<StoreDto> {
-        val store = storePersistence.findByOwnerId(storeOwnerId)
-        return store.map { it.toDto() }
+        return storePersistence.findByOwnerId(storeOwnerId).map { StoreDto.from(it) }
     }
 
     override fun deleteStore(id: Long): Boolean {

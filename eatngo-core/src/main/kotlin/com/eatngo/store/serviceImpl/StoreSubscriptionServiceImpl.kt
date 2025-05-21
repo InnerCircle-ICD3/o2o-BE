@@ -3,7 +3,6 @@ package com.eatngo.store.serviceImpl
 import com.eatngo.common.exception.StoreException
 import com.eatngo.store.domain.StoreSubscription
 import com.eatngo.store.dto.StoreSubscriptionDto
-import com.eatngo.store.dto.extension.toDto
 import com.eatngo.store.infra.StorePersistence
 import com.eatngo.store.infra.StoreSubscriptionPersistence
 import com.eatngo.store.service.StoreSubscriptionService
@@ -33,22 +32,20 @@ class StoreSubscriptionServiceImpl(
 
         val subscription = storeSubscriptionPersistence.findByUserIdAndStoreId(userId, storeId)?.let { existingSubscription ->
             if (existingSubscription.deletedAt != null) {
-                // 재구독
                 existingSubscription.restore()
                 storeSubscriptionPersistence.save(existingSubscription)
             } else {
-                // 구독 해제
                 existingSubscription.softDelete()
                 storeSubscriptionPersistence.save(existingSubscription)
             }
             existingSubscription
         } ?: run {
-            // 신규 구독
-            val newSubscription = StoreSubscription(userId = userId, storeId = storeId)
+            val newSubscription = StoreSubscription.create(userId, storeId)
             storeSubscriptionPersistence.save(newSubscription)
         }
 
-        return subscription.toDto(
+        return StoreSubscriptionDto.from(
+            subscription = subscription,
             userName = userName,
             storeName = store.name.value,
             mainImageUrl = store.imageUrl?.value,
@@ -66,8 +63,8 @@ class StoreSubscriptionServiceImpl(
         val store = storePersistence.findById(subscription.storeId)
             ?: throw StoreException.StoreNotFound(subscription.storeId)
 
-        // 하드코딩된 상품 정보 사용
-        return subscription.toDto(
+        return StoreSubscriptionDto.from(
+            subscription = subscription,
             userName = userName,
             storeName = store.name.value,
             mainImageUrl = store.imageUrl?.value,
@@ -87,7 +84,8 @@ class StoreSubscriptionServiceImpl(
 
         return subscriptions.map { subscription ->
             val store = stores[subscription.storeId] ?: throw StoreException.StoreNotFound(subscription.storeId)
-            subscription.toDto(
+            StoreSubscriptionDto.from(
+                subscription = subscription,
                 userName = userName,
                 storeName = store.name.value,
                 mainImageUrl = store.imageUrl?.value,
@@ -106,7 +104,8 @@ class StoreSubscriptionServiceImpl(
 
         return storeSubscriptionPersistence.findByStoreId(storeId)
             .map { subscription ->
-                subscription.toDto(
+                StoreSubscriptionDto.from(
+                    subscription = subscription,
                     userName = userName,
                     storeName = store.name.value,
                     mainImageUrl = store.imageUrl?.value,
