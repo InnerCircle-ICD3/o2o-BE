@@ -24,7 +24,7 @@ class StoreSubscriptionServiceImpl(
         val discountedPrice = 9000
     }
 
-    override suspend fun toggleSubscription(storeId: Long): StoreSubscriptionDto {
+    override fun toggleSubscription(storeId: Long): StoreSubscriptionDto {
         val userId = 1L // TODO: Security Context에서 가져오기
         val userName = "임시사용자" // TODO: Security Context에서 가져오기
 
@@ -59,7 +59,7 @@ class StoreSubscriptionServiceImpl(
         )
     }
 
-    override suspend fun getSubscriptionById(id: Long): StoreSubscriptionDto {
+    override fun getSubscriptionById(id: Long): StoreSubscriptionDto {
         val userName = "임시사용자" // TODO: Security Context에서 가져오기
         val subscription = storeSubscriptionPersistence.findById(id)
             ?: throw StoreException.SubscriptionNotFound(id)
@@ -78,7 +78,7 @@ class StoreSubscriptionServiceImpl(
         )
     }
 
-    override suspend fun getMySubscriptions(): List<StoreSubscriptionDto> {
+    override fun getMySubscriptions(): List<StoreSubscriptionDto> {
         val userId = 1L
         val userName = "임시사용자" // TODO: Security Context에서 가져오기
         val subscriptions = storeSubscriptionPersistence.findByUserId(userId)
@@ -99,7 +99,7 @@ class StoreSubscriptionServiceImpl(
         }
     }
 
-    override suspend fun getSubscriptionsByStoreId(storeId: Long): List<StoreSubscriptionDto> {
+    override fun getSubscriptionsByStoreId(storeId: Long): List<StoreSubscriptionDto> {
         val userName = "임시사용자" // TODO: Security Context에서 가져오기
         val store = storePersistence.findById(storeId)
             ?: throw StoreException.StoreNotFound(storeId)
@@ -117,7 +117,7 @@ class StoreSubscriptionServiceImpl(
                 )
             }
     }
-//    override suspend fun toggleSubscription(storeId: Long): StoreSubscriptionDto {
+//    override fun toggleSubscription(storeId: Long): StoreSubscriptionDto {
 //        val userId = "임시사용자" // TODO: Security Context에서 가져오기
 //
 //        // 매장 정보 조회
@@ -145,7 +145,7 @@ class StoreSubscriptionServiceImpl(
 //        )
 //    }
 //
-//    override suspend fun getSubscriptionById(id: String): StoreSubscriptionDto {
+//    override fun getSubscriptionById(id: String): StoreSubscriptionDto {
 //        val subscription = storeSubscriptionPersistence.findById(id)
 //            ?: throw StoreException.SubscriptionNotFound(id)
 //        val store = storePersistence.findById(subscription.storeId)
@@ -163,7 +163,7 @@ class StoreSubscriptionServiceImpl(
 //        )
 //    }
 //
-//    override suspend fun getMySubscriptions(): List<StoreSubscriptionDto> {
+//    override fun getMySubscriptions(): List<StoreSubscriptionDto> {
 //        val userId = "임시사용자"
 //        val subscriptions = storeSubscriptionPersistence.findByUserId(userId)
 //        return subscriptions.mapNotNull { subscription ->
@@ -181,7 +181,7 @@ class StoreSubscriptionServiceImpl(
 //        }
 //    }
 //
-//    override suspend fun getSubscriptionsByStoreId(storeId: Long): List<StoreSubscriptionDto> {
+//    override fun getSubscriptionsByStoreId(storeId: Long): List<StoreSubscriptionDto> {
 //        val subscriptions = storeSubscriptionPersistence.findByStoreId(storeId)
 //        val store = storePersistence.findById(storeId) ?: throw StoreException.StoreNotFound(storeId)
 //        val productInfo = productPersistence.findByStoreId(store.id)

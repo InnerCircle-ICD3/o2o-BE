@@ -10,20 +10,20 @@ interface StoreSubscriptionService {
     /**
      * 상점 구독 생성/취소
      */
-    suspend fun toggleSubscription(storeId: Long): StoreSubscriptionDto
+    fun toggleSubscription(storeId: Long): StoreSubscriptionDto
 
     /**
      * ID로 상점 구독 조회
      */
-    suspend fun getSubscriptionById(id: Long): StoreSubscriptionDto
+    fun getSubscriptionById(id: Long): StoreSubscriptionDto
     
     /**
      * 사용자 ID로 상점 구독 목록 조회
      */
-    suspend fun getMySubscriptions(): List<StoreSubscriptionDto>
+    fun getMySubscriptions(): List<StoreSubscriptionDto>
     
     /**
      * 매장 ID로 상점 구독 목록 조회
      */
-    suspend fun getSubscriptionsByStoreId(storeId: Long): List<StoreSubscriptionDto>
+    fun getSubscriptionsByStoreId(storeId: Long): List<StoreSubscriptionDto>
 } 

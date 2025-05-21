@@ -9,35 +9,35 @@ interface StoreSubscriptionPersistence {
     /**
      * 구독 ID로 상점 구독 조회
      */
-    suspend fun findById(id: Long): StoreSubscription?
+    fun findById(id: Long): StoreSubscription?
 
     /**
      * 사용자 ID로 상점 구독 목록 조회
      */
-    suspend fun findByUserId(userId: Long): List<StoreSubscription>
+    fun findByUserId(userId: Long): List<StoreSubscription>
 
     /**
      * 상점 ID로 상점 구독 목록 조회
      */
-    suspend fun findByStoreId(storeId: Long): List<StoreSubscription>
+    fun findByStoreId(storeId: Long): List<StoreSubscription>
 
     /**
      * 사용자 ID와 상점 ID로 상점 구독 조회
      */
-    suspend fun findByUserIdAndStoreId(userId: Long, storeId: Long): StoreSubscription?
+    fun findByUserIdAndStoreId(userId: Long, storeId: Long): StoreSubscription?
 
     /**
      * 상점 구독 저장
      */
-    suspend fun save(subscription: StoreSubscription): StoreSubscription
+    fun save(subscription: StoreSubscription): StoreSubscription
 
     /**
      * 상점 구독 삭제
      */
-    suspend fun softDelete(id: Long): Boolean
+    fun softDelete(id: Long): Boolean
 
     /**
      * 사용자 ID로 상점 구독 여부 조회
      */
-    suspend fun existsByUserIdAndStoreId(userId: Long, storeId: Long): Boolean
+    fun existsByUserIdAndStoreId(userId: Long, storeId: Long): Boolean
 } 
