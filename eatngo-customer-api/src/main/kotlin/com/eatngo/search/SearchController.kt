@@ -44,7 +44,7 @@ class SearchController(
                             category = StoreEnum.StoreCategory.fromString(category),
                             time = time,
                             searchText = searchText,
-                            status = status,
+                            status = status.statusCode,
                         ),
                 ),
                 page = page,
