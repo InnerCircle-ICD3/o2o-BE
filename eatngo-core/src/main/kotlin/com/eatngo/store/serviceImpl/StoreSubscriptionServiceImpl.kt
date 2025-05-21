@@ -31,15 +31,23 @@ class StoreSubscriptionServiceImpl(
         val store = storePersistence.findById(storeId)
             ?: throw StoreException.StoreNotFound(storeId)
 
-        val subscription = storeSubscriptionPersistence.findByUserIdAndStoreId(userId, storeId)?.let {
-            it.softDelete()
-            storeSubscriptionPersistence.save(it)
+        val subscription = storeSubscriptionPersistence.findByUserIdAndStoreId(userId, storeId)?.let { existingSubscription ->
+            if (existingSubscription.deletedAt != null) {
+                // 재구독
+                existingSubscription.restore()
+                storeSubscriptionPersistence.save(existingSubscription)
+            } else {
+                // 구독 해제
+                existingSubscription.softDelete()
+                storeSubscriptionPersistence.save(existingSubscription)
+            }
+            existingSubscription
         } ?: run {
+            // 신규 구독
             val newSubscription = StoreSubscription(userId = userId, storeId = storeId)
             storeSubscriptionPersistence.save(newSubscription)
         }
 
-        // 3. 하드코딩된 상품 정보 사용
         return subscription.toDto(
             userName = userName,
             storeName = store.name.value,

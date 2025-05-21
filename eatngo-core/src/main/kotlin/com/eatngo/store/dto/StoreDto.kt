@@ -1,7 +1,6 @@
 package com.eatngo.store.dto
 
 import com.eatngo.common.constant.StoreEnum
-import com.eatngo.store.vo.*
 import java.time.DayOfWeek
 import java.time.LocalTime
 import java.time.LocalDateTime

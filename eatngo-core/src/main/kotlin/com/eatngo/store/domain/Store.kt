@@ -9,7 +9,7 @@ import java.time.LocalDateTime
 /**
  * 매장(가게) 도메인 모델
  */
-data class Store(
+class Store(
     val id: Long,                       // 매장의 고유 id
     val storeOwnerId: Long,             // 해당 매장을 소유한 점주계정 id(매장:계정 1:1)
     val name: StoreName,                // 매장명
@@ -20,11 +20,11 @@ data class Store(
     val imageUrl: ImageUrl?,            // 대표 이미지 url(카드뷰에 보이는 이미지)
     val businessHours: List<BusinessHour>?, // 영업시간(픽업시간과는 다름, 단순 정보제공용 및 확장성 고려해 추가)
     val storeCategoryInfo: StoreCategoryInfo, // 매장의 카테고리 정보들
-    val status: StoreEnum.StoreStatus = StoreEnum.StoreStatus.PENDING, // 매장 상태(기본: 승인대기중)
-    val pickUpInfo: PickUpInfo,         // 픽업과 관련된 정보(픽업시간 from to, 내일 픽업 가능 여부)
+    var status: StoreEnum.StoreStatus = StoreEnum.StoreStatus.PENDING, // 매장 상태(기본: 승인대기중)
+    var pickUpInfo: PickUpInfo,         // 픽업과 관련된 정보(픽업시간 from to, 내일 픽업 가능 여부)
     val reviewInfo: ReviewInfo,         // 리뷰와 관련된 정보(평균 별점, 리뷰 개수)
     val createdAt: LocalDateTime,       // 생성일
-    val updatedAt: LocalDateTime,       // 수정일
+    var updatedAt: LocalDateTime,       // 수정일
     var deletedAt: LocalDateTime? = null, // 삭제일(softDel용, 삭제 시간이 존재하면 softDel)
 ) {
     companion object {
@@ -120,11 +120,9 @@ data class Store(
     /**
      * 매장 상태만 업데이트
      */
-    fun updateStatus(newStatus: StoreEnum.StoreStatus): Store {
-        return this.copy(
-            status = newStatus,
-            updatedAt = LocalDateTime.now()
-        )
+    fun updateStatus(newStatus: StoreEnum.StoreStatus) {
+        status = newStatus
+        updatedAt = LocalDateTime.now()
     }
 
     /**
@@ -134,14 +132,22 @@ data class Store(
         startTime: LocalTime,
         endTime: LocalTime,
         availableForTomorrow: Boolean
-    ): Store {
-        return this.copy(
-            pickUpInfo = this.pickUpInfo.copy(
-                pickupStartTime = startTime,
-                pickupEndTime = endTime,
-                pickupAvailableForTomorrow = availableForTomorrow
-            )
+    ) {
+        pickUpInfo = PickUpInfo(
+            pickupStartTime = startTime,
+            pickupEndTime = endTime,
+            pickupAvailableForTomorrow = availableForTomorrow
         )
+        updatedAt = LocalDateTime.now()
+    }
+
+
+    /**
+     * Soft Delete를 위한 메서드
+     */
+    fun softDelete() {
+        updatedAt = LocalDateTime.now()
+        deletedAt = LocalDateTime.now()
     }
 }
 

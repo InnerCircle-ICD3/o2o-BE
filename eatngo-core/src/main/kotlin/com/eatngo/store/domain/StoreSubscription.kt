@@ -11,7 +11,7 @@ class StoreSubscription(
     val userId: Long,               // 구독한 사용자의 계정 id
     val storeId: Long,              // 구독된 매장의 매장 id
     val createdAt: LocalDateTime = LocalDateTime.now(), // 생성일
-    val updatedAt: LocalDateTime = createdAt,           // 수정일
+    var updatedAt: LocalDateTime = createdAt,           // 수정일
     var deletedAt: LocalDateTime? = null,               // 삭제일(softDel용, 삭제 시간이 존재하면 softDel)
 ) {
     companion object {
@@ -32,9 +32,17 @@ class StoreSubscription(
     /**
      * Soft Delete를 위한 메서드
      */
-    fun softDelete(): StoreSubscription {
-        val now = LocalDateTime.now()
-        this.deletedAt = now
-        return this
+    fun softDelete() {
+        updatedAt = LocalDateTime.now()
+        deletedAt = LocalDateTime.now()
+    }
+
+
+    /**
+     * 재구독
+     */
+    fun restore() {
+        deletedAt = null
+        updatedAt = LocalDateTime.now()
     }
 }
