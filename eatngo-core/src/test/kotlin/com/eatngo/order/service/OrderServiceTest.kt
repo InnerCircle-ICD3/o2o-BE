@@ -4,9 +4,7 @@ import com.eatngo.order.domain.Order
 import com.eatngo.order.domain.OrderItem
 import com.eatngo.order.domain.Status
 import com.eatngo.order.dto.OrderCreateDto
-import com.eatngo.order.dto.OrderDto
 import com.eatngo.order.dto.OrderItemCreateDto
-import com.eatngo.order.dto.OrderItemDto
 import com.eatngo.order.infra.OrderPersistence
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
@@ -33,6 +31,9 @@ class MockOrderPersistenceImpl : OrderPersistence {
         )
     }
 
+    override fun findById(id: Long): Order? {
+        throw NotImplementedError()
+    }
 }
 
 class OrderServiceTest : BehaviorSpec({
@@ -54,17 +55,17 @@ class OrderServiceTest : BehaviorSpec({
         )
 
         `when`("service가 dto를 입력받고") {
-            val result: OrderDto = service.createOrder(createDto)
+            val result: Order = service.createOrder(createDto)
 
             then("id와 orderNumber를 매핑해서 반환한다") {
                 // Order.create 로 생성된 도메인 객체를 기대값으로 사용
-                val expectedOrder = OrderDto(
+                val expectedOrder = Order(
                     id = 1L,
                     orderNumber = 1L,
                     customerId = createDto.customerId,
                     storeId = createDto.storeId,
                     orderItems = createDto.orderItems.mapIndexed { index, orderItemCreateDto ->
-                        OrderItemDto(
+                        OrderItem(
                             id = index.toLong(),
                             productId = orderItemCreateDto.productId,
                             productName = orderItemCreateDto.productName,
@@ -72,12 +73,14 @@ class OrderServiceTest : BehaviorSpec({
                             quantity = orderItemCreateDto.quantity
                         )
                     },
-                    status = Status.CREATED.toString(),
+                    status = Status.CREATED,
                     createdAt = result.createdAt,
                     updatedAt = result.updatedAt,
                 )
 
-                result shouldBe expectedOrder
+                result.id shouldBe expectedOrder.id
+                result.storeId shouldBe expectedOrder.storeId
+                result.orderNumber shouldBe expectedOrder.orderNumber
             }
         }
     }

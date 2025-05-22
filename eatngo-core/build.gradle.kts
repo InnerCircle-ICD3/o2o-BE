@@ -8,6 +8,9 @@ dependencies {
     implementation("org.springframework:spring-context")  // REST API 지원
     implementation("org.jetbrains.kotlin:kotlin-reflect")              // Kotlin 리플렉션 지원
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin") // Kotlin JSON 직렬화/역직렬화
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa") // Transactional 사용
+    // tsid 생성기
+    implementation("com.github.f4b6a3:tsid-creator:5.2.6")
 
     // jpa
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")

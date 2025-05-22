@@ -9,13 +9,13 @@ open class OrderException(
 ) : RuntimeException(message) {
 
     // 예외 생성
-    class OrderNotFound(orderId: String) : OrderException(
+    class OrderNotFound(orderId: Long) : OrderException(
         BusinessErrorCode.ORDER_NOT_FOUND,
         "${BusinessErrorCode.ORDER_NOT_FOUND.message} (ID: $orderId)",
         mapOf("orderId" to orderId)
     )
 
-    class OrderAlreadyCompleted(orderId: String) : OrderException(
+    class OrderAlreadyCompleted(orderId: Long) : OrderException(
         BusinessErrorCode.ORDER_ALREADY_COMPLETED,
         "${BusinessErrorCode.ORDER_ALREADY_COMPLETED.message} (ID: $orderId)",
         mapOf("orderId" to orderId)

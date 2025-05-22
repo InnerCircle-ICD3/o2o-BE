@@ -1,68 +1,80 @@
 package com.eatngo.mongo.entity.search
 
 import com.eatngo.common.type.Point
+import com.eatngo.search.constant.StoreEnum
 import com.eatngo.search.domain.SearchStore
+import com.eatngo.search.dto.BusinessHoursDto
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.geo.GeoJsonPoint
 import org.springframework.data.mongodb.core.index.GeoSpatialIndexed
 import org.springframework.data.mongodb.core.mapping.Document
+import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.LocalTime
 
 @Document(collection = "SearchStore")
-class SearchStoreEntity (
+class SearchStoreEntity(
     @Id
     var storeId: Long = 0L,
     var storeName: String = "",
     var storeImage: String = "", // 매장 이미지 S3 URL
-    var storeCategory: List<String> = emptyList(),
-    var foodCategory: List<String> = emptyList(),
+    var category: List<StoreEnum.StoreCategory> = emptyList(),
+    var open: Boolean = true, // 매장 오픈 여부
+    var openTime: LocalDateTime = LocalDateTime.of(LocalDate.now(), LocalTime.of(9, 0)), // 매장 오픈 시간
+    var closeTime: LocalDateTime = LocalDateTime.of(LocalDate.now(), LocalTime.of(22, 0)), // 매장 마감 시간
     var roadAddress: String = "",
     @GeoSpatialIndexed
     var location: GeoJsonPoint = GeoJsonPoint(0.0, 0.0),
     var updatedAt: LocalDateTime = LocalDateTime.now(), // 마지막 업데이트 시간
-    var createdAt: LocalDateTime = LocalDateTime.now() // 생성 시간
+    var createdAt: LocalDateTime = LocalDateTime.now(), // 생성 시간
 ) {
-    fun to(): SearchStore {
-        return SearchStore(
+    fun to(): SearchStore =
+        SearchStore(
             storeId = storeId,
             storeName = storeName,
             storeImage = storeImage,
-            storeCategory = storeCategory,
-            foodCategory = foodCategory,
+            category = category,
+            open = open,
+            businessHours =
+                BusinessHoursDto(
+                    openTime = openTime,
+                    closeTime = closeTime,
+                ),
             roadAddress = roadAddress,
             location = toPoint(location),
             updatedAt = updatedAt,
-            createdAt = createdAt
+            createdAt = createdAt,
         )
-    }
 
     companion object {
-        fun from(searchStore: SearchStore): SearchStoreEntity {
-            return SearchStoreEntity(
+        fun from(searchStore: SearchStore): SearchStoreEntity =
+            SearchStoreEntity(
                 storeId = searchStore.storeId,
                 storeName = searchStore.storeName,
                 storeImage = searchStore.storeImage,
-                storeCategory = searchStore.storeCategory,
-                foodCategory = searchStore.foodCategory,
+                category = searchStore.category,
                 roadAddress = searchStore.roadAddress,
-                location = toGeoJsonPoint(
-                    searchStore.location.lat,
-                    searchStore.location.lng
-                ),
+                open = searchStore.open,
+                openTime = searchStore.businessHours.openTime,
+                closeTime = searchStore.businessHours.closeTime,
+                location =
+                    toGeoJsonPoint(
+                        searchStore.location.lat,
+                        searchStore.location.lng,
+                    ),
                 updatedAt = searchStore.updatedAt,
-                createdAt = searchStore.createdAt
+                createdAt = searchStore.createdAt,
             )
-        }
 
-        fun toGeoJsonPoint(lat: Double, lng: Double): GeoJsonPoint {
-            return GeoJsonPoint(lng, lat)
-        }
+        fun toGeoJsonPoint(
+            lat: Double,
+            lng: Double,
+        ): GeoJsonPoint = GeoJsonPoint(lng, lat)
 
-        fun toPoint(geoJsonPoint: GeoJsonPoint): Point {
-            return Point(
+        fun toPoint(geoJsonPoint: GeoJsonPoint): Point =
+            Point(
                 lat = geoJsonPoint.coordinates[1],
-                lng = geoJsonPoint.coordinates[0]
+                lng = geoJsonPoint.coordinates[0],
             )
-        }
     }
 }
