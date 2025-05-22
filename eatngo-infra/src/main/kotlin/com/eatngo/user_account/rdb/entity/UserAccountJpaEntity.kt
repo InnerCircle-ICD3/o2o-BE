@@ -32,10 +32,12 @@ class UserAccountJpaEntity(
             email = account.email?.value,
         ).also {
             account.oauth2.forEach { oauth2 ->
-                it.oauth2.addLast(UserAccountOAuth2JpaEntity.of(oauth2, it))
+                // addLast
+                it.oauth2.add(UserAccountOAuth2JpaEntity.of(oauth2, it))
             }
             account.roles.forEach { role ->
-                it.roles.addLast(UserAccountRoleJpaEntity.of(role, it))
+                // addLast
+                it.roles.add(UserAccountRoleJpaEntity.of(role, it))
             }
         }
 

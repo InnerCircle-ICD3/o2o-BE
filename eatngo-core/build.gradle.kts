@@ -12,6 +12,9 @@ dependencies {
     // tsid 생성기
     implementation("com.github.f4b6a3:tsid-creator:5.2.6")
 
+    // jpa
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+
     // 테스트 의존성
     testImplementation("io.kotest:kotest-runner-junit5:5.8.1")
     testImplementation("io.kotest:kotest-assertions-core:5.8.1")

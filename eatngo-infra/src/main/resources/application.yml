@@ -1,0 +1,6 @@
+cloud:
+  aws:
+    region:
+      static: us-east-1
+    s3:
+      bucket: eatgoeatgo
