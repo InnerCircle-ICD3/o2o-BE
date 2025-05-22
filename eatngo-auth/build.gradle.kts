@@ -11,6 +11,9 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
 
+    implementation(project(":eatngo-infra"))
+    implementation(project(":eatngo-core"))
+
     implementation("io.jsonwebtoken:jjwt-api:0.12.6")         // API
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.6")           // 내부 구현체
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.12.6")

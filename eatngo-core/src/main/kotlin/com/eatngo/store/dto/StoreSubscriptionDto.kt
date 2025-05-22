@@ -1,6 +1,7 @@
 package com.eatngo.store.dto
 
 import com.eatngo.common.constant.StoreEnum
+import com.eatngo.store.domain.StoreSubscription
 import java.time.LocalDateTime
 
 /**
@@ -20,4 +21,33 @@ data class StoreSubscriptionDto(
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime,
     val deletedAt: LocalDateTime? = null,
-)
+){
+    companion object {
+        fun from(
+            subscription: StoreSubscription,
+            userName: String,
+            storeName: String,
+            mainImageUrl: String?,
+            status: StoreEnum.StoreStatus,
+            discountRate: Double,
+            originalPrice: Int,
+            discountedPrice: Int
+        ): StoreSubscriptionDto {
+            return StoreSubscriptionDto(
+                id = subscription.id,
+                userId = subscription.userId,
+                userName = userName,
+                storeId = subscription.storeId,
+                storeName = storeName,
+                mainImageUrl = mainImageUrl,
+                status = status,
+                discountRate = discountRate,
+                originalPrice = originalPrice,
+                discountedPrice = discountedPrice,
+                createdAt = subscription.createdAt,
+                updatedAt = subscription.updatedAt,
+                deletedAt = subscription.deletedAt
+            )
+        }
+    }
+}

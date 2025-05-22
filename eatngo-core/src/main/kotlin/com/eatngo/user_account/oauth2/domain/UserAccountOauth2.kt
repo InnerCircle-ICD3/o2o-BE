@@ -9,14 +9,16 @@ import java.time.LocalDateTime
 class UserAccountOauth2(
     val id: Long = 0,
     val userAccount: UserAccount,
-    val email: EmailAddress,
-    val nickname: String?,
+    val email: EmailAddress?,
+    val nickname: String? = null,
     val provider: Oauth2Provider,
-    val principal: String,
-    val createdAt: LocalDateTime,
-    val updatedAt: LocalDateTime,
-    val isDeleted: Boolean = false,
-    val deletedAt: LocalDateTime? = null,
+    val userKey: String,
+    val accessToken: String? = null,
+    val expireAt: LocalDateTime? = null,
+    val scopes: String? = null,
+    val createdAt: LocalDateTime? = null,
+    var updatedAt: LocalDateTime? = null,
+    val deletedAt: LocalDateTime? = null
 ) {
 
     private val _terms = mutableListOf<UserAccountOauth2Term>()
@@ -32,12 +34,10 @@ class UserAccountOauth2(
         ): UserAccountOauth2 {
             val userAccountOauth2 = UserAccountOauth2(
                 userAccount = account,
-                email = EmailAddress.from(oauth2.email),
+                email = oauth2.email.let { it?.let { EmailAddress(it) } },
                 nickname = oauth2.nickname,
                 provider = oauth2.provider,
-                principal = oauth2.principal,
-                createdAt = LocalDateTime.now(),
-                updatedAt = LocalDateTime.now()
+                userKey = oauth2.principal,
             )
             val newTerms = oauth2.terms.map {
                 UserAccountOauth2Term.of(

@@ -12,27 +12,27 @@ import org.springframework.stereotype.Component
 @Component
 class StorePersistenceImpl : StorePersistence {
     
-    override suspend fun findById(id: Long): Store? {
+    override fun findById(id: Long): Store? {
         TODO("Not yet implemented")
     }
 
-    override suspend fun findAllByIds(storeIds: List<Long>): List<Store> {
+    override fun findAllByIds(storeIds: List<Long>): List<Store> {
         TODO("Not yet implemented")
     }
     
-    override suspend fun findByOwnerId(storeOwnerId: Long): List<Store> {
+    override fun findByOwnerId(storeOwnerId: Long): List<Store> {
         TODO("Not yet implemented")
     }
 
-    override suspend fun save(store: Store): Store {
+    override fun save(store: Store): Store {
         TODO("Not yet implemented")
     }
 
-    override suspend fun softDelete(id: Long): Boolean {
+    override fun softDelete(id: Long): Boolean {
         TODO("Not yet implemented")
     }
     
-    override suspend fun updateStatus(id: Long, status: StoreEnum.StoreStatus): Boolean {
+    override fun updateStatus(id: Long, status: StoreEnum.StoreStatus): Boolean {
         TODO("Not yet implemented")
     }
 }

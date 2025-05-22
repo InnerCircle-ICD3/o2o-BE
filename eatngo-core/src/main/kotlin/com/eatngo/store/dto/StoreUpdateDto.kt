@@ -1,5 +1,7 @@
 package com.eatngo.store.dto
 
+import com.eatngo.common.constant.StoreEnum
+
 
 /**
  * 상점 수정 요청 DTO

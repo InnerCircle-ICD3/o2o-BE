@@ -1,5 +1,6 @@
 package com.eatngo.store.dto
 
+import com.eatngo.common.constant.StoreEnum
 import java.time.LocalTime
 
 /**
@@ -21,19 +22,54 @@ data class StoreCreateRequest(
     val adminFullAddress: String? = null,
 
     // 위치 정보
-    val latitude: Double,
-    val longitude: Double,
+    val latitude: Double? = null,
+    val longitude: Double? = null,
 
     // 운영 정보
     val pickupStartTime: LocalTime,
     val pickupEndTime: LocalTime,
-    val pickupAvailableForTomorrow: Boolean = false,
+    val pickupDay: String,
 
     // 부가 정보
     val businessHours: List<BusinessHourDto>? = null,
     val contact: String? = null,
     val description: String? = null,
     val mainImageUrl: String? = null,
-    val storeCategory: List<String> = emptyList(),
-    val foodCategory: List<String> = emptyList()
-)
+    val storeCategory: List<String>? = null,
+    val foodCategory: List<String>?  = null,
+) {
+    fun toStoreCreateDto(storeOwnerId: Long): StoreCreateDto {
+        return StoreCreateDto(
+            storeOwnerId = storeOwnerId,
+            name = this.name,
+            address = AddressDto(
+                roadAddress = RoadAddressDto(
+                    fullAddress = this.roadFullAddress,
+                    zoneNo = this.roadZoneNo
+                ),
+                legalAddress = if (this.legalFullAddress != null) {
+                    LegalAddressDto(this.legalFullAddress)
+                } else null,
+                adminAddress = this.adminFullAddress?.let { AdminAddressDto(it) },
+                coordinate = CoordinateDto(
+                    latitude = this.latitude ?: 0.0,
+                    longitude = this.longitude ?: 0.0
+                )
+            ),
+            businessNumber = this.businessNumber,
+            businessHours = this.businessHours,
+            contactNumber = this.contact,
+            description = this.description,
+            imageUrl = this.mainImageUrl,
+            pickUpInfo = PickUpInfoDto(
+                pickupStartTime = this.pickupStartTime,
+                pickupEndTime = this.pickupEndTime,
+                pickupDay = StoreEnum.PickupDay.valueOf(this.pickupDay.uppercase())
+            ),
+            storeCategoryInfo = StoreCategoryInfoDto(
+                storeCategory = this.storeCategory,
+                foodCategory = this.foodCategory
+            )
+        )
+    }
+}
