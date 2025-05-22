@@ -2,10 +2,10 @@ package com.eatngo.store.controller
 
 import com.eatngo.auth.annotaion.StoreOwnerId
 import com.eatngo.common.response.ApiResponse
-import com.eatngo.store.dto.PickUpInfoDto
 import com.eatngo.store.dto.StoreCreateRequest
 import com.eatngo.store.dto.StoreDetailResponse
 import com.eatngo.store.dto.StoreCUDResponse
+import com.eatngo.store.dto.StorePickUpInfoRequest
 import com.eatngo.store.dto.StoreUpdateRequest
 import com.eatngo.store.mock.StoreMockData
 import com.eatngo.store.service.StoreService
@@ -52,10 +52,10 @@ class StoreController(
     
     @Operation(summary = "상점 픽업 정보 변경", description = "점주가 상점의 픽업 관련 정보를 변경합니다.")
     @PatchMapping("/{storeId}/pickup-info")
-    fun updateStorePickupInfo(@PathVariable storeId: Long, @RequestBody request: PickUpInfoDto, @StoreOwnerId storeOwnerId: Long): ApiResponse<StoreCUDResponse> {
+    fun updateStorePickupInfo(@PathVariable storeId: Long, @RequestBody request: StorePickUpInfoRequest, @StoreOwnerId storeOwnerId: Long): ApiResponse<StoreCUDResponse> {
         // TODO: 실제 서비스 로직으로 교체 필요
-        // val response = storeService.updateStorePickupInfo(storeId, request)
-        // return ApiResponse.success(StoreCUDResponse(storeId = response.storeId, actionTime = LocalDateTime.now()))
+//         val response = storeService.updateStorePickupInfo(storeId, StorePickUpInfoRequest.from(request))
+//         return ApiResponse.success(StoreCUDResponse(storeId = response.storeId, actionTime = LocalDateTime.now()))
         val response = StoreMockData.createStoreCUDResponse(storeId)
         return ApiResponse.success(response)
     }

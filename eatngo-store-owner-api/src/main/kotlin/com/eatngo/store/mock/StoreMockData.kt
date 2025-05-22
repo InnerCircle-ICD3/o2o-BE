@@ -18,11 +18,11 @@ object StoreMockData {
             description = "맛있는 음식을 제공하는 가게입니다.",
             businessNumber = "${random.nextInt(100, 999)}-${random.nextInt(10, 99)}-${random.nextInt(10000, 99999)}",
             businessHours = listOf(
-                BusinessHourResponse("MONDAY", "09:00", "18:00"),
-                BusinessHourResponse("TUESDAY", "09:00", "18:00"),
-                BusinessHourResponse("WEDNESDAY", "09:00", "18:00"),
-                BusinessHourResponse("THURSDAY", "09:00", "18:00"),
-                BusinessHourResponse("FRIDAY", "09:00", "18:00")
+                mapOf("dayOfWeek" to "MONDAY", "openTime" to "09:00:00", "closeTime" to "18:00:00"),
+                mapOf("dayOfWeek" to "TUESDAY", "openTime" to "09:00:00", "closeTime" to "18:00:00"),
+                mapOf("dayOfWeek" to "WEDNESDAY", "openTime" to "09:00:00", "closeTime" to "18:00:00"),
+                mapOf("dayOfWeek" to "THURSDAY", "openTime" to "09:00:00", "closeTime" to "18:00:00"),
+                mapOf("dayOfWeek" to "FRIDAY", "openTime" to "09:00:00", "closeTime" to "18:00:00")
             ),
             latitude = 37.5665 + random.nextDouble(-0.1, 0.1),
             longitude = 126.9780 + random.nextDouble(-0.1, 0.1),
@@ -68,15 +68,15 @@ object StoreMockData {
             adminFullAddress = "서울시 강남구 역삼동",
             latitude = 37.5665,
             longitude = 126.9780,
-            pickupStartTime = LocalTime.of(12, 0),
-            pickupEndTime = LocalTime.of(13, 0),
+            pickupStartTime = "12:00:00",
+            pickupEndTime = "13:00:00",
             pickupDay = "MONDAY",
             businessHours = listOf(
-                BusinessHourDto(DayOfWeek.MONDAY, LocalTime.of(9, 0), LocalTime.of(18, 0)),
-                BusinessHourDto(DayOfWeek.TUESDAY, LocalTime.of(9, 0), LocalTime.of(18, 0)),
-                BusinessHourDto(DayOfWeek.WEDNESDAY, LocalTime.of(9, 0), LocalTime.of(18, 0)),
-                BusinessHourDto(DayOfWeek.THURSDAY, LocalTime.of(9, 0), LocalTime.of(18, 0)),
-                BusinessHourDto(DayOfWeek.FRIDAY, LocalTime.of(9, 0), LocalTime.of(18, 0))
+                mapOf("dayOfWeek" to "MONDAY", "openTime" to "09:00:00", "closeTime" to "18:00:00"),
+                mapOf("dayOfWeek" to "TUESDAY", "openTime" to "09:00:00", "closeTime" to "18:00:00"),
+                mapOf("dayOfWeek" to "WEDNESDAY", "openTime" to "09:00:00", "closeTime" to "18:00:00"),
+                mapOf("dayOfWeek" to "THURSDAY", "openTime" to "09:00:00", "closeTime" to "18:00:00"),
+                mapOf("dayOfWeek" to "FRIDAY", "openTime" to "09:00:00", "closeTime" to "18:00:00")
             ),
             contact = "02-${random.nextInt(1000, 9999)}-${random.nextInt(1000, 9999)}",
             description = "맛있는 음식을 제공하는 가게입니다.",
@@ -99,15 +99,15 @@ object StoreMockData {
             adminFullAddress = "서울시 서초구 서초동",
             latitude = 37.4837,
             longitude = 127.0324,
-            pickupStartTime = LocalTime.of(13, 0),
-            pickupEndTime = LocalTime.of(14, 0),
+            pickupStartTime = "13:00:00",
+            pickupEndTime = "14:00:00",
             pickupDay = "TUESDAY",
             businessHours = listOf(
-                BusinessHourDto(DayOfWeek.MONDAY, LocalTime.of(10, 0), LocalTime.of(19, 0)),
-                BusinessHourDto(DayOfWeek.TUESDAY, LocalTime.of(10, 0), LocalTime.of(19, 0)),
-                BusinessHourDto(DayOfWeek.WEDNESDAY, LocalTime.of(10, 0), LocalTime.of(19, 0)),
-                BusinessHourDto(DayOfWeek.THURSDAY, LocalTime.of(10, 0), LocalTime.of(19, 0)),
-                BusinessHourDto(DayOfWeek.FRIDAY, LocalTime.of(10, 0), LocalTime.of(19, 0))
+                mapOf("dayOfWeek" to "MONDAY", "openTime" to "10:00:00", "closeTime" to "19:00:00"),
+                mapOf("dayOfWeek" to "TUESDAY", "openTime" to "10:00:00", "closeTime" to "19:00:00"),
+                mapOf("dayOfWeek" to "WEDNESDAY", "openTime" to "10:00:00", "closeTime" to "19:00:00"),
+                mapOf("dayOfWeek" to "THURSDAY", "openTime" to "10:00:00", "closeTime" to "19:00:00"),
+                mapOf("dayOfWeek" to "FRIDAY", "openTime" to "10:00:00", "closeTime" to "19:00:00")
             ),
             contact = "02-${random.nextInt(1000, 9999)}-${random.nextInt(1000, 9999)}",
             description = "수정된 설명입니다.",

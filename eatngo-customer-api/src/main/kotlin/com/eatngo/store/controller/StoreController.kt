@@ -16,7 +16,7 @@ class StoreController(
 ) {
     @Operation(summary = "상점 상세 조회", description = "상점 상세 정보를 조회합니다.")
     @GetMapping("/{storeId}")
-    suspend fun getStoreDetail(
+    fun getStoreDetail(
         @PathVariable storeId: Long
     ): ApiResponse<StoreDetailResponse> {
         // TODO: 실제 서비스 로직으로 교체 필요

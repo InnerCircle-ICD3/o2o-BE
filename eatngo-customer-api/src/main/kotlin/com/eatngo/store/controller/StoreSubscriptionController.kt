@@ -17,7 +17,7 @@ class StoreSubscriptionController(
 ) {
     @Operation(summary = "구독 토글", description = "고객이 매장 구독을 생성/해제합니다.")
     @PostMapping("/{storeId}")
-    suspend fun toggleSubscription(
+    fun toggleSubscription(
         @PathVariable storeId: Long
     ): ApiResponse<SubscriptionToggleResponse> {
         // TODO: 실제 서비스 로직으로 교체 필요
@@ -29,7 +29,7 @@ class StoreSubscriptionController(
 
     @Operation(summary = "내 구독 목록 조회", description = "고객이 구독한 모든 매장 목록을 조회합니다.")
     @GetMapping("/me")
-    suspend fun getMySubscriptions(): ApiResponse<List<StoreSubscriptionResponse>> {
+    fun getMySubscriptions(): ApiResponse<List<StoreSubscriptionResponse>> {
         // TODO: 실제 서비스 로직으로 교체 필요
         // val subscriptions = storeSubscriptionService.getMySubscriptions()
         // return ApiResponse.success(subscriptions.map { StoreSubscriptionResponse.from(it) })
