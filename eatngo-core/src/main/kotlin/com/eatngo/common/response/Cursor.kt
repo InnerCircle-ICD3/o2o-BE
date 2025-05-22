@@ -1,7 +1,5 @@
 package com.eatngo.common.response
 
-import com.eatngo.order.domain.Order
-
 data class Cursor<T>(
     val contents: List<T>,
     val lastId: Long?
