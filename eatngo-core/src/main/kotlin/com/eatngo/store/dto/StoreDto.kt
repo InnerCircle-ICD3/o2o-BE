@@ -25,7 +25,8 @@ data class StoreDto(
     val pickUpInfo: PickUpInfoDto,
     val reviewInfo: ReviewInfoDto,
     val createdAt: LocalDateTime,
-    val updatedAt: LocalDateTime
+    val updatedAt: LocalDateTime,
+    var deletedAt: LocalDateTime?,
 ){
     companion object {
         fun from(store: Store): StoreDto {
@@ -67,7 +68,8 @@ data class StoreDto(
                     ratingCount = store.reviewInfo.ratingCount
                 ),
                 createdAt = store.createdAt,
-                updatedAt = store.updatedAt
+                updatedAt = store.updatedAt,
+                deletedAt = store.deletedAt
             )
         }
     }

@@ -1,6 +1,5 @@
 package com.eatngo.store.service
 
-import com.eatngo.store.dto.StoreDto
 import com.eatngo.store.dto.StoreSubscriptionDto
 
 /**

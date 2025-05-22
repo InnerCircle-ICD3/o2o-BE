@@ -68,10 +68,10 @@ class StoreServiceImpl(
         return storePersistence.findByOwnerId(storeOwnerId).map { StoreDto.from(it) }
     }
 
-    override fun deleteStore(id: Long): Boolean {
+    override fun deleteStore(id: Long): StoreDto {
         val store = storePersistence.findById(id) ?: throw StoreException.StoreNotFound(id)
         store.softDelete()
-        storePersistence.save(store)
-        return true
+        val savedStore = storePersistence.save(store)
+        return StoreDto.from(savedStore)
     }
 }

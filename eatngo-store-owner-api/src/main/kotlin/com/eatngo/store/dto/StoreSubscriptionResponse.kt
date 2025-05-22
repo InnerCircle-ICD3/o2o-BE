@@ -1,4 +1,5 @@
 package com.eatngo.store.dto
+import com.eatngo.store.dto.StoreSubscriptionDto
 import java.time.LocalDateTime
 
 
@@ -12,4 +13,17 @@ data class SubscriptionResponseForStoreOwner(
     val userName: String,            // 구독한 사용자의 이름
     val subscribed: Boolean,         // 구독 여부 (토글 결과)
     val actionTime: LocalDateTime    // 구독/해제 시간
-)
+) {
+    companion object {
+        fun fromStoreSubscriptionDto(dto: StoreSubscriptionDto): SubscriptionResponseForStoreOwner {
+            return SubscriptionResponseForStoreOwner(
+                id = dto.id,
+                storeId = dto.storeId,
+                userId = dto.userId,
+                userName = dto.userName,
+                subscribed = dto.deletedAt == null,      // deletedAt이 null이면 구독중
+                actionTime = dto.updatedAt               // 마지막 변경 시각
+            )
+        }
+    }
+}

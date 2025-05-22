@@ -36,7 +36,7 @@ interface StoreService {
     /**
      * 상점 삭제 (Soft Delete)
      */
-    fun deleteStore(id: Long): Boolean
+    fun deleteStore(id: Long): StoreDto
 
     /**
      * ID로 상점 조회
