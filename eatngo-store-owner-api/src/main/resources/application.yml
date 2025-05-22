@@ -31,6 +31,13 @@ spring:
       port: 6379
       password: eatngolocal
 
+cloud:
+  aws:
+    region:
+      static: us-east-1
+    s3:
+      bucket: eatgoeatgo
+
 datastore:
   mongodb:
     uri: mongodb://localhost:27017/eatngo

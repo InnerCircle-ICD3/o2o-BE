@@ -64,7 +64,8 @@ class UserAccountOAuth2JpaEntity(
             scopes = userAccountOauth2.scopes,
         ).also {
             userAccountOauth2.terms.forEach { term ->
-                it.terms.addLast(UserAccountOauth2TermJpaEntity.of(term, it))
+                // addLast
+                it.terms.add(UserAccountOauth2TermJpaEntity.of(term, it))
             }
         }
 

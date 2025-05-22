@@ -3,6 +3,7 @@ package com.eatngo.aws.s3
 import com.eatngo.file.FileStorageService
 import com.eatngo.product.domain.Image
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import software.amazon.awssdk.services.s3.S3Client
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest
@@ -18,12 +19,11 @@ import java.util.*
 class S3Service(
     private val s3Client: S3Client,
     private val s3PreSigner: S3Presigner,
-//    @Value("\${cloud.aws.s3.bucket}") private val bucket: String
+    @Value("\${cloud.aws.s3.bucket}") private val bucket: String
 ) : FileStorageService {
     companion object {
         private val log = LoggerFactory.getLogger(S3Service::class.java)
         private val PRE_SIGNED_URL_DURATION = Duration.ofMinutes(10)
-        private const val BUCKET_NAME: String = "eatgoeatgo"
     }
 
     override fun generatePreSignedUploadUrl(
@@ -36,7 +36,7 @@ class S3Service(
 
         try {
             val putObjectRequest = PutObjectRequest.builder()
-                .bucket(BUCKET_NAME)
+                .bucket(bucket)
                 .key(s3Key)
                 .contentType(contentType)
                 .build()
@@ -71,7 +71,7 @@ class S3Service(
     override fun deleteFile(key: String) { // ex. images/uuid_filename.jpg"
         try {
             val deleteObjectRequest = DeleteObjectRequest.builder()
-                .bucket(BUCKET_NAME)
+                .bucket(bucket)
                 .key(key)
                 .build()
 
@@ -89,7 +89,7 @@ class S3Service(
 
         try {
             val getUrlRequest = GetUrlRequest.builder()
-                .bucket(BUCKET_NAME)
+                .bucket(bucket)
                 .key(key) // s3 key
                 .build()
 

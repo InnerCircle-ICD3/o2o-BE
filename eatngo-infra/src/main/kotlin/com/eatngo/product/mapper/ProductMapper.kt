@@ -47,7 +47,7 @@ class ProductMapper {
             val updatedAt = entity.updatedAt
 
             val inventory = Inventory(entity.inventory.quantity, entity.inventory.stock)
-            val price = ProductPrice(entity.price.originalPrice, entity.price.discountRate, entity.price.finalPrice)
+            val price = ProductPrice(entity.price.originalPrice, entity.price.discountRate)
             val foodTypes = FoodTypes(entity.foodTypes.map { name -> Food(name) })
 
             return when (entity.productType) {
