@@ -2,7 +2,6 @@ package com.eatngo.store.controller
 
 import com.eatngo.common.response.ApiResponse
 import com.eatngo.store.dto.StoreDetailResponse
-import com.eatngo.store.dto.extension.toDetailResponse
 import com.eatngo.store.service.StoreService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
@@ -20,7 +19,7 @@ class StoreController(
         @PathVariable storeId: Long
     ): ApiResponse<StoreDetailResponse> {
         val storeDto = storeService.getStoreDetail(storeId)
-        val response = storeDto.toDetailResponse()
+        val response = StoreDetailResponse.from(storeDto)
         return ApiResponse.success(response)
     }
 } 

@@ -14,7 +14,23 @@ data class StoreSubscriptionResponse(
     val originalPrice: Int,           // 원가
     val discountedPrice: Int,         // 할인된 가격
     val subscribedAt: LocalDateTime,  // 구독 일시 (정렬, 표시용)
-)
+) {
+    companion object {
+        fun from(dto: StoreSubscriptionDto): StoreSubscriptionResponse {
+            return StoreSubscriptionResponse(
+                id = dto.id,
+                storeId = dto.storeId,
+                storeName = dto.storeName,
+                mainImageUrl = dto.mainImageUrl,
+                status = dto.status.name,
+                discountRate = dto.discountRate,
+                originalPrice = dto.originalPrice,
+                discountedPrice = dto.discountedPrice,
+                subscribedAt = dto.createdAt
+            )
+        }
+    }
+}
 
 /**
  * 매장 구독 토글 시 반환하는 리스폰스(구독 성공용)
@@ -25,4 +41,16 @@ data class SubscriptionToggleResponse(
     val storeId: Long,               // 매장 ID
     val subscribed: Boolean,         // 구독 여부
     val actionTime: LocalDateTime    // 구독/해제 시간
-)
+) {
+    companion object {
+        fun from(dto: StoreSubscriptionDto): SubscriptionToggleResponse {
+            return SubscriptionToggleResponse(
+                id = dto.id,
+                userId = dto.userId,
+                storeId = dto.storeId,
+                subscribed = dto.deletedAt == null,
+                actionTime = dto.updatedAt
+            )
+        }
+    }
+}
