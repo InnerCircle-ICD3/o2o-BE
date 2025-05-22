@@ -31,4 +31,11 @@ object DistanceCalculator {
 
         return (earthRadius * c * 10.0).roundToInt() / 10.0 // 소수점 첫째 자리 반올림
     }
+
+    /**
+     * 특정 반경(km) 내에 위치하는지 확인
+     */
+    fun isWithinRadius(from: Point, to: Point, radiusKm: Double): Boolean {
+        return calculateDistance(from, to) <= radiusKm
+    }
 }

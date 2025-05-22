@@ -12,40 +12,60 @@ open class StoreException(
 ) : RuntimeException(message) {
 
     // 매장 조회 관련 예외
-    class StoreNotFound(storeId: String) : StoreException(
+    class StoreNotFound(storeId: Long) : StoreException(
         BusinessErrorCode.STORE_NOT_FOUND,
         "${BusinessErrorCode.STORE_NOT_FOUND.message} (ID: $storeId)",
         mapOf("storeId" to storeId)
     )
 
-    class StoreClosed(storeId: String) : StoreException(
+    class StoreClosed(storeId: Long) : StoreException(
         BusinessErrorCode.STORE_CLOSED,
         "${BusinessErrorCode.STORE_CLOSED.message} (ID: $storeId)",
         mapOf("storeId" to storeId)
     )
 
-    class StoreNotAvailable(storeId: String) : StoreException(
+    class StoreNotAvailable(storeId: Long) : StoreException(
         BusinessErrorCode.STORE_NOT_AVAILABLE,
         "${BusinessErrorCode.STORE_NOT_AVAILABLE.message} (ID: $storeId)",
         mapOf("storeId" to storeId)
     )
 
-    // 매장 관리 관련 예외
-    class StoreRegistrationFailed(reason: String) : StoreOwnerException(
-        BusinessErrorCode.STORE_REGISTRATION_FAILED,
-        "${BusinessErrorCode.STORE_REGISTRATION_FAILED.message}: $reason",
-        mapOf("reason" to reason)
+    // 매장 생성 검증 관련 예외
+    class StoreValidationErrors(errorMessage: String, errors: Map<String, String>) : StoreException(
+        BusinessErrorCode.STORE_VALIDATION_FAILED,
+        errorMessage,
+        mapOf("validationErrors" to errors)
     )
 
-    class StoreUpdateFailed(storeId: String, reason: String) : StoreOwnerException(
-        BusinessErrorCode.STORE_UPDATE_FAILED,
-        "${BusinessErrorCode.STORE_UPDATE_FAILED.message} (ID: $storeId): $reason",
-        mapOf("storeId" to storeId, "reason" to reason)
+    class StoreNotFoundByStoreOwner(storeOwnerId: Long) : StoreException(
+        BusinessErrorCode.STORE_NOT_FOUND,
+        "${BusinessErrorCode.STORE_NOT_FOUND.message} (StoreOwnerId: $storeOwnerId)",
+        mapOf("storeOwnerId" to storeOwnerId)
     )
 
-    class StoreDeleteFailed(storeId: String, reason: String) : StoreOwnerException(
-        BusinessErrorCode.STORE_DELETE_FAILED,
-        "${BusinessErrorCode.STORE_DELETE_FAILED.message} (ID: $storeId): $reason",
-        mapOf("storeId" to storeId, "reason" to reason)
+    class InvalidAddressException(missingFields: Map<String, String>) : StoreException(
+        BusinessErrorCode.STORE_VALIDATION_FAILED,
+        "주소 정보가 유효하지 않습니다. 필수 필드: ${missingFields.keys.joinToString()}",
+        mapOf("validationErrors" to missingFields)
+    )
+
+    // 매장 상태 관련 예외
+    class StoreStatusInvalid(status: String) : StoreException(
+        BusinessErrorCode.STORE_STATUS_INVALID,
+        "${BusinessErrorCode.STORE_STATUS_INVALID.message}: $status",
+        mapOf("status" to status)
+    )
+
+    // 구독 관련 예외
+    class SubscriptionNotFound(subscriptionId: Long) : StoreException(
+        BusinessErrorCode.SUBSCRIPTION_NOT_FOUND,
+        "${BusinessErrorCode.SUBSCRIPTION_NOT_FOUND.message}: $subscriptionId",
+        mapOf("subscriptionId" to subscriptionId)
+    )
+
+    class SubscriptionUpdateFailed(subscriptionId: Long) : StoreException(
+        BusinessErrorCode.SUBSCRIPTION_UPDATE_FAILED,
+        "${BusinessErrorCode.SUBSCRIPTION_UPDATE_FAILED.message}: $subscriptionId",
+        mapOf("subscriptionId" to subscriptionId)
     )
 }
