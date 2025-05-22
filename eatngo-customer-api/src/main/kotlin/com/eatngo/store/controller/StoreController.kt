@@ -2,6 +2,7 @@ package com.eatngo.store.controller
 
 import com.eatngo.common.response.ApiResponse
 import com.eatngo.store.dto.StoreDetailResponse
+import com.eatngo.store.mock.StoreMockData
 import com.eatngo.store.service.StoreService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
@@ -18,8 +19,10 @@ class StoreController(
     suspend fun getStoreDetail(
         @PathVariable storeId: Long
     ): ApiResponse<StoreDetailResponse> {
-        val storeDto = storeService.getStoreDetail(storeId)
-        val response = StoreDetailResponse.from(storeDto)
+        // TODO: 실제 서비스 로직으로 교체 필요
+        // val storeDto = storeService.getStoreDetail(storeId)
+        // val response = StoreDetailResponse.from(storeDto)
+        val response = StoreMockData.createStoreDetailResponse(storeId)
         return ApiResponse.success(response)
     }
 } 
