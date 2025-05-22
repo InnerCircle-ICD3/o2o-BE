@@ -7,8 +7,7 @@ class UserAccountOauth2Term(
     val userAccountOauth2: UserAccountOauth2,
     val tag: String,
     val agreedAt: LocalDateTime,
-    val createdAt: LocalDateTime,
-    val isDeleted: Boolean = false,
+    val createdAt: LocalDateTime? = null,
     val deletedAt: LocalDateTime? = null,
 ) {
     companion object {
@@ -18,9 +17,7 @@ class UserAccountOauth2Term(
             return UserAccountOauth2Term(
                 userAccountOauth2 = userAccountOauth2,
                 tag = tag,
-                agreedAt = LocalDateTime.now(),
-                createdAt = LocalDateTime.now(
-                )
+                agreedAt = userAccountOauth2.createdAt ?: LocalDateTime.now(),
             )
         }
     }

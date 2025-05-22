@@ -8,7 +8,6 @@ class StoreOwner(
     val account: UserAccount,
     val createdAt: LocalDateTime,
     var updatedAt: LocalDateTime,
-    var isDeleted: Boolean = false,
     var deletedAt: LocalDateTime? = null,
 ) {
     companion object {
@@ -21,11 +20,4 @@ class StoreOwner(
         }
     }
 
-    fun delete() {
-        if (isDeleted) {
-            throw IllegalStateException("Store owner is already deleted")
-        }
-        isDeleted = true
-        deletedAt = LocalDateTime.now()
-    }
 }

@@ -1,5 +1,6 @@
 package com.eatngo.order.persistence
 
+import com.eatngo.extension.mapOrNull
 import com.eatngo.order.domain.Order
 import com.eatngo.order.infra.OrderPersistence
 import com.eatngo.order.rdb.entity.OrderJpaEntity
@@ -17,4 +18,8 @@ class OrderPersistenceImpl(
             )
         )
 
+    override fun findById(id: Long): Order? =
+        orderRdbRepository
+            .findById(id)
+            .mapOrNull(OrderJpaEntity::toOrder)
 }

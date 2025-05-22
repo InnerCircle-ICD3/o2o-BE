@@ -1,4 +1,4 @@
-package com.eatngo.auth.constants
+package com.eatngo.user_account.oauth2.constants
 
 enum class Role(val roleName: String) {
     USER("ROLE_USER"),

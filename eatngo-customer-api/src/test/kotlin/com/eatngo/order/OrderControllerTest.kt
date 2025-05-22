@@ -1,5 +1,6 @@
 package com.eatngo.order
 
+import com.eatngo.configuration.TestConfiguration
 import com.eatngo.order.dto.CreateOrderItemRequestDto
 import com.eatngo.order.dto.CreateOrderRequestDto
 import com.eatngo.order.dto.OrderDto
@@ -13,7 +14,9 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import io.kotest.extensions.spring.SpringExtension
+import org.springframework.context.annotation.Import
 
+@Import(TestConfiguration::class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class OrderControllerTest : StringSpec() {
 
