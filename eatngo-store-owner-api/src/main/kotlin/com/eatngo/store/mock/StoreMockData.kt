@@ -1,162 +1,119 @@
-//package com.eatngo.store.mock
-//
-//import com.eatngo.store.constant.StoreEnum
-//import com.eatngo.store.dto.*
-//import java.time.LocalTime
-//import java.time.ZonedDateTime
-//import java.util.*
-//import kotlin.random.Random
-//
-///**
-// * Mock 데이터 생성 클래스
-// */
-//object StoreMockData {
-//
-//    private val storeNames = listOf(
-//        "맛있는 베이커리", "신선한 마트", "쿠키 프레시", "사랑의 빵집", "우리 동네 베이커리",
-//        "황금 빵집", "천국의 맛", "클래식 베이커리", "프라임 마트", "아침이슬 빵집"
-//    )
-//
-//    private val descriptions = listOf(
-//        "신선한 재료로 만든 빵과 디저트를 판매합니다.",
-//        "매일 아침 구워내는 신선한 빵이 대표 메뉴입니다.",
-//        "전통적인 방식으로 제빵하는 품격있는 빵집입니다.",
-//        "다양한 종류의 빵과 케이크를 만나보세요.",
-//        "지역 주민들이 사랑하는 향수를 불러일으키는 빵집입니다."
-//    )
-//
-//    private val categories = listOf(
-//        "베이커리", "케이크", "디저트", "커피", "샌드위치",
-//        "빵", "마트", "편의점", "카페", "분식"
-//    )
-//
-//    private val addresses = listOf(
-//        "서울시 강남구 역삼동 123-45",
-//        "서울시 서초구 서초동 456-78",
-//        "서울시 종로구 종로1가 89-12",
-//        "서울시 마포구 합정동 345-67",
-//        "서울시 강서구 화곡동 890-12"
-//    )
-//
-//    /**
-//     * 랜덤 Store 응답 객체 생성
-//     */
-//    fun createRandomStore(storeId: Long = Random.nextLong(1, 100)): StoreDto {
-//        val name = storeNames.random()
-//        val description = descriptions.random()
-//        val category = categories.shuffled().take(Random.nextInt(1, 3))
-//
-//        return StoreDto(
-//            storeId = storeId,
-//            name = name,
-//            description = description,
-//            mainImageUrl = "https://example.com/images/store$storeId.jpg",
-//            businessNumber = "123-45-${Random.nextInt(10000, 99999)}",
-//            contact = "02-${Random.nextInt(1000, 9999)}-${Random.nextInt(1000, 9999)}",
-//            roadAddress = RoadAddressDto(
-//                fullAddress = "도로명 " + addresses.random(),
-//                zoneNo = "${Random.nextInt(10000, 99999)}",
-//                buildingName = "건물명 ${Random.nextInt(1, 100)}"
-//            ),
-//            legalAddress = LegalAddressDto(
-//                fullAddress = addresses.random(),
-//                mainAddressNo = "${Random.nextInt(1, 100)}",
-//                subAddressNo = "${Random.nextInt(1, 100)}"
-//            ),
-//            adminAddress = AdminAddressDto(
-//                fullAddress = "행정동 테스트"
-//            ),
-//            location = LocationDto(
-//                lat = 37.4 + Random.nextDouble(0.0, 0.3),
-//                lng = 127.0 + Random.nextDouble(0.0, 0.3)
-//            ),
-//            status = StoreEnum.StoreStatus.values().random(),
-//            categories = category,
-//            businessHours = listOf(
-//                BusinessHourDto(
-//                    dayOfWeek = "MONDAY",
-//                    openTime = "09:00",
-//                    closeTime = "18:00"
-//                ),
-//                BusinessHourDto(
-//                    dayOfWeek = "TUESDAY",
-//                    openTime = "09:00",
-//                    closeTime = "18:00"
-//                )
-//            ),
-//            pickupStartTime = LocalTime.of(9, 0).toString(),
-//            pickupEndTime = LocalTime.of(18, 0).toString(),
-//            pickupAvailableForTomorrow = Random.nextBoolean(),
-//            isAvailableForPickup = Random.nextBoolean()
-//        )
-//    }
-//
-//    /**
-//     * 랜덤 Store 목록 생성
-//     */
-//    fun createRandomStores(count: Int = 10): List<StoreResponse> {
-//        return (1..count).map {
-//            val store = createRandomStore(it.toLong())
-//            StoreResponse(
-//                storeId = store.storeId,
-//                name = store.name,
-//                mainImageUrl = store.mainImageUrl,
-//                status = store.status,
-//                isAvailableForPickup = store.isAvailableForPickup,
-//                pickupAvailableForTomorrow = store.pickupAvailableForTomorrow,
-//                distance = Random.nextDouble(0.1, 5.0)
-//            )
-//        }
-//    }
-//
-//    /**
-//     * 랜덤 구독 정보 생성
-//     */
-//    fun createRandomSubscription(id: String = UUID.randomUUID().toString(), storeId: Long = Random.nextLong(1, 100)): StoreSubscriptionDto {
-//        val storeSummary = createRandomStores(5).random()
-//
-//        return StoreSubscriptionDto(
-//            id = id,
-//            userId = UUID.randomUUID().toString(),
-//            storeId = storeId,
-//            createdAt = ZonedDateTime.now().minusDays(Random.nextLong(1, 30)),
-//            updatedAt = ZonedDateTime.now(),
-//            deletedAt = null,
-//            subscribed = true,
-//            store = storeSummary
-//        )
-//    }
-//
-//    /**
-//     * 랜덤 구독 목록 생성
-//     */
-//    fun createRandomSubscriptions(count: Int = 5): List<StoreSubscriptionSummary> {
-//        return (1..count).map {
-//            val storeId = Random.nextLong(1, 100)
-//            val store = createRandomStore(storeId)
-//
-//            StoreSubscriptionSummary(
-//                id = UUID.randomUUID().toString(),
-//                storeId = storeId,
-//                userId = UUID.randomUUID().toString(),
-//                createdAt = ZonedDateTime.now().minusDays(Random.nextLong(1, 30)),
-//                store = StoreResponse(
-//                    storeId = store.storeId,
-//                    name = store.name,
-//                    mainImageUrl = store.mainImageUrl,
-//                    status = store.status,
-//                    isAvailableForPickup = store.isAvailableForPickup,
-//                    pickupAvailableForTomorrow = store.pickupAvailableForTomorrow,
-//                    distance = Random.nextDouble(0.1, 5.0)
-//                )
-//            )
-//        }
-//    }
-//
-//    /**
-//     * 구독한 매장 목록 생성
-//     */
-//    fun createSubscribedStores(userId: Long = Random.nextLong(1, 100)): List<StoreResponse> {
-//        return createRandomStores(Random.nextInt(3, 8))
-//    }
-//}
+package com.eatngo.store.mock
+
+import com.eatngo.store.dto.*
+import java.time.DayOfWeek
+import java.time.LocalDateTime
+import java.time.LocalTime
+import kotlin.random.Random
+
+object StoreMockData {
+    private val random = Random(System.currentTimeMillis())
+
+    fun createStoreDetailResponse(storeId: Long): StoreDetailResponse {
+        return StoreDetailResponse(
+            id = storeId,
+            name = "맛있는 가게 ${storeId}",
+            mainImageUrl = "https://example.com/store${storeId}.jpg",
+            contact = "02-${random.nextInt(1000, 9999)}-${random.nextInt(1000, 9999)}",
+            description = "맛있는 음식을 제공하는 가게입니다.",
+            businessNumber = "${random.nextInt(100, 999)}-${random.nextInt(10, 99)}-${random.nextInt(10000, 99999)}",
+            businessHours = listOf(
+                mapOf("dayOfWeek" to "MONDAY", "openTime" to "09:00:00", "closeTime" to "18:00:00"),
+                mapOf("dayOfWeek" to "TUESDAY", "openTime" to "09:00:00", "closeTime" to "18:00:00"),
+                mapOf("dayOfWeek" to "WEDNESDAY", "openTime" to "09:00:00", "closeTime" to "18:00:00"),
+                mapOf("dayOfWeek" to "THURSDAY", "openTime" to "09:00:00", "closeTime" to "18:00:00"),
+                mapOf("dayOfWeek" to "FRIDAY", "openTime" to "09:00:00", "closeTime" to "18:00:00")
+            ),
+            latitude = 37.5665 + random.nextDouble(-0.1, 0.1),
+            longitude = 126.9780 + random.nextDouble(-0.1, 0.1),
+            pickupStartTime = LocalTime.of(12, 0),
+            pickupEndTime = LocalTime.of(13, 0),
+            pickupDay = "MONDAY",
+            status = "OPEN",
+            ratingAverage = random.nextDouble(3.0, 5.0),
+            ratingCount = random.nextInt(10, 100),
+            foodCategory = listOf("한식", "분식", "카페"),
+            storeCategory = listOf("픽업", "할인")
+        )
+    }
+
+    fun createStoreCUDResponse(storeId: Long): StoreCUDResponse {
+        return StoreCUDResponse(
+            storeId = storeId,
+            actionTime = LocalDateTime.now()
+        )
+    }
+
+    fun createSubscriptionResponseForStoreOwner(storeId: Long): SubscriptionResponseForStoreOwner {
+        return SubscriptionResponseForStoreOwner(
+            id = random.nextLong(1, 1000),
+            userId = random.nextLong(1, 1000),
+            storeId = storeId,
+            subscribed = random.nextBoolean(),
+            actionTime = LocalDateTime.now(),
+            userName = "사용자${random.nextInt(1, 1000)}"
+        )
+    }
+
+    fun createStoreCreateRequest(): StoreCreateRequest {
+        return StoreCreateRequest(
+            name = "새로운 가게",
+            businessNumber = "${random.nextInt(100, 999)}-${random.nextInt(10, 99)}-${random.nextInt(10000, 99999)}",
+            roadFullAddress = "서울시 강남구 역삼동 123-45",
+            roadZoneNo = "12345",
+            roadBuildingName = "테스트빌딩",
+            legalFullAddress = "서울시 강남구 역삼동 123-45",
+            legalMainAddressNo = "123",
+            legalSubAddressNo = "45",
+            adminFullAddress = "서울시 강남구 역삼동",
+            latitude = 37.5665,
+            longitude = 126.9780,
+            pickupStartTime = "12:00:00",
+            pickupEndTime = "13:00:00",
+            pickupDay = "MONDAY",
+            businessHours = listOf(
+                mapOf("dayOfWeek" to "MONDAY", "openTime" to "09:00:00", "closeTime" to "18:00:00"),
+                mapOf("dayOfWeek" to "TUESDAY", "openTime" to "09:00:00", "closeTime" to "18:00:00"),
+                mapOf("dayOfWeek" to "WEDNESDAY", "openTime" to "09:00:00", "closeTime" to "18:00:00"),
+                mapOf("dayOfWeek" to "THURSDAY", "openTime" to "09:00:00", "closeTime" to "18:00:00"),
+                mapOf("dayOfWeek" to "FRIDAY", "openTime" to "09:00:00", "closeTime" to "18:00:00")
+            ),
+            contact = "02-${random.nextInt(1000, 9999)}-${random.nextInt(1000, 9999)}",
+            description = "맛있는 음식을 제공하는 가게입니다.",
+            mainImageUrl = "https://example.com/store.jpg",
+            storeCategory = listOf("픽업", "할인"),
+            foodCategory = listOf("한식", "분식", "카페")
+        )
+    }
+
+    fun createStoreUpdateRequest(): StoreUpdateRequest {
+        return StoreUpdateRequest(
+            name = "수정된 가게",
+            businessNumber = "${random.nextInt(100, 999)}-${random.nextInt(10, 99)}-${random.nextInt(10000, 99999)}",
+            roadFullAddress = "서울시 서초구 서초동 456-78",
+            roadZoneNo = "67890",
+            roadBuildingName = "수정된빌딩",
+            legalFullAddress = "서울시 서초구 서초동 456-78",
+            legalMainAddressNo = "456",
+            legalSubAddressNo = "78",
+            adminFullAddress = "서울시 서초구 서초동",
+            latitude = 37.4837,
+            longitude = 127.0324,
+            pickupStartTime = "13:00:00",
+            pickupEndTime = "14:00:00",
+            pickupDay = "TUESDAY",
+            businessHours = listOf(
+                mapOf("dayOfWeek" to "MONDAY", "openTime" to "10:00:00", "closeTime" to "19:00:00"),
+                mapOf("dayOfWeek" to "TUESDAY", "openTime" to "10:00:00", "closeTime" to "19:00:00"),
+                mapOf("dayOfWeek" to "WEDNESDAY", "openTime" to "10:00:00", "closeTime" to "19:00:00"),
+                mapOf("dayOfWeek" to "THURSDAY", "openTime" to "10:00:00", "closeTime" to "19:00:00"),
+                mapOf("dayOfWeek" to "FRIDAY", "openTime" to "10:00:00", "closeTime" to "19:00:00")
+            ),
+            contact = "02-${random.nextInt(1000, 9999)}-${random.nextInt(1000, 9999)}",
+            description = "수정된 설명입니다.",
+            mainImageUrl = "https://example.com/store_updated.jpg",
+            storeCategory = listOf("픽업", "할인", "신규"),
+            foodCategory = listOf("중식", "일식", "양식")
+        )
+    }
+}

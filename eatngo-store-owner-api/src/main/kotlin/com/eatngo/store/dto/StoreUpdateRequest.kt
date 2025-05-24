@@ -2,6 +2,7 @@ package com.eatngo.store.dto
 
 import com.eatngo.common.constant.StoreEnum
 import com.eatngo.store.dto.*
+import java.time.DayOfWeek
 import java.time.LocalTime
 
 /**
@@ -27,12 +28,12 @@ data class StoreUpdateRequest(
     val longitude: Double? = null,
 
     // 운영 정보
-    val pickupStartTime: LocalTime? = null,
-    val pickupEndTime: LocalTime? = null,
+    val pickupStartTime: String? = null,
+    val pickupEndTime: String? = null,
     val pickupDay: String? = null,
 
     // 부가 정보
-    val businessHours: List<BusinessHourDto>? = null,
+    val businessHours: List<Map<String, Any>>? = null,
     val contact: String? = null,
     val description: String? = null,
     val mainImageUrl: String? = null,
@@ -57,9 +58,9 @@ data class StoreUpdateRequest(
 
         val pickUpInfoDto = if (pickupStartTime != null && pickupEndTime != null && pickupDay != null) {
             PickUpInfoDto(
-                pickupStartTime = pickupStartTime,
-                pickupEndTime = pickupEndTime,
-                pickupDay = StoreEnum.PickupDay.valueOf(pickupDay.uppercase())
+                pickupStartTime = this.pickupStartTime.let { LocalTime.parse(it) },
+                pickupEndTime = this.pickupEndTime.let { LocalTime.parse(it) },
+                pickupDay = StoreEnum.PickupDay.valueOf(this.pickupDay.uppercase())
             )
         } else null
 
@@ -74,7 +75,13 @@ data class StoreUpdateRequest(
         return StoreUpdateDto(
             name = name,
             address = addressDto,
-            businessHours = businessHours,
+            businessHours = this.businessHours?.map { map ->
+                BusinessHourDto(
+                    dayOfWeek = DayOfWeek.valueOf((map["dayOfWeek"] as String).uppercase()),
+                    openTime = LocalTime.parse(map["openTime"] as String),
+                    closeTime = LocalTime.parse(map["closeTime"] as String)
+                )
+            },
             contactNumber = contact,
             description = description,
             mainImageUrl = mainImageUrl,

@@ -1,6 +1,7 @@
 package com.eatngo.store.dto
 
 import com.eatngo.common.constant.StoreEnum
+import java.time.DayOfWeek
 import java.time.LocalTime
 
 /**
@@ -26,12 +27,12 @@ data class StoreCreateRequest(
     val longitude: Double? = null,
 
     // 운영 정보
-    val pickupStartTime: LocalTime,
-    val pickupEndTime: LocalTime,
-    val pickupDay: String,
+    val pickupStartTime: String? = null,
+    val pickupEndTime: String? = null,
+    val pickupDay: String? = null,
 
     // 부가 정보
-    val businessHours: List<BusinessHourDto>? = null,
+    val businessHours: List<Map<String, Any>>? = null,
     val contact: String? = null,
     val description: String? = null,
     val mainImageUrl: String? = null,
@@ -57,14 +58,20 @@ data class StoreCreateRequest(
                 )
             ),
             businessNumber = this.businessNumber,
-            businessHours = this.businessHours,
+            businessHours = this.businessHours?.map { map ->
+                BusinessHourDto(
+                    dayOfWeek = DayOfWeek.valueOf((map["dayOfWeek"] as String).uppercase()),
+                    openTime = LocalTime.parse(map["openTime"] as String),
+                    closeTime = LocalTime.parse(map["closeTime"] as String)
+                )
+            },
             contactNumber = this.contact,
             description = this.description,
             imageUrl = this.mainImageUrl,
             pickUpInfo = PickUpInfoDto(
-                pickupStartTime = this.pickupStartTime,
-                pickupEndTime = this.pickupEndTime,
-                pickupDay = StoreEnum.PickupDay.valueOf(this.pickupDay.uppercase())
+                pickupStartTime = this.pickupStartTime?.let { LocalTime.parse(it) },
+                pickupEndTime = this.pickupEndTime?.let { LocalTime.parse(it) },
+                pickupDay = StoreEnum.PickupDay.valueOf(this.pickupDay!!.uppercase())
             ),
             storeCategoryInfo = StoreCategoryInfoDto(
                 storeCategory = this.storeCategory,
