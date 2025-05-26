@@ -27,7 +27,7 @@ class OrderPersistenceImpl(
             .findById(id)
             .mapOrNull(OrderJpaEntity::toOrder)
 
-    override fun cursoredFindAllByQueryParameters(
+    override fun findAllByQueryParameter(
         queryParam: OrderQueryParamDto
     ): Cursor<Order> {
         val pageRequest = PageRequest.of(0, 50, Sort.by("id").descending())

@@ -9,5 +9,5 @@ interface OrderPersistence {
 
     fun findById(id: Long): Order?
 
-    fun cursoredFindAllByQueryParameters(queryParam: OrderQueryParamDto): Cursor<Order>
+    fun findAllByQueryParameter(queryParam: OrderQueryParamDto): Cursor<Order>
 }

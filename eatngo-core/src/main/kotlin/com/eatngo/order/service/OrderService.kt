@@ -43,5 +43,5 @@ class OrderService(
     }
 
     fun findAllByQueryParam(queryParam: OrderQueryParamDto): Cursor<Order> =
-        orderPersistence.cursoredFindAllByQueryParameters(queryParam)
+        orderPersistence.findAllByQueryParameter(queryParam)
 }
