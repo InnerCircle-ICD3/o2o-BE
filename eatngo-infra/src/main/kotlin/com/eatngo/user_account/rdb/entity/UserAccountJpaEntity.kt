@@ -17,6 +17,9 @@ class UserAccountJpaEntity(
     @Column(nullable = true, length = 255)
     val email: String?,
 
+    @Column(nullable = true, length = 255)
+    val nickname: String?,
+
     @OneToMany(mappedBy = "userAccount", fetch = FetchType.LAZY, cascade = [CascadeType.PERSIST])
     @Filter(name = DELETED_FILTER)
     val oauth2: MutableList<UserAccountOAuth2JpaEntity> = mutableListOf(),
@@ -30,13 +33,12 @@ class UserAccountJpaEntity(
         fun from(account: UserAccount) = UserAccountJpaEntity(
             id = account.id,
             email = account.email?.value,
+            nickname = account.nickname,
         ).also {
             account.oauth2.forEach { oauth2 ->
-                // addLast
                 it.oauth2.add(UserAccountOAuth2JpaEntity.of(oauth2, it))
             }
             account.roles.forEach { role ->
-                // addLast
                 it.roles.add(UserAccountRoleJpaEntity.of(role, it))
             }
         }
@@ -45,11 +47,18 @@ class UserAccountJpaEntity(
             UserAccount(
                 id = id,
                 email = email?.let { EmailAddress(it) },
+                nickname = account.nickname,
                 createdAt = createdAt,
                 updatedAt = updatedAt,
                 deletedAt = deletedAt,
                 roles = roles.map { UserAccountRoleJpaEntity.toRole(it) },
             )
         }
+    }
+
+    override fun delete() {
+        super.delete()
+        oauth2.forEach { it.delete() }
+        roles.forEach { it.delete() }
     }
 }

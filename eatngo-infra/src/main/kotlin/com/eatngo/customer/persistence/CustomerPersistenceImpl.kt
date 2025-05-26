@@ -1,5 +1,6 @@
 package com.eatngo.customer.persistence
 
+import com.eatngo.aop.SoftDeletedFilter
 import com.eatngo.customer.domain.Customer
 import com.eatngo.customer.infra.CustomerPersistence
 import com.eatngo.customer.rdb.entity.CustomerJpaEntity
@@ -12,20 +13,25 @@ import org.springframework.transaction.annotation.Transactional
 class CustomerPersistenceImpl(
     private val customerRdbRepository: CustomerRdbRepository,
 ) : CustomerPersistence {
-    override fun save(customer: Customer) =
-        customerRdbRepository.save(CustomerJpaEntity.from(customer))
+    override fun save(customer: Customer): Customer {
+        return customerRdbRepository.save(CustomerJpaEntity.from(customer))
             .let { CustomerJpaEntity.toCustomer(it) }
+    }
 
+    @SoftDeletedFilter
     override fun findById(id: Long): Customer? {
         return customerRdbRepository.findById(id)
             .orElse(null)
             ?.let { CustomerJpaEntity.toCustomer(it) }
     }
 
+    @SoftDeletedFilter
     override fun deleteById(id: Long) {
-        customerRdbRepository.softDeleteById(id)
+        customerRdbRepository.findById(id).orElseThrow()
+            .apply { delete() }
     }
 
+    @SoftDeletedFilter
     override fun findByUserId(userId: Long): Customer? =
         customerRdbRepository.findByAccount_Id(userId)
             ?.let { customerJpaEntity ->

@@ -1,6 +1,7 @@
 package com.eatngo.handler
 
 import com.eatngo.common.error.CommonErrorCode
+import com.eatngo.common.exception.CustomerException
 import com.eatngo.common.exception.OrderException
 import com.eatngo.common.response.ApiResponse
 import jakarta.servlet.http.HttpServletRequest
@@ -29,6 +30,24 @@ class CustomerApiExceptionHandler {
         val (httpStatus, logLevel) = when (e) {
             is OrderException.OrderNotFound -> HttpStatus.NOT_FOUND to Level.WARN
             is OrderException.OrderAlreadyCompleted -> HttpStatus.CONFLICT to Level.WARN
+            else -> HttpStatus.BAD_REQUEST to Level.ERROR
+        }
+
+        // 로그 메시지 기록
+        logError(e, logLevel, e.message, context)
+
+        return ResponseEntity
+            .status(httpStatus)
+            .body(ApiResponse.error(e.errorCode.code, e.message))
+    }
+
+    @ExceptionHandler(CustomerException::class)
+    fun handleCustomerException(e: CustomerException, request: HttpServletRequest): ResponseEntity<ApiResponse<Nothing>> {
+        val context = buildLogContext(request, e.data)
+
+        // HTTP 상태 결정
+        val (httpStatus, logLevel) = when (e) {
+            is CustomerException.CustomerNotFound -> HttpStatus.NOT_FOUND to Level.WARN
             else -> HttpStatus.BAD_REQUEST to Level.ERROR
         }
 

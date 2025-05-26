@@ -11,6 +11,12 @@ enum class BusinessErrorCode(
     // 일반 비즈니스 오류
     BUSINESS_EXCEPTION("B001", "비즈니스 로직 처리 중 오류가 발생했습니다."),
 
+    // 사용자 관련 오류
+    USER_NOT_FOUND("U001", "사용자를 찾을 수 없습니다."),
+
+    // 고객 관련 오류
+    CUSTOMER_NOT_FOUND("C001", "고객을 찾을 수 없습니다."),
+
     // 주문 관련 오류
     ORDER_NOT_FOUND("O001", "주문을 찾을 수 없습니다."),
     ORDER_ALREADY_COMPLETED("O002", "이미 완료된 주문입니다."),

@@ -96,4 +96,9 @@ class UserAccountOAuth2JpaEntity(
             userAccount
         }
     }
+
+    override fun delete() {
+        super.delete()
+        terms.forEach { it.delete() }
+    }
 }
