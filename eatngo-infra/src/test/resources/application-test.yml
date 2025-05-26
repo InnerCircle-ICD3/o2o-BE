@@ -1,0 +1,46 @@
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  datasource:
+    # H2 메모리 DB를 PostgreSQL 모드로 실행
+    url: jdbc:h2:mem:eatngo;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DATABASE_TO_LOWER=TRUE
+    username: sa
+    password: sa
+    driverClassName: org.h2.Driver
+  jpa:
+    open-in-view: false
+    # Hibernate가 PostgreSQL 방언을 사용하도록 설정
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        format_sql: true
+        highlight_sql: true
+  h2:
+    console:
+      enabled: true
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: eatngolocal
+
+cloud:
+  aws:
+    region:
+      static: us-east-1
+    s3:
+      bucket: eatgoeatgo
+
+datastore:
+  mongodb:
+    uri: mongodb://localhost:27017/eatngo
+    database: eatngo
+    username: eatngo-owner
+    password: eatngolocal
+
+logging:
+  level:
+    org.hibernate.SQL: debug
+    org.hibernate.orm.jdbc.bind: trace
