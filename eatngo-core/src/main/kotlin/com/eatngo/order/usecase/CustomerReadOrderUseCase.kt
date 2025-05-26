@@ -10,8 +10,8 @@ import org.springframework.transaction.annotation.Transactional
 
 @Service
 class CustomerReadOrderUseCase(
-    val orderService: OrderService,
-    val customerService: CustomerService
+    private val orderService: OrderService,
+    private val customerService: CustomerService
 ) {
     @Transactional(readOnly = true)
     fun findAllByQueryParameter(queryParam: OrderQueryParamDto): Cursor<OrderDto> {
