@@ -7,6 +7,7 @@ import com.eatngo.product.domain.ProductSizeType.*
 import com.eatngo.product.dto.ProductAfterStockDto
 import com.eatngo.product.dto.ProductCurrentStockDto
 import com.eatngo.product.dto.ProductDto
+import com.eatngo.product.infra.ProductCachePersistence
 import com.eatngo.product.infra.ProductPersistence
 import com.eatngo.product.infra.findByIdAndStoreIdOrElseThrow
 import com.eatngo.product.infra.findByIdOrThrow
@@ -17,7 +18,8 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional
 class ProductService(
     private val productPersistence: ProductPersistence,
-    private val fileStorageService: FileStorageService
+    private val fileStorageService: FileStorageService,
+    private val productCachePersistence: ProductCachePersistence
     // TODO storeRepository
 ) {
     fun createProduct(
@@ -68,6 +70,7 @@ class ProductService(
         }
 
         val savedProduct: Product = productPersistence.save(product)
+        productCachePersistence.save(product)
 
         return ProductDto.from(
             savedProduct,
@@ -80,7 +83,8 @@ class ProductService(
         productId: Long
     ): ProductDto {
         // TODO storePersistence.findById(storeId)
-        val product: Product = productPersistence.findByIdOrThrow(productId)
+        val product: Product =
+            productCachePersistence.findById(productId) ?: productPersistence.findByIdOrThrow(productId)
 
         return ProductDto.from(
             product,
@@ -88,13 +92,19 @@ class ProductService(
         )
     }
 
-    fun findAllProducts(storeId: Long): List<ProductDto> = productPersistence.findAllByStoreId(storeId)
-        .map { it ->
-            ProductDto.from(
-                it,
-                it.imageUrl?.let { fileStorageService.resolveImageUrl(it) }
-            )
+    fun findAllProducts(storeId: Long): List<ProductDto> {
+        var products: List<Product> = productCachePersistence.findAllByStoreId(storeId)
+        if (products.isEmpty()) {
+            products = productPersistence.findAllByStoreId(storeId)
         }
+        return products
+            .map { it ->
+                ProductDto.from(
+                    it,
+                    it.imageUrl?.let { fileStorageService.resolveImageUrl(it) }
+                )
+            }
+    }
 
     fun deleteProduct(storeId: Long, productId: Long) {
         val product: Product = productPersistence.findByIdOrThrow(productId)

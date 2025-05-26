@@ -7,8 +7,10 @@ import com.eatngo.product.mapper.ProductMapper
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.convertValue
 import org.springframework.data.redis.core.RedisTemplate
+import org.springframework.stereotype.Repository
 import java.time.Duration
 
+@Repository
 class ProductRedisPersistenceImpl(
     private val redisTemplate: RedisTemplate<String, String>,
     private val objectMapper: ObjectMapper
