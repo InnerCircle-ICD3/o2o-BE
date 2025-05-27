@@ -1,5 +1,7 @@
 package com.eatngo.product.persistence
 
+import com.eatngo.common.exception.StockException.StockEmpty
+import com.eatngo.common.exception.StockException.StockNotFound
 import com.eatngo.product.domain.Product
 import com.eatngo.product.entity.ProductEntity
 import com.eatngo.product.infra.ProductCachePersistence
@@ -88,8 +90,8 @@ class ProductRedisPersistenceImpl(
         val result = redisTemplate.execute(script, listOf(pKey(productId)), quantity.toString())
             ?: -2L
         when (result) {
-            -1L -> throw IllegalStateException("재고 부족")
-            -2L -> throw IllegalStateException("재고 정보 없음")
+            -1L -> throw StockNotFound(productId)
+            -2L -> throw StockEmpty(productId)
         }
         return result.toInt()
     }

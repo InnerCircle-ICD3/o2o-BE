@@ -31,4 +31,8 @@ class ProductPersistenceImpl(
             ProductMapper.toDomain(it)
         }.orElse(null)
     }
+
+    override fun updateStock(productId: Long, stockQuantity: Int): Int {
+        return productRepository.updateStock(productId, stockQuantity)
+    }
 }
