@@ -1,16 +1,15 @@
 package com.eatngo.product.entity
 
+import com.eatngo.common.BaseJpaEntity
+import com.eatngo.constants.DELETED_FILTER
 import com.eatngo.product.domain.ProductStatus
 import jakarta.persistence.*
-import org.hibernate.annotations.CreationTimestamp
-import org.hibernate.annotations.SoftDelete
+import org.hibernate.annotations.Filter
 import org.hibernate.annotations.SoftDeleteType
-import org.hibernate.annotations.UpdateTimestamp
-import java.time.LocalDateTime
 
+@Filter(name = DELETED_FILTER)
 @Entity
 @Table(name = "products")
-@SoftDelete
 // TODO 이후 DType 추가 필요!
 data class ProductEntity(
     @Id
@@ -50,13 +49,5 @@ data class ProductEntity(
 
     @Enumerated(EnumType.STRING)
     var deleteStatus: SoftDeleteType,
-
-    @CreationTimestamp
-    @Column(nullable = false, updatable = false)
-    var createdAt: LocalDateTime = LocalDateTime.now(),
-
-    @UpdateTimestamp
-    @Column(nullable = false)
-    var updatedAt: LocalDateTime? = LocalDateTime.now()
-) {
+) : BaseJpaEntity() {
 }
