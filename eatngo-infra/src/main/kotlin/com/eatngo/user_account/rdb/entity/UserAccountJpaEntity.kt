@@ -19,7 +19,7 @@ class UserAccountJpaEntity(
 
     @OneToMany(mappedBy = "userAccount", fetch = FetchType.LAZY, cascade = [CascadeType.PERSIST])
     @Filter(name = DELETED_FILTER)
-    val oauth2: MutableList<UserAccountOAuth2JpaEntity> = mutableListOf(),
+    val oAuth2: MutableList<UserAccountOAuth2JpaEntity> = mutableListOf(),
 
     @OneToMany(mappedBy = "account", fetch = FetchType.LAZY, cascade = [CascadeType.PERSIST])
     @Filter(name = DELETED_FILTER)
@@ -31,9 +31,9 @@ class UserAccountJpaEntity(
             id = account.id,
             email = account.email?.value,
         ).also {
-            account.oauth2.forEach { oauth2 ->
+            account.oAuth2.forEach { oAuth2 ->
                 // addLast
-                it.oauth2.add(UserAccountOAuth2JpaEntity.of(oauth2, it))
+                it.oAuth2.add(UserAccountOAuth2JpaEntity.of(oAuth2, it))
             }
             account.roles.forEach { role ->
                 // addLast
