@@ -31,7 +31,7 @@ class TokenProvider(
             .subject(loginUser.userAccountId.toString())
             .claim("roles", loginUser.roles)
             .claim("customerId", customerId)
-            .claim("storeOwnerId", storeOwnerId)
+            .claim("storeOwnerId", storeOwnerId).claim("nickname", loginUser.nickname)
             .issuedAt(Date())
             .expiration(Date(System.currentTimeMillis() + 1000L * 60 * 60 * 24 * 14)) // 14 days -- 레디스 없어서 일단 길게~! //TODO 짧게 변경하기
             .signWith(key)
@@ -63,17 +63,18 @@ class TokenProvider(
 
         val customerId = (claims["customerId"] as? Number)?.toLong()
         val storeOwnerId = (claims["storeOwnerId"] as? Number)?.toLong()
+        val nickname = claims["nickname"] as? String
 
         val loginUser: LoginUser = when {
             customerId != null -> LoginCustomer(
                 userAccountId = userAccountId,
-                roles = roles.map { it.toString() },
+                roles = roles.map { it.toString() }, nickname = nickname,
                 customerId = customerId
             )
 
             storeOwnerId != null -> LoginStoreOwner(
                 userAccountId = userAccountId,
-                roles = roles.map { it.toString() },
+                roles = roles.map { it.toString() }, nickname = nickname,
                 storeOwnerId = storeOwnerId
             )
 

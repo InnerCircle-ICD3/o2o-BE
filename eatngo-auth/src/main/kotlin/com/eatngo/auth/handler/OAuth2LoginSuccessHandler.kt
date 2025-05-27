@@ -38,7 +38,7 @@ class OAuth2LoginSuccessHandler(
         val profile = kakaoAccount["profile"] as? Map<*, *> ?: emptyMap<Any, Any>()
         val nickname = profile["nickname"] as? String
 
-        if (nickname == null) {
+        if (loginUser.nickname == null || nickname == null) {
             response.status = HttpServletResponse.SC_MOVED_TEMPORARILY
             response.setHeader("Location", "/mypage/complete-profile")
         }

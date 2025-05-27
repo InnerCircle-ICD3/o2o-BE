@@ -16,6 +16,7 @@ class DefaultOAuth2SuccessPostProcessor : OAuth2SuccessPostProcessor {
     override fun postProcess(userId: Long): LoginUser {
         return object : LoginUser {
             override val userAccountId: Long = userId
+            override val nickname: String? = null
             override val roles: List<String> = emptyList()
         }
     }
