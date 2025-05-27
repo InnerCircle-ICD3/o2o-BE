@@ -102,14 +102,14 @@
 
 ### 주문(Order)
 
-| 변수명 | 한글명 | 설명 |
-| --- | --- | --- |
-| id | 식별자 | 주문 식별자 |
-| orderNumber | 주문번호 | 주문 번호 ( unique 한 식별자, TsId 로 만들어짐 ) |
-| orderItems | 주문상품 목록 | 주문상품 목록 |
-| customerId | 손님Id | 손님 식별자 |
-| storeId | 상점Id | 상점 식별자 |
-| status | 주문상태 | - CREATED - CONFIRMED- CANCELED- DONE |
+| 변수명          | 한글명 | 설명 |
+|--------------| --- | --- |
+| id           | 식별자 | 주문 식별자 |
+| orderNumber  | 주문번호 | 주문 번호 ( unique 한 식별자, TsId 로 만들어짐 ) |
+| orderItems   | 주문상품 목록 | 주문상품 목록 |
+| customerId   | 손님Id | 손님 식별자 |
+| storeOwnerId | 상점Id | 상점 식별자 |
+| status       | 주문상태 | - CREATED - CONFIRMED- CANCELED- DONE |
 
 ### 주문상품(OrderItem)
 
