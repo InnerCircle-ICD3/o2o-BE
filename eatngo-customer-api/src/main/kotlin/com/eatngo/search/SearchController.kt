@@ -1,6 +1,6 @@
 package com.eatngo.search
 
-import com.eatngo.common.type.Point
+import com.eatngo.common.type.Coordinate
 import com.eatngo.search.constant.StoreEnum
 import com.eatngo.search.dto.*
 import com.eatngo.search.service.SearchService
@@ -34,8 +34,8 @@ class SearchController(
         val searchResult =
             searchService.searchStore(
                 SearchStoreQueryDto(
-                    viewPoint =
-                        Point(
+                    viewCoordinate =
+                        Coordinate(
                             lat = lat,
                             lng = lng,
                         ),
@@ -64,8 +64,8 @@ class SearchController(
         ResponseEntity.ok(
             searchService.searchStoreMap(
                 SearchStoreQueryDto(
-                    viewPoint =
-                        Point(
+                    viewCoordinate =
+                        Coordinate(
                             lat = lat,
                             lng = lng,
                         ),

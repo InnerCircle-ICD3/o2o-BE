@@ -1,6 +1,6 @@
 package com.eatngo.search.service
 
-import com.eatngo.common.type.Point
+import com.eatngo.common.type.Coordinate
 import com.eatngo.search.domain.SearchStore
 import com.eatngo.search.dto.Box
 import com.eatngo.search.dto.SearchStoreDto
@@ -40,8 +40,8 @@ class SearchService(
 
         val searchStoreList: List<SearchStore> =
             searchStoreRepository.searchStore(
-                lng = searchQuery.viewPoint.lng,
-                lat = searchQuery.viewPoint.lat,
+                lng = searchQuery.viewCoordinate.lng,
+                lat = searchQuery.viewCoordinate.lat,
                 maxDistance = searchDistance,
                 searchFilter = searchQuery.filter,
                 page = page,
@@ -52,7 +52,7 @@ class SearchService(
             storeList =
                 searchStoreList.map {
                     SearchStoreDto.from(
-                        userPoint = searchQuery.viewPoint,
+                        userCoordinate = searchQuery.viewCoordinate,
                         searchStore = it,
                     )
                 },
@@ -68,8 +68,8 @@ class SearchService(
         // center 값을 기준으로 해당하는 box 좌표를 구한다.
         val box: Box =
             getBox(
-                lng = searchQuery.viewPoint.lng,
-                lat = searchQuery.viewPoint.lat,
+                lng = searchQuery.viewCoordinate.lng,
+                lat = searchQuery.viewCoordinate.lat,
             )
 
         // Redis에서 box 검색 결과를 가져온다. -> 위경도 기중 0.005 단위로 박스 매핑
@@ -128,8 +128,8 @@ class SearchService(
         val topLat = ceil(lat / cacheBoxSize) * cacheBoxSize
         val bottomLat = floor(lat / cacheBoxSize) * cacheBoxSize
 
-        val topLeft = Point(lng = leftLng, lat = topLat) // 서쪽 + 북쪽
-        val bottomRight = Point(lng = rightLng, lat = bottomLat) // 동쪽 + 남쪽
+        val topLeft = Coordinate(lng = leftLng, lat = topLat) // 서쪽 + 북쪽
+        val bottomRight = Coordinate(lng = rightLng, lat = bottomLat) // 동쪽 + 남쪽
 
         return Box(topLeft, bottomRight)
     }

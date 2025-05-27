@@ -1,6 +1,6 @@
 package com.eatngo.redis.repository.search
 
-import com.eatngo.common.type.Point
+import com.eatngo.common.type.Coordinate
 import com.eatngo.redis.utils.readValueFromJson
 import com.eatngo.redis.utils.writeValueToJson
 import com.eatngo.search.dto.SearchStoreMap
@@ -20,7 +20,7 @@ class SearchMapMapRedisRepositoryImpl(
     private val redisTemplate: RedisTemplate<String, String>,
     private val objectMapper: ObjectMapper,
 ) : SearchMapRedisRepository {
-    override fun getKey(topLeft: Point): String {
+    override fun getKey(topLeft: Coordinate): String {
         val lat = topLeft.lat
         val lng = topLeft.lng
         return "searchMap:lat:$lat:lng:$lng"
