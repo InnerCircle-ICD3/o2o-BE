@@ -96,3 +96,92 @@
 
 #### `FoodCategoryVO`
 - `value`: `String` - 음식 카테고리 값
+# 주문
+
+## 도메인
+
+### 주문(Order)
+
+| 변수명          | 한글명 | 설명 |
+|--------------| --- | --- |
+| id           | 식별자 | 주문 식별자 |
+| orderNumber  | 주문번호 | 주문 번호 ( unique 한 식별자, TsId 로 만들어짐 ) |
+| orderItems   | 주문상품 목록 | 주문상품 목록 |
+| customerId   | 손님Id | 손님 식별자 |
+| storeOwnerId | 상점Id | 상점 식별자 |
+| status       | 주문상태 | - CREATED - CONFIRMED- CANCELED- DONE |
+
+### 주문상품(OrderItem)
+
+| 변수명 | 한글명 | 설명 |
+| --- | --- | --- |
+| id | 식별자 | 주문상품 식별자 |
+| productId | 상품Id | 상품 식별자 ( 이 때문에 상품Id는 softDelete 하는 것이 좋음) |
+| productName | 상품명 | 주문했을 당시의 상품 명을 기록 |
+| quantity | 개수 | 주문한 상품 개수 |
+| price | 가격 | 주문했을 당시의 상품 가격과 상품 개수를 곱한 값 |
+
+### 주문 상태 내역 (OrderStatusHistory)
+| 변수명       | 한글명  | 설명                 |
+|-----------|------|--------------------|
+| id        | 식별자  | 주문 상태 내역 식별자       |
+| orderId   | 주문Id | 주문 식별자             |
+| status    | 주문상태 | 이 내역이 기록될 당시 주문 내역 |
+| userType  | 유저타입 | 유저타입(상점, 유저)       |
+| createdAt | 생성시각 | 해당 내역이 생성된 시각      |
+
+## 이벤트
+### 주문 이벤트(OrderEvent)
+
+주문 생성 이벤트 (CreateOrderEvent)
+- 상품 (재고 차감)
+- 상점 (신규 주문 생성 알람)
+
+주문 수락 이벤트 (ConfirmOrderEvent)
+- 유저 (주문 수락 알람) 
+
+주문 취소 이벤트 (CancelOrderEvent)
+- 상품 (재고 복원)
+
+주문 완료 이벤트 (DoneOrderEvent)
+- 없음
+
+## 흐름
+
+``` mermaid
+sequenceDiagram
+    participant User
+    participant Server
+    participant Store
+
+    User->>Server: 주문 요청 (상품 정보(가격, 개수 등)) 
+
+    Server->>Server: 상품 정보 유효성 검증
+    Server->>Server: 재고 차감 시도
+    alt 재고 부족
+        Server-->>User: 주문 실패 응답
+    else 재고 충분
+        Server->>Server: 주문 생성(CREATED)
+        Server-->>User: 주문 생성(CREATED) 완료
+    end
+
+    alt 유저 주문 취소
+        User->>Server: 주문 취소(CANCELED) 요청
+        Server-->>User: 주문 취소(CANCELED) 완료
+    end
+
+    alt 상점 주문 취소
+        Store->>Server: 주문 취소(CANCELED) 요청
+        Server-->>Store: 주문 취소(CANCELED) 완료
+    end
+
+    Store->>Server: 주문 수락(CONFIRMED)
+
+    alt 주문 수락 이후
+        User->>Server: 주문 취소(CANCELED) 시도
+        Server-->>User: 주문 취소(CANCELED) 불가
+    end
+
+    User->>Server: 상품 수령후 주문 완료(DONE)
+
+```
