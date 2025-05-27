@@ -1,6 +1,7 @@
 package com.eatngo.store.infra
 
 import com.eatngo.common.constant.StoreEnum
+import com.eatngo.common.exception.StoreException
 import com.eatngo.store.domain.Store
 
 /**
@@ -36,5 +37,12 @@ interface StorePersistence {
      * 매장 상태 업데이트
      */
     fun updateStatus(id: Long, status: StoreEnum.StoreStatus): Boolean
+}
 
-} 
+// extensions
+fun StorePersistence.findByIdOrThrow(id: Long): Store =
+    this.findById(id) ?: throw StoreException.StoreNotFound(id)
+
+fun Store.requireOwner(storeOwnerId: Long) {
+    if (this.storeOwnerId != storeOwnerId) { throw StoreException.Forbidden(storeOwnerId) }
+}
