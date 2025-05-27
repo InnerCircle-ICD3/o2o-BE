@@ -15,7 +15,7 @@ data class CustomerDto(
             CustomerDto(
                 id = customer.id,
                 userAccountId = customer.account.id,
-                nickname = customer.account.nickname,
+                nickname = customer.account.nickname?.value,
                 createdAt = customer.createdAt,
                 updatedAt = customer.updatedAt
             )
