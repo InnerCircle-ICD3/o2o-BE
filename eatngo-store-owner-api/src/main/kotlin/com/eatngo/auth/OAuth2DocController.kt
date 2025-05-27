@@ -27,7 +27,7 @@ class OAuth2DocController {
     )
     @ApiResponse(
         responseCode = "302",
-        description = "로그인 성공",
+        description = "로그인 성공 시 '/'로, 닉네임이 없으면 '/mypage/complete-profile'로 리디렉션",
         content = [],
         headers = [
             Header(
