@@ -15,7 +15,7 @@ data class StoreOwnerDto(
             StoreOwnerDto(
                 id = storeOwner.id,
                 userAccountId = storeOwner.account.id,
-                nickname = storeOwner.account.nickname,
+                nickname = storeOwner.account.nickname?.value,
                 createdAt = storeOwner.createdAt,
                 updatedAt = storeOwner.updatedAt
             )

@@ -12,7 +12,7 @@ class StoreOwner(
     var deletedAt: LocalDateTime? = null,
 ) {
     fun update(storeOwnerUpdateDto: StoreOwnerUpdateDto) {
-        TODO("Not yet implemented")
+        // do nothing
     }
 
     companion object {

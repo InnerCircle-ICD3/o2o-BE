@@ -7,10 +7,8 @@ import com.eatngo.store_owner.infra.StoreOwnerPersistence
 import com.eatngo.user_account.domain.UserAccount
 import com.eatngo.user_account.infra.UserAccountPersistence
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
 
 @Service
-@Transactional(readOnly = true)
 class StoreOwnerService(
     private val userAccountPersistence: UserAccountPersistence,
     private val storeOwnerPersistence: StoreOwnerPersistence
@@ -20,13 +18,11 @@ class StoreOwnerService(
         return storeOwnerPersistence.findById(id) ?: throw StoreException.StoreNotFound(id)
     }
 
-    @Transactional
     fun deleteStoreOwner(id: Long) {
         storeOwnerPersistence.deleteById(id)
         userAccountPersistence.deleteById(id)
     }
 
-    @Transactional
     fun update(StoreOwnerId: Long, StoreOwnerUpdateDto: StoreOwnerUpdateDto) {
         val storeOwner = storeOwnerPersistence.getByIdOrThrow(StoreOwnerId)
         storeOwner.update(StoreOwnerUpdateDto)
@@ -37,7 +33,6 @@ class StoreOwnerService(
         userAccountPersistence.save(account)
     }
 
-    @Transactional
     fun createByAccount(userAccount: UserAccount): StoreOwner {
         return storeOwnerPersistence.save(
             StoreOwner.create(userAccount)

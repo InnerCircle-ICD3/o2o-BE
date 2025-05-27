@@ -2,7 +2,7 @@ package com.eatngo.store_owner
 
 import com.eatngo.auth.annotaion.StoreOwnerId
 import com.eatngo.common.response.ApiResponse
-import com.eatngo.customer.dto.CustomerDto
+import com.eatngo.store_owner.dto.StoreOwnerDto
 import com.eatngo.store_owner.dto.StoreOwnerUpdateDto
 import com.eatngo.store_owner.service.StoreOwnerService
 import io.swagger.v3.oas.annotations.Operation
@@ -21,10 +21,10 @@ class StoreOwnerController(
     @GetMapping("/me")
     fun getCustomer(
         @StoreOwnerId storeOwnerId: Long,
-    ): ResponseEntity<ApiResponse<CustomerDto>> {
-        val customerDto = storeOwnerService.getStoreOwnerById(storeOwnerId)
-            .let { CustomerDto.from(it) }
-        return ResponseEntity.ok(ApiResponse.success(customerDto))
+    ): ResponseEntity<ApiResponse<StoreOwnerDto>> {
+        val storeOwnerDto = storeOwnerService.getStoreOwnerById(storeOwnerId)
+            .let { StoreOwnerDto.from(it) }
+        return ResponseEntity.ok(ApiResponse.success(storeOwnerDto))
     }
 
     @Operation(summary = "탈퇴 API", description = "유저의 정보를 삭제하는 API")
@@ -32,7 +32,7 @@ class StoreOwnerController(
     fun deleteCustomer(
         @StoreOwnerId storeOwnerId: Long,
     ): ResponseEntity<Unit> {
-        storeOwnerService.deleteCustomer(storeOwnerId)
+        storeOwnerService.deleteStoreOwner(storeOwnerId)
         return ResponseEntity.noContent().build()
     }
 

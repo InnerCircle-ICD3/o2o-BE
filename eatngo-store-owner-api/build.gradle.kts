@@ -23,11 +23,13 @@ dependencies {
     implementation("org.springdoc:springdoc-openapi-starter-common:2.8.5")       // Swagger 공통 기능
 
     // 테스트 의존성
+    testImplementation("io.rest-assured:rest-assured:5.5.5")
     testImplementation("io.kotest:kotest-runner-junit5:5.8.1")
     testImplementation("io.kotest:kotest-assertions-core:5.8.1")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("io.mockk:mockk:1.13.10")                        // mockk
     testImplementation("com.appmattus.fixture:fixture:1.2.0")           // Kotlin-fixture
+    testImplementation("io.kotest.extensions:kotest-extensions-spring:1.1.2") // 필요
 
     // h2
     runtimeOnly("com.h2database:h2")
