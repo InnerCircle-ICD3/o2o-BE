@@ -9,6 +9,7 @@ import com.eatngo.customer.service.CustomerService
 import com.eatngo.user_account.oauth2.constants.Oauth2Provider
 import com.eatngo.user_account.oauth2.dto.KakaoOauth2
 import com.eatngo.user_account.service.UserAccountService
+import com.eatngo.user_account.vo.Nickname
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 import io.restassured.RestAssured
@@ -53,7 +54,7 @@ class CustomerControllerTest(
             it("고객 정보를 수정한다") {
                 val (token, loginCustomer) = 유저_생성_및_토큰_반환()
 
-                val updateDto = CustomerUpdateDto(nickname = "엄복동")
+                val updateDto = CustomerUpdateDto(nickname = Nickname("엄복동"))
                 고객_정보_수정(token, updateDto)
 
                 val customerDto = 고객_정보_조회_성공(token)
