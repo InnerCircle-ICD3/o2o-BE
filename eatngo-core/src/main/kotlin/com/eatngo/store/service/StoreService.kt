@@ -41,6 +41,11 @@ interface StoreService {
     /**
      * ID로 상점 조회
      */
+    fun getStoreDetail(id: Long): StoreDto
+
+    /**
+     * ID로 상점 조회 - 권한 체크 필요
+     */
     fun getStoreDetail(id: Long, storeOwnerId: Long): StoreDto
 
     /**
