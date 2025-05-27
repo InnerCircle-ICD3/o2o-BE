@@ -5,12 +5,13 @@ import com.eatngo.user_account.oauth2.constants.Role
 import com.eatngo.user_account.oauth2.domain.UserAccountOauth2
 import com.eatngo.user_account.oauth2.dto.Oauth2
 import com.eatngo.user_account.vo.EmailAddress
+import com.eatngo.user_account.vo.Nickname
 import java.time.LocalDateTime
 
 class UserAccount(
     val id: Long = 0,
     val email: EmailAddress?,
-    var nickname: String? = null,
+    var nickname: Nickname? = null,
     var roles: List<Role> = mutableListOf(),
     val createdAt: LocalDateTime? = null,
     var updatedAt: LocalDateTime? = null,
@@ -24,9 +25,7 @@ class UserAccount(
     }
 
     fun update(userAccountUpdateDto: UserAccountUpdateDto) {
-        userAccountUpdateDto.nickname?.let {
-            this.nickname = it
-        }
+        userAccountUpdateDto.nickname?.let { this.nickname = it }
     }
 
     companion object {
@@ -34,7 +33,7 @@ class UserAccount(
         fun create(oauth2: Oauth2): UserAccount {
             val userAccount = UserAccount(
                 email = oauth2.email.let { it?.let { EmailAddress(it) } },
-                nickname = oauth2.nickname,
+                nickname = oauth2.nickname?.let { Nickname(it) },
             )
             userAccount.addOauth2(
                 UserAccountOauth2.of(

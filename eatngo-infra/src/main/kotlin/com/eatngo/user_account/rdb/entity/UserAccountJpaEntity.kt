@@ -4,6 +4,7 @@ import com.eatngo.common.BaseJpaEntity
 import com.eatngo.constants.DELETED_FILTER
 import com.eatngo.user_account.domain.UserAccount
 import com.eatngo.user_account.vo.EmailAddress
+import com.eatngo.user_account.vo.Nickname
 import jakarta.persistence.*
 import org.hibernate.annotations.Filter
 
@@ -33,7 +34,7 @@ class UserAccountJpaEntity(
         fun from(account: UserAccount) = UserAccountJpaEntity(
             id = account.id,
             email = account.email?.value,
-            nickname = account.nickname,
+            nickname = account.nickname?.value,
         ).also {
             account.oauth2.forEach { oauth2 ->
                 it.oauth2.add(UserAccountOAuth2JpaEntity.of(oauth2, it))
@@ -47,7 +48,7 @@ class UserAccountJpaEntity(
             UserAccount(
                 id = id,
                 email = email?.let { EmailAddress(it) },
-                nickname = account.nickname,
+                nickname = account.nickname?.let { Nickname(it) },
                 createdAt = createdAt,
                 updatedAt = updatedAt,
                 deletedAt = deletedAt,
