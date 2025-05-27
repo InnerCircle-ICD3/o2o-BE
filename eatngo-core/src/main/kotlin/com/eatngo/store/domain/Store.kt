@@ -34,7 +34,7 @@ class Store(
             return Store(
                 id = dto.storeId,
                 storeOwnerId = dto.storeOwnerId,
-                name = StoreNameVO(dto.name),
+                name = StoreNameVO.from(dto.name),
                 description = DescriptionVO.from(dto.description),
                 address = Address(
                     roadAddress = RoadAddressVO.from(
@@ -75,7 +75,7 @@ class Store(
             return Store(
                 id = 0L,
                 storeOwnerId = request.storeOwnerId,
-                name = StoreNameVO(request.name),
+                name = StoreNameVO.from(request.name),
                 description = DescriptionVO.from(request.description),
                 address = Address(
                     roadAddress = RoadAddressVO.from(
@@ -117,7 +117,7 @@ class Store(
      * 매장 정보 업데이트
      */
     fun update(request: StoreUpdateDto) {
-        request.name?.let { this.name = StoreNameVO(it) }
+        request.name?.let { this.name = StoreNameVO.from(it) }
         request.description?.let { this.description = DescriptionVO.from(it) }
         request.address?.let { addr ->
             this.address = Address(
