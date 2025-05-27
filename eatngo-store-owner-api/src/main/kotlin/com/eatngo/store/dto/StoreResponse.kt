@@ -21,7 +21,7 @@ data class StoreDetailResponse(
     val contact: String,
     val description: String,
     val businessNumber: String,
-    val businessHours: List<BusinessHourResponse>,
+    val businessHours: List<Map<String, Any>>,
     val latitude: Double?,
     val longitude: Double?,
     val pickupStartTime: LocalTime?,
@@ -44,10 +44,10 @@ data class StoreDetailResponse(
                 description = storeDto.description ?: "",
                 businessNumber = storeDto.businessNumber,
                 businessHours = storeDto.businessHours.map { hour ->
-                    BusinessHourResponse(
-                        dayOfWeek = hour.dayOfWeek.name,
-                        openTime = hour.openTime.format(timeFormatter),
-                        closeTime = hour.closeTime.format(timeFormatter),
+                    mapOf(
+                        "dayOfWeek" to hour.dayOfWeek.name,
+                        "openTime" to hour.openTime.format(timeFormatter),
+                        "closeTime" to hour.closeTime.format(timeFormatter)
                     )
                 },
                 latitude = storeDto.address.coordinate.latitude,
@@ -64,9 +64,3 @@ data class StoreDetailResponse(
         }
     }
 }
-
-data class BusinessHourResponse(
-    val dayOfWeek: String,  // 요일 (MONDAY, TUESDAY, ...)
-    val openTime: String,   // 영업 시작 시간 (HH:MM 형식)
-    val closeTime: String,  // 영업 종료 시간 (HH:MM 형식)
-)
