@@ -73,6 +73,7 @@ data class StoreUpdateRequest(
         } else null
 
         return StoreUpdateDto(
+            storeOwnerId = storeOwnerId,
             name = name,
             address = addressDto,
             businessHours = this.businessHours?.map { map ->

@@ -19,10 +19,8 @@ class StoreController(
     fun getStoreDetail(
         @PathVariable storeId: Long
     ): ApiResponse<StoreDetailResponse> {
-        // TODO: 실제 서비스 로직으로 교체 필요
-        // val storeDto = storeService.getStoreDetail(storeId)
-        // val response = StoreDetailResponse.from(storeDto)
-        val response = StoreMockData.createStoreDetailResponse(storeId)
+         val storeDto = storeService.getStoreDetail(storeId)
+         val response = StoreDetailResponse.from(storeDto)
         return ApiResponse.success(response)
     }
 } 

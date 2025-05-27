@@ -52,6 +52,9 @@ enum class BusinessErrorCode(
     STORE_UPDATE_FAILED("S010", "매장 정보 수정에 실패했습니다."),
     STORE_DELETE_FAILED("S011", "매장 삭제에 실패했습니다."),
 
+    // 매장 권한 관련 오류
+    STORE_OWNER_FORBIDDEN("S012", "해당 매장에 대한 권한이 없습니다."),
+
     // 메뉴 관련 오류
     PRODUCT_NOT_FOUND("M001", "메뉴를 찾을 수 없습니다."),
     PRODUCT_NOT_AVAILABLE("M002", "현재 제공하지 않는 메뉴입니다."),

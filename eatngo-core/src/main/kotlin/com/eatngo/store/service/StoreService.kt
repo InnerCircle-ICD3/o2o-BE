@@ -26,22 +26,22 @@ interface StoreService {
     /**
      * 점주가 직접 상점의 상태를 변경
      */
-    fun updateStoreOnlyStatus(id: Long, newStatus: String): StoreDto
+    fun updateStoreOnlyStatus(id: Long, newStatus: String, storeOwnerId: Long): StoreDto
 
     /**
      * 상점 픽업 정보 변경
      */
-    fun updateStorePickupInfo(id: Long, request: PickUpInfoDto): StoreDto
+    fun updateStorePickupInfo(id: Long, request: PickUpInfoDto, storeOwnerId: Long): StoreDto
 
     /**
      * 상점 삭제 (Soft Delete)
      */
-    fun deleteStore(id: Long): StoreDto
+    fun deleteStore(id: Long, storeOwnerId: Long): StoreDto
 
     /**
      * ID로 상점 조회
      */
-    fun getStoreDetail(id: Long): StoreDto
+    fun getStoreDetail(id: Long, storeOwnerId: Long): StoreDto
 
     /**
      * 점주 ID로 상점 조회

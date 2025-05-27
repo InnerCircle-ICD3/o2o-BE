@@ -37,9 +37,14 @@ class StoreServiceImpl(
         return StoreDto.from(storePersistence.save(existingStore))
     }
 
-    override fun updateStoreOnlyStatus(id: Long, newStatus: String): StoreDto {
+    override fun updateStoreOnlyStatus(id: Long, newStatus: String, storeOwnerId: Long): StoreDto {
         val existingStore = storePersistence.findById(id)
             ?: throw StoreException.StoreNotFound(id)
+
+        if (existingStore.storeOwnerId != storeOwnerId) {
+            throw StoreException.Forbidden(storeOwnerId)
+        }
+
         val enumStatus = try {
             StoreEnum.StoreStatus.valueOf(newStatus.uppercase())
         } catch (e: IllegalArgumentException) {
@@ -49,8 +54,13 @@ class StoreServiceImpl(
         return StoreDto.from(storePersistence.save(existingStore))
     }
 
-    override fun updateStorePickupInfo(id: Long, request: PickUpInfoDto): StoreDto {
+    override fun updateStorePickupInfo(id: Long, request: PickUpInfoDto, storeOwnerId: Long): StoreDto {
         val existingStore = storePersistence.findById(id) ?: throw StoreException.StoreNotFound(id)
+
+        if (existingStore.storeOwnerId != storeOwnerId) {
+            throw StoreException.Forbidden(storeOwnerId)
+        }
+
         existingStore.updatePickupInfo(
             request.pickupDay,
             request.pickupStartTime,
@@ -59,19 +69,26 @@ class StoreServiceImpl(
         return StoreDto.from(storePersistence.save(existingStore))
     }
 
-    override fun getStoreDetail(id: Long): StoreDto {
-        val store = storePersistence.findById(id) ?: throw StoreException.StoreNotFound(id)
-        return StoreDto.from(store)
+    override fun getStoreDetail(id: Long, storeOwnerId: Long): StoreDto {
+        val existingStore = storePersistence.findById(id) ?: throw StoreException.StoreNotFound(id)
+        if (existingStore.storeOwnerId != storeOwnerId) {
+            throw StoreException.Forbidden(storeOwnerId)
+        }
+        return StoreDto.from(existingStore)
     }
 
     override fun getStoreByOwnerId(storeOwnerId: Long): List<StoreDto> {
         return storePersistence.findByOwnerId(storeOwnerId).map { StoreDto.from(it) }
     }
 
-    override fun deleteStore(id: Long): StoreDto {
-        val store = storePersistence.findById(id) ?: throw StoreException.StoreNotFound(id)
-        store.softDelete()
-        val savedStore = storePersistence.save(store)
+    override fun deleteStore(id: Long, storeOwnerId: Long): StoreDto {
+        val existingStore = storePersistence.findById(id) ?: throw StoreException.StoreNotFound(id)
+        if (existingStore.storeOwnerId != storeOwnerId) {
+            throw StoreException.Forbidden(storeOwnerId)
+        }
+
+        existingStore.softDelete()
+        val savedStore = storePersistence.save(existingStore)
         return StoreDto.from(savedStore)
     }
 }

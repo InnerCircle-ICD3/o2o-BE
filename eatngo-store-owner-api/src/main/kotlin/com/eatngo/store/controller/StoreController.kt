@@ -23,60 +23,42 @@ class StoreController(
     @Operation(summary = "상점 등록", description = "점주가 상점을 등록합니다.")
     @PostMapping
     fun createStore(@RequestBody request: StoreCreateRequest, @StoreOwnerId storeOwnerId: Long): ApiResponse<StoreCUDResponse> {
-        // TODO: 실제 서비스 로직으로 교체 필요
-        // val response = storeService.createStore(request.toStoreCreateDto(storeOwnerId))
-        // return ApiResponse.success(StoreCUDResponse(storeId = response.storeId, actionTime = LocalDateTime.now()))
-        val response = StoreMockData.createStoreCUDResponse(1)
-        return ApiResponse.success(response)
+         val response = storeService.createStore(request.toStoreCreateDto(storeOwnerId))
+         return ApiResponse.success(StoreCUDResponse(storeId = response.storeId, actionTime = LocalDateTime.now()))
     }
     
     @Operation(summary = "상점 수정", description = "점주가 상점 정보를 수정합니다.")
     @PutMapping("/{storeId}")
     fun updateStore(@PathVariable storeId: Long, @RequestBody request: StoreUpdateRequest, @StoreOwnerId storeOwnerId: Long): ApiResponse<StoreCUDResponse> {
-        // TODO: 실제 서비스 로직으로 교체 필요
-        // val response = storeService.updateStore(storeId, request.toStoreUpdateDto(storeOwnerId = storeOwnerId))
-        // return ApiResponse.success(StoreCUDResponse(storeId = response.storeId, actionTime = LocalDateTime.now()))
-        val response = StoreMockData.createStoreCUDResponse(storeId)
-        return ApiResponse.success(response)
+         val response = storeService.updateStore(storeId, request.toStoreUpdateDto(storeOwnerId = storeOwnerId))
+         return ApiResponse.success(StoreCUDResponse(storeId = response.storeId, actionTime = LocalDateTime.now()))
     }
     
     @Operation(summary = "상점 상태 변경", description = "점주가 상점의 영업 상태를 변경합니다.")
     @PatchMapping("/{storeId}/status")
     fun updateStoreOnlyStatus(@PathVariable storeId: Long, @RequestBody request: String, @StoreOwnerId storeOwnerId: Long): ApiResponse<StoreCUDResponse> {
-        // TODO: 실제 서비스 로직으로 교체 필요
-        // val response = storeService.updateStoreOnlyStatus(storeId, request)
-        // return ApiResponse.success(StoreCUDResponse(storeId = response.storeId, actionTime = LocalDateTime.now()))
-        val response = StoreMockData.createStoreCUDResponse(storeId)
-        return ApiResponse.success(response)
+         val response = storeService.updateStoreOnlyStatus(storeId, request, storeOwnerId)
+         return ApiResponse.success(StoreCUDResponse(storeId = response.storeId, actionTime = LocalDateTime.now()))
     }
     
     @Operation(summary = "상점 픽업 정보 변경", description = "점주가 상점의 픽업 관련 정보를 변경합니다.")
     @PatchMapping("/{storeId}/pickup-info")
     fun updateStorePickupInfo(@PathVariable storeId: Long, @RequestBody request: StorePickUpInfoRequest, @StoreOwnerId storeOwnerId: Long): ApiResponse<StoreCUDResponse> {
-        // TODO: 실제 서비스 로직으로 교체 필요
-//         val response = storeService.updateStorePickupInfo(storeId, StorePickUpInfoRequest.from(request))
-//         return ApiResponse.success(StoreCUDResponse(storeId = response.storeId, actionTime = LocalDateTime.now()))
-        val response = StoreMockData.createStoreCUDResponse(storeId)
-        return ApiResponse.success(response)
+         val response = storeService.updateStorePickupInfo(storeId, StorePickUpInfoRequest.from(request), storeOwnerId)
+         return ApiResponse.success(StoreCUDResponse(storeId = response.storeId, actionTime = LocalDateTime.now()))
     }
     
     @Operation(summary = "상점 삭제", description = "점주가 등록된 상점을 삭제합니다.")
     @DeleteMapping("/{storeId}")
     fun deleteStore(@PathVariable storeId: Long, @StoreOwnerId storeOwnerId: Long): ApiResponse<StoreCUDResponse> {
-        // TODO: 실제 서비스 로직으로 교체 필요
-        // val response = storeService.deleteStore(storeId)
-        // return ApiResponse.success(StoreCUDResponse(storeId = response.storeId, actionTime = response.deletedAt))
-        val response = StoreMockData.createStoreCUDResponse(storeId)
-        return ApiResponse.success(response)
+         val response = storeService.deleteStore(storeId, storeOwnerId)
+         return ApiResponse.success(StoreCUDResponse(storeId = response.storeId, actionTime = response.deletedAt))
     }
     
-    @Operation(summary = "상점 상세 조회", description = "점주가 등록된 상점 상세 정보를 조회합니다.")
+    @Operation(summary = "상점 상세 조회", description = "점주가 운영중인 자신의 상점 상세 정보를 조회합니다.")
     @GetMapping("/{storeId}")
     fun getStoreDetail(@PathVariable storeId: Long, @StoreOwnerId storeOwnerId: Long): ApiResponse<StoreDetailResponse> {
-        // TODO: 실제 서비스 로직으로 교체 필요
-        // val storeDto = storeService.getStoreDetail(storeId)
-        // return ApiResponse.success(StoreDetailResponse.fromStoreDto(storeDto))
-        val response = StoreMockData.createStoreDetailResponse(storeId)
-        return ApiResponse.success(response)
+         val storeDto = storeService.getStoreDetail(storeId, storeOwnerId)
+         return ApiResponse.success(StoreDetailResponse.fromStoreDto(storeDto))
     }
 } 
