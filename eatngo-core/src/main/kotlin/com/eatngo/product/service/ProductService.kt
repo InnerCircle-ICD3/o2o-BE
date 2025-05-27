@@ -4,6 +4,8 @@ import com.eatngo.file.FileStorageService
 import com.eatngo.product.domain.*
 import com.eatngo.product.domain.Product.*
 import com.eatngo.product.domain.ProductSizeType.*
+import com.eatngo.product.domain.StockActionType.DECREASE
+import com.eatngo.product.domain.StockActionType.INCREASE
 import com.eatngo.product.dto.ProductAfterStockDto
 import com.eatngo.product.dto.ProductCurrentStockDto
 import com.eatngo.product.dto.ProductDto
@@ -110,13 +112,18 @@ class ProductService(
         val product: Product = productPersistence.findByIdOrThrow(productId)
         product.remove()
         productPersistence.save(product)
-        // TODO storePersistence.deleteById(storeId)
+        productCachePersistence.deleteById(productId)
     }
 
     fun toggleStock(productCurrentStockDto: ProductCurrentStockDto): ProductAfterStockDto {
         val product: Product = productPersistence.findByIdOrThrow(productCurrentStockDto.id)
         product.changeStock(productCurrentStockDto.action, productCurrentStockDto.amount)
         val savedProduct = productPersistence.save(product)
+
+        when (StockActionType.fromValue(productCurrentStockDto.action)) {
+            INCREASE -> productCachePersistence.increaseStock(product.id!!, productCurrentStockDto.amount)
+            DECREASE -> productCachePersistence.decreaseStock(product.id!!, productCurrentStockDto.amount)
+        }
         return ProductAfterStockDto.create(savedProduct)
     }
 
@@ -139,6 +146,9 @@ class ProductService(
         )
 
         val savedProduct: Product = productPersistence.save(product)
+        productCachePersistence.deleteById(savedProduct.id!!)
+        productCachePersistence.save(savedProduct)
+
         return ProductDto.from(
             savedProduct,
             savedProduct.imageUrl?.let { fileStorageService.resolveImageUrl(it) }

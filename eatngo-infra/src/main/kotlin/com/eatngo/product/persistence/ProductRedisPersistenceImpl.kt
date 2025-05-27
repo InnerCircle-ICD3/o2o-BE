@@ -48,7 +48,8 @@ class ProductRedisPersistenceImpl(
         if (productData.isEmpty()) {
             return null
         }
-        return ProductMapper.toDomain(objectMapper.convertValue(productData))
+
+        return ProductMapper.toDomain(objectMapper.convertValue<ProductEntity>(productData))
     }
 
     override fun findAllByStoreId(storeId: Long): List<Product> {
@@ -73,21 +74,23 @@ class ProductRedisPersistenceImpl(
         storeId?.let { setOps.remove(sKey(it), productId.toString()) }
     }
 
-    override fun findStockById(productId: Long): Long {
-        return hashOps.get(pKey(productId), "stock")?.toLong() ?: 0L
+    override fun findStockById(productId: Long): Int {
+        return hashOps.get(pKey(productId), "stock")?.toInt() ?: 0
     }
 
-    override fun increaseStock(productId: Long, quantity: Long): Long {
-        return hashOps.increment(pKey(productId), "stock", quantity) ?: 0L
+    override fun increaseStock(productId: Long, quantity: Int): Int {
+        val after = hashOps.increment(pKey(productId), "stock", quantity.toLong())
+        return after.toInt()
     }
 
-    override fun decreaseStock(product: Product, quantity: Long): Long {
+    override fun decreaseStock(productId: Long, quantity: Int): Int {
         val script = DefaultRedisScript(LUA_DEC_STOCK, Long::class.java)
-        val afterStock = redisTemplate.execute(script, listOf(pKey(product.id!!)), quantity.toString()) ?: -2L
-        when (afterStock) {
+        val result = redisTemplate.execute(script, listOf(pKey(productId)), quantity.toString())
+            ?: -2L
+        when (result) {
             -1L -> throw IllegalStateException("재고 부족")
             -2L -> throw IllegalStateException("재고 정보 없음")
         }
-        return afterStock
+        return result.toInt()
     }
 }
