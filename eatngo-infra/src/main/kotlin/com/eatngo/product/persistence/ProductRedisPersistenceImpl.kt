@@ -9,18 +9,15 @@ import com.fasterxml.jackson.module.kotlin.convertValue
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.data.redis.core.script.DefaultRedisScript
 import org.springframework.stereotype.Repository
-import org.springframework.transaction.annotation.Transactional
 import java.time.Duration
 
 @Repository
-@Transactional
 class ProductRedisPersistenceImpl(
     private val redisTemplate: RedisTemplate<String, String>,
     private val objectMapper: ObjectMapper
 ) : ProductCachePersistence {
 
     private val hashOps = redisTemplate.opsForHash<String, String>()
-    private val stockHashOps = redisTemplate.opsForHash<String, Long>()
     private val setOps = redisTemplate.opsForSet()
 
     companion object {
@@ -38,25 +35,20 @@ class ProductRedisPersistenceImpl(
     }
 
     override fun save(product: Product) {
-        hashOps.putAll(
-            pKey(product.id!!),
-            objectMapper.convertValue<Map<String, String>>(ProductMapper.toEntity(product))
-        )
-        hashOps.putAll(
-            pKey(product.id!!),
-            objectMapper.convertValue<Map<String, String>>(product.inventory.stock)
-        )
+        val productData = objectMapper.convertValue<Map<String, String>>(ProductMapper.toEntity(product))
+        hashOps.putAll(pKey(product.id!!), productData + saveStock(product))
         setOps.add(sKey(product.storeId!!), product.id.toString())
-        // TODO ttl fix
-        redisTemplate.expire(pKey(product.id!!), Duration.ofSeconds(3000))
+        redisTemplate.expire(pKey(product.id!!), Duration.ofHours(1))
     }
 
+    private fun saveStock(product: Product) = ("stock" to product.inventory.stock.toString())
+
     override fun findById(productId: Long): Product? {
-        val map = hashOps.entries(pKey(productId))
-        if (map.isEmpty()) {
+        val productData = hashOps.entries(pKey(productId))
+        if (productData.isEmpty()) {
             return null
         }
-        return ProductMapper.toDomain(objectMapper.convertValue(map))
+        return ProductMapper.toDomain(objectMapper.convertValue(productData))
     }
 
     override fun findAllByStoreId(storeId: Long): List<Product> {
@@ -82,13 +74,11 @@ class ProductRedisPersistenceImpl(
     }
 
     override fun findStockById(productId: Long): Long {
-        // TODO
-//        return stockHashOps.entries(productId).toLong()
-        return 1
+        return hashOps.get(pKey(productId), "stock")?.toLong() ?: 0L
     }
 
     override fun increaseStock(productId: Long, quantity: Long): Long {
-        return stockHashOps.increment(pKey(productId), "stock", quantity)
+        return hashOps.increment(pKey(productId), "stock", quantity) ?: 0L
     }
 
     override fun decreaseStock(product: Product, quantity: Long): Long {
