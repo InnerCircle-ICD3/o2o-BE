@@ -11,7 +11,7 @@ open class UserAccountException(
     class UserAccountNotfoundException(userAccountId: Long) : UserAccountException(
         BusinessErrorCode.USER_NOT_FOUND,
         "${BusinessErrorCode.USER_NOT_FOUND.message} (ID: $userAccountId)",
-        mapOf("orderId" to userAccountId)
+        mapOf("userAccountId" to userAccountId)
     )
 
 }

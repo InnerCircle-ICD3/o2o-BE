@@ -11,7 +11,7 @@ open class CustomerException(
     class CustomerNotFound(customerId: Long) : CustomerException(
         BusinessErrorCode.CUSTOMER_NOT_FOUND,
         "${BusinessErrorCode.CUSTOMER_NOT_FOUND.message} (ID: $customerId)",
-        mapOf("orderId" to customerId)
+        mapOf("customerId" to customerId)
     )
 
 }

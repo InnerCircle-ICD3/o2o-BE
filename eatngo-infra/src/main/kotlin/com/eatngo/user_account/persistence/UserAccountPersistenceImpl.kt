@@ -1,6 +1,7 @@
 package com.eatngo.user_account.persistence
 
 import com.eatngo.aop.SoftDeletedFilter
+import com.eatngo.common.exception.UserAccountException
 import com.eatngo.user_account.domain.UserAccount
 import com.eatngo.user_account.infra.UserAccountPersistence
 import com.eatngo.user_account.oauth2.constants.Oauth2Provider
@@ -18,7 +19,7 @@ class UserAccountPersistenceImpl(
     override fun save(account: UserAccount): UserAccount {
         val accountJpaEntity = userAccountRdbRepository.save(UserAccountJpaEntity.from(account))
         return userAccountRdbRepository.findById(accountJpaEntity.id)
-            .orElseThrow { IllegalArgumentException("User account not found after save") }
+            .orElseThrow { UserAccountException.UserAccountNotfoundException(accountJpaEntity.id) }
             .let { (UserAccountJpaEntity.toUserAccount(it)) }
     }
 
