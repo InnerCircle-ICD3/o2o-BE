@@ -13,9 +13,9 @@ interface StoreEvent {
         }
 
         // 매장 삭제 이벤트 (삭제 시점)
-        fun fromDelete(store: Store, userId: Long): StoreEvent? {
-            return if (store.deletedAt != null)
-                StoreDeletedEvent(store, userId)
+        fun fromDelete(isDeleted: Boolean, storeId: Long, userId: Long): StoreEvent? {
+            return if (isDeleted)
+                StoreDeletedEvent(storeId, userId)
             else null
         }
 
@@ -101,6 +101,6 @@ data class StorePickupInfoUpdatedEvent(
  * 매장 삭제 이벤트
  */
 data class StoreDeletedEvent(
-    val store: Store,
+    val storeId: Long,
     val userId: Long
 ) : StoreEvent

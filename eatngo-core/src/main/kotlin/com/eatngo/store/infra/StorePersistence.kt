@@ -27,8 +27,9 @@ interface StorePersistence {
      * 매장 저장
      */
     fun save(store: Store): Store
-}
 
-// extensions
-fun StorePersistence.findByIdOrThrow(id: Long): Store =
-    this.findById(id) ?: throw StoreException.StoreNotFound(id)
+    /**
+     * 매장 삭제
+     */
+    fun deleteById(id: Long): Boolean
+}

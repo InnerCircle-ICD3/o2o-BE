@@ -37,7 +37,7 @@ class StoreSubscriptionServiceImpl(
                 existingSubscription.restore()
                 storeSubscriptionPersistence.save(existingSubscription)
             } else {
-                existingSubscription.softDelete()
+//                existingSubscription.softDelete() -> persistence로
                 storeSubscriptionPersistence.save(existingSubscription)
             }
             existingSubscription

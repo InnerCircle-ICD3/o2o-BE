@@ -1,5 +1,6 @@
 package com.eatngo.store.controller
 
+import com.eatngo.aop.SoftDeletedFilter
 import com.eatngo.auth.annotaion.StoreOwnerId
 import com.eatngo.common.response.ApiResponse
 import com.eatngo.store.dto.StoreCreateRequest
@@ -29,7 +30,7 @@ class StoreController(
     private val storeQueryUseCase: StoreQueryUseCase
 ) {
     @Operation(summary = "상점 상세 조회", description = "점주가 운영중인 자신의 상점 상세 정보를 조회합니다.")
-    @GetMapping
+    @GetMapping @SoftDeletedFilter
     fun getStoresByOwnerId(@StoreOwnerId storeOwnerId: Long): ApiResponse<List<StoreDetailResponse>> {
         val storeDtos = storeQueryUseCase.getStoresByStoreOwnerId(storeOwnerId)
         val responses = storeDtos.map { StoreDetailResponse.fromStoreDto(it) }
@@ -68,7 +69,7 @@ class StoreController(
     @Operation(summary = "상점 삭제", description = "점주가 등록된 상점을 삭제합니다.")
     @DeleteMapping("/{storeId}")
     fun deleteStore(@PathVariable storeId: Long, @StoreOwnerId storeOwnerId: Long): ApiResponse<StoreCUDResponse> {
-        val storeDto = storeOwnerStoreDeletedUseCase.delete(storeId, storeOwnerId)
-        return ApiResponse.success(StoreCUDResponse(storeId = storeDto.storeId, actionTime = storeDto.deletedAt))
+        val response = storeOwnerStoreDeletedUseCase.delete(storeId, storeOwnerId)
+        return ApiResponse.success(StoreCUDResponse(storeId = response, actionTime = LocalDateTime.now()))
     }
 } 

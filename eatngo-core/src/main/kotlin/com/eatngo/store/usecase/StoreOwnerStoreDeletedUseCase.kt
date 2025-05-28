@@ -13,12 +13,12 @@ class StoreOwnerStoreDeletedUseCase(
     private val eventPublisher: ApplicationEventPublisher
 ) {
     @Transactional
-    fun delete(storeId: Long, storeOwnerId: Long): StoreDto {
-        val deletedStore = storeService.deleteStore(storeId, storeOwnerId)
+    fun delete(storeId: Long, storeOwnerId: Long): Long {
+        val isDeleted = storeService.deleteStore(storeId, storeOwnerId)
 
-        StoreEvent.fromDelete(deletedStore, storeOwnerId)
+        StoreEvent.fromDelete(isDeleted, storeId, storeOwnerId)
             ?.let { eventPublisher.publishEvent(it) }
 
-        return StoreDto.from(deletedStore)
+        return storeId
     }
 }

@@ -1,12 +1,13 @@
 package com.eatngo.store.serviceImpl
 
 import com.eatngo.common.constant.StoreEnum
+import com.eatngo.common.exception.StoreException
+import com.eatngo.extension.orThrow
 import com.eatngo.store.domain.Store
 import com.eatngo.store.dto.PickUpInfoDto
 import com.eatngo.store.dto.StoreCreateDto
 import com.eatngo.store.dto.StoreUpdateDto
 import com.eatngo.store.infra.StorePersistence
-import com.eatngo.store.infra.findByIdOrThrow
 import com.eatngo.store.service.StoreService
 import org.springframework.stereotype.Service
 
@@ -24,20 +25,20 @@ class StoreServiceImpl(
     }
 
     override fun updateStore(id: Long, request: StoreUpdateDto): Store {
-        val existingStore = storePersistence.findByIdOrThrow(id)
+        val existingStore = storePersistence.findById(id).orThrow { StoreException.StoreNotFound(id) }
         existingStore.requireOwner(request.storeOwnerId)
         existingStore.update(request)
         return storePersistence.save(existingStore)
     }
 
     override fun updateStoreStatus(id: Long, hasStock: Boolean): Store {
-        val existingStore = storePersistence.findByIdOrThrow(id)
+        val existingStore = storePersistence.findById(id).orThrow { StoreException.StoreNotFound(id) }
         existingStore.updateStoreStatus(hasStock)
         return storePersistence.save(existingStore)
     }
 
     override fun updateStoreStatus(id: Long, newStatus: String, storeOwnerId: Long): Store {
-        val existingStore = storePersistence.findByIdOrThrow(id)
+        val existingStore = storePersistence.findById(id).orThrow { StoreException.StoreNotFound(id) }
         existingStore.requireOwner(storeOwnerId)
 
         val status = StoreEnum.StoreStatus.valueOf(newStatus.uppercase())
@@ -53,7 +54,7 @@ class StoreServiceImpl(
 
     //TODO: UI 따라 삭제 가능성 있는 로직 -> 픽업 정보를 따로 변경하는 화면이 있지 않은 이상 매정 정보에서 같이 변경할거라 삭제가능성 있음
     override fun updateStorePickupInfo(id: Long, request: PickUpInfoDto, storeOwnerId: Long): Store {
-        val existingStore = storePersistence.findByIdOrThrow(id)
+        val existingStore = storePersistence.findById(id).orThrow { StoreException.StoreNotFound(id) }
         existingStore.requireOwner(storeOwnerId)
 
         existingStore.updatePickupInfo(
@@ -64,12 +65,11 @@ class StoreServiceImpl(
         return storePersistence.save(existingStore)
     }
 
-    override fun deleteStore(id: Long, storeOwnerId: Long): Store {
-        val existingStore = storePersistence.findByIdOrThrow(id)
+    override fun deleteStore(id: Long, storeOwnerId: Long): Boolean {
+        val existingStore = storePersistence.findById(id).orThrow { StoreException.StoreNotFound(id) }
         existingStore.requireOwner(storeOwnerId)
 
-        existingStore.softDelete()
-        return storePersistence.save(existingStore)
+        return storePersistence.deleteById(id)
     }
 
     override fun getStoresByStoreOwnerId(storeOwnerId: Long): List<Store> {
@@ -78,6 +78,7 @@ class StoreServiceImpl(
     }
 
     override fun getStoreById(id: Long): Store {
-        return storePersistence.findByIdOrThrow(id)
+        val existingStore = storePersistence.findById(id).orThrow { StoreException.StoreNotFound(id) }
+        return existingStore
     }
 }
