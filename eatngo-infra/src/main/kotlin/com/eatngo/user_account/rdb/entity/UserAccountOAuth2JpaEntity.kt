@@ -6,6 +6,7 @@ import com.eatngo.user_account.domain.UserAccount
 import com.eatngo.user_account.oauth2.constants.Oauth2Provider
 import com.eatngo.user_account.oauth2.domain.UserAccountOAuth2
 import com.eatngo.user_account.vo.EmailAddress
+import com.eatngo.user_account.vo.Nickname
 import jakarta.persistence.*
 import org.hibernate.annotations.Filter
 import java.time.LocalDateTime
@@ -74,7 +75,7 @@ class UserAccountOAuth2JpaEntity(
             val userAccount = UserAccount(
                 id = userAccount.id,
                 email = emailAddress,
-                nickname = nickname,
+                nickname = nickname?.let { Nickname(it) },
                 createdAt = createdAt,
                 updatedAt = updatedAt,
                 deletedAt = deletedAt,
@@ -95,5 +96,10 @@ class UserAccountOAuth2JpaEntity(
             )
             userAccount
         }
+    }
+
+    override fun delete() {
+        super.delete()
+        terms.forEach { it.delete() }
     }
 }

@@ -3,7 +3,6 @@ package com.eatngo.user_account.rdb.repository
 import com.eatngo.user_account.oauth2.constants.Oauth2Provider
 import com.eatngo.user_account.rdb.entity.UserAccountJpaEntity
 import org.springframework.data.jpa.repository.JpaRepository
-import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
 import java.util.*
 
@@ -27,13 +26,4 @@ interface UserAccountRdbRepository : JpaRepository<UserAccountJpaEntity, Long> {
     )
     fun findByOAuth2Key(userKey: String, provider: Oauth2Provider): UserAccountJpaEntity?
 
-    @Modifying(clearAutomatically = true, flushAutomatically = true)
-    @Query(
-        """
-        UPDATE UserAccountJpaEntity u
-        SET u.deletedAt = CURRENT_TIMESTAMP
-        WHERE u.id = :id
-    """
-    )
-    fun softDeleteById(id: Long)
 }
