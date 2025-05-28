@@ -28,8 +28,8 @@ class SearchStoreRepositoryImpl(
     override fun findBox(box: CoreBox): List<SearchStore> {
         val mongoBox: Shape =
             Box(
-                GeoJsonPoint(box.topLeft.lng, box.topLeft.lat),
-                GeoJsonPoint(box.bottomRight.lng, box.bottomRight.lat),
+                GeoJsonPoint(box.topLeft.longitude, box.topLeft.latitude),
+                GeoJsonPoint(box.bottomRight.longitude, box.bottomRight.latitude),
             )
 
         val query = Query()
@@ -115,8 +115,8 @@ class SearchStoreRepositoryImpl(
      *     }
      */
     override fun searchStore(
-        lng: Double,
-        lat: Double,
+        longitude: Double,
+        latitude: Double,
         maxDistance: Double,
         searchFilter: SearchFilter?,
         page: Int,
@@ -124,8 +124,8 @@ class SearchStoreRepositoryImpl(
     ): List<SearchStore> {
         val searchOp =
             makeSearchQuery(
-                lng = lng,
-                lat = lat,
+                longitude = longitude,
+                latitude = latitude,
                 maxDistance = maxDistance,
                 searchFilter = searchFilter,
             )
@@ -186,8 +186,8 @@ class SearchStoreRepositoryImpl(
     }
 
     fun makeSearchQuery(
-        lng: Double,
-        lat: Double,
+        longitude: Double,
+        latitude: Double,
         maxDistance: Double,
         searchFilter: SearchFilter?,
     ): AggregationOperation {
@@ -204,7 +204,7 @@ class SearchStoreRepositoryImpl(
                         "center",
                         Document("type", "Point").append(
                             "coordinates",
-                            listOf(lng, lat),
+                            listOf(longitude, latitude),
                         ),
                     ),
                 ).append("radius", maxDistance),
@@ -275,7 +275,7 @@ class SearchStoreRepositoryImpl(
                         Document(
                             "origin",
                             Document("type", "Point")
-                                .append("coordinates", listOf(lng, lat)),
+                                .append("coordinates", listOf(longitude, latitude)),
                         ).append("path", "location"),
                     ),
                 ),

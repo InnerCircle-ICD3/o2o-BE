@@ -59,22 +59,22 @@ class SearchStoreEntity(
                 closeTime = searchStore.businessHours.closeTime,
                 location =
                     toGeoJsonPoint(
-                        searchStore.location.lat,
-                        searchStore.location.lng,
+                        searchStore.location.latitude,
+                        searchStore.location.longitude,
                     ),
                 updatedAt = searchStore.updatedAt,
                 createdAt = searchStore.createdAt,
             )
 
         fun toGeoJsonPoint(
-            lat: Double,
-            lng: Double,
-        ): GeoJsonPoint = GeoJsonPoint(lng, lat)
+            latitude: Double,
+            longitude: Double,
+        ): GeoJsonPoint = GeoJsonPoint(longitude, latitude)
 
         fun toPoint(geoJsonPoint: GeoJsonPoint): Coordinate =
             Coordinate(
-                lat = geoJsonPoint.coordinates[1],
-                lng = geoJsonPoint.coordinates[0],
+                latitude = geoJsonPoint.coordinates[1],
+                longitude = geoJsonPoint.coordinates[0],
             )
     }
 }

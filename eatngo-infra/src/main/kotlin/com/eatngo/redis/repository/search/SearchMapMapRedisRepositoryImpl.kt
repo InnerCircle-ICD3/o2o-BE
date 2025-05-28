@@ -21,9 +21,9 @@ class SearchMapMapRedisRepositoryImpl(
     private val objectMapper: ObjectMapper,
 ) : SearchMapRedisRepository {
     override fun getKey(topLeft: Coordinate): String {
-        val lat = topLeft.lat
-        val lng = topLeft.lng
-        return "searchMap:lat:$lat:lng:$lng"
+        val latitude = topLeft.latitude
+        val longitude = topLeft.longitude
+        return "searchMap:lat:$latitude:lng:$longitude"
     }
 
     override fun save(

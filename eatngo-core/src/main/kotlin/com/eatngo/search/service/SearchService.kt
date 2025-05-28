@@ -40,8 +40,8 @@ class SearchService(
 
         val searchStoreList: List<SearchStore> =
             searchStoreRepository.searchStore(
-                lng = searchQuery.viewCoordinate.lng,
-                lat = searchQuery.viewCoordinate.lat,
+                longitude = searchQuery.viewCoordinate.longitude,
+                latitude = searchQuery.viewCoordinate.latitude,
                 maxDistance = searchDistance,
                 searchFilter = searchQuery.filter,
                 page = page,
@@ -68,8 +68,8 @@ class SearchService(
         // center 값을 기준으로 해당하는 box 좌표를 구한다.
         val box: Box =
             getBox(
-                lng = searchQuery.viewCoordinate.lng,
-                lat = searchQuery.viewCoordinate.lat,
+                longitude = searchQuery.viewCoordinate.longitude,
+                latitude = searchQuery.viewCoordinate.latitude,
             )
 
         // Redis에서 box 검색 결과를 가져온다. -> 위경도 기중 0.005 단위로 박스 매핑
@@ -112,24 +112,24 @@ class SearchService(
 
     /**
      * 검색 쿼리에서 box 좌표(0.005단위로 캐싱)를 구하는 메서드
-     * @param lng 경도
-     * @param lat 위도
+     * @param longitude 경도
+     * @param latitude 위도
      * @return Box 객체
      */
     fun getBox(
-        lng: Double,
-        lat: Double,
+        longitude: Double,
+        latitude: Double,
     ): Box {
         // 경도: 왼쪽(서쪽)으로 내림, 오른쪽(동쪽)으로 올림
-        val leftLng = floor(lng / cacheBoxSize) * cacheBoxSize
-        val rightLng = ceil(lng / cacheBoxSize) * cacheBoxSize
+        val leftLng = floor(longitude / cacheBoxSize) * cacheBoxSize
+        val rightLng = ceil(longitude / cacheBoxSize) * cacheBoxSize
 
         // 위도: 위쪽(북쪽)으로 올림, 아래쪽(남쪽)으로 내림
-        val topLat = ceil(lat / cacheBoxSize) * cacheBoxSize
-        val bottomLat = floor(lat / cacheBoxSize) * cacheBoxSize
+        val topLat = ceil(latitude / cacheBoxSize) * cacheBoxSize
+        val bottomLat = floor(latitude / cacheBoxSize) * cacheBoxSize
 
-        val topLeft = Coordinate(lng = leftLng, lat = topLat) // 서쪽 + 북쪽
-        val bottomRight = Coordinate(lng = rightLng, lat = bottomLat) // 동쪽 + 남쪽
+        val topLeft = Coordinate(longitude = leftLng, latitude = topLat) // 서쪽 + 북쪽
+        val bottomRight = Coordinate(longitude = rightLng, latitude = bottomLat) // 동쪽 + 남쪽
 
         return Box(topLeft, bottomRight)
     }

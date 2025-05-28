@@ -5,13 +5,11 @@ import com.eatngo.search.dto.Box
 import com.eatngo.search.dto.SearchFilter
 
 interface SearchStoreRepository {
-    fun findBox(
-        box: Box,
-    ): List<SearchStore>
+    fun findBox(box: Box): List<SearchStore>
 
     fun searchStore(
-        lng: Double,
-        lat: Double,
+        longitude: Double,
+        latitude: Double,
         maxDistance: Double,
         searchFilter: SearchFilter? = null,
         page: Int = 0,
@@ -20,6 +18,6 @@ interface SearchStoreRepository {
 
     fun searchStoreRecommend(
         keyword: String,
-        size: Int = 10
+        size: Int = 10,
     ): List<String>
 }

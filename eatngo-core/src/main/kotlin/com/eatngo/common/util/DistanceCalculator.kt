@@ -18,13 +18,13 @@ object DistanceCalculator {
     ): Double {
         val earthRadius = 6371.0 // km
 
-        val latDistance = Math.toRadians(to.lat - from.lat)
-        val lonDistance = Math.toRadians(to.lng - from.lng)
+        val latDistance = Math.toRadians(to.latitude - from.latitude)
+        val lonDistance = Math.toRadians(to.longitude - from.longitude)
 
         val a =
             sin(latDistance / 2).pow(2.0) +
-                cos(Math.toRadians(from.lat)) *
-                cos(Math.toRadians(to.lat)) *
+                cos(Math.toRadians(from.latitude)) *
+                cos(Math.toRadians(to.latitude)) *
                 sin(lonDistance / 2).pow(2.0)
 
         val c = 2 * atan2(sqrt(a), sqrt(1 - a))

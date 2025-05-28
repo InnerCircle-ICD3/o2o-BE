@@ -21,8 +21,8 @@ class SearchController(
     @Operation(summary = "가게 검색 API", description = "매장 리스트 리턴 및 검색 API")
     @GetMapping("/api/v1/search/store")
     fun searchStore(
-        @RequestParam lat: Double,
-        @RequestParam lng: Double,
+        @RequestParam latitude: Double,
+        @RequestParam longitude: Double,
         @RequestParam searchText: String?,
         @RequestParam category: String?,
         @RequestParam time: LocalDateTime?,
@@ -36,8 +36,8 @@ class SearchController(
                 SearchStoreQueryDto(
                     viewCoordinate =
                         Coordinate(
-                            lat = lat,
-                            lng = lng,
+                            latitude = latitude,
+                            longitude = longitude,
                         ),
                     filter =
                         SearchFilter(
@@ -58,16 +58,16 @@ class SearchController(
     @Operation(summary = "지도 검색 API", description = "지도에서 매장 포인트 리턴 API")
     @GetMapping("/api/v1/search/store/map")
     fun searchStoreMap(
-        @RequestParam lat: Double,
-        @RequestParam lng: Double,
+        @RequestParam latitude: Double,
+        @RequestParam longitude: Double,
     ): ResponseEntity<SearchStoreMapResultDto> =
         ResponseEntity.ok(
             searchService.searchStoreMap(
                 SearchStoreQueryDto(
                     viewCoordinate =
                         Coordinate(
-                            lat = lat,
-                            lng = lng,
+                            latitude = latitude,
+                            longitude = longitude,
                         ),
                 ),
             ),
