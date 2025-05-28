@@ -30,15 +30,6 @@ class StoreSubscription(
     }
 
     /**
-     * Soft Delete를 위한 메서드
-     */
-    fun softDelete() {
-        updatedAt = LocalDateTime.now()
-        deletedAt = LocalDateTime.now()
-    }
-
-
-    /**
      * 재구독
      */
     fun restore() {
