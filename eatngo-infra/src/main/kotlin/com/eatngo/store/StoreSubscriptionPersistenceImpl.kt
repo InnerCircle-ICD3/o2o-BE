@@ -1,4 +1,4 @@
-package com.eatngo.store.persistence
+package com.eatngo.store
 
 import com.eatngo.store.domain.StoreSubscription
 import com.eatngo.store.infra.StoreSubscriptionPersistence

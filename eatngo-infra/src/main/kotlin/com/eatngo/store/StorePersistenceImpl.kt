@@ -1,4 +1,4 @@
-package com.eatngo.store.persistence
+package com.eatngo.store
 
 import com.eatngo.common.constant.StoreEnum
 import com.eatngo.store.domain.Address
@@ -25,14 +25,6 @@ class StorePersistenceImpl : StorePersistence {
     }
 
     override fun save(store: Store): Store {
-        TODO("Not yet implemented")
-    }
-
-    override fun softDelete(id: Long): Boolean {
-        TODO("Not yet implemented")
-    }
-    
-    override fun updateStatus(id: Long, status: StoreEnum.StoreStatus): Boolean {
         TODO("Not yet implemented")
     }
 }
