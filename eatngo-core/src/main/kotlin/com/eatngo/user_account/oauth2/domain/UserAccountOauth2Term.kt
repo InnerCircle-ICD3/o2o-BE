@@ -4,7 +4,7 @@ import java.time.LocalDateTime
 
 class UserAccountOauth2Term(
     val id: Long = 0,
-    val userAccountOauth2: UserAccountOauth2,
+    val userAccountOauth2: UserAccountOAuth2,
     val tag: String,
     val agreedAt: LocalDateTime,
     val createdAt: LocalDateTime? = null,
@@ -12,7 +12,7 @@ class UserAccountOauth2Term(
 ) {
     companion object {
         fun of(
-            userAccountOauth2: UserAccountOauth2, tag: String
+            userAccountOauth2: UserAccountOAuth2, tag: String
         ): UserAccountOauth2Term {
             return UserAccountOauth2Term(
                 userAccountOauth2 = userAccountOauth2,

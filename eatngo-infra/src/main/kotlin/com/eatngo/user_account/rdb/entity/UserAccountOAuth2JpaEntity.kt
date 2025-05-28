@@ -4,7 +4,7 @@ import com.eatngo.common.BaseJpaEntity
 import com.eatngo.constants.DELETED_FILTER
 import com.eatngo.user_account.domain.UserAccount
 import com.eatngo.user_account.oauth2.constants.Oauth2Provider
-import com.eatngo.user_account.oauth2.domain.UserAccountOauth2
+import com.eatngo.user_account.oauth2.domain.UserAccountOAuth2
 import com.eatngo.user_account.vo.EmailAddress
 import jakarta.persistence.*
 import org.hibernate.annotations.Filter
@@ -50,7 +50,7 @@ class UserAccountOAuth2JpaEntity(
 ) : BaseJpaEntity() {
     companion object {
         fun of(
-            userAccountOauth2: UserAccountOauth2,
+            userAccountOauth2: UserAccountOAuth2,
             accountJpaEntity: UserAccountJpaEntity
         ) = UserAccountOAuth2JpaEntity(
             id = userAccountOauth2.id,
@@ -81,7 +81,7 @@ class UserAccountOAuth2JpaEntity(
             )
 
             userAccount.addOauth2(
-                UserAccountOauth2(
+                UserAccountOAuth2(
                     id = id,
                     userAccount = userAccount,
                     email = emailAddress,

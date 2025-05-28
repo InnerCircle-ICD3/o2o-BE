@@ -6,8 +6,8 @@ import com.eatngo.user_account.infra.UserAccountPersistence
 import com.eatngo.user_account.oauth2.constants.Oauth2Provider
 import com.eatngo.user_account.oauth2.constants.Role
 import com.eatngo.user_account.oauth2.constants.Role.*
-import com.eatngo.user_account.oauth2.dto.KakaoOauth2
-import com.eatngo.user_account.oauth2.dto.Oauth2
+import com.eatngo.user_account.oauth2.dto.KakaoOAuth2
+import com.eatngo.user_account.oauth2.dto.OAuth2
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest
@@ -25,10 +25,10 @@ class CustomOAuth2UserService(
         val oAuth2User = delegate.loadUser(userRequest)
 
         val provider = Oauth2Provider.valueOfIgnoreCase(userRequest.clientRegistration.registrationId)
-        val oauth2: Oauth2 = handleOauth2Attributes(provider, oAuth2User)
+        val oAuth2: OAuth2 = handleOauth2Attributes(provider, oAuth2User)
 
-        val userAccount = userAccountPersistence.findByOauth(oauth2.id.toString(), provider)
-            ?: userAccountPersistence.save(UserAccount.create(oauth2))
+        val userAccount = userAccountPersistence.findByOauth(oAuth2.id.toString(), provider)
+            ?: userAccountPersistence.save(UserAccount.create(oAuth2))
         // TODO term fetch api 추가하기
 
         val roles = handleRoles(userAccount)
@@ -59,7 +59,7 @@ class CustomOAuth2UserService(
         provider: Oauth2Provider,
         oAuth2User: OAuth2User
     ) = when (provider) {
-        Oauth2Provider.KAKAO -> KakaoOauth2(oAuth2User.attributes, provider)
+        Oauth2Provider.KAKAO -> KakaoOAuth2(oAuth2User.attributes, provider)
         else -> throw IllegalArgumentException("Unsupported provider: $provider")
     }
 }
