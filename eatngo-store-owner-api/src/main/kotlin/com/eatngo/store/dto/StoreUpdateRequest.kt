@@ -9,7 +9,6 @@ import java.time.LocalTime
  */
 
 data class StoreUpdateRequest(
-    val storeOwnerId: Long? = null,
     val name: String? = null,
     val businessNumber: Long? = null,
 
@@ -86,3 +85,5 @@ data class StoreUpdateRequest(
         )
     }
 }
+
+data class StoreStatusUpdateRequest(val status: String)

@@ -7,6 +7,7 @@ import com.eatngo.store.dto.StoreCreateRequest
 import com.eatngo.store.dto.StoreDetailResponse
 import com.eatngo.store.dto.StoreCUDResponse
 import com.eatngo.store.dto.StorePickUpInfoRequest
+import com.eatngo.store.dto.StoreStatusUpdateRequest
 import com.eatngo.store.dto.StoreUpdateRequest
 import com.eatngo.store.service.StoreService
 import com.eatngo.store.usecase.StoreOwnerStatusChangeUseCase
@@ -53,8 +54,8 @@ class StoreController(
     
     @Operation(summary = "상점 상태 변경", description = "점주가 상점의 영업 상태를 변경합니다.")
     @PatchMapping("/{storeId}/status")
-    fun updateStoreOnlyStatus(@PathVariable storeId: Long, @RequestBody request: String, @StoreOwnerId storeOwnerId: Long): ApiResponse<StoreCUDResponse> {
-        val storeDto = storeOwnerStatusChangeUseCase.change(storeId, storeOwnerId, request)
+    fun updateStoreOnlyStatus(@PathVariable storeId: Long, @RequestBody request: StoreStatusUpdateRequest, @StoreOwnerId storeOwnerId: Long): ApiResponse<StoreCUDResponse> {
+        val storeDto = storeOwnerStatusChangeUseCase.change(storeId, storeOwnerId, request.status)
         return ApiResponse.success(StoreCUDResponse(storeId = storeDto.storeId, actionTime = storeDto.updatedAt))
     }
 

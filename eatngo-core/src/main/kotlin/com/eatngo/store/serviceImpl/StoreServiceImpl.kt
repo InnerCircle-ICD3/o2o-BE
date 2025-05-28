@@ -41,7 +41,7 @@ class StoreServiceImpl(
         val existingStore = storePersistence.findById(id).orThrow { StoreException.StoreNotFound(id) }
         existingStore.requireOwner(storeOwnerId)
 
-        val status = StoreEnum.StoreStatus.valueOf(newStatus.uppercase())
+        val status = StoreEnum.StoreStatus.valueOf(newStatus.trim().uppercase())
 
         when (status) {
             StoreEnum.StoreStatus.OPEN -> existingStore.toOpen()
