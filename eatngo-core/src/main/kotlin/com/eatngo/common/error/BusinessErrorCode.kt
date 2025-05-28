@@ -42,18 +42,16 @@ enum class BusinessErrorCode(
     // 매장 생성 관련 오류
     STORE_VALIDATION_FAILED("S006", "매장 정보 검증에 실패했습니다."),
 
-    // 매장 상태 관련 오류
-    STORE_STATUS_INVALID("S012", "유효하지 않은 매장 상태입니다"),
-
     // 매장 점주 관련 오류
     STORE_OWNER_NOT_FOUND("S007", "점주 정보를 찾을 수 없습니다."),
     STORE_OWNER_ALREADY_EXISTS("S008", "이미 등록된 점주입니다."),
     STORE_REGISTRATION_FAILED("S009", "매장 등록에 실패했습니다."),
     STORE_UPDATE_FAILED("S010", "매장 정보 수정에 실패했습니다."),
     STORE_DELETE_FAILED("S011", "매장 삭제에 실패했습니다."),
-
+    // 매장 상태 관련 오류
+    STORE_STATUS_INVALID("S012", "유효하지 않은 매장 상태입니다"),
     // 매장 권한 관련 오류
-    STORE_OWNER_FORBIDDEN("S012", "해당 매장에 대한 권한이 없습니다."),
+    STORE_OWNER_FORBIDDEN("S013", "해당 매장에 대한 권한이 없습니다."),
 
     // 메뉴 관련 오류
     PRODUCT_NOT_FOUND("M001", "메뉴를 찾을 수 없습니다."),

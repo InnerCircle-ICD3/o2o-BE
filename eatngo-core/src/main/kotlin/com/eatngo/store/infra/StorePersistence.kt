@@ -29,7 +29,9 @@ interface StorePersistence {
     fun save(store: Store): Store
 
     /**
-     * 매장 삭제
-     */
+    * 매장 삭제 (soft delete)
+    * @param id 삭제할 매장 ID
+    * @return 삭제 성공 여부
+    */
     fun deleteById(id: Long): Boolean
 }
