@@ -1,7 +1,6 @@
 package com.eatngo.store.serviceImpl
 
 import com.eatngo.common.constant.StoreEnum
-import com.eatngo.common.exception.StoreException
 import com.eatngo.store.domain.Store
 import com.eatngo.store.dto.PickUpInfoDto
 import com.eatngo.store.dto.StoreCreateDto
@@ -12,7 +11,6 @@ import com.eatngo.store.infra.findByIdOrThrow
 import com.eatngo.store.infra.requireOwner
 import com.eatngo.store.service.StoreService
 import org.springframework.stereotype.Service
-import java.time.LocalDateTime
 
 /**
  * 상점 서비스 구현체
@@ -34,9 +32,9 @@ class StoreServiceImpl(
         return StoreDto.from(savedStore)
     }
 
-    override fun updateStoreStatus(id: Long, hasStock: Boolean, now: LocalDateTime): StoreDto {
+    override fun updateStoreStatus(id: Long, hasStock: Boolean): StoreDto {
         val existingStore = storePersistence.findByIdOrThrow(id)
-        existingStore.updateStoreStatus(now, hasStock)
+        existingStore.updateStoreStatus(hasStock)
         val savedStore = storePersistence.save(existingStore)
         return StoreDto.from(savedStore)
     }

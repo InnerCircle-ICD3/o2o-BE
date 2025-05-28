@@ -21,7 +21,7 @@ interface StoreService {
     /**
      * 상점 상태 변경
      */
-    fun updateStoreStatus(id: Long, hasStock: Boolean, now: LocalDateTime): StoreDto
+    fun updateStoreStatus(id: Long, hasStock: Boolean): StoreDto
 
     /**
      * 점주가 직접 상점의 상태를 변경
