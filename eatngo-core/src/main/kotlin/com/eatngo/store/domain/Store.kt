@@ -121,7 +121,7 @@ class Store(
 
 
     /**
-     * 점주 권한 확인 메서드 추가 (점주용)
+     * 점주 권한 확인 메서드
      */
     fun requireOwner(storeOwnerId: Long) {
         require(storeOwnerId == this.storeOwnerId) { "점주(ID: ${storeOwnerId})는 해당 매장(ID: ${this.id})의 작업을 수행할 수 없습니다." }
@@ -131,7 +131,6 @@ class Store(
      * 매장 정보 업데이트 (점주용)
      */
     fun update(request: StoreUpdateDto) {
-        requireOwner(request.storeOwnerId)
         request.name?.let { this.name = StoreNameVO.from(it) }
         request.description?.let { this.description = DescriptionVO.from(it) }
         request.address?.let { addr ->
@@ -174,20 +173,17 @@ class Store(
     /**
      *  상태 전이 메서드 (점주용)
      */
-    fun toOpen(storeOwnerId: Long) {
-        requireOwner(storeOwnerId)
+    fun toOpen() {
         status = status.open()
         updatedAt = LocalDateTime.now()
     }
 
-    fun toClose(storeOwnerId: Long) {
-        requireOwner(storeOwnerId)
+    fun toClose() {
         status = status.close()
         updatedAt = LocalDateTime.now()
     }
 
-    fun toPending(storeOwnerId: Long) {
-        requireOwner(storeOwnerId)
+    fun toPending() {
         status = status.pending()
         updatedAt = LocalDateTime.now()
     }
@@ -229,13 +225,10 @@ class Store(
      * 픽업 정보만 업데이트
      */
     fun updatePickupInfo(
-        storeOwnerId: Long,
         pickupDay: StoreEnum.PickupDay?,
         startTime: LocalTime?,
         endTime: LocalTime?
     ) {
-        requireOwner(storeOwnerId)
-
         this.pickUpInfo = PickUpInfoVO.from(
             pickupDay!!,
             startTime!!,
@@ -247,9 +240,7 @@ class Store(
     /**
      * Soft Delete를 위한 메서드
      */
-    fun softDelete(storeOwnerId: Long) {
-        requireOwner(storeOwnerId)
-
+    fun softDelete() {
         updatedAt = LocalDateTime.now()
         deletedAt = LocalDateTime.now()
     }
