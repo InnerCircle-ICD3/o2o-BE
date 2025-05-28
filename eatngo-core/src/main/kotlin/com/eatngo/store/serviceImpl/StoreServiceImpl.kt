@@ -4,11 +4,9 @@ import com.eatngo.common.constant.StoreEnum
 import com.eatngo.store.domain.Store
 import com.eatngo.store.dto.PickUpInfoDto
 import com.eatngo.store.dto.StoreCreateDto
-import com.eatngo.store.dto.StoreDto
 import com.eatngo.store.dto.StoreUpdateDto
 import com.eatngo.store.infra.StorePersistence
 import com.eatngo.store.infra.findByIdOrThrow
-import com.eatngo.store.infra.requireOwner
 import com.eatngo.store.service.StoreService
 import org.springframework.stereotype.Service
 
@@ -19,38 +17,40 @@ import org.springframework.stereotype.Service
 class StoreServiceImpl(
     private val storePersistence: StorePersistence,
 ) : StoreService {
-    override fun createStore(request: StoreCreateDto): StoreDto {
+    override fun createStore(request: StoreCreateDto): Store {
         val store = Store.create(request)
-        val savedStore = storePersistence.save(store)
-        return StoreDto.from(savedStore)
+        return storePersistence.save(store)
     }
 
-    override fun updateStore(id: Long, request: StoreUpdateDto): StoreDto {
+    override fun updateStore(id: Long, request: StoreUpdateDto): Store {
         val existingStore = storePersistence.findByIdOrThrow(id)
+        existingStore.requireOwner(request.storeOwnerId)
         existingStore.update(request)
-        val savedStore = storePersistence.save(existingStore)
-        return StoreDto.from(savedStore)
+        return storePersistence.save(existingStore)
     }
 
-    override fun updateStoreStatus(id: Long, hasStock: Boolean): StoreDto {
+    override fun updateStoreStatus(id: Long, hasStock: Boolean): Store {
         val existingStore = storePersistence.findByIdOrThrow(id)
         existingStore.updateStoreStatus(hasStock)
-        val savedStore = storePersistence.save(existingStore)
-        return StoreDto.from(savedStore)
+        return storePersistence.save(existingStore)
     }
 
-    override fun updateStoreOnlyStatus(id: Long, newStatus: String, storeOwnerId: Long): StoreDto {
+    override fun updateStoreStatus(id: Long, newStatus: String, storeOwnerId: Long): Store {
         val existingStore = storePersistence.findByIdOrThrow(id)
         existingStore.requireOwner(storeOwnerId)
 
         val status = StoreEnum.StoreStatus.valueOf(newStatus.uppercase())
 
-        existingStore.updateOnlyStoreStatus(status)
-        val savedStore = storePersistence.save(existingStore)
-        return StoreDto.from(savedStore)
+        when (status) {
+            StoreEnum.StoreStatus.OPEN -> existingStore.toOpen()
+            StoreEnum.StoreStatus.CLOSED -> existingStore.toClose()
+            StoreEnum.StoreStatus.PENDING -> existingStore.toPending()
+        }
+
+        return storePersistence.save(existingStore)
     }
 
-    override fun updateStorePickupInfo(id: Long, request: PickUpInfoDto, storeOwnerId: Long): StoreDto {
+    override fun updateStorePickupInfo(id: Long, request: PickUpInfoDto, storeOwnerId: Long): Store {
         val existingStore = storePersistence.findByIdOrThrow(id)
         existingStore.requireOwner(storeOwnerId)
 
@@ -59,31 +59,20 @@ class StoreServiceImpl(
             request.pickupStartTime,
             request.pickupEndTime
         )
-        val savedStore = storePersistence.save(existingStore)
-        return StoreDto.from(savedStore)
+        return storePersistence.save(existingStore)
     }
 
-    override fun getStoreDetail(id: Long): StoreDto {
-        val store = storePersistence.findByIdOrThrow(id)
-        return StoreDto.from(store)
-    }
-
-    override fun getStoreDetail(id: Long, storeOwnerId: Long): StoreDto {
-        val existingStore = storePersistence.findByIdOrThrow(id)
-        existingStore.requireOwner(storeOwnerId)
-        return StoreDto.from(existingStore)
-    }
-
-    override fun getStoreByOwnerId(storeOwnerId: Long): List<StoreDto> {
-        return storePersistence.findByOwnerId(storeOwnerId).map { StoreDto.from(it) }
-    }
-
-    override fun deleteStore(id: Long, storeOwnerId: Long): StoreDto {
+    override fun deleteStore(id: Long, storeOwnerId: Long): Store {
         val existingStore = storePersistence.findByIdOrThrow(id)
         existingStore.requireOwner(storeOwnerId)
 
         existingStore.softDelete()
-        val savedStore = storePersistence.save(existingStore)
-        return StoreDto.from(savedStore)
+        return storePersistence.save(existingStore)
+    }
+
+    override fun getStoreDetail(id: Long, storeOwnerId: Long): Store {
+        val existingStore = storePersistence.findByIdOrThrow(id)
+        existingStore.requireOwner(storeOwnerId)
+        return existingStore
     }
 }
