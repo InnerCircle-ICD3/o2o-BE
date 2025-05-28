@@ -1,6 +1,5 @@
 package com.eatngo.store.usecase
 
-import com.eatngo.store.dto.StoreCreateDto
 import com.eatngo.store.dto.StoreDto
 import com.eatngo.store.event.StoreEvent
 import com.eatngo.store.service.StoreService
@@ -9,18 +8,17 @@ import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 
 @Service
-class StoreOwnerStoreCreatedUseCase(
+class StoreOwnerStoreDeletedUseCase(
     private val storeService: StoreService,
     private val eventPublisher: ApplicationEventPublisher
 ) {
     @Transactional
-    fun create(request: StoreCreateDto): StoreDto {
-        val store = storeService.createStore(request)
+    fun delete(storeId: Long, storeOwnerId: Long): StoreDto {
+        val deletedStore = storeService.deleteStore(storeId, storeOwnerId)
 
-        // 이벤트 발행
-        StoreEvent.fromCreate(store, request.storeOwnerId)
+        StoreEvent.fromDelete(deletedStore, storeOwnerId)
             ?.let { eventPublisher.publishEvent(it) }
 
-        return StoreDto.from(store)
+        return StoreDto.from(deletedStore)
     }
 }

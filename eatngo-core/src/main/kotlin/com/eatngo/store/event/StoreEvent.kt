@@ -26,9 +26,6 @@ interface StoreEvent {
                 StoreEnum.StoreStatus.OPEN -> StoreOpenedEvent(store, userId)
                 StoreEnum.StoreStatus.CLOSED -> StoreClosedEvent(store, userId)
                 StoreEnum.StoreStatus.PENDING -> StorePendingEvent(store, userId)
-            }.let { statusEvent ->
-                //TODO
-                statusEvent
             }
         }
 
