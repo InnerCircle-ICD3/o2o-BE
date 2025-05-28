@@ -38,7 +38,12 @@ interface StoreService {
     fun deleteStore(id: Long, storeOwnerId: Long): Store
 
     /**
-     * ID로 상점 조회 - 권한 체크 필요
+     * 상점 주인 ID로 상점 조회
      */
-    fun getStoreDetail(id: Long, storeOwnerId: Long): Store
+    fun getStoresByStoreOwnerId(storeOwnerId: Long): List<Store>
+
+    /**
+     * 상점 ID로 상점 조회
+     */
+    fun getStoreById(id: Long): Store
 } 

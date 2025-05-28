@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service
 class StoreServiceImpl(
     private val storePersistence: StorePersistence,
 ) : StoreService {
+
     override fun createStore(request: StoreCreateDto): Store {
         val store = Store.create(request)
         return storePersistence.save(store)
@@ -50,6 +51,7 @@ class StoreServiceImpl(
         return storePersistence.save(existingStore)
     }
 
+    //TODO: UI 따라 삭제 가능성 있는 로직 -> 픽업 정보를 따로 변경하는 화면이 있지 않은 이상 매정 정보에서 같이 변경할거라 삭제가능성 있음
     override fun updateStorePickupInfo(id: Long, request: PickUpInfoDto, storeOwnerId: Long): Store {
         val existingStore = storePersistence.findByIdOrThrow(id)
         existingStore.requireOwner(storeOwnerId)
@@ -70,9 +72,12 @@ class StoreServiceImpl(
         return storePersistence.save(existingStore)
     }
 
-    override fun getStoreDetail(id: Long, storeOwnerId: Long): Store {
-        val existingStore = storePersistence.findByIdOrThrow(id)
-        existingStore.requireOwner(storeOwnerId)
+    override fun getStoresByStoreOwnerId(storeOwnerId: Long): List<Store> {
+        val existingStore = storePersistence.findByOwnerId(storeOwnerId)
         return existingStore
+    }
+
+    override fun getStoreById(id: Long): Store {
+        return storePersistence.findByIdOrThrow(id)
     }
 }
