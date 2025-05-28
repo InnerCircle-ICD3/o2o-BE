@@ -28,6 +28,10 @@ class UserAccount(
         userAccountUpdateDto.nickname?.let { this.nickname = it }
     }
 
+    fun update(userAccountUpdateDto: UserAccountUpdateDto) {
+        userAccountUpdateDto.nickname?.let { this.nickname = it }
+    }
+
     companion object {
 
         fun create(oAuth2: OAuth2): UserAccount {
