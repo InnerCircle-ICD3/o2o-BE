@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component
 @Component
 class OAuth2LoginSuccessHandler(
     private val tokenProvider: TokenProvider,
-    private val postProcessor: OAuth2SuccessPostProcessor // 다형성 지원
+    private val postProcessor: OAuth2SuccessPostProcessor
 ) : AuthenticationSuccessHandler {
 
     override fun onAuthenticationSuccess(
@@ -33,6 +33,16 @@ class OAuth2LoginSuccessHandler(
         response.addHeader("Set-Cookie", responseCookie.toString())
         // TODO redis refresh token 추가하기
         response.contentType = "application/json"
+
+        val kakaoAccount = attributes["kakao_account"] as? Map<*, *> ?: emptyMap<Any, Any>()
+        val profile = kakaoAccount["profile"] as? Map<*, *> ?: emptyMap<Any, Any>()
+        val oAuthNickname = profile["nickname"] as? String
+
+        if (loginUser.nickname == null || oAuthNickname == null) {
+            response.status = HttpServletResponse.SC_MOVED_TEMPORARILY
+            response.setHeader("Location", "/mypage/complete-profile")
+            return
+        }
     }
 
     private fun createHttpOnlyCookie(name: String, value: String): ResponseCookie {

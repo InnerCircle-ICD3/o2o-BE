@@ -26,6 +26,7 @@ class StoreOwnerOAuth2SuccessPostProcessor(
         val loginStoreOwner = LoginStoreOwner(
             userAccountId = userId,
             roles = listOf(Role.USER.name, Role.STORE_OWNER.name),
+            nickname = storeOwner.account.nickname,
             storeOwnerId = storeOwner.id
         )
 

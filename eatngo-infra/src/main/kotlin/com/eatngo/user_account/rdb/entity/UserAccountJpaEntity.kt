@@ -23,7 +23,7 @@ class UserAccountJpaEntity(
 
     @OneToMany(mappedBy = "userAccount", fetch = FetchType.LAZY, cascade = [CascadeType.PERSIST])
     @Filter(name = DELETED_FILTER)
-    val oauth2: MutableList<UserAccountOAuth2JpaEntity> = mutableListOf(),
+    val oAuth2: MutableList<UserAccountOAuth2JpaEntity> = mutableListOf(),
 
     @OneToMany(mappedBy = "account", fetch = FetchType.LAZY, cascade = [CascadeType.PERSIST])
     @Filter(name = DELETED_FILTER)

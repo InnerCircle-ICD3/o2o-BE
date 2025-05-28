@@ -3,6 +3,7 @@ package com.eatngo.handler
 import com.eatngo.common.error.CommonErrorCode
 import com.eatngo.common.exception.CustomerException
 import com.eatngo.common.exception.OrderException
+import com.eatngo.common.exception.StoreException
 import com.eatngo.common.response.ApiResponse
 import jakarta.servlet.http.HttpServletRequest
 import org.slf4j.LoggerFactory
@@ -19,6 +20,30 @@ import java.time.LocalDateTime
 class CustomerApiExceptionHandler {
     companion object {
         private val log = LoggerFactory.getLogger(this::class.java)
+    }
+
+    // 상점 관련 예외 처리
+    @ExceptionHandler(StoreException::class)
+    fun handleStoreException(e: StoreException, request: HttpServletRequest): ResponseEntity<ApiResponse<Nothing>> {
+        // context 정보 구성
+        val context = buildLogContext(request, e.data)
+
+        // HTTP 상태 결정
+        val (httpStatus, logLevel) = when (e) {
+            is StoreException.StoreNotFound -> HttpStatus.NOT_FOUND to Level.WARN
+            is StoreException.StoreClosed,
+            is StoreException.StoreNotAvailable -> HttpStatus.CONFLICT to Level.WARN
+            is StoreException.SubscriptionNotFound -> HttpStatus.NOT_FOUND to Level.WARN
+            is StoreException.SubscriptionUpdateFailed -> HttpStatus.BAD_REQUEST to Level.ERROR
+            else -> HttpStatus.BAD_REQUEST to Level.ERROR
+        }
+
+        // 로그 메시지 기록
+        logError(e, logLevel, e.message, context)
+
+        return ResponseEntity
+            .status(httpStatus)
+            .body(ApiResponse.error(e.errorCode.code, e.message))
     }
 
     @ExceptionHandler(OrderException::class)
