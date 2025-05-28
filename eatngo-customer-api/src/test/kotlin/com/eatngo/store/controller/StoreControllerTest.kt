@@ -40,7 +40,7 @@
 //
 //    val roadAddress = RoadAddressDto(
 //        fullAddress = "서울특별시 강남구 테헤란로 123",
-//        zoneNo = "12345",
+//        zipCode = "12345",
 //        buildingName = "테스트빌딩"
 //    )
 //

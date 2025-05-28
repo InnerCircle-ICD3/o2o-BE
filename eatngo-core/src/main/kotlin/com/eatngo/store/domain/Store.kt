@@ -1,6 +1,7 @@
 package com.eatngo.store.domain
 
 import com.eatngo.common.constant.StoreEnum
+import com.eatngo.store.dto.CoordinateDto
 import com.eatngo.store.dto.StoreCreateDto
 import com.eatngo.store.dto.StoreDto
 import com.eatngo.store.dto.StoreUpdateDto
@@ -24,7 +25,6 @@ class Store(
     var storeCategoryInfo: StoreCategoryInfo, // 매장의 카테고리 정보들
     var status: StoreEnum.StoreStatus = StoreEnum.StoreStatus.PENDING, // 매장 상태(기본: 승인대기중)
     var pickUpInfo: PickUpInfoVO,         // 픽업과 관련된 정보(픽업시간 from to, 오늘/내일 픽업)
-    val reviewInfo: ReviewInfoVO,         // 리뷰와 관련된 정보(평균 별점, 리뷰 개수)
     val createdAt: LocalDateTime,       // 생성일
     var updatedAt: LocalDateTime,       // 수정일
     var deletedAt: LocalDateTime? = null, // 삭제일(softDel용, 삭제 시간이 존재하면 softDel)
@@ -37,12 +37,9 @@ class Store(
                 name = StoreNameVO.from(dto.name),
                 description = DescriptionVO.from(dto.description),
                 address = Address(
-                    roadAddress = RoadAddressVO.from(
-                        fullAddress = dto.address.roadAddress.fullAddress,
-                        zoneNo = dto.address.roadAddress.zoneNo
-                    ),
-                    legalAddress = dto.address.legalAddress?.fullAddress?.let { LegalAddress(it) },
-                    adminAddress = dto.address.adminAddress?.fullAddress?.let { AdminAddress(it) },
+                    roadNameAddress = RoadNameAddressVO.from(dto.address.roadNameAddress),
+                    lotNumberAddress = LotNumberAddressVO.from(dto.address.lotNumberAddress),
+                    zipCode = ZipCodeVO.from(dto.address.zipCode),
                     coordinate = CoordinateVO.from(
                         dto.address.coordinate.latitude ?: 0.0,
                         dto.address.coordinate.longitude ?: 0.0
@@ -63,10 +60,6 @@ class Store(
                     dto.pickUpInfo.pickupStartTime!!,
                     dto.pickUpInfo.pickupEndTime!!
                 ),
-                reviewInfo = ReviewInfoVO.from(
-                    dto.reviewInfo.ratingAverage,
-                    dto.reviewInfo.ratingCount
-                ),
                 createdAt = dto.createdAt,
                 updatedAt = dto.updatedAt,
                 deletedAt = null
@@ -83,12 +76,9 @@ class Store(
                 name = StoreNameVO.from(request.name),
                 description = DescriptionVO.from(request.description),
                 address = Address(
-                    roadAddress = RoadAddressVO.from(
-                        request.address.roadAddress.fullAddress,
-                        request.address.roadAddress.zoneNo
-                    ),
-                    legalAddress = request.address.legalAddress?.fullAddress?.let { LegalAddress(it) },
-                    adminAddress = request.address.adminAddress?.fullAddress?.let { AdminAddress(it) },
+                    roadNameAddress = RoadNameAddressVO.from(request.address.roadNameAddress),
+                    lotNumberAddress = LotNumberAddressVO.from(request.address.lotNumberAddress),
+                    zipCode = ZipCodeVO.from(request.address.zipCode),
                     coordinate = CoordinateVO.from(
                         request.address.coordinate.latitude ?: 0.0,
                         request.address.coordinate.longitude ?: 0.0
@@ -111,7 +101,6 @@ class Store(
                     request.pickUpInfo.pickupStartTime!!,
                     request.pickUpInfo.pickupEndTime!!
                 ),
-                reviewInfo = ReviewInfoVO.from(0.0, 0),
                 createdAt = LocalDateTime.now(),
                 updatedAt = LocalDateTime.now(),
                 deletedAt = null
@@ -135,12 +124,9 @@ class Store(
         request.description?.let { this.description = DescriptionVO.from(it) }
         request.address?.let { addr ->
             this.address = Address(
-                roadAddress = RoadAddressVO.from(
-                    fullAddress = addr.roadAddress.fullAddress,
-                    zoneNo = addr.roadAddress.zoneNo
-                ),
-                legalAddress = addr.legalAddress?.fullAddress?.let { LegalAddress(it) },
-                adminAddress = addr.adminAddress?.fullAddress?.let { AdminAddress(it) },
+                roadNameAddress = RoadNameAddressVO.from(addr.roadNameAddress),
+                lotNumberAddress = LotNumberAddressVO.from(addr.lotNumberAddress),
+                zipCode = ZipCodeVO.from(addr.zipCode),
                 coordinate = CoordinateVO.from(
                     addr.coordinate.latitude ?: 0.0,
                     addr.coordinate.longitude ?: 0.0
@@ -250,24 +236,10 @@ class Store(
  * 매장 위치 정보
  */
 data class Address(
-    val roadAddress: RoadAddressVO,           // 도로명 주소 (필수)
-    val legalAddress: LegalAddress? = null, // 법정동 주소
-    val adminAddress: AdminAddress? = null, // 행정동 주소
-    val coordinate: CoordinateVO              // 위도, 경도
-)
-
-/**
- * 법정동 주소
- */
-data class LegalAddress(
-    val fullAddress: String?,     // 전체 지번 주소
-)
-
-/**
- * 행정동 주소
- */
-data class AdminAddress(
-    val fullAddress: String?       // 전체 행정동 주소
+    val roadNameAddress: RoadNameAddressVO,      // 도로명 주소 (VO)
+    val lotNumberAddress: LotNumberAddressVO,   // 지번 주소
+    val zipCode: ZipCodeVO,                      // 우편번호
+    val coordinate: CoordinateVO          // 위도, 경도
 )
 
 /**
