@@ -10,10 +10,9 @@ interface CustomerAddressRedisRepository {
     fun save(
         key: String,
         address: CustomerAddress,
-    ): String
+    )
 
-    fun deleteAddressId(
+    fun deleteValue(
         key: String,
-        addressId: Long,
-    ): Boolean
+    )
 }

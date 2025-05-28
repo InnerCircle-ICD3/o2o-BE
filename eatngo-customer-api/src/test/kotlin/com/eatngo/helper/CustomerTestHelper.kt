@@ -1,0 +1,52 @@
+package com.eatngo.helper
+
+import com.eatngo.auth.dto.LoginCustomer
+import com.eatngo.auth.token.TokenProvider
+import com.eatngo.customer.service.CustomerService
+import com.eatngo.user_account.oauth2.constants.Oauth2Provider
+import com.eatngo.user_account.oauth2.dto.KakaoOAuth2
+import com.eatngo.user_account.service.UserAccountService
+import org.springframework.boot.test.context.TestComponent
+
+@TestComponent
+class CustomerTestHelper(
+    private val userAccountService: UserAccountService,
+    private val customerService: CustomerService,
+    private val tokenProvider: TokenProvider,
+) {
+    fun 유저_생성_및_토큰_반환(): Pair<String, LoginCustomer> {
+        val account = userAccountService.createAccount(
+            KakaoOAuth2(
+                mapOf(
+                    "id" to System.currentTimeMillis(),
+                    "kakao_account" to mapOf(
+                        "email" to "test${System.nanoTime()}@test.com",
+                        "profile" to mapOf("nickname" to "홍길동")
+                    )
+                ),
+                Oauth2Provider.KAKAO
+            )
+        )
+
+        val customer = customerService.createByAccount(account)
+
+        val loginCustomer = LoginCustomer(
+            userAccountId = account.id,
+            roles = account.roles.map { it.name },
+            customerId = customer.id,
+            nickname = customer.account.nickname?.value ?: "홍길동"
+        )
+
+        val token = tokenProvider.createAccessToken(loginCustomer)
+        return token to loginCustomer
+    }
+
+    fun 데이터_삭제(loginCustomer: LoginCustomer) {
+        try {
+            customerService.deleteCustomer(loginCustomer.customerId)
+            userAccountService.deleteAccount(loginCustomer.userAccountId)
+        } catch (e: Exception) {
+            println("데이터 삭제 실패: ${e.message}")
+        }
+    }
+}

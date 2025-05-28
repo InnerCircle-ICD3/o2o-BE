@@ -1,53 +1,51 @@
 package com.eatngo.customer.service
 
-import com.eatngo.customer.domain.CustomerAddress
+import com.eatngo.common.exception.CustomerException
+import com.eatngo.customer.dto.AddressCreateDto
 import com.eatngo.customer.dto.CustomerAddressDto
 import com.eatngo.customer.infra.CustomerAddressPersistence
 import com.eatngo.customer.infra.CustomerAddressRedisRepository
+import com.eatngo.customer.infra.CustomerPersistence
+import com.eatngo.extension.orThrow
 import org.springframework.stereotype.Service
 
 @Service
 class CustomerAddressService(
+    private val customerPersistence: CustomerPersistence,
     private val customerAddressPersistence: CustomerAddressPersistence,
     private val customerAddressRedisRepository: CustomerAddressRedisRepository,
 ) {
-    fun getAddressList(): List<CustomerAddressDto> {
-        // TODO : CustomerId 파라미터로 받아서 처리
-        val customerId = 1L
-
-        val redisKey = customerAddressRedisRepository.getKey(customerId)
-        var addressList = customerAddressRedisRepository.findCustomerAddress(redisKey)
-        if (addressList.isEmpty()) {
-            addressList = customerAddressPersistence.findByCustomerId(customerId)
+    fun getAddressList(customerId: Long): List<CustomerAddressDto> = customerPersistence.findById(customerId)
+        .orThrow { CustomerException.CustomerNotFound(customerId) }
+        .let {
+            val customer = it
+            customerAddressRedisRepository.findCustomerAddress(customerAddressRedisRepository.getKey(it.id))
+                .ifEmpty { customerAddressPersistence.findByCustomer(customer) }
+                .map(CustomerAddressDto.Companion::from)
         }
-        return addressList.map {
-            CustomerAddressDto.from(it)
+
+    fun addAddress(customerId: Long, addressCreateDto: AddressCreateDto): Long = customerPersistence.findById(customerId)
+        .orThrow { CustomerException.CustomerNotFound(customerId) }
+        .let {
+            customerAddressPersistence.save(it, addressCreateDto.toCustomerAddress())
+                .let {
+                    val redisKey = customerAddressRedisRepository.getKey(it.customerId!!)
+                    customerAddressRedisRepository.save(
+                        key = redisKey,
+                        address = it,
+                    )
+                    it.addressId!!
+                }
         }
-    }
 
-    fun addAddress(address: CustomerAddress): Long {
-        // TODO : 주소 검증(위경도 <-> 주소 변환) 구현
-        // TODO : 주소 중복 체크 구현
-        val saveRes = customerAddressPersistence.save(address)
-
-        val redisKey = customerAddressRedisRepository.getKey(saveRes.customerId)
-        customerAddressRedisRepository.save(
-            key = redisKey,
-            address = saveRes,
-        )
-        return saveRes.addressId
-    }
-
-    fun deleteAddress(addressId: Long): Boolean {
-        // TODO : CustomerId 파라미터로 받아서 처리
-        val customerId = 1L
-
-        val success = customerAddressPersistence.deleteById(addressId)
-        if (success) {
-            // TODO: 비동기로 처리?
-            val key = customerAddressRedisRepository.getKey(customerId)
-            customerAddressRedisRepository.deleteAddressId(key, addressId)
-        }
-        return success
-    }
+    fun deleteAddress(customerId: Long, addressId: Long) =
+        customerPersistence.findById(customerId)
+            .orThrow { CustomerException.CustomerNotFound(customerId) }
+            .let {
+                customerAddressPersistence.deleteById(addressId)
+            }
+            .also {
+                val key = customerAddressRedisRepository.getKey(customerId)
+                customerAddressRedisRepository.deleteValue(key)
+            }
 }
