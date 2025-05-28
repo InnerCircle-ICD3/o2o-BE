@@ -7,7 +7,7 @@ data class StoreCreateDto(
     val storeOwnerId: Long,
     val name: String,
     val address: AddressDto,
-    val businessNumber: String,
+    val businessNumber: Long,
     val businessHours: List<BusinessHourDto>?,
     val contactNumber: String?,
     val description: String?,

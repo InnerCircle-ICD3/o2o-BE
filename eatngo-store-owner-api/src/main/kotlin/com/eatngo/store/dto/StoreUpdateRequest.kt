@@ -11,7 +11,7 @@ import java.time.LocalTime
 data class StoreUpdateRequest(
     val storeOwnerId: Long? = null,
     val name: String? = null,
-    val businessNumber: String? = null,
+    val businessNumber: Long? = null,
 
     // 주소 정보 (flat)
     val roadNameAddress: String? = null,

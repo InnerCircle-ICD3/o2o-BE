@@ -19,14 +19,13 @@ value class StoreNameVO(val value: String) {
 }
 
 @JvmInline
-value class BusinessNumberVO(val value: String) {
+value class BusinessNumberVO(val value: Long) {
     init {
-        require(value.isNotBlank()) { "사업자등록번호는 비어있을 수 없습니다" }
-        require(value.matches(Regex("^\\d{10}$"))) { "사업자등록번호는 10자리 숫자여야 합니다" }
+        require(value.toString().length == 10) { "사업자등록번호는 10자리 숫자여야 합니다" }
     }
 
     companion object {
-        fun from(number: String): BusinessNumberVO = BusinessNumberVO(number)
+        fun from(number: Long): BusinessNumberVO = BusinessNumberVO(number)
     }
 }
 
