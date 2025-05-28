@@ -39,7 +39,7 @@ class Store(
                 address = Address(
                     roadAddress = RoadAddressVO.from(
                         fullAddress = dto.address.roadAddress.fullAddress,
-                        zoneNo =dto.address.roadAddress.zoneNo
+                        zoneNo = dto.address.roadAddress.zoneNo
                     ),
                     legalAddress = dto.address.legalAddress?.fullAddress?.let { LegalAddress(it) },
                     adminAddress = dto.address.adminAddress?.fullAddress?.let { AdminAddress(it) },
@@ -53,7 +53,8 @@ class Store(
                 imageUrl = dto.imageUrl?.let { ImageUrlVO.from(it) },
                 businessHours = BusinessHourVO.fromList(dto.businessHours),
                 storeCategoryInfo = StoreCategoryInfo(
-                    storeCategory = dto.storeCategoryInfo.storeCategory?.map { StoreCategoryVO.from(it) } ?: emptyList(),
+                    storeCategory = dto.storeCategoryInfo.storeCategory?.map { StoreCategoryVO.from(it) }
+                        ?: emptyList(),
                     foodCategory = dto.storeCategoryInfo.foodCategory?.map { FoodCategoryVO.from(it) }
                 ),
                 status = dto.status,
@@ -71,6 +72,10 @@ class Store(
                 deletedAt = null
             )
         }
+
+        /**
+         * 매장 생성 (점주용)
+         */
         fun create(request: StoreCreateDto): Store {
             return Store(
                 id = 0L,
@@ -96,7 +101,8 @@ class Store(
                     BusinessHourVO.from(it.dayOfWeek, it.openTime, it.closeTime)
                 } ?: emptyList(),
                 storeCategoryInfo = StoreCategoryInfo(
-                    storeCategory = request.storeCategoryInfo.storeCategory?.map { StoreCategoryVO.from(it) } ?: emptyList(),
+                    storeCategory = request.storeCategoryInfo.storeCategory?.map { StoreCategoryVO.from(it) }
+                        ?: emptyList(),
                     foodCategory = request.storeCategoryInfo.foodCategory?.map { FoodCategoryVO.from(it) }
                 ),
                 status = StoreEnum.StoreStatus.PENDING,
@@ -113,10 +119,19 @@ class Store(
         }
     }
 
+
     /**
-     * 매장 정보 업데이트
+     * 점주 권한 확인 메서드 추가 (점주용)
+     */
+    fun requireOwner(storeOwnerId: Long) {
+        require(storeOwnerId == this.storeOwnerId) { "점주(ID: ${storeOwnerId})는 해당 매장(ID: ${this.id})의 작업을 수행할 수 없습니다." }
+    }
+
+    /**
+     * 매장 정보 업데이트 (점주용)
      */
     fun update(request: StoreUpdateDto) {
+        requireOwner(request.storeOwnerId)
         request.name?.let { this.name = StoreNameVO.from(it) }
         request.description?.let { this.description = DescriptionVO.from(it) }
         request.address?.let { addr ->
@@ -156,58 +171,71 @@ class Store(
         this.updatedAt = LocalDateTime.now()
     }
 
+    /**
+     *  상태 전이 메서드 (점주용)
+     */
+    fun toOpen(storeOwnerId: Long) {
+        requireOwner(storeOwnerId)
+        status = status.open()
+        updatedAt = LocalDateTime.now()
+    }
+
+    fun toClose(storeOwnerId: Long) {
+        requireOwner(storeOwnerId)
+        status = status.close()
+        updatedAt = LocalDateTime.now()
+    }
+
+    fun toPending(storeOwnerId: Long) {
+        requireOwner(storeOwnerId)
+        status = status.pending()
+        updatedAt = LocalDateTime.now()
+    }
 
     /**
      * 활성화된 픽업 시간이 정확히 되었는지(=알림 시점) 반환
      */
-    fun isPickupTime(now: LocalDateTime = LocalDateTime.now()): Boolean {
-        val currentTime = now.toLocalTime()
+    fun isPickupTime(): Boolean {
+        val currentTime = LocalDateTime.now().toLocalTime()
         val startWindow = pickUpInfo.pickupStartTime.minusMinutes(1)
         val endWindow = pickUpInfo.pickupStartTime.plusMinutes(1)
         return currentTime.isAfter(startWindow) && currentTime.isBefore(endWindow)
     }
 
     /**
-     * 매장 상태만 업데이트
-     */
-    fun updateOnlyStoreStatus(newStatus: StoreEnum.StoreStatus) {
-        status = newStatus
-        updatedAt = LocalDateTime.now()
-    }
-
-    /**
-     * 매장 상태를 자동으로 전환 (재고, 시간 등)
+     * 시스템 상에서 매장 상태를 전환
      * - hasStock: 재고가 있는지 여부
      */
-    fun updateStoreStatus(now: LocalDateTime = LocalDateTime.now(), hasStock: Boolean) {
-        val currentTime = now.toLocalTime()
-        val start = pickUpInfo.pickupStartTime
-        val end = pickUpInfo.pickupEndTime
+    fun updateStoreStatus(hasStock: Boolean) {
+        val now = LocalDateTime.now()
+        val isAfterMidnight = pickUpInfo.pickupEndTime.isBefore(pickUpInfo.pickupStartTime)
 
-        val isOpen = if (isAfterMidnight()) {
-            // 자정 넘김: (시작 시간과 같거나 이후) 또는 (종료 시간과 같거나 이전)
-            currentTime >= start || currentTime <= end
+        val isInPickupTime = if (isAfterMidnight) {
+            now.toLocalTime() >= pickUpInfo.pickupStartTime || now.toLocalTime() <= pickUpInfo.pickupEndTime
         } else {
-            // 일반: 시작 시간과 같거나 이후이고, 종료 시간과 같거나 이전
-            currentTime >= start && currentTime <= end
+            now.toLocalTime() >= pickUpInfo.pickupStartTime && now.toLocalTime() <= pickUpInfo.pickupEndTime
         }
 
-        val newStatus = if (!hasStock || !isOpen) StoreEnum.StoreStatus.CLOSED else StoreEnum.StoreStatus.OPEN
-        this.status = newStatus
-        this.updatedAt = now
-    }
+        status = when {
+            !hasStock -> StoreEnum.StoreStatus.CLOSED
+            isInPickupTime -> status.open()
+            else -> status.close()
+        }
 
-    /**
-     * 픽업 시간이 자정을 넘어가는지 확인
-     */
-    private fun isAfterMidnight(): Boolean {
-        return pickUpInfo.pickupEndTime.isBefore(pickUpInfo.pickupStartTime)
+        this.updatedAt = now
     }
 
     /**
      * 픽업 정보만 업데이트
      */
-    fun updatePickupInfo(pickupDay: StoreEnum.PickupDay?, startTime: LocalTime?, endTime: LocalTime?) {
+    fun updatePickupInfo(
+        storeOwnerId: Long,
+        pickupDay: StoreEnum.PickupDay?,
+        startTime: LocalTime?,
+        endTime: LocalTime?
+    ) {
+        requireOwner(storeOwnerId)
+
         this.pickUpInfo = PickUpInfoVO.from(
             pickupDay!!,
             startTime!!,
@@ -219,7 +247,9 @@ class Store(
     /**
      * Soft Delete를 위한 메서드
      */
-    fun softDelete() {
+    fun softDelete(storeOwnerId: Long) {
+        requireOwner(storeOwnerId)
+
         updatedAt = LocalDateTime.now()
         deletedAt = LocalDateTime.now()
     }
