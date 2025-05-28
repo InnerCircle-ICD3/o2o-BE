@@ -26,7 +26,7 @@ class CustomerOAuth2SuccessPostProcessor(
         val loginCustomer = LoginCustomer(
             userAccountId = userId,
             roles = listOf(Role.USER.name, Role.CUSTOMER.name),
-            nickname = customer.account.nickname,
+            nickname = customer.account.nickname?.value,
             customerId = customer.id
         )
 

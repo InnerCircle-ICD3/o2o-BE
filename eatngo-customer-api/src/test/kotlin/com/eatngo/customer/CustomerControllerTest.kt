@@ -7,7 +7,7 @@ import com.eatngo.customer.dto.CustomerDto
 import com.eatngo.customer.dto.CustomerUpdateDto
 import com.eatngo.customer.service.CustomerService
 import com.eatngo.user_account.oauth2.constants.Oauth2Provider
-import com.eatngo.user_account.oauth2.dto.KakaoOauth2
+import com.eatngo.user_account.oauth2.dto.KakaoOAuth2
 import com.eatngo.user_account.service.UserAccountService
 import com.eatngo.user_account.vo.Nickname
 import io.kotest.core.spec.style.DescribeSpec
@@ -79,7 +79,7 @@ class CustomerControllerTest(
 
     private fun 유저_생성_및_토큰_반환(): Pair<String, LoginCustomer> {
         val account = userAccountService.createAccount(
-            KakaoOauth2(
+            KakaoOAuth2(
                 mapOf(
                     "id" to System.currentTimeMillis(),
                     "kakao_account" to mapOf(
@@ -96,7 +96,8 @@ class CustomerControllerTest(
         val loginCustomer = LoginCustomer(
             userAccountId = account.id,
             roles = account.roles.map { it.name },
-            customerId = customer.id
+            customerId = customer.id,
+            nickname = customer.account.nickname?.value ?: "홍길동"
         )
 
         val token = tokenProvider.createAccessToken(loginCustomer)

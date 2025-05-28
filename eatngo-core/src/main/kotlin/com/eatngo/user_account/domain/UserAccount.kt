@@ -28,16 +28,12 @@ class UserAccount(
         userAccountUpdateDto.nickname?.let { this.nickname = it }
     }
 
-    fun update(userAccountUpdateDto: UserAccountUpdateDto) {
-        userAccountUpdateDto.nickname?.let { this.nickname = it }
-    }
-
     companion object {
 
         fun create(oAuth2: OAuth2): UserAccount {
             val userAccount = UserAccount(
-                email = oauth2.email.let { it?.let { EmailAddress(it) } },
-                nickname = oauth2.nickname?.let { Nickname(it) },
+                email = oAuth2.email.let { it?.let { EmailAddress(it) } },
+                nickname = oAuth2.nickname?.let { Nickname(it) },
             )
             userAccount.addOauth2(
                 UserAccountOAuth2.of(
