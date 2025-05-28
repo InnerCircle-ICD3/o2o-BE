@@ -36,8 +36,8 @@ class UserAccountJpaEntity(
             email = account.email?.value,
             nickname = account.nickname?.value,
         ).also {
-            account.oauth2.forEach { oauth2 ->
-                it.oauth2.add(UserAccountOAuth2JpaEntity.of(oauth2, it))
+            account.oAuth2.forEach { oauth2 ->
+                it.oAuth2.add(UserAccountOAuth2JpaEntity.of(oauth2, it))
             }
             account.roles.forEach { role ->
                 it.roles.add(UserAccountRoleJpaEntity.of(role, it))
@@ -59,7 +59,7 @@ class UserAccountJpaEntity(
 
     override fun delete() {
         super.delete()
-        oauth2.forEach { it.delete() }
+        oAuth2.forEach { it.delete() }
         roles.forEach { it.delete() }
     }
 }

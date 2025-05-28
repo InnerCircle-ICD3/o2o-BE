@@ -7,7 +7,7 @@ import com.eatngo.store_owner.dto.StoreOwnerDto
 import com.eatngo.store_owner.dto.StoreOwnerUpdateDto
 import com.eatngo.store_owner.service.StoreOwnerService
 import com.eatngo.user_account.oauth2.constants.Oauth2Provider
-import com.eatngo.user_account.oauth2.dto.KakaoOauth2
+import com.eatngo.user_account.oauth2.dto.KakaoOAuth2
 import com.eatngo.user_account.service.UserAccountService
 import com.eatngo.user_account.vo.Nickname
 import io.kotest.core.spec.style.DescribeSpec
@@ -79,7 +79,7 @@ class StoreOwnerControllerTest(
 
     private fun 유저_생성_및_토큰_반환(): Pair<String, LoginStoreOwner> {
         val account = userAccountService.createAccount(
-            KakaoOauth2(
+            KakaoOAuth2(
                 mapOf(
                     "id" to System.currentTimeMillis(),
                     "kakao_account" to mapOf(
@@ -96,7 +96,8 @@ class StoreOwnerControllerTest(
         val loginStoreOwner = LoginStoreOwner(
             userAccountId = account.id,
             roles = account.roles.map { it.name },
-            storeOwnerId = storeOwner.id
+            storeOwnerId = storeOwner.id,
+            nickname = account.nickname?.value ?: "홍길동"
         )
 
         val token = tokenProvider.createAccessToken(loginStoreOwner)
