@@ -14,9 +14,27 @@ object StoreEnum {
      * 매장 상태
      */
     enum class StoreStatus {
-        OPEN,       // 영업 중
-        CLOSED,     // 영업 종료
-        PENDING     // 승인 대기
+        OPEN {
+            override fun close(): StoreStatus = CLOSED
+            override fun pending(): StoreStatus = PENDING
+        },
+        CLOSED {
+            override fun open(): StoreStatus = OPEN
+            override fun pending(): StoreStatus = PENDING
+        },
+        PENDING {
+            override fun open(): StoreStatus = OPEN
+            override fun close(): StoreStatus = CLOSED
+        };
+
+        open fun open(): StoreStatus = invalidTransition("open")
+        open fun close(): StoreStatus = invalidTransition("close")
+        open fun pending(): StoreStatus = invalidTransition("pending")
+
+        fun soldOut(): StoreStatus = CLOSED
+
+        private fun invalidTransition(action: String): StoreStatus =
+            throw IllegalStateException("현재 상태($this)에서 '$action' 작업을 수행할 수 없습니다.")
     }
 
     enum class PickupDay {
