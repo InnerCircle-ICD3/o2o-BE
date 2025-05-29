@@ -16,7 +16,7 @@ data class StoreDto(
     val name: String,
     val description: String?,
     val address: AddressDto,
-    val businessNumber: Long,
+    val businessNumber: String,
     val contactNumber: String?,
     val imageUrl: String?,
     val businessHours: List<BusinessHourDto> = emptyList(),

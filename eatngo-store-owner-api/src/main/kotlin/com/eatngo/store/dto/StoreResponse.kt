@@ -20,7 +20,7 @@ data class StoreDetailResponse(
     val mainImageUrl: String?,
     val contact: String,
     val description: String,
-    val businessNumber: Long,
+    val businessNumber: String,
     val businessHours: List<Map<String, Any>>,
     val latitude: Double?,
     val longitude: Double?,

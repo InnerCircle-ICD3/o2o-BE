@@ -48,8 +48,8 @@ class StoreJpaEntity(
     @Column(nullable = false)
     val longitude: Double,
 
-    @Column(name = "business_number", nullable = false)
-    val businessNumber: Long,
+    @Column(name = "business_number", length = 10, nullable = false)
+    val businessNumber: String,
 
     @Column
     val contactNumber: String?,

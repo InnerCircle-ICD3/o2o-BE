@@ -31,8 +31,6 @@ object StoreEnum {
         open fun close(): StoreStatus = invalidTransition("close")
         open fun pending(): StoreStatus = invalidTransition("pending")
 
-        fun soldOut(): StoreStatus = CLOSED
-
         private fun invalidTransition(action: String): StoreStatus =
             throw IllegalStateException("현재 상태($this)에서 '$action' 작업을 수행할 수 없습니다.")
     }

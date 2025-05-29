@@ -11,7 +11,7 @@ import java.time.LocalTime
 data class StoreCreateRequest(
     // 기본 정보
     val name: String,
-    val businessNumber: Long,
+    val businessNumber: String,
 
     // 주소 정보 (Flat 구조)
     val roadNameAddress: String? = null,
