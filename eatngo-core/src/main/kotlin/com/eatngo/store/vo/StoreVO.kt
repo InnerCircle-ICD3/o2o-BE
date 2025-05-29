@@ -131,8 +131,7 @@ value class RoadNameAddressVO(val value: String) {
 
     companion object {
         fun from(roadNameAddress: String?): RoadNameAddressVO {
-            requireNotNull(roadNameAddress) { "도로명 주소는 null일 수 없습니다" }
-            return RoadNameAddressVO(roadNameAddress)
+            return RoadNameAddressVO(requireNotNull(roadNameAddress) { "도로명 주소는 null일 수 없습니다" })
         }
     }
 }
@@ -145,8 +144,7 @@ value class LotNumberAddressVO(val value: String) {
 
     companion object {
         fun from(lotNumberAddress: String?): LotNumberAddressVO {
-            requireNotNull(lotNumberAddress) { "지번 주소는 null일 수 없습니다" }
-            return LotNumberAddressVO(lotNumberAddress)
+            return LotNumberAddressVO(requireNotNull(lotNumberAddress) { "지번 주소는 null일 수 없습니다" })
         }
     }
 }
