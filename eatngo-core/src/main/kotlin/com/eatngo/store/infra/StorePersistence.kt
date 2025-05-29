@@ -1,6 +1,7 @@
 package com.eatngo.store.infra
 
 import com.eatngo.common.constant.StoreEnum
+import com.eatngo.common.exception.StoreException
 import com.eatngo.store.domain.Store
 
 /**
@@ -26,15 +27,11 @@ interface StorePersistence {
      * 매장 저장
      */
     fun save(store: Store): Store
-    
-    /**
-     * 매장 삭제 (softDelete)
-     */
-    fun softDelete(id: Long): Boolean
-    
-    /**
-     * 매장 상태 업데이트
-     */
-    fun updateStatus(id: Long, status: StoreEnum.StoreStatus): Boolean
 
-} 
+    /**
+    * 매장 삭제 (soft delete)
+    * @param id 삭제할 매장 ID
+    * @return 삭제 성공 여부
+    */
+    fun deleteById(id: Long): Boolean
+}

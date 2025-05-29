@@ -56,6 +56,13 @@ open class StoreException(
         mapOf("status" to status)
     )
 
+    // 매장 권한 관련 예외
+    class Forbidden(storeOwnerId: Long) : StoreException(
+        BusinessErrorCode.STORE_OWNER_FORBIDDEN,
+        "점주아이디: $storeOwnerId 는 ${BusinessErrorCode.STORE_OWNER_FORBIDDEN.message}",
+        mapOf("storeOwnerId" to storeOwnerId)
+    )
+
     // 구독 관련 예외
     class SubscriptionNotFound(subscriptionId: Long) : StoreException(
         BusinessErrorCode.SUBSCRIPTION_NOT_FOUND,

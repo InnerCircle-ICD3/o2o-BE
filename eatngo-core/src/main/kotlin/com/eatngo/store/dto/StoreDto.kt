@@ -36,12 +36,9 @@ data class StoreDto(
                 name = store.name.value,
                 description = store.description?.value,
                 address = AddressDto(
-                    roadAddress = RoadAddressDto(
-                        fullAddress = store.address.roadAddress.fullAddress,
-                        zoneNo = store.address.roadAddress.zoneNo
-                    ),
-                    legalAddress = store.address.legalAddress?.fullAddress?.let { LegalAddressDto(it) },
-                    adminAddress = store.address.adminAddress?.fullAddress?.let { AdminAddressDto(it) },
+                    roadNameAddress = store.address.roadNameAddress.value,
+                    lotNumberAddress = store.address.lotNumberAddress.value,
+                    zipCode = store.address.zipCode.value,
                     coordinate = CoordinateDto(
                         latitude = store.address.coordinate.latitude,
                         longitude = store.address.coordinate.longitude
@@ -64,8 +61,9 @@ data class StoreDto(
                     pickupDay = store.pickUpInfo.pickupDay
                 ),
                 reviewInfo = ReviewInfoDto(
-                    ratingAverage = store.reviewInfo.ratingAverage,
-                    ratingCount = store.reviewInfo.ratingCount
+                    //TODO: 리뷰는 dto에만 포함, 추후 기능 개발되면 서비스에서 값 가져와야 함
+                    ratingAverage = 0.0,
+                    ratingCount = 0
                 ),
                 createdAt = store.createdAt,
                 updatedAt = store.updatedAt,
@@ -79,9 +77,9 @@ data class StoreDto(
  * 주소 관련 정보를 담은 DTO
  */
 data class AddressDto(
-    val roadAddress: RoadAddressDto,
-    val legalAddress: LegalAddressDto?,
-    val adminAddress: AdminAddressDto?,
+    val roadNameAddress: String? = null,
+    val lotNumberAddress: String? = null,
+    val zipCode: String? = null,
     val coordinate: CoordinateDto
 )
 
@@ -97,23 +95,16 @@ data class BusinessHourDto(
 /**
  * 도로명 주소 DTO
  */
-data class RoadAddressDto(
-    val fullAddress: String,
-    val zoneNo: String
+data class RoadNameAddressDto(
+    val roadNameAddress: String? = null,
+    val zipCode: String? = null
 )
 
 /**
  * 법정동 주소 DTO
  */
-data class LegalAddressDto(
-    val fullAddress: String? = null
-)
-
-/**
- * 행정동 주소 DTO
- */
-data class AdminAddressDto(
-    val fullAddress: String? = null
+data class LotNumberAddressDto(
+    val lotNumberAddress: String? = null
 )
 
 /**

@@ -7,6 +7,7 @@ import com.eatngo.common.constant.StoreEnum
  * 상점 수정 요청 DTO
  */
 data class StoreUpdateDto(
+    val storeOwnerId: Long,
     val name: String? = null,
     val address: AddressDto? = null,
     val businessHours: List<BusinessHourDto>? = null,
