@@ -1,6 +1,6 @@
 package com.eatngo.mongo.entity.search
 
-import com.eatngo.common.type.Coordinate
+import com.eatngo.common.type.CoordinateVO
 import com.eatngo.search.constant.StoreEnum
 import com.eatngo.search.domain.SearchStore
 import com.eatngo.search.dto.BusinessHoursDto
@@ -71,8 +71,8 @@ class SearchStoreEntity(
             longitude: Double,
         ): GeoJsonPoint = GeoJsonPoint(longitude, latitude)
 
-        fun toPoint(geoJsonPoint: GeoJsonPoint): Coordinate =
-            Coordinate(
+        fun toPoint(geoJsonPoint: GeoJsonPoint): CoordinateVO =
+            CoordinateVO.from(
                 latitude = geoJsonPoint.coordinates[1],
                 longitude = geoJsonPoint.coordinates[0],
             )

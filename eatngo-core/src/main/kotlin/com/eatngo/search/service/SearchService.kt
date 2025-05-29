@@ -1,6 +1,6 @@
 package com.eatngo.search.service
 
-import com.eatngo.common.type.Coordinate
+import com.eatngo.common.type.CoordinateVO
 import com.eatngo.search.domain.SearchStore
 import com.eatngo.search.dto.Box
 import com.eatngo.search.dto.SearchStoreDto
@@ -128,8 +128,8 @@ class SearchService(
         val topLat = ceil(latitude / cacheBoxSize) * cacheBoxSize
         val bottomLat = floor(latitude / cacheBoxSize) * cacheBoxSize
 
-        val topLeft = Coordinate(longitude = leftLng, latitude = topLat) // 서쪽 + 북쪽
-        val bottomRight = Coordinate(longitude = rightLng, latitude = bottomLat) // 동쪽 + 남쪽
+        val topLeft = CoordinateVO.from(longitude = leftLng, latitude = topLat) // 서쪽 + 북쪽
+        val bottomRight = CoordinateVO.from(longitude = rightLng, latitude = bottomLat) // 동쪽 + 남쪽
 
         return Box(topLeft, bottomRight)
     }

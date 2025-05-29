@@ -1,6 +1,6 @@
 package com.eatngo.search.dto
 
-import com.eatngo.common.type.Coordinate
+import com.eatngo.common.type.CoordinateVO
 import com.eatngo.search.domain.SearchStore
 
 data class SearchStoreMapResultDto(
@@ -11,7 +11,7 @@ data class SearchStoreMapResultDto(
 data class SearchStoreMap(
     val storeID: Long,
     val storeName: String,
-    val location: Coordinate, // 매장 위치(위도, 경도)
+    val location: CoordinateVO, // 매장 위치(위도, 경도)
     val stock: Int = 1, // 상품 재고 수량 TODO
 ) {
     companion object {
@@ -25,6 +25,6 @@ data class SearchStoreMap(
 }
 
 data class Box(
-    val topLeft: Coordinate,
-    val bottomRight: Coordinate,
+    val topLeft: CoordinateVO,
+    val bottomRight: CoordinateVO,
 )

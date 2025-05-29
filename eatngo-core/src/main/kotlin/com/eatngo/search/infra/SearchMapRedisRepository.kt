@@ -1,10 +1,10 @@
 package com.eatngo.search.infra
 
-import com.eatngo.common.type.Coordinate
+import com.eatngo.common.type.CoordinateVO
 import com.eatngo.search.dto.SearchStoreMap
 
 interface SearchMapRedisRepository {
-    fun getKey(topLeft: Coordinate): String
+    fun getKey(topLeft: CoordinateVO): String
 
     fun save(
         key: String,

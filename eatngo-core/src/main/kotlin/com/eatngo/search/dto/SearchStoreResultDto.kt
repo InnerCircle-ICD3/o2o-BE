@@ -1,6 +1,6 @@
 package com.eatngo.search.dto
 
-import com.eatngo.common.type.Coordinate
+import com.eatngo.common.type.CoordinateVO
 import com.eatngo.common.util.DistanceCalculator
 import com.eatngo.search.constant.StoreEnum
 import com.eatngo.search.domain.SearchStore
@@ -19,7 +19,7 @@ data class SearchStoreDto(
     val open: Boolean, // 매장 오픈 여부
     val stock: Int, // 재고 수량
     val roadAddress: String, // 매장 주소(도로명 주소)
-    val location: Coordinate, // 매장 위치(위도, 경도)
+    val location: CoordinateVO, // 매장 위치(위도, 경도)
     val businessHours: BusinessHoursDto =
         BusinessHoursDto(
             openTime = LocalDateTime.now(),
@@ -33,7 +33,7 @@ data class SearchStoreDto(
 ) {
     companion object {
         fun from(
-            userCoordinate: Coordinate,
+            userCoordinate: CoordinateVO,
             searchStore: SearchStore,
         ): SearchStoreDto =
             SearchStoreDto(

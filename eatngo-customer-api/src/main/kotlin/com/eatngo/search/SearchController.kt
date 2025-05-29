@@ -1,6 +1,6 @@
 package com.eatngo.search
 
-import com.eatngo.common.type.Coordinate
+import com.eatngo.common.type.CoordinateVO
 import com.eatngo.search.constant.StoreEnum
 import com.eatngo.search.dto.*
 import com.eatngo.search.service.SearchService
@@ -35,7 +35,7 @@ class SearchController(
             searchService.searchStore(
                 SearchStoreQueryDto(
                     viewCoordinate =
-                        Coordinate(
+                        CoordinateVO.from(
                             latitude = latitude,
                             longitude = longitude,
                         ),
@@ -65,7 +65,7 @@ class SearchController(
             searchService.searchStoreMap(
                 SearchStoreQueryDto(
                     viewCoordinate =
-                        Coordinate(
+                        CoordinateVO.from(
                             latitude = latitude,
                             longitude = longitude,
                         ),

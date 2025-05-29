@@ -1,6 +1,6 @@
 package com.eatngo.common.util
 
-import com.eatngo.common.type.Coordinate
+import com.eatngo.common.type.CoordinateVO
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.pow
@@ -13,8 +13,8 @@ object DistanceCalculator {
      * from 부터 to 까지의 거리를 계산합니다. (단위: km)
      */
     fun calculateDistance(
-        from: Coordinate,
-        to: Coordinate,
+        from: CoordinateVO,
+        to: CoordinateVO,
     ): Double {
         val earthRadius = 6371.0 // km
 
@@ -36,8 +36,8 @@ object DistanceCalculator {
      * 특정 반경(km) 내에 위치하는지 확인
      */
     fun isWithinRadius(
-        from: Coordinate,
-        to: Coordinate,
+        from: CoordinateVO,
+        to: CoordinateVO,
         radiusKm: Double,
     ): Boolean = calculateDistance(from, to) <= radiusKm
 }

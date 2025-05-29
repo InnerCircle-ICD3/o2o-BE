@@ -1,6 +1,6 @@
 package com.eatngo.customer.dto
 
-import com.eatngo.common.type.Coordinate
+import com.eatngo.common.type.CoordinateVO
 import com.eatngo.customer.domain.CustomerAddress
 import com.eatngo.customer.domain.CustomerAddressType
 
@@ -10,7 +10,7 @@ import com.eatngo.customer.domain.CustomerAddressType
 data class CustomerAddressDto(
     val roadAddress: RoadAddressDto, // 도로명 주소
     val legalAddress: LegalAddressDto?, // 법정동 주소
-    val coordinate: Coordinate, // 위경도
+    val coordinate: CoordinateVO, // 위경도
     val customerAddressType: CustomerAddressType = CustomerAddressType.OTHER, // 주소 타입 (집, 회사, 기타)
     val addressTypeDesc: String?, // 주소 설명
 ) {
