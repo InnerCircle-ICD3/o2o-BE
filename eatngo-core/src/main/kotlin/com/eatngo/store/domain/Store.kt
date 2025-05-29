@@ -1,7 +1,7 @@
 package com.eatngo.store.domain
 
 import com.eatngo.common.constant.StoreEnum
-import com.eatngo.store.dto.CoordinateDto
+import com.eatngo.common.type.CoordinateVO
 import com.eatngo.store.dto.StoreCreateDto
 import com.eatngo.store.dto.StoreDto
 import com.eatngo.store.dto.StoreUpdateDto
