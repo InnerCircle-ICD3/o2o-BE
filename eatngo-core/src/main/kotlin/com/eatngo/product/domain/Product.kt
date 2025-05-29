@@ -4,7 +4,7 @@ import com.eatngo.product.domain.ProductSizeType.*
 import java.time.LocalDateTime
 
 sealed class Product {
-    abstract var id: Long
+    abstract val id: Long
     abstract var name: String
     abstract var description: String
     abstract var price: ProductPrice
@@ -30,7 +30,7 @@ sealed class Product {
     abstract fun remove()
 
     data class LargeEatNGoBag(
-        override var id: Long = 0,
+        override val id: Long = 0,
         override var name: String,
         override var description: String,
         override var price: ProductPrice,
@@ -69,7 +69,7 @@ sealed class Product {
     }
 
     data class MediumEatNGoBag(
-        override var id: Long = 0,
+        override val id: Long = 0,
         override var name: String,
         override var description: String,
         override var price: ProductPrice,
@@ -108,7 +108,7 @@ sealed class Product {
     }
 
     data class SmallEatNGoBag(
-        override var id: Long = 0,
+        override val id: Long = 0,
         override var name: String,
         override var description: String,
         override var price: ProductPrice,

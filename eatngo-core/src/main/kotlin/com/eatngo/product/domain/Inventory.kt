@@ -20,6 +20,18 @@ data class Inventory(
         return changedInventory
     }
 
+    fun changeInventory(
+        quantity: Int,
+        stock: Int,
+    ): Inventory {
+        return Inventory(
+            id = this.id,
+            quantity = quantity,
+            stock = stock,
+            productId = this.productId
+        )
+    }
+
     private fun increaseStock(amount: Int): Inventory {
         return Inventory(this.id, this.quantity, this.stock + amount, this.productId)
     }

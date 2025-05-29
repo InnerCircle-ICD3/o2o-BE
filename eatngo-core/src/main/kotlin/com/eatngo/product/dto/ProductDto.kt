@@ -23,6 +23,7 @@ data class ProductDto(
         fun from(
             product: Product,
             imageUrl: String?,
+            inventory: Inventory,
         ): ProductDto =
             ProductDto(
                 id = product.id,
@@ -30,10 +31,10 @@ data class ProductDto(
                 description = product.description,
                 // when 이 아닌 추상메소드로 로직 수정
                 size = product.getSize().value,
-                inventory = ProductInventoryDto.from(product.inventory),
+                inventory = ProductInventoryDto.from(inventory),
                 price = ProductPriceDto.from(product.price),
                 imageUrl = imageUrl,
-                storeId = product.storeId!!,
+                storeId = product.storeId,
                 foodTypes = product.foodTypes.foods.map { it.name },
                 status = product.status.name,
                 createdAt = product.createdAt,

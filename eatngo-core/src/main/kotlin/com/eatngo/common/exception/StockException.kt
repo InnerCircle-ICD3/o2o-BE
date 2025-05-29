@@ -15,8 +15,8 @@ open class StockException(
     )
 
     class StockEmpty(productId: Long) : StockException(
-        BusinessErrorCode.STOCK_NOT_FOUND,
-        "${BusinessErrorCode.STOCK_NOT_FOUND.message} (ID: $productId)",
+        BusinessErrorCode.STOCK_EMPTY,
+        "${BusinessErrorCode.STOCK_EMPTY.message} (ID: $productId)",
         mapOf("productId" to productId)
     )
 

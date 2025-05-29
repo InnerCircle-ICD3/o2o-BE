@@ -15,18 +15,18 @@ open class ProductException(
     class ProductNotFound(productId: Long) : ProductException(
         BusinessErrorCode.PRODUCT_NOT_FOUND,
         "${BusinessErrorCode.PRODUCT_NOT_FOUND.message} (ID: $productId)",
-        mapOf("menuId" to productId)
+        mapOf("productId" to productId)
     )
 
     class ProductNotAvailable(productId: Long) : ProductException(
         BusinessErrorCode.PRODUCT_NOT_AVAILABLE,
         "${BusinessErrorCode.PRODUCT_NOT_AVAILABLE.message} (ID: $productId)",
-        mapOf("menuId" to productId)
+        mapOf("productId" to productId)
     )
 
     class ProductSoldOut(productId: Long) : ProductException(
         BusinessErrorCode.PRODUCT_SOLD_OUT,
         "${BusinessErrorCode.PRODUCT_SOLD_OUT.message} (ID: $productId)",
-        mapOf("menuId" to productId)
+        mapOf("productId" to productId)
     )
 }

@@ -79,7 +79,8 @@ enum class BusinessErrorCode(
     SEARCH_SUGGESTION_FAILED("H007", "추천 검색어 조회에 실패했습니다."),
     SEARCH_CATEGORY_NOT_FOUND("H008", "존재하지 않는 카테고리 입니다."),
     // 재고 관련 오류
-    STOCK_NOT_FOUND("S001", "상품의 재고를 찾을 수 없습니다."),
-    STOCK_EMPTY("S002", "상품의 재고가 없습니다."),
+    STOCK_NOT_FOUND("ST001", "상품의 재고를 찾을 수 없습니다."),
+    STOCK_EMPTY("ST002", "상품의 재고가 없습니다."),
+    INVENTORY_NOT_FOUND("I001", "상품 재고를 찾을 수 없습니다.")
 
 }

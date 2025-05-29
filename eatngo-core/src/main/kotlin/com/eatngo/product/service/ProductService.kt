@@ -1,16 +1,16 @@
 package com.eatngo.product.service
 
+import com.eatngo.common.exception.InventoryException.InventoryNotFound
 import com.eatngo.common.exception.ProductException.ProductNotFound
 import com.eatngo.extension.orThrow
 import com.eatngo.file.FileStorageService
 import com.eatngo.product.domain.*
 import com.eatngo.product.domain.Product.*
 import com.eatngo.product.domain.ProductSizeType.*
-import com.eatngo.product.domain.StockActionType.DECREASE
-import com.eatngo.product.domain.StockActionType.INCREASE
 import com.eatngo.product.dto.ProductAfterStockDto
 import com.eatngo.product.dto.ProductCurrentStockDto
 import com.eatngo.product.dto.ProductDto
+import com.eatngo.product.infra.InventoryPersistence
 import com.eatngo.product.infra.ProductCachePersistence
 import com.eatngo.product.infra.ProductPersistence
 import org.springframework.stereotype.Service
@@ -21,7 +21,8 @@ import org.springframework.transaction.annotation.Transactional
 class ProductService(
     private val productPersistence: ProductPersistence,
     private val fileStorageService: FileStorageService,
-    private val productCachePersistence: ProductCachePersistence
+    private val productCachePersistence: ProductCachePersistence,
+    private val inventoryPersistence: InventoryPersistence,
     // TODO storeRepository
 ) {
     fun createProduct(
@@ -38,7 +39,6 @@ class ProductService(
                 LargeEatNGoBag(
                     name = productDto.name,
                     description = productDto.description,
-                    inventory = inventory,
                     price = price,
                     imageUrl = productDto.imageUrl,
                     storeId = productDto.storeId,
@@ -50,7 +50,6 @@ class ProductService(
                 MediumEatNGoBag(
                     name = productDto.name,
                     description = productDto.description,
-                    inventory = inventory,
                     price = price,
                     imageUrl = productDto.imageUrl,
                     storeId = productDto.storeId,
@@ -62,7 +61,6 @@ class ProductService(
                 SmallEatNGoBag(
                     name = productDto.name,
                     description = productDto.description,
-                    inventory = inventory,
                     price = price,
                     imageUrl = productDto.imageUrl,
                     storeId = productDto.storeId,
@@ -72,11 +70,13 @@ class ProductService(
         }
 
         val savedProduct: Product = productPersistence.save(product)
+        val savedInventory: Inventory = inventoryPersistence.save(inventory)
         productCachePersistence.save(product)
 
         return ProductDto.from(
             savedProduct,
-            savedProduct.imageUrl?.let(fileStorageService::resolveImageUrl)
+            savedProduct.imageUrl?.let(fileStorageService::resolveImageUrl),
+            savedInventory
         )
     }
 
@@ -89,9 +89,14 @@ class ProductService(
             productCachePersistence.findById(productId) ?: productPersistence.findById(productId)
                 .orThrow { ProductNotFound(productId) }
 
+        val inventory: Inventory =
+            inventoryPersistence.findTopByProductIdOrderByVersionDesc(productId)
+                .orThrow { InventoryNotFound(productId) }
+
         return ProductDto.from(
             product,
-            product.imageUrl?.let(fileStorageService::resolveImageUrl)
+            product.imageUrl?.let(fileStorageService::resolveImageUrl),
+            inventory
         )
     }
 
@@ -100,11 +105,14 @@ class ProductService(
         if (products.isEmpty()) {
             products = productPersistence.findAllByStoreId(storeId)
         }
+
         return products
             .map {
                 ProductDto.from(
                     it,
-                    it.imageUrl?.let(fileStorageService::resolveImageUrl)
+                    it.imageUrl?.let(fileStorageService::resolveImageUrl),
+                    inventoryPersistence.findTopByProductIdOrderByVersionDesc(it.id)
+                        .orThrow { InventoryNotFound(it.id) }
                 )
             }
     }
@@ -114,19 +122,21 @@ class ProductService(
         product.remove()
         productPersistence.save(product)
         productCachePersistence.deleteById(productId)
+        inventoryPersistence.deleteById(product.id)
     }
 
     fun toggleStock(productCurrentStockDto: ProductCurrentStockDto): ProductAfterStockDto {
         val product: Product = productPersistence.findById(productCurrentStockDto.id)
             .orThrow { ProductNotFound(productCurrentStockDto.id) }
-        product.changeStock(productCurrentStockDto.action, productCurrentStockDto.amount)
-        val savedProduct = productPersistence.save(product)
 
-        when (StockActionType.fromValue(productCurrentStockDto.action)) {
-            INCREASE -> productCachePersistence.increaseStock(product.id, productCurrentStockDto.amount)
-            DECREASE -> productCachePersistence.decreaseStock(product.id, productCurrentStockDto.amount)
-        }
-        return ProductAfterStockDto.create(savedProduct)
+        val inventory: Inventory = inventoryPersistence.findTopByProductIdOrderByVersionDesc(product.id)
+            .orThrow { InventoryNotFound(productCurrentStockDto.id) }
+        val changedInventory = inventory.changeStock(productCurrentStockDto.action, productCurrentStockDto.amount)
+
+        val savedProduct = productPersistence.save(product)
+        val savedInventory: Inventory = inventoryPersistence.save(changedInventory)
+
+        return ProductAfterStockDto.create(savedProduct, savedInventory)
     }
 
     fun modifyProduct(productDto: ProductDto): ProductDto {
@@ -136,11 +146,6 @@ class ProductService(
         product.modify(
             name = productDto.name,
             description = productDto.description,
-            inventory = Inventory(
-                productDto.inventory.quantity,
-                productDto.inventory.stock,
-                productDto.id!!
-            ),
             price = ProductPrice(
                 productDto.price.originalPrice,
                 productDto.price.discountRate
@@ -154,9 +159,20 @@ class ProductService(
         productCachePersistence.deleteById(savedProduct.id)
         productCachePersistence.save(savedProduct)
 
+        val inventory: Inventory = inventoryPersistence.findTopByProductIdOrderByVersionDesc(productDto.id!!)
+            .orThrow { InventoryNotFound(productDto.id!!) }
+
+        val changedInventory: Inventory = inventory.changeInventory(
+            quantity = productDto.inventory.quantity,
+            stock = productDto.inventory.stock,
+        )
+
+        val savedInventory: Inventory = inventoryPersistence.save(changedInventory)
+
         return ProductDto.from(
             savedProduct,
-            savedProduct.imageUrl?.let(fileStorageService::resolveImageUrl)
+            savedProduct.imageUrl?.let(fileStorageService::resolveImageUrl),
+            savedInventory
         )
     }
 }

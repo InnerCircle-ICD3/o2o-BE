@@ -13,4 +13,7 @@ data class InventoryEntity(
 
     @Column(name = "product_id", nullable = false)
     val productId: Long,
+
+    @Version
+    var version: Long = 0L,
 )
