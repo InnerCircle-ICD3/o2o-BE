@@ -14,7 +14,7 @@ import org.hibernate.annotations.SoftDeleteType
 data class ProductEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    var id: Long? = null,
+    var id: Long = 0L,
 
     @Column(nullable = false)
     var name: String,

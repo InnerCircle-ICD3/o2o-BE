@@ -6,7 +6,7 @@ import com.eatngo.product.domain.StockActionType.INCREASE
 import java.time.LocalDateTime
 
 sealed class Product {
-    abstract var id: Long?
+    abstract var id: Long
     abstract var name: String
     abstract var description: String
     abstract var inventory: Inventory
@@ -39,7 +39,7 @@ sealed class Product {
     abstract fun remove()
 
     data class LargeEatNGoBag(
-        override var id: Long? = null,
+        override var id: Long = 0,
         override var name: String,
         override var description: String,
         override var inventory: Inventory,
@@ -96,7 +96,7 @@ sealed class Product {
     }
 
     data class MediumEatNGoBag(
-        override var id: Long? = null,
+        override var id: Long = 0,
         override var name: String,
         override var description: String,
         override var inventory: Inventory,
@@ -153,7 +153,7 @@ sealed class Product {
     }
 
     data class SmallEatNGoBag(
-        override var id: Long? = null,
+        override var id: Long = 0,
         override var name: String,
         override var description: String,
         override var inventory: Inventory,
