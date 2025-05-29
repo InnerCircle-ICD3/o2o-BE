@@ -59,7 +59,7 @@ open class StoreException(
     // 매장 권한 관련 예외
     class Forbidden(storeOwnerId: Long) : StoreException(
         BusinessErrorCode.STORE_OWNER_FORBIDDEN,
-        "${BusinessErrorCode.STORE_OWNER_FORBIDDEN.message}: $storeOwnerId",
+        "점주아이디: $storeOwnerId 는 ${BusinessErrorCode.STORE_OWNER_FORBIDDEN.message}",
         mapOf("storeOwnerId" to storeOwnerId)
     )
 

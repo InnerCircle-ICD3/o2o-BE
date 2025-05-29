@@ -1,10 +1,12 @@
 package com.eatngo.store.event
 
 import com.eatngo.store.service.StoreService
-import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Component
-import org.springframework.transaction.annotation.Transactional
 
+
+/**
+ * 매장 서비스에서 재고(Stock) 품절 이벤트를 리슨하여 매장 상태를 변경하는 리스너
+ */
 @Component
 class StockEventListener(
     private val storeService: StoreService

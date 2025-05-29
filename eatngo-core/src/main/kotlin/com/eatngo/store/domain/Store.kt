@@ -1,6 +1,7 @@
 package com.eatngo.store.domain
 
 import com.eatngo.common.constant.StoreEnum
+import com.eatngo.common.exception.StoreException
 import com.eatngo.common.type.CoordinateVO
 import com.eatngo.store.dto.StoreCreateDto
 import com.eatngo.store.dto.StoreDto
@@ -113,7 +114,9 @@ class Store(
      * 점주 권한 확인 메서드
      */
     fun requireOwner(storeOwnerId: Long) {
-        require(storeOwnerId == this.storeOwnerId) { "점주(ID: ${storeOwnerId})는 해당 매장(ID: ${this.id})의 작업을 수행할 수 없습니다." }
+        if (storeOwnerId != this.storeOwnerId) {
+            throw StoreException.Forbidden(storeOwnerId)
+        }
     }
 
     /**
