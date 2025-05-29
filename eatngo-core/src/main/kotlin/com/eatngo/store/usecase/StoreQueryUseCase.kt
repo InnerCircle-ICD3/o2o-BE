@@ -6,9 +6,10 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
-class StoreQueryUseCase (
+class StoreQueryUseCase(
     private val storeService: StoreService
 ) {
+    @Transactional(readOnly = true)
     fun getStoreById(storeId: Long): StoreDto {
         val store = storeService.getStoreById(storeId)
         return StoreDto.from(store)
