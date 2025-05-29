@@ -2,6 +2,7 @@ package com.eatngo.store.domain
 
 import com.eatngo.common.constant.StoreEnum
 import com.eatngo.common.exception.StoreException
+import com.eatngo.common.type.Address
 import com.eatngo.common.type.CoordinateVO
 import com.eatngo.store.dto.StoreCreateDto
 import com.eatngo.store.dto.StoreDto
@@ -238,20 +239,6 @@ class Store(
         updatedAt = LocalDateTime.now()
     }
 }
-
-/**
- * 매장 위치 정보
- */
-data class Address(
-    val roadNameAddress: RoadNameAddressVO,      // 도로명 주소 (VO)
-    val lotNumberAddress: LotNumberAddressVO,   // 지번 주소
-    val buildingName: String?,             // 건물명
-    val zipCode: ZipCodeVO,                      // 우편번호
-    val region1DepthName: String?,         // 시도명
-    val region2DepthName: String?,         // 시군구명
-    val region3DepthName: String?,         // 상세주소
-    val coordinate: CoordinateVO          // 위도, 경도
-)
 
 /**
  * 매장의 카테고리 정보(분류와 사용자 입력 카테고리)

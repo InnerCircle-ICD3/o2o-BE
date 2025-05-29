@@ -3,6 +3,7 @@ package com.eatngo.store.rdb.entity
 import com.eatngo.common.BaseJpaEntity
 import com.eatngo.common.constant.StoreEnum
 import com.eatngo.common.converter.JsonAttributeConverter
+import com.eatngo.common.type.Address
 import com.eatngo.common.type.CoordinateVO
 import com.eatngo.constants.DELETED_FILTER
 import com.eatngo.store.domain.*
