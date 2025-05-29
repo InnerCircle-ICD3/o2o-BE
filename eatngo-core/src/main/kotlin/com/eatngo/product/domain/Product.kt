@@ -12,8 +12,8 @@ sealed class Product {
     abstract var inventory: Inventory
     abstract var price: ProductPrice
     abstract var imageUrl: String?
-    abstract var storeId: Long?
-    abstract var foodTypes: FoodTypes
+    abstract val storeId: Long
+    abstract val foodTypes: FoodTypes
     abstract var status: ProductStatus
     abstract var deletedStatus: DeletedStatus
     abstract var createdAt: LocalDateTime?
@@ -45,7 +45,7 @@ sealed class Product {
         override var inventory: Inventory,
         override var price: ProductPrice,
         override var imageUrl: String?,
-        override var storeId: Long?,
+        override val storeId: Long,
         override var foodTypes: FoodTypes,
         override var status: ProductStatus = ProductStatus.ACTIVE,
         override var deletedStatus: DeletedStatus = DeletedStatus.ACTIVE,
@@ -91,7 +91,6 @@ sealed class Product {
 
         override fun remove() {
             this.deletedStatus = DeletedStatus.DELETED
-            this.storeId = null
         }
     }
 
@@ -102,7 +101,7 @@ sealed class Product {
         override var inventory: Inventory,
         override var price: ProductPrice,
         override var imageUrl: String?,
-        override var storeId: Long?,
+        override val storeId: Long,
         override var foodTypes: FoodTypes,
         override var status: ProductStatus = ProductStatus.ACTIVE,
         override var deletedStatus: DeletedStatus = DeletedStatus.ACTIVE,
@@ -148,7 +147,6 @@ sealed class Product {
 
         override fun remove() {
             this.deletedStatus = DeletedStatus.DELETED
-            this.storeId = null
         }
     }
 
@@ -159,7 +157,7 @@ sealed class Product {
         override var inventory: Inventory,
         override var price: ProductPrice,
         override var imageUrl: String?,
-        override var storeId: Long?,
+        override val storeId: Long,
         override var foodTypes: FoodTypes,
         override var status: ProductStatus = ProductStatus.ACTIVE,
         override var deletedStatus: DeletedStatus = DeletedStatus.ACTIVE,
@@ -205,7 +203,6 @@ sealed class Product {
 
         override fun remove() {
             this.deletedStatus = DeletedStatus.DELETED
-            this.storeId = null
         }
     }
 }

@@ -32,7 +32,7 @@ data class ProductEntity(
     var imageUrl: String?,
 
     @Column(nullable = false)
-    var storeId: Long,
+    val storeId: Long,
 
     @ElementCollection
     @CollectionTable(name = "product_entity_food_types", joinColumns = [JoinColumn(name = "product_entity_id")])
