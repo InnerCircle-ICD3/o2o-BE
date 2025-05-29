@@ -76,7 +76,7 @@ class ProductService(
 
         return ProductDto.from(
             savedProduct,
-            savedProduct.imageUrl?.let { fileStorageService.resolveImageUrl(it) }
+            savedProduct.imageUrl?.let(fileStorageService::resolveImageUrl)
         )
     }
 
@@ -90,7 +90,7 @@ class ProductService(
 
         return ProductDto.from(
             product,
-            product.imageUrl?.let { fileStorageService.resolveImageUrl(it) }
+            product.imageUrl?.let(fileStorageService::resolveImageUrl)
         )
     }
 
@@ -100,10 +100,10 @@ class ProductService(
             products = productPersistence.findAllByStoreId(storeId)
         }
         return products
-            .map { it ->
+            .map {
                 ProductDto.from(
                     it,
-                    it.imageUrl?.let { fileStorageService.resolveImageUrl(it) }
+                    it.imageUrl?.let(fileStorageService::resolveImageUrl)
                 )
             }
     }
@@ -151,7 +151,7 @@ class ProductService(
 
         return ProductDto.from(
             savedProduct,
-            savedProduct.imageUrl?.let { fileStorageService.resolveImageUrl(it) }
+            savedProduct.imageUrl?.let(fileStorageService::resolveImageUrl)
         )
     }
 }

@@ -48,7 +48,7 @@ class ProductMapper {
 
             val inventory = Inventory(entity.inventory.quantity, entity.inventory.stock)
             val price = ProductPrice(entity.price.originalPrice, entity.price.discountRate)
-            val foodTypes = FoodTypes(entity.foodTypes.map { name -> Food(name) })
+            val foodTypes = FoodTypes(entity.foodTypes.map { Food(it) })
 
             return when (entity.productType) {
                 L -> LargeEatNGoBag(
