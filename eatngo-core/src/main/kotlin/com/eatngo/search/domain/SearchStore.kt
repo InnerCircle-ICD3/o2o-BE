@@ -14,7 +14,7 @@ class SearchStore(
     val storeId: Long = 0L,
     val storeName: String = "",
     val storeImage: String = "", // 매장 이미지 S3 URL
-    val category: List<StoreEnum.StoreCategory> = emptyList(),
+    val storeCategory: List<StoreEnum.StoreCategory> = emptyList(),
     val roadAddress: String = "",
     val location: Coordinate = Coordinate(0.0, 0.0),
     val open: Boolean = false, // 매장 오픈 여부
@@ -28,7 +28,7 @@ class SearchStore(
                 storeId = 0L,
                 storeName = "",
                 storeImage = "",
-                category = emptyList(),
+                storeCategory = emptyList(),
                 roadAddress = "",
                 location = Coordinate(0.0, 0.0),
                 open = true,

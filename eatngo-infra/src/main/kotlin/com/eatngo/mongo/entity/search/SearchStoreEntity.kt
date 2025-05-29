@@ -18,7 +18,7 @@ class SearchStoreEntity(
     var storeId: Long = 0L,
     var storeName: String = "",
     var storeImage: String = "", // 매장 이미지 S3 URL
-    var category: List<StoreEnum.StoreCategory> = emptyList(),
+    var storeCategory: List<StoreEnum.StoreCategory> = emptyList(),
     var open: Boolean = true, // 매장 오픈 여부
     var openTime: LocalDateTime = LocalDateTime.of(LocalDate.now(), LocalTime.of(9, 0)), // 매장 오픈 시간
     var closeTime: LocalDateTime = LocalDateTime.of(LocalDate.now(), LocalTime.of(22, 0)), // 매장 마감 시간
@@ -33,7 +33,7 @@ class SearchStoreEntity(
             storeId = storeId,
             storeName = storeName,
             storeImage = storeImage,
-            category = category,
+            storeCategory = storeCategory,
             open = open,
             businessHours =
                 BusinessHoursDto(
@@ -52,7 +52,7 @@ class SearchStoreEntity(
                 storeId = searchStore.storeId,
                 storeName = searchStore.storeName,
                 storeImage = searchStore.storeImage,
-                category = searchStore.category,
+                storeCategory = searchStore.storeCategory,
                 roadAddress = searchStore.roadAddress,
                 open = searchStore.open,
                 openTime = searchStore.businessHours.openTime,
