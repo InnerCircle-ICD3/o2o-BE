@@ -23,9 +23,6 @@ data class ProductEntity(
     var description: String,
 
     @Embedded
-    var inventory: InventoryEmbeddable,
-
-    @Embedded
     var price: ProductPriceEmbeddable,
 
     @Column(columnDefinition = "TEXT")

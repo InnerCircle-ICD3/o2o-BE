@@ -29,7 +29,7 @@ class ProductService(
     ): ProductDto {
         // TODO storeRepo.findById()
 
-        val inventory = Inventory.create(productDto.inventory.quantity)
+        val inventory = Inventory.create(productDto.inventory.quantity, productDto.id!!)
         val price = ProductPrice.create(productDto.price.originalPrice)
         val foodTypes = FoodTypes.create(productDto.foodTypes)
 
@@ -138,7 +138,8 @@ class ProductService(
             description = productDto.description,
             inventory = Inventory(
                 productDto.inventory.quantity,
-                productDto.inventory.stock
+                productDto.inventory.stock,
+                productDto.id!!
             ),
             price = ProductPrice(
                 productDto.price.originalPrice,
