@@ -1,16 +1,16 @@
 package com.eatngo.product.service
 
-import com.eatngo.common.exception.InventoryException.InventoryNotFound
 import com.eatngo.common.exception.ProductException.ProductNotFound
 import com.eatngo.extension.orThrow
 import com.eatngo.file.FileStorageService
+import com.eatngo.inventory.dto.InventoryDto
+import com.eatngo.inventory.service.InventoryService
 import com.eatngo.product.domain.*
 import com.eatngo.product.domain.Product.*
 import com.eatngo.product.domain.ProductSizeType.*
 import com.eatngo.product.dto.ProductAfterStockDto
 import com.eatngo.product.dto.ProductCurrentStockDto
 import com.eatngo.product.dto.ProductDto
-import com.eatngo.product.infra.InventoryPersistence
 import com.eatngo.product.infra.ProductCachePersistence
 import com.eatngo.product.infra.ProductPersistence
 import org.springframework.stereotype.Service
@@ -22,15 +22,13 @@ class ProductService(
     private val productPersistence: ProductPersistence,
     private val fileStorageService: FileStorageService,
     private val productCachePersistence: ProductCachePersistence,
-    private val inventoryPersistence: InventoryPersistence,
+    private val inventoryService: InventoryService,
     // TODO storeRepository
 ) {
     fun createProduct(
         productDto: ProductDto,
     ): ProductDto {
         // TODO storeRepo.findById()
-
-        val inventory = Inventory.create(productDto.inventory.quantity, productDto.id!!)
         val price = ProductPrice.create(productDto.price.originalPrice)
         val foodTypes = FoodTypes.create(productDto.foodTypes)
 
@@ -70,8 +68,9 @@ class ProductService(
         }
 
         val savedProduct: Product = productPersistence.save(product)
-        val savedInventory: Inventory = inventoryPersistence.save(inventory)
         productCachePersistence.save(product)
+
+        val savedInventory: InventoryDto = inventoryService.createInventory(productDto)
 
         return ProductDto.from(
             savedProduct,
@@ -89,14 +88,12 @@ class ProductService(
             productCachePersistence.findById(productId) ?: productPersistence.findById(productId)
                 .orThrow { ProductNotFound(productId) }
 
-        val inventory: Inventory =
-            inventoryPersistence.findTopByProductIdOrderByVersionDesc(productId)
-                .orThrow { InventoryNotFound(productId) }
+        val inventoryDetails: InventoryDto = inventoryService.getInventoryDetails(productId)
 
         return ProductDto.from(
             product,
             product.imageUrl?.let(fileStorageService::resolveImageUrl),
-            inventory
+            inventoryDetails
         )
     }
 
@@ -111,8 +108,7 @@ class ProductService(
                 ProductDto.from(
                     it,
                     it.imageUrl?.let(fileStorageService::resolveImageUrl),
-                    inventoryPersistence.findTopByProductIdOrderByVersionDesc(it.id)
-                        .orThrow { InventoryNotFound(it.id) }
+                    inventoryService.getInventoryDetails(it.id)
                 )
             }
     }
@@ -122,21 +118,17 @@ class ProductService(
         product.remove()
         productPersistence.save(product)
         productCachePersistence.deleteById(productId)
-        inventoryPersistence.deleteById(product.id)
+        inventoryService.deleteInventory(product.id)
     }
 
     fun toggleStock(productCurrentStockDto: ProductCurrentStockDto): ProductAfterStockDto {
         val product: Product = productPersistence.findById(productCurrentStockDto.id)
             .orThrow { ProductNotFound(productCurrentStockDto.id) }
-
-        val inventory: Inventory = inventoryPersistence.findTopByProductIdOrderByVersionDesc(product.id)
-            .orThrow { InventoryNotFound(productCurrentStockDto.id) }
-        val changedInventory = inventory.changeStock(productCurrentStockDto.action, productCurrentStockDto.amount)
-
         val savedProduct = productPersistence.save(product)
-        val savedInventory: Inventory = inventoryPersistence.save(changedInventory)
 
-        return ProductAfterStockDto.create(savedProduct, savedInventory)
+        val changedInventory: InventoryDto = inventoryService.toggleInventory(productCurrentStockDto)
+
+        return ProductAfterStockDto.create(savedProduct, changedInventory)
     }
 
     fun modifyProduct(productDto: ProductDto): ProductDto {
@@ -159,20 +151,12 @@ class ProductService(
         productCachePersistence.deleteById(savedProduct.id)
         productCachePersistence.save(savedProduct)
 
-        val inventory: Inventory = inventoryPersistence.findTopByProductIdOrderByVersionDesc(productDto.id!!)
-            .orThrow { InventoryNotFound(productDto.id!!) }
-
-        val changedInventory: Inventory = inventory.changeInventory(
-            quantity = productDto.inventory.quantity,
-            stock = productDto.inventory.stock,
-        )
-
-        val savedInventory: Inventory = inventoryPersistence.save(changedInventory)
+        val changedInventory: InventoryDto = inventoryService.modifyInventory(productDto)
 
         return ProductDto.from(
             savedProduct,
             savedProduct.imageUrl?.let(fileStorageService::resolveImageUrl),
-            savedInventory
+            changedInventory
         )
     }
 }

@@ -1,5 +1,6 @@
-package com.eatngo.product.domain
+package com.eatngo.inventory.domain
 
+import com.eatngo.product.domain.StockActionType
 import com.eatngo.product.domain.StockActionType.DECREASE
 import com.eatngo.product.domain.StockActionType.INCREASE
 

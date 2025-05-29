@@ -1,7 +1,7 @@
-package com.eatngo.product.persistence
+package com.eatngo.inventory.persistence
 
-import com.eatngo.product.domain.Inventory
-import com.eatngo.product.entity.InventoryEntity
+import com.eatngo.inventory.domain.Inventory
+import com.eatngo.inventory.entity.InventoryEntity
 import org.springframework.data.jpa.repository.JpaRepository
 
 interface JpaInventoryRepository : JpaRepository<InventoryEntity, Long> {

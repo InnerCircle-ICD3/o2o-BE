@@ -1,7 +1,7 @@
-package com.eatngo.product.mapper
+package com.eatngo.inventory.mapper
 
-import com.eatngo.product.domain.Inventory
-import com.eatngo.product.entity.InventoryEntity
+import com.eatngo.inventory.domain.Inventory
+import com.eatngo.inventory.entity.InventoryEntity
 
 class InventoryMapper {
 

@@ -1,6 +1,7 @@
 package com.eatngo.product
 
 import com.eatngo.common.response.ApiResponse
+import com.eatngo.inventory.dto.InventoryDto
 import com.eatngo.product.domain.StockActionType
 import com.eatngo.product.domain.StockActionType.DECREASE
 import com.eatngo.product.domain.StockActionType.INCREASE
@@ -27,7 +28,7 @@ class ProductController(
                 name = createProductRequestDto.name,
                 description = createProductRequestDto.description,
                 size = createProductRequestDto.size,
-                inventory = ProductInventoryDto(createProductRequestDto.quantity),
+                inventory = InventoryDto(createProductRequestDto.quantity),
                 price = ProductPriceDto(createProductRequestDto.originalPrice),
                 imageUrl = createProductRequestDto.image,
                 storeId = storeId,
@@ -103,7 +104,7 @@ class ProductController(
                 name = updateProductRequestDto.name,
                 description = updateProductRequestDto.description,
                 size = updateProductRequestDto.size,
-                inventory = ProductInventoryDto(
+                inventory = InventoryDto(
                     updateProductRequestDto.inventory.quantity,
                     updateProductRequestDto.inventory.stock
                 ),

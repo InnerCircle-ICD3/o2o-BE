@@ -1,4 +1,4 @@
-package com.eatngo.product.entity
+package com.eatngo.inventory.entity
 
 import jakarta.persistence.*
 

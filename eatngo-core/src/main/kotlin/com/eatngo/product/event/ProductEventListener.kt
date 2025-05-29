@@ -2,8 +2,9 @@ package com.eatngo.product.event
 
 import com.eatngo.common.exception.StockException.StockEmpty
 import com.eatngo.common.exception.StockException.StockNotFound
+import com.eatngo.inventory.event.StockEventPublisher
 import com.eatngo.order.event.CreateOrderEvent
-import com.eatngo.product.dto.StockDto
+import com.eatngo.inventory.dto.StockDto
 import com.eatngo.product.infra.ProductCachePersistence
 import com.eatngo.product.infra.ProductPersistence
 import org.springframework.stereotype.Component

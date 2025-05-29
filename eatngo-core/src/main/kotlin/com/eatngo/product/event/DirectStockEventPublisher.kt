@@ -1,6 +1,9 @@
 package com.eatngo.product.event
 
-import com.eatngo.product.dto.StockDto
+import com.eatngo.inventory.event.ResultStatus
+import com.eatngo.inventory.event.StockChangedEvent
+import com.eatngo.inventory.event.StockEventPublisher
+import com.eatngo.inventory.dto.StockDto
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional

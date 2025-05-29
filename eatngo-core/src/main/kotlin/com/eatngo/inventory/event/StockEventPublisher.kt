@@ -1,6 +1,6 @@
-package com.eatngo.product.event
+package com.eatngo.inventory.event
 
-import com.eatngo.product.dto.StockDto
+import com.eatngo.inventory.dto.StockDto
 
 interface StockEventPublisher {
     fun publishDecreaseEvent(stockDto: StockDto)

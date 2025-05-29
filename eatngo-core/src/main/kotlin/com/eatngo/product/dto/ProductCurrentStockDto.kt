@@ -1,6 +1,6 @@
 package com.eatngo.product.dto
 
-import com.eatngo.product.domain.Inventory
+import com.eatngo.inventory.dto.InventoryDto
 import com.eatngo.product.domain.Product
 
 data class ProductCurrentStockDto(
@@ -16,15 +16,15 @@ data class ProductAfterStockDto(
     val stock: Int,
 ) {
     companion object {
-        fun create(product: Product, inventory: Inventory): ProductAfterStockDto {
+        fun create(product: Product, inventoryDto: InventoryDto): ProductAfterStockDto {
             val productId = requireNotNull(product.id) { "productId 가 비어있습니다." }
             val storeId = requireNotNull(product.storeId) { "product의 storeId가 비어있습니다." }
 
             return ProductAfterStockDto(
                 id = productId,
                 storeId = storeId,
-                quantity = inventory.quantity,
-                stock = inventory.stock
+                quantity = inventoryDto.quantity,
+                stock = inventoryDto.stock
             )
         }
     }

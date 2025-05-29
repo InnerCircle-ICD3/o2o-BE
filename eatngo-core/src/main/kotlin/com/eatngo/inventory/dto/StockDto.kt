@@ -1,4 +1,4 @@
-package com.eatngo.product.dto
+package com.eatngo.inventory.dto
 
 data class StockDto(
     val orderId: Long,

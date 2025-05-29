@@ -1,6 +1,6 @@
-package com.eatngo.product.infra
+package com.eatngo.inventory.infra
 
-import com.eatngo.product.domain.Inventory
+import com.eatngo.inventory.domain.Inventory
 
 interface InventoryPersistence {
     fun save(inventory: Inventory): Inventory

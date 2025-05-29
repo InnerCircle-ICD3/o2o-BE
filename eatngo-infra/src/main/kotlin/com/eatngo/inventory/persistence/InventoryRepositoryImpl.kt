@@ -1,8 +1,8 @@
-package com.eatngo.product.persistence
+package com.eatngo.inventory.persistence
 
-import com.eatngo.product.domain.Inventory
-import com.eatngo.product.infra.InventoryPersistence
-import com.eatngo.product.mapper.InventoryMapper
+import com.eatngo.inventory.domain.Inventory
+import com.eatngo.inventory.infra.InventoryPersistence
+import com.eatngo.inventory.mapper.InventoryMapper
 import org.springframework.stereotype.Repository
 
 @Repository

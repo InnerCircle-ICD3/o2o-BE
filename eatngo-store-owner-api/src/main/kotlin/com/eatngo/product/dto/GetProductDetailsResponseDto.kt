@@ -1,5 +1,6 @@
 package com.eatngo.product.dto
 
+import com.eatngo.inventory.dto.InventoryDto
 import java.time.LocalDateTime
 
 data class GetProductDetailsResponseDto(
@@ -37,7 +38,7 @@ data class GetProductInventoryResponseDto(
     val stock: Int,
 ) {
     companion object {
-        fun from(inventoryDto: ProductInventoryDto): GetProductInventoryResponseDto {
+        fun from(inventoryDto: InventoryDto): GetProductInventoryResponseDto {
             return GetProductInventoryResponseDto(
                 quantity = inventoryDto.quantity,
                 stock = inventoryDto.stock,
