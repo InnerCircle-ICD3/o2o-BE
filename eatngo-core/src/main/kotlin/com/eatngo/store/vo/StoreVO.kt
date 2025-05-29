@@ -21,10 +21,9 @@ value class StoreNameVO(val value: String) {
 @JvmInline
 value class BusinessNumberVO(val value: String) {
     init {
-        require(value.isNotBlank()) { "사업자등록번호는 비어있을 수 없습니다" }
-        require(value.matches(Regex("^\\d{10}$"))) { "사업자등록번호는 10자리 숫자여야 합니다" }
+        require(value.length == 10) { "사업자등록번호는 10자리여야 합니다" }
+        require(value.all { it.isDigit() }) { "사업자등록번호는 숫자만 포함해야 합니다" }
     }
-
     companion object {
         fun from(number: String): BusinessNumberVO = BusinessNumberVO(number)
     }
@@ -33,8 +32,8 @@ value class BusinessNumberVO(val value: String) {
 @JvmInline
 value class ContactNumberVO(val value: String) {
     init {
-        require(value.matches(Regex("^\\d{2,3}-\\d{3,4}-\\d{4}$"))) { 
-            "올바른 전화번호 형식이 아닙니다 (예: 02-123-4567)" 
+        require(value.matches(Regex("^\\d{2,3}-\\d{3,4}-\\d{4}$"))) {
+            "올바른 전화번호 형식이 아닙니다 (예: 02-123-4567)"
         }
     }
 
@@ -114,22 +113,6 @@ value class FoodCategoryVO(val value: String) {
 }
 
 @JvmInline
-value class CoordinateVO(val value: Pair<Double, Double>) {
-    init {
-        require(value.first in -90.0..90.0) { "위도는 -90에서 90 사이여야 합니다" }
-        require(value.second in -180.0..180.0) { "경도는 -180에서 180 사이여야 합니다" }
-    }
-
-    val latitude: Double get() = value.first
-    val longitude: Double get() = value.second
-
-    companion object {
-        fun from(latitude: Double, longitude: Double): CoordinateVO =
-            CoordinateVO(Pair(latitude, longitude))
-    }
-}
-
-@JvmInline
 value class DescriptionVO(val value: String) {
     init {
         require(value.length <= 500) { "설명은 500자를 초과할 수 없습니다" }
@@ -141,31 +124,43 @@ value class DescriptionVO(val value: String) {
 }
 
 @JvmInline
-value class RoadAddressVO(val value: Pair<String, String>) {
+value class RoadNameAddressVO(val value: String) {
     init {
-        require(value.first.isNotBlank()) { "도로명 주소는 비어있을 수 없습니다" }
-        require(value.second.isNotBlank()) { "우편번호는 비어있을 수 없습니다" }
+        require(value.isNotBlank()) { "도로명 주소는 비어있을 수 없습니다" }
     }
 
-    val fullAddress: String get() = value.first
-    val zoneNo: String get() = value.second
-
     companion object {
-        fun from(fullAddress: String?, zoneNo: String?): RoadAddressVO {
-            requireNotNull(fullAddress) { "도로명 주소는 null일 수 없습니다" }
-            requireNotNull(zoneNo) { "우편번호는 null일 수 없습니다" }
-            return RoadAddressVO(Pair(fullAddress, zoneNo))
+        fun from(roadNameAddress: String?): RoadNameAddressVO {
+            return RoadNameAddressVO(requireNotNull(roadNameAddress) { "도로명 주소는 null일 수 없습니다" })
         }
     }
 }
 
 @JvmInline
-value class ReviewInfoVO(val value: Pair<Double, Int>) {
-    val ratingAverage: Double get() = value.first
-    val ratingCount: Int get() = value.second
+value class LotNumberAddressVO(val value: String) {
+    init {
+        require(value.isNotBlank()) { "지번 주소는 비어있을 수 없습니다" }
+    }
 
     companion object {
-        fun from(ratingAverage: Double, ratingCount: Int): ReviewInfoVO =
-            ReviewInfoVO(Pair(ratingAverage, ratingCount))
+        fun from(lotNumberAddress: String?): LotNumberAddressVO {
+            return LotNumberAddressVO(requireNotNull(lotNumberAddress) { "지번 주소는 null일 수 없습니다" })
+        }
+    }
+}
+
+@JvmInline
+value class ZipCodeVO(val value: String) {
+    init {
+        require(value.isNotBlank()) { "우편번호는 비어있을 수 없습니다" }
+        require(value.length == 5) { "우편번호는 5자리여야 합니다" }
+        require(value.all { it.isDigit() }) { "우편번호는 숫자여야 합니다" }
+    }
+
+    companion object {
+        fun from(zipCode: String?): ZipCodeVO {
+            requireNotNull(zipCode) { "우편번호는 null일 수 없습니다" }
+            return ZipCodeVO(zipCode)
+        }
     }
 }

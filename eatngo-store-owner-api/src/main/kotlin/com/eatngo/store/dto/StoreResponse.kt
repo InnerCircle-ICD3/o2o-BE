@@ -2,7 +2,6 @@ package com.eatngo.store.dto
 
 import java.time.LocalDateTime
 import java.time.LocalTime
-import java.time.format.DateTimeFormatter
 
 
 /**
@@ -21,9 +20,8 @@ data class StoreDetailResponse(
     val contact: String,
     val description: String,
     val businessNumber: String,
-    val businessHours: List<Map<String, Any>>,
-    val latitude: Double?,
-    val longitude: Double?,
+    val businessHours: List<BusinessHourDto>,
+    val address: AddressDto,
     val pickupStartTime: LocalTime?,
     val pickupEndTime: LocalTime?,
     val pickupDay: String?,
@@ -35,7 +33,6 @@ data class StoreDetailResponse(
 ) {
     companion object {
         fun fromStoreDto(storeDto: StoreDto): StoreDetailResponse {
-            val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
             return StoreDetailResponse(
                 id = storeDto.storeId,
                 name = storeDto.name,
@@ -44,14 +41,25 @@ data class StoreDetailResponse(
                 description = storeDto.description ?: "",
                 businessNumber = storeDto.businessNumber,
                 businessHours = storeDto.businessHours.map { hour ->
-                    mapOf(
-                        "dayOfWeek" to hour.dayOfWeek.name,
-                        "openTime" to hour.openTime.format(timeFormatter),
-                        "closeTime" to hour.closeTime.format(timeFormatter)
+                    BusinessHourDto(
+                        dayOfWeek = hour.dayOfWeek,
+                        openTime = hour.openTime,
+                        closeTime = hour.closeTime,
                     )
                 },
-                latitude = storeDto.address.coordinate.latitude,
-                longitude = storeDto.address.coordinate.longitude,
+                address = AddressDto(
+                    roadNameAddress = storeDto.address.roadNameAddress,
+                    lotNumberAddress = storeDto.address.lotNumberAddress,
+                    buildingName = storeDto.address.buildingName,
+                    zipCode = storeDto.address.zipCode,
+                    region1DepthName = storeDto.address.region1DepthName,
+                    region2DepthName = storeDto.address.region2DepthName,
+                    region3DepthName = storeDto.address.region3DepthName,
+                    coordinate = CoordinateDto(
+                        latitude = storeDto.address.coordinate.latitude,
+                        longitude = storeDto.address.coordinate.longitude
+                    )
+                ),
                 pickupStartTime = storeDto.pickUpInfo.pickupStartTime,
                 pickupEndTime = storeDto.pickUpInfo.pickupEndTime,
                 pickupDay = storeDto.pickUpInfo.pickupDay?.name,

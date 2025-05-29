@@ -11,6 +11,12 @@ enum class BusinessErrorCode(
     // 일반 비즈니스 오류
     BUSINESS_EXCEPTION("B001", "비즈니스 로직 처리 중 오류가 발생했습니다."),
 
+    // 사용자 관련 오류
+    USER_NOT_FOUND("U001", "사용자를 찾을 수 없습니다."),
+
+    // 고객 관련 오류
+    CUSTOMER_NOT_FOUND("C001", "고객을 찾을 수 없습니다."),
+
     // 주문 관련 오류
     ORDER_NOT_FOUND("O001", "주문을 찾을 수 없습니다."),
     ORDER_ALREADY_COMPLETED("O002", "이미 완료된 주문입니다."),
@@ -42,15 +48,16 @@ enum class BusinessErrorCode(
     // 매장 생성 관련 오류
     STORE_VALIDATION_FAILED("S006", "매장 정보 검증에 실패했습니다."),
 
-    // 매장 상태 관련 오류
-    STORE_STATUS_INVALID("S012", "유효하지 않은 매장 상태입니다"),
-
     // 매장 점주 관련 오류
     STORE_OWNER_NOT_FOUND("S007", "점주 정보를 찾을 수 없습니다."),
     STORE_OWNER_ALREADY_EXISTS("S008", "이미 등록된 점주입니다."),
     STORE_REGISTRATION_FAILED("S009", "매장 등록에 실패했습니다."),
     STORE_UPDATE_FAILED("S010", "매장 정보 수정에 실패했습니다."),
     STORE_DELETE_FAILED("S011", "매장 삭제에 실패했습니다."),
+    // 매장 상태 관련 오류
+    STORE_STATUS_INVALID("S012", "유효하지 않은 매장 상태입니다"),
+    // 매장 권한 관련 오류
+    STORE_OWNER_FORBIDDEN("S013", "해당 매장에 대한 권한이 없습니다."),
 
     // 메뉴 관련 오류
     PRODUCT_NOT_FOUND("M001", "메뉴를 찾을 수 없습니다."),

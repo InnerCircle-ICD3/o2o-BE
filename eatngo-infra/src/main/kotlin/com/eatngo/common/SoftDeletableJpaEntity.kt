@@ -12,4 +12,8 @@ import java.time.LocalDateTime
 @MappedSuperclass
 abstract class SoftDeletableJpaEntity(
     var deletedAt: LocalDateTime? = null,
-)
+) {
+    open fun delete() {
+        this.deletedAt = LocalDateTime.now()
+    }
+}

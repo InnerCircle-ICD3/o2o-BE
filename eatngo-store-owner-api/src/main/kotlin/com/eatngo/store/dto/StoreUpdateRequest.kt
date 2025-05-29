@@ -1,7 +1,6 @@
 package com.eatngo.store.dto
 
 import com.eatngo.common.constant.StoreEnum
-import com.eatngo.store.dto.*
 import java.time.DayOfWeek
 import java.time.LocalTime
 
@@ -10,18 +9,17 @@ import java.time.LocalTime
  */
 
 data class StoreUpdateRequest(
-    val storeOwnerId: Long? = null,
     val name: String? = null,
     val businessNumber: String? = null,
 
     // 주소 정보 (flat)
-    val roadFullAddress: String? = null,
-    val roadZoneNo: String? = null,
-    val roadBuildingName: String? = null,
-    val legalFullAddress: String? = null,
-    val legalMainAddressNo: String? = null,
-    val legalSubAddressNo: String? = null,
-    val adminFullAddress: String? = null,
+    val roadNameAddress: String? = null,
+    val lotNumberAddress: String? = null,
+    val buildingName: String? = null,
+    val zipCode: String? = null,
+    val region1DepthName: String? = null,
+    val region2DepthName: String? = null,
+    val region3DepthName: String? = null,
 
     // 위치 정보
     val latitude: Double? = null,
@@ -41,14 +39,18 @@ data class StoreUpdateRequest(
     val foodCategory: List<String>? = null
 ) {
     fun toStoreUpdateDto(storeOwnerId: Long): StoreUpdateDto {
-        val addressDto = if (roadFullAddress != null && roadZoneNo != null && (latitude != null && longitude != null)) {
+        val addressDto = if (
+            roadNameAddress != null && zipCode != null &&
+            latitude != null && longitude != null
+        ) {
             AddressDto(
-                roadAddress = RoadAddressDto(
-                    fullAddress = roadFullAddress,
-                    zoneNo = roadZoneNo
-                ),
-                legalAddress = legalFullAddress?.let { LegalAddressDto(it) },
-                adminAddress = adminFullAddress?.let { AdminAddressDto(it) },
+                roadNameAddress = roadNameAddress,
+                lotNumberAddress = lotNumberAddress,
+                buildingName = buildingName,
+                zipCode = zipCode,
+                region1DepthName = region1DepthName,
+                region2DepthName = region2DepthName,
+                region3DepthName = region3DepthName,
                 coordinate = CoordinateDto(
                     latitude = latitude,
                     longitude = longitude
@@ -73,6 +75,7 @@ data class StoreUpdateRequest(
         } else null
 
         return StoreUpdateDto(
+            storeOwnerId = storeOwnerId,
             name = name,
             address = addressDto,
             businessHours = this.businessHours?.map { map ->
@@ -90,3 +93,5 @@ data class StoreUpdateRequest(
         )
     }
 }
+
+data class StoreStatusUpdateRequest(val status: String)

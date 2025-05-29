@@ -1,38 +1,44 @@
 package com.eatngo.user_account.domain
 
+import com.eatngo.user_account.dto.UserAccountUpdateDto
 import com.eatngo.user_account.oauth2.constants.Role
-import com.eatngo.user_account.oauth2.domain.UserAccountOauth2
-import com.eatngo.user_account.oauth2.dto.Oauth2
+import com.eatngo.user_account.oauth2.domain.UserAccountOAuth2
+import com.eatngo.user_account.oauth2.dto.OAuth2
 import com.eatngo.user_account.vo.EmailAddress
+import com.eatngo.user_account.vo.Nickname
 import java.time.LocalDateTime
 
 class UserAccount(
     val id: Long = 0,
     val email: EmailAddress?,
-    val nickname: String? = null,
+    var nickname: Nickname? = null,
     var roles: List<Role> = mutableListOf(),
     val createdAt: LocalDateTime? = null,
     var updatedAt: LocalDateTime? = null,
     var deletedAt: LocalDateTime? = null,
 ) {
-    private val _oauth2 = mutableListOf<UserAccountOauth2>()
-    val oauth2: List<UserAccountOauth2> get() = _oauth2
+    private val _oAuth2 = mutableListOf<UserAccountOAuth2>()
+    val oAuth2: List<UserAccountOAuth2> get() = _oAuth2
 
-    fun addOauth2(oauth2: UserAccountOauth2) {
-        _oauth2.add(oauth2)
+    fun addOauth2(oAuth2: UserAccountOAuth2) {
+        _oAuth2.add(oAuth2)
+    }
+
+    fun update(userAccountUpdateDto: UserAccountUpdateDto) {
+        userAccountUpdateDto.nickname?.let { this.nickname = it }
     }
 
     companion object {
 
-        fun create(oauth2: Oauth2): UserAccount {
+        fun create(oAuth2: OAuth2): UserAccount {
             val userAccount = UserAccount(
-                email = oauth2.email.let { it?.let { EmailAddress(it) } },
-                nickname = oauth2.nickname,
+                email = oAuth2.email.let { it?.let { EmailAddress(it) } },
+                nickname = oAuth2.nickname?.let { Nickname(it) },
             )
             userAccount.addOauth2(
-                UserAccountOauth2.of(
+                UserAccountOAuth2.of(
                     account = userAccount,
-                    oauth2 = oauth2
+                    oAuth2 = oAuth2
                 )
             )
             userAccount.roles = listOf(Role.USER)

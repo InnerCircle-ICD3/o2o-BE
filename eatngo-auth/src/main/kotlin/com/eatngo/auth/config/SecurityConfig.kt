@@ -17,7 +17,7 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher
 @Configuration
 @EnableWebSecurity
 class SecurityConfig(
-    private val oauth2UserService: CustomOAuth2UserService,
+    private val oAuth2UserService: CustomOAuth2UserService,
     private val authenticationSuccessHandler: OAuth2LoginSuccessHandler,
     private val tokenProvider: TokenProvider
 ) {
@@ -47,7 +47,7 @@ class SecurityConfig(
             .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter::class.java)
 
             .oauth2Login {
-                it.userInfoEndpoint { userInfo -> userInfo.userService(oauth2UserService) }
+                it.userInfoEndpoint { userInfo -> userInfo.userService(oAuth2UserService) }
                     .successHandler(authenticationSuccessHandler)
             }
 
