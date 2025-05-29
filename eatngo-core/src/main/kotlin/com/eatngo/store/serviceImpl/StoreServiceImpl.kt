@@ -41,7 +41,11 @@ class StoreServiceImpl(
         val existingStore = storePersistence.findById(id).orThrow { StoreException.StoreNotFound(id) }
         existingStore.requireOwner(storeOwnerId)
 
-        val status = StoreEnum.StoreStatus.valueOf(newStatus.trim().uppercase())
+        val status = try {
+            StoreEnum.StoreStatus.valueOf(newStatus.trim().uppercase())
+        } catch (e: IllegalArgumentException) {
+            throw StoreException.StoreStatusInvalid(newStatus)
+        }
 
         when (status) {
             StoreEnum.StoreStatus.OPEN -> existingStore.toOpen()
