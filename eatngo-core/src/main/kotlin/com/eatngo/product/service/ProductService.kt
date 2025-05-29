@@ -1,5 +1,7 @@
 package com.eatngo.product.service
 
+import com.eatngo.common.exception.ProductException.ProductNotFound
+import com.eatngo.extension.orThrow
 import com.eatngo.file.FileStorageService
 import com.eatngo.product.domain.*
 import com.eatngo.product.domain.Product.*
@@ -11,8 +13,6 @@ import com.eatngo.product.dto.ProductCurrentStockDto
 import com.eatngo.product.dto.ProductDto
 import com.eatngo.product.infra.ProductCachePersistence
 import com.eatngo.product.infra.ProductPersistence
-import com.eatngo.product.infra.findByIdAndStoreIdOrElseThrow
-import com.eatngo.product.infra.findByIdOrThrow
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -86,7 +86,8 @@ class ProductService(
     ): ProductDto {
         // TODO storePersistence.findById(storeId)
         val product: Product =
-            productCachePersistence.findById(productId) ?: productPersistence.findByIdOrThrow(productId)
+            productCachePersistence.findById(productId) ?: productPersistence.findById(productId)
+                .orThrow { ProductNotFound(productId) }
 
         return ProductDto.from(
             product,
@@ -109,26 +110,29 @@ class ProductService(
     }
 
     fun deleteProduct(storeId: Long, productId: Long) {
-        val product: Product = productPersistence.findByIdOrThrow(productId)
+        val product: Product = productPersistence.findById(productId).orThrow { ProductNotFound(productId) }
         product.remove()
         productPersistence.save(product)
         productCachePersistence.deleteById(productId)
     }
 
     fun toggleStock(productCurrentStockDto: ProductCurrentStockDto): ProductAfterStockDto {
-        val product: Product = productPersistence.findByIdOrThrow(productCurrentStockDto.id)
+        val product: Product = productPersistence.findById(productCurrentStockDto.id)
+            .orThrow { ProductNotFound(productCurrentStockDto.id) }
         product.changeStock(productCurrentStockDto.action, productCurrentStockDto.amount)
         val savedProduct = productPersistence.save(product)
 
         when (StockActionType.fromValue(productCurrentStockDto.action)) {
-            INCREASE -> productCachePersistence.increaseStock(product.id!!, productCurrentStockDto.amount)
-            DECREASE -> productCachePersistence.decreaseStock(product.id!!, productCurrentStockDto.amount)
+            INCREASE -> productCachePersistence.increaseStock(product.id, productCurrentStockDto.amount)
+            DECREASE -> productCachePersistence.decreaseStock(product.id, productCurrentStockDto.amount)
         }
         return ProductAfterStockDto.create(savedProduct)
     }
 
     fun modifyProduct(productDto: ProductDto): ProductDto {
-        val product: Product = productPersistence.findByIdAndStoreIdOrElseThrow(productDto.id!!, productDto.storeId)
+        val product: Product = productPersistence.findByIdAndStoreId(productDto.id!!, productDto.storeId)
+            .orThrow { ProductNotFound(productDto.id!!) }
+
         product.modify(
             name = productDto.name,
             description = productDto.description,
@@ -146,7 +150,7 @@ class ProductService(
         )
 
         val savedProduct: Product = productPersistence.save(product)
-        productCachePersistence.deleteById(savedProduct.id!!)
+        productCachePersistence.deleteById(savedProduct.id)
         productCachePersistence.save(savedProduct)
 
         return ProductDto.from(
