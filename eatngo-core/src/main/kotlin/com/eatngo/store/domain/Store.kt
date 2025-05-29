@@ -40,7 +40,11 @@ class Store(
                 address = Address(
                     roadNameAddress = RoadNameAddressVO.from(dto.address.roadNameAddress),
                     lotNumberAddress = LotNumberAddressVO.from(dto.address.lotNumberAddress),
+                    buildingName = dto.address.buildingName,
                     zipCode = ZipCodeVO.from(dto.address.zipCode),
+                    region1DepthName = dto.address.region1DepthName,
+                    region2DepthName = dto.address.region2DepthName,
+                    region3DepthName = dto.address.region3DepthName,
                     coordinate = CoordinateVO.from(
                         dto.address.coordinate.latitude ?: 0.0,
                         dto.address.coordinate.longitude ?: 0.0
@@ -79,7 +83,11 @@ class Store(
                 address = Address(
                     roadNameAddress = RoadNameAddressVO.from(request.address.roadNameAddress),
                     lotNumberAddress = LotNumberAddressVO.from(request.address.lotNumberAddress),
+                    buildingName = request.address.buildingName,
                     zipCode = ZipCodeVO.from(request.address.zipCode),
+                    region1DepthName = request.address.region1DepthName,
+                    region2DepthName = request.address.region2DepthName,
+                    region3DepthName = request.address.region3DepthName,
                     coordinate = CoordinateVO.from(
                         request.address.coordinate.latitude ?: 0.0,
                         request.address.coordinate.longitude ?: 0.0
@@ -129,7 +137,11 @@ class Store(
             this.address = Address(
                 roadNameAddress = RoadNameAddressVO.from(addr.roadNameAddress),
                 lotNumberAddress = LotNumberAddressVO.from(addr.lotNumberAddress),
+                buildingName = addr.buildingName,
                 zipCode = ZipCodeVO.from(addr.zipCode),
+                region1DepthName = addr.region1DepthName,
+                region2DepthName = addr.region2DepthName,
+                region3DepthName = addr.region3DepthName,
                 coordinate = CoordinateVO.from(
                     addr.coordinate.latitude ?: 0.0,
                     addr.coordinate.longitude ?: 0.0
@@ -233,7 +245,11 @@ class Store(
 data class Address(
     val roadNameAddress: RoadNameAddressVO,      // 도로명 주소 (VO)
     val lotNumberAddress: LotNumberAddressVO,   // 지번 주소
+    val buildingName: String?,             // 건물명
     val zipCode: ZipCodeVO,                      // 우편번호
+    val region1DepthName: String?,         // 시도명
+    val region2DepthName: String?,         // 시군구명
+    val region3DepthName: String?,         // 상세주소
     val coordinate: CoordinateVO          // 위도, 경도
 )
 

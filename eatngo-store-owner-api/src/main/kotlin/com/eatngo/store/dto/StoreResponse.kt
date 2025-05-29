@@ -22,8 +22,7 @@ data class StoreDetailResponse(
     val description: String,
     val businessNumber: String,
     val businessHours: List<Map<String, Any>>,
-    val latitude: Double?,
-    val longitude: Double?,
+    val address: Map<String, Any?>,
     val pickupStartTime: LocalTime?,
     val pickupEndTime: LocalTime?,
     val pickupDay: String?,
@@ -50,8 +49,19 @@ data class StoreDetailResponse(
                         "closeTime" to hour.closeTime.format(timeFormatter)
                     )
                 },
-                latitude = storeDto.address.coordinate.latitude,
-                longitude = storeDto.address.coordinate.longitude,
+                address = mapOf(
+                    "roadNameAddress" to storeDto.address.roadNameAddress,
+                    "lotNumberAddress" to storeDto.address.lotNumberAddress,
+                    "buildingName" to storeDto.address.buildingName,
+                    "zipCode" to storeDto.address.zipCode,
+                    "region1DepthName" to storeDto.address.region1DepthName,
+                    "region2DepthName" to storeDto.address.region2DepthName,
+                    "region3DepthName" to storeDto.address.region3DepthName,
+                    "coordinate" to mapOf(
+                        "latitude" to storeDto.address.coordinate.latitude,
+                        "longitude" to storeDto.address.coordinate.longitude
+                    )
+                ),
                 pickupStartTime = storeDto.pickUpInfo.pickupStartTime,
                 pickupEndTime = storeDto.pickUpInfo.pickupEndTime,
                 pickupDay = storeDto.pickUpInfo.pickupDay?.name,
