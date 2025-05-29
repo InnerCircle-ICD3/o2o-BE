@@ -14,9 +14,7 @@ class Inventory(
     }
 
     private fun validateStock(amount: Int) {
-        if (this.stock - amount < 0) {
-            throw IllegalArgumentException("재고는 음수가 될 수 없습니다.")
-        }
+        require(this.stock - amount < 0) { "재고는 음수가 될 수 없습니다." }
     }
 
     companion object {
