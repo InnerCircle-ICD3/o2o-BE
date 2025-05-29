@@ -1,7 +1,6 @@
 package com.eatngo.store.dto
 
 import java.time.LocalTime
-import java.time.format.DateTimeFormatter
 
 /**
  * 매장 카드뷰 내용 반환을 위해 사용하는 리스폰스
