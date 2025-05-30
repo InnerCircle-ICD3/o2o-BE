@@ -6,10 +6,12 @@ import com.eatngo.product.domain.ProductStatus
 import jakarta.persistence.*
 import org.hibernate.annotations.Filter
 import org.hibernate.annotations.SoftDeleteType
+import org.springframework.data.redis.core.RedisHash
 
 @Filter(name = DELETED_FILTER)
 @Entity
 @Table(name = "products")
+@RedisHash(value = "product", timeToLive = 600)
 // TODO 이후 DType 추가 필요!
 data class ProductEntity(
     @Id

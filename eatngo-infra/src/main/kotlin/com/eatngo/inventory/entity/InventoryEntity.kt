@@ -1,9 +1,11 @@
 package com.eatngo.inventory.entity
 
 import jakarta.persistence.*
+import org.springframework.data.redis.core.RedisHash
 
 @Entity
 @Table(name = "inventory")
+@RedisHash(value = "inventory", timeToLive = 600)
 data class InventoryEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
