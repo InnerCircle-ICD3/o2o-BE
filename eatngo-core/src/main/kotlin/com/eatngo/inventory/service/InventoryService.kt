@@ -7,6 +7,9 @@ import com.eatngo.inventory.dto.InventoryDto
 import com.eatngo.inventory.infra.InventoryPersistence
 import com.eatngo.product.dto.ProductCurrentStockDto
 import com.eatngo.product.dto.ProductDto
+import org.springframework.cache.annotation.CacheEvict
+import org.springframework.cache.annotation.CachePut
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -16,12 +19,14 @@ class InventoryService(
     private val inventoryPersistence: InventoryPersistence,
 ) {
 
+    @CachePut("inventory", key = "#productDto.id")
     fun createInventory(productDto: ProductDto): InventoryDto {
         val inventory = Inventory.create(productDto.inventory.quantity, productDto.id!!)
         val savedInventory: Inventory = inventoryPersistence.save(inventory)
         return InventoryDto(savedInventory.quantity)
     }
 
+    @Cacheable("inventory", key = "#productId")
     fun getInventoryDetails(productId: Long): InventoryDto {
         val inventory: Inventory =
             inventoryPersistence.findTopByProductIdOrderByVersionDesc(productId)
@@ -29,10 +34,12 @@ class InventoryService(
         return InventoryDto(inventory.quantity)
     }
 
+    @CacheEvict("inventory", key = "#productId")
     fun deleteInventory(productId: Long) {
-        inventoryPersistence.deleteById(productId)
+        inventoryPersistence.deleteByProductId(productId)
     }
 
+    @CacheEvict("inventory", key = "#productCurrentStockDto.id")
     fun toggleInventory(productCurrentStockDto: ProductCurrentStockDto): InventoryDto {
         val inventory: Inventory = inventoryPersistence.findTopByProductIdOrderByVersionDesc(productCurrentStockDto.id)
             .orThrow { InventoryNotFound(productCurrentStockDto.id) }
@@ -41,6 +48,7 @@ class InventoryService(
         return InventoryDto(savedInventory.quantity)
     }
 
+    @CachePut("inventory", key = "#productDto.id")
     fun modifyInventory(productDto: ProductDto): InventoryDto {
         val inventory: Inventory = inventoryPersistence.findTopByProductIdOrderByVersionDesc(productDto.id!!)
             .orThrow { InventoryNotFound(productDto.id!!) }

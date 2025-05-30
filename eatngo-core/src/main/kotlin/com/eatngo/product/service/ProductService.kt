@@ -28,7 +28,10 @@ class ProductService(
     // TODO storeRepository
 ) {
 
-    @CachePut("product", key = "#result.id")
+    @Caching(
+        put = [CachePut("product", key = "#result.id")],
+        evict = [CacheEvict("storeProducts", key = "#productDto.storeId")]
+    )
     fun createProduct(
         productDto: ProductDto,
     ): ProductDto {
@@ -101,12 +104,7 @@ class ProductService(
 
     @Cacheable("storeProducts", key = "#storeId")
     fun findAllProducts(storeId: Long): List<ProductDto> {
-        var products: List<Product> = productPersistence.findAllByStoreId(storeId)
-        if (products.isEmpty()) {
-            products = productPersistence.findAllByStoreId(storeId)
-        }
-
-        return products
+        return productPersistence.findAllByStoreId(storeId)
             .map {
                 ProductDto.from(
                     it,
@@ -116,7 +114,12 @@ class ProductService(
             }
     }
 
-    @CacheEvict("product", key = "#productId")
+    @Caching(
+        evict = [
+            CacheEvict("product", key = "#productId"),
+            CacheEvict("inventory", key = "#productId"),
+            CacheEvict("storeProducts", key = "#storeId")],
+    )
     fun deleteProduct(storeId: Long, productId: Long) {
         val product: Product = productPersistence.findById(productId).orThrow { ProductNotFound(productId) }
         product.remove()

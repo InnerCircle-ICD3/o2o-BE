@@ -19,7 +19,7 @@ class InventoryRepositoryImpl(
         return jpaInventoryRepository.findTopByProductIdOrderByVersionDesc(productId)
     }
 
-    override fun deleteById(productId: Long) {
+    override fun deleteByProductId(productId: Long) {
         jpaInventoryRepository.deleteByProductId(productId)
     }
 }
