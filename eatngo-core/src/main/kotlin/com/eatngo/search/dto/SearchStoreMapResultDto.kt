@@ -11,7 +11,7 @@ data class SearchStoreMapResultDto(
 data class SearchStoreMap(
     val storeID: Long,
     val storeName: String,
-    val location: CoordinateVO, // 매장 위치(위도, 경도)
+    val coordinate: CoordinateVO, // 매장 위치(위도, 경도)
     val stock: Int = 1, // 상품 재고 수량 TODO
 ) {
     companion object {
@@ -19,7 +19,7 @@ data class SearchStoreMap(
             SearchStoreMap(
                 storeID = searchStore.storeId,
                 storeName = searchStore.storeName,
-                location = searchStore.location,
+                coordinate = searchStore.location,
             )
     }
 }

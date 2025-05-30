@@ -20,7 +20,7 @@ data class SearchStoreDto(
     val open: Boolean, // 매장 오픈 여부
     val stock: Int, // 재고 수량
     val roadAddress: String, // 매장 주소(도로명 주소)
-    val location: CoordinateVO, // 매장 위치(위도, 경도)
+    val coordinate: CoordinateVO, // 매장 위치(위도, 경도)
     val businessHours: BusinessHoursDto =
         BusinessHoursDto(
             openTime = LocalDateTime.now(),
@@ -44,10 +44,10 @@ data class SearchStoreDto(
                 storeCategory = searchStore.storeCategory,
                 foodCategory = searchStore.foodCategory,
                 roadAddress = searchStore.roadAddress,
-                location = searchStore.location, // TODO: MongoDB GeoJSON -> Point 변환
+                coordinate = searchStore.coordinate,
                 distanceKm =
                     DistanceCalculator.calculateDistance(
-                        from = searchStore.location,
+                        from = searchStore.coordinate,
                         to = userCoordinate,
                     ),
                 open = searchStore.open,

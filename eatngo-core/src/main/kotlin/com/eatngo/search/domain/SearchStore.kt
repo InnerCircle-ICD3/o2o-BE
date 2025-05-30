@@ -17,7 +17,7 @@ class SearchStore(
     val storeCategory: List<StoreEnum.StoreCategory> = emptyList(),
     val foodCategory: List<String> = emptyList(), // 대표 판매 음식 종류
     val roadAddress: String = "",
-    val location: CoordinateVO = CoordinateVO.from(0.0, 0.0),
+    val coordinate: CoordinateVO = CoordinateVO.from(0.0, 0.0),
     val open: Boolean = false, // 매장 오픈 여부
     val businessHours: BusinessHoursDto, // 매장 영업 시간
     val updatedAt: LocalDateTime, // 마지막 업데이트 시간
@@ -32,7 +32,7 @@ class SearchStore(
                 storeCategory = emptyList(),
                 foodCategory = emptyList(),
                 roadAddress = "",
-                location = CoordinateVO.from(0.0, 0.0),
+                coordinate = CoordinateVO.from(0.0, 0.0),
                 open = true,
                 businessHours =
                     BusinessHoursDto(
