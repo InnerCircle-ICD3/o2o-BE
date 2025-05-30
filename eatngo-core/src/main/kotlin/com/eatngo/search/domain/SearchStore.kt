@@ -15,6 +15,7 @@ class SearchStore(
     val storeName: String = "",
     val storeImage: String = "", // 매장 이미지 S3 URL
     val storeCategory: List<StoreEnum.StoreCategory> = emptyList(),
+    val foodCategory: List<String> = emptyList(), // 대표 판매 음식 종류
     val roadAddress: String = "",
     val location: CoordinateVO = CoordinateVO.from(0.0, 0.0),
     val open: Boolean = false, // 매장 오픈 여부
@@ -29,6 +30,7 @@ class SearchStore(
                 storeName = "",
                 storeImage = "",
                 storeCategory = emptyList(),
+                foodCategory = emptyList(),
                 roadAddress = "",
                 location = CoordinateVO.from(0.0, 0.0),
                 open = true,

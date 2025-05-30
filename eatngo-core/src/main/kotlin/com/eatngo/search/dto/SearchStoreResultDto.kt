@@ -15,6 +15,7 @@ data class SearchStoreDto(
     val storeName: String,
     val storeImage: String = "", // 매장 이미지 URL
     val storeCategory: List<StoreEnum.StoreCategory>, // 대표 판매 음식 종류
+    val foodCategory: List<String>, // 음식 종류
     val distanceKm: Double, // 검색하는 유저와 매장 간의 거리(km)
     val open: Boolean, // 매장 오픈 여부
     val stock: Int, // 재고 수량
@@ -41,6 +42,7 @@ data class SearchStoreDto(
                 storeName = searchStore.storeName,
                 storeImage = searchStore.storeImage,
                 storeCategory = searchStore.storeCategory,
+                foodCategory = searchStore.foodCategory,
                 roadAddress = searchStore.roadAddress,
                 location = searchStore.location, // TODO: MongoDB GeoJSON -> Point 변환
                 distanceKm =
