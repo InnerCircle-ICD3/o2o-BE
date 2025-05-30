@@ -14,23 +14,24 @@ import java.time.Duration
 
 @Configuration
 @EnableRedisRepositories
-class RedisConfig (
-    private val env: Environment
+class RedisConfig(
+    private val env: Environment,
 ) {
-
     val stringSerializer: StringRedisSerializer = StringRedisSerializer()
 
     @Bean
     fun redisConnectionFactory(): RedisConnectionFactory {
-        val host = env.getProperty("spring.redis.host")?: "localhost"
+        val host = env.getProperty("spring.redis.host") ?: "localhost"
         val port = env.getProperty("spring.redis.port")?.toInt() ?: 6379
         val password = env.getProperty("spring.redis.password")
 
-        val lettuceClientConfiguration = LettuceClientConfiguration.builder()
-            .commandTimeout(Duration.ofSeconds(5))
-            .shutdownTimeout(Duration.ZERO)
-            .build()
-        val redisStandaloneConfiguration = RedisStandaloneConfiguration(host, /* port = */ port)
+        val lettuceClientConfiguration =
+            LettuceClientConfiguration
+                .builder()
+                .commandTimeout(Duration.ofSeconds(5))
+                .shutdownTimeout(Duration.ZERO)
+                .build()
+        val redisStandaloneConfiguration = RedisStandaloneConfiguration(host, port)
         redisStandaloneConfiguration.setPassword(password)
 
         return LettuceConnectionFactory(redisStandaloneConfiguration, lettuceClientConfiguration)
@@ -40,8 +41,8 @@ class RedisConfig (
     fun redisTemplate(redisConnectionFactory: RedisConnectionFactory): RedisTemplate<Any, Any> {
         val template = RedisTemplate<Any, Any>()
         template.connectionFactory = redisConnectionFactory
-        template.keySerializer  = stringSerializer
-        template.hashKeySerializer  = stringSerializer
+        template.keySerializer = stringSerializer
+        template.hashKeySerializer = stringSerializer
         return template
     }
 }
