@@ -18,12 +18,12 @@ enum class SearchStoreStatus(
                 2 -> CLOSED
                 else -> throw IllegalArgumentException("Invalid status code: $code")
             }
-
-        fun from(storeStatus: StoreEnum.StoreStatus): SearchStoreStatus =
-            when (storeStatus) {
-                StoreEnum.StoreStatus.PENDING -> PENDING
-                StoreEnum.StoreStatus.OPEN -> OPEN
-                StoreEnum.StoreStatus.CLOSED -> CLOSED
-            }
     }
+
+    fun toStoreStatus(): StoreEnum.StoreStatus =
+        when (this) {
+            PENDING -> StoreEnum.StoreStatus.PENDING
+            OPEN -> StoreEnum.StoreStatus.OPEN
+            CLOSED -> StoreEnum.StoreStatus.CLOSED
+        }
 }

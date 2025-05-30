@@ -7,12 +7,6 @@ data class Coordinate(
     val longitude: Double, // 경도
 ) {
     companion object {
-        fun from(coordinateVO: CoordinateVO): Coordinate =
-            Coordinate(
-                latitude = coordinateVO.latitude,
-                longitude = coordinateVO.longitude,
-            )
-
         fun from(
             latitude: Double,
             longitude: Double,
@@ -22,4 +16,6 @@ data class Coordinate(
                 longitude = longitude,
             )
     }
+
+    fun toVO(): CoordinateVO = CoordinateVO.from(latitude, longitude)
 }

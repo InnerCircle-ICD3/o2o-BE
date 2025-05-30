@@ -1,6 +1,7 @@
 package com.eatngo.search.domain
 
 import com.eatngo.common.constant.StoreEnum
+import java.time.DayOfWeek
 import java.time.LocalDateTime
 
 /**
