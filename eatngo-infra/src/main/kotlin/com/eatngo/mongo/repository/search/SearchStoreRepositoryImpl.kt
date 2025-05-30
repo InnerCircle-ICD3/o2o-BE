@@ -1,6 +1,5 @@
 package com.eatngo.mongo.repository.search
 
-import com.eatngo.common.constant.StoreEnum
 import com.eatngo.mongo.entity.search.SearchStoreEntity
 import com.eatngo.search.domain.SearchStore
 import com.eatngo.search.dto.AutoCompleteStoreNameDto
@@ -47,11 +46,44 @@ class SearchStoreRepositoryImpl(
         }
     }
 
+    override fun listStore(
+        longitude: Double,
+        latitude: Double,
+        maxDistance: Double,
+        searchFilter: SearchFilter,
+        page: Int,
+        size: Int,
+    ): List<SearchStore> {
+        val query = Query()
+        // 필수 : 위치 기반 필터링
+        query.addCriteria(
+            Criteria
+                .where("coordinate")
+                .nearSphere(GeoJsonPoint(longitude, latitude))
+                .maxDistance(maxDistance),
+        )
+
+        // 선택 : 카테고리 필터링
+        searchFilter.storeCategory?.let {
+            query.addCriteria(
+                Criteria.where("storeCategory").`is`(it),
+            )
+        }
+
+        // TODO 선택 : 시간 필터링
+        // TODO 선택 : 매장 상태 필터링
+
+        val result = mongoTemplate.find(query, SearchStoreEntity::class.java)
+        return result.map {
+            it.to()
+        }
+    }
+
     override fun searchStore(
         longitude: Double,
         latitude: Double,
         maxDistance: Double,
-        searchFilter: SearchFilter?,
+        searchText: String,
         page: Int,
         size: Int,
     ): List<SearchStore> {
@@ -60,7 +92,7 @@ class SearchStoreRepositoryImpl(
                 longitude = longitude,
                 latitude = latitude,
                 maxDistance = maxDistance,
-                searchFilter = searchFilter,
+                searchText = searchText,
             )
         val skipOp = Aggregation.skip(page.toLong() * size)
         val limitOp = Aggregation.limit(size.toLong())
@@ -127,12 +159,12 @@ class SearchStoreRepositoryImpl(
         longitude: Double,
         latitude: Double,
         maxDistance: Double,
-        searchFilter: SearchFilter?,
+        searchText: String,
     ): AggregationOperation {
         val filters = mutableListOf<Bson>()
         val must = mutableListOf<Bson>()
 
-        // 필수: 위치 기반 필터
+        // 위치 기반 필터
         filters.add(
             Document(
                 "geoWithin",
@@ -149,67 +181,14 @@ class SearchStoreRepositoryImpl(
             ),
         )
 
-        // 선택적: 카테고리 필터
-        searchFilter?.storeCategory?.let {
-            filters.add(
-                Document(
-                    "equals",
-                    Document()
-                        .append("value", it)
-                        .append("path", "storeCategory"),
-                ),
-            )
-        }
-
-        // 선택적: 시간 필터
-        searchFilter?.time?.let { currentTime ->
-            val pickupTimeCondition =
-                Document(
-                    "compound",
-                    Document(
-                        "must",
-                        listOf(
-                            Document(
-                                "range",
-                                Document()
-                                    .append("path", "pickupHour.openTime")
-                                    .append("lte", currentTime),
-                            ),
-                            Document(
-                                "range",
-                                Document()
-                                    .append("path", "pickupHour.closeTime")
-                                    .append("gte", currentTime),
-                            ),
-                        ),
-                    ),
-                )
-            filters.add(pickupTimeCondition)
-        }
-
-        // 선택적: 상태 필터 TODO: businessHours 필터링 로직 추가 필요
-        searchFilter?.status?.let {
-            if (it == StoreEnum.StoreStatus.OPEN) {
-                filters.add(
-                    Document(
-                        "equals",
-                        Document("query", StoreEnum.StoreStatus.OPEN)
-                            .append("path", "status"),
-                    ),
-                )
-            }
-        }
-
-        // 선택적: 검색어 필터
-        searchFilter?.searchText?.let {
-            must.add(
-                Document(
-                    "text",
-                    Document("query", it)
-                        .append("path", listOf("storeName", "foodCategory")),
-                ),
-            )
-        }
+        // 검색어 필터
+        must.add(
+            Document(
+                "text",
+                Document("query", searchText)
+                    .append("path", listOf("storeName", "foodCategory")),
+            ),
+        )
 
         // MongoDB Atlas Search 쿼리 생성
         val score =

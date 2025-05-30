@@ -6,12 +6,13 @@ import com.eatngo.extension.orThrow
 import com.eatngo.search.domain.SearchStore
 import com.eatngo.search.dto.AutoCompleteStoreNameDto
 import com.eatngo.search.dto.Box
-import com.eatngo.search.dto.SearchFilter
 import com.eatngo.search.dto.SearchStoreMap
 import com.eatngo.search.dto.SearchStoreMapResultDto
 import com.eatngo.search.dto.SearchStoreResultDto
 import com.eatngo.search.dto.SearchSuggestionDto
 import com.eatngo.search.dto.SearchSuggestionResultDto
+import com.eatngo.search.dto.StoreFilterDto
+import com.eatngo.search.dto.StoreSearchFilterDto
 import com.eatngo.search.infra.SearchMapRedisRepository
 import com.eatngo.search.infra.SearchStoreRepository
 import org.springframework.stereotype.Service
@@ -27,44 +28,43 @@ class SearchService(
 
     /**
      * 매장 리스트 조회 API
-     * @param userCoordinate 검색하는 유저의 위치 정보
-     * @param searchFilter 검색 필터
+     * @param storeFilterDto 검색 정보
      * @param page 페이지 번호
      * @param size 페이지 사이즈
      * @return 검색 결과 DTO
      */
     fun listStore(
-        userCoordinate: CoordinateVO,
-        searchFilter: SearchFilter,
+        storeFilterDto: StoreFilterDto,
+        // TODO: 검색반경 프론트와 논의 필요
+        searchDistance: Double = 2000.0,
         page: Int = 0,
         size: Int = 20,
     ): SearchStoreResultDto {
         val listStore: List<SearchStore> =
             searchStoreRepository
                 .listStore(
-                    longitude = userCoordinate.longitude,
-                    latitude = userCoordinate.latitude,
-                    searchFilter = searchFilter,
+                    longitude = storeFilterDto.viewCoordinate.longitude,
+                    latitude = storeFilterDto.viewCoordinate.latitude,
+                    maxDistance = searchDistance,
+                    searchFilter = storeFilterDto.filter,
                     page = page,
                     size = size,
-                ).orThrow { SearchException.SearchStoreListFailed(userCoordinate, searchFilter) }
+                ).orThrow { SearchException.SearchStoreListFailed(storeFilterDto.viewCoordinate, storeFilterDto.filter) }
         return SearchStoreResultDto.from(
-            userCoordinate = userCoordinate,
+            userCoordinate = storeFilterDto.viewCoordinate,
             searchStoreList = listStore,
         )
     }
 
     /**
      * 가게 검색 API - 검색어 입력
-     * @param userCoordinate 검색하는 유저의 위치 정보
-     * @param searchText 검색어
+     * @param storeSearchFilterDto 검색하는 유저의 위치 정보와 검색어
      * @param page 페이지 번호
      * @param size 페이지 사이즈
      * @return 검색 결과 DTO
      */
     fun searchStore(
-        userCoordinate: CoordinateVO,
-        searchText: String,
+        storeSearchFilterDto: StoreSearchFilterDto,
         // TODO: 검색반경 프론트와 논의 필요
         searchDistance: Double = 2000.0,
         page: Int,
@@ -73,16 +73,15 @@ class SearchService(
         val searchStoreList: List<SearchStore> =
             searchStoreRepository
                 .searchStore(
-                    longitude = userCoordinate.longitude,
-                    latitude = userCoordinate.latitude,
+                    longitude = storeSearchFilterDto.viewCoordinate.longitude,
+                    latitude = storeSearchFilterDto.viewCoordinate.latitude,
                     maxDistance = searchDistance,
-                    searchText = searchText,
+                    searchText = storeSearchFilterDto.searchText,
                     page = page,
                     size = size,
-                ).orThrow { SearchException.SearchStoreSearchFailed(userCoordinate, searchText) }
-
+                ).orThrow { SearchException.SearchStoreSearchFailed(storeSearchFilterDto.viewCoordinate, storeSearchFilterDto.searchText) }
         return SearchStoreResultDto.from(
-            userCoordinate = userCoordinate,
+            userCoordinate = storeSearchFilterDto.viewCoordinate,
             searchStoreList = searchStoreList,
         )
     }

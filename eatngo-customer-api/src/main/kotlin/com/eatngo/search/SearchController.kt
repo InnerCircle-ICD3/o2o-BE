@@ -2,10 +2,11 @@ package com.eatngo.search
 
 import com.eatngo.common.constant.StoreEnum
 import com.eatngo.common.type.CoordinateVO
-import com.eatngo.search.dto.SearchFilter
 import com.eatngo.search.dto.SearchStoreMapResultDto
 import com.eatngo.search.dto.SearchStoreResultDto
 import com.eatngo.search.dto.SearchSuggestionResultDto
+import com.eatngo.search.dto.StoreFilterDto
+import com.eatngo.search.dto.StoreSearchFilterDto
 import com.eatngo.search.service.SearchService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
@@ -37,11 +38,9 @@ class SearchController(
     ): ResponseEntity<SearchStoreResultDto> =
         ResponseEntity.ok(
             searchService.listStore(
-                CoordinateVO.from(
+                StoreFilterDto.from(
                     latitude = latitude,
                     longitude = longitude,
-                ),
-                SearchFilter.from(
                     storeCategory = storeCategory,
                     time = time,
                     status = status,
@@ -63,12 +62,11 @@ class SearchController(
     ): ResponseEntity<SearchStoreResultDto> =
         ResponseEntity.ok(
             searchService.searchStore(
-                userCoordinate =
-                    CoordinateVO.from(
-                        latitude = latitude,
-                        longitude = longitude,
-                    ),
-                searchText = searchText,
+                StoreSearchFilterDto.from(
+                    latitude = latitude,
+                    longitude = longitude,
+                    searchText = searchText,
+                ),
                 page = page,
                 size = size,
             ),
