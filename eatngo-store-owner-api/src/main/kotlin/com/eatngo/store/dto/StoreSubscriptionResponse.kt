@@ -1,5 +1,5 @@
 package com.eatngo.store.dto
-import com.eatngo.store.dto.StoreSubscriptionDto
+import com.eatngo.subscription.dto.StoreSubscriptionDto
 import java.time.LocalDateTime
 
 

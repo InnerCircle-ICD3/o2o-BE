@@ -1,6 +1,6 @@
-package com.eatngo.store.infra
+package com.eatngo.subscription.infra
 
-import com.eatngo.store.domain.StoreSubscription
+import com.eatngo.subscription.domain.StoreSubscription
 
 /**
  * 매장 구독 영속성 인터페이스
@@ -40,4 +40,4 @@ interface StoreSubscriptionPersistence {
      * 사용자 ID로 상점 구독 여부 조회
      */
     fun existsByUserIdAndStoreId(userId: Long, storeId: Long): Boolean
-} 
+}

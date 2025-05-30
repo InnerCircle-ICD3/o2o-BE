@@ -1,7 +1,7 @@
-package com.eatngo.store.dto
+package com.eatngo.subscription.dto
 
 import com.eatngo.common.constant.StoreEnum
-import com.eatngo.store.domain.StoreSubscription
+import com.eatngo.subscription.domain.StoreSubscription
 import java.time.LocalDateTime
 
 /**

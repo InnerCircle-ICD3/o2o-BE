@@ -1,11 +1,11 @@
-package com.eatngo.store.serviceImpl
+package com.eatngo.subscription.service.Impl
 
 import com.eatngo.common.exception.StoreException
-import com.eatngo.store.domain.StoreSubscription
-import com.eatngo.store.dto.StoreSubscriptionDto
 import com.eatngo.store.infra.StorePersistence
-import com.eatngo.store.infra.StoreSubscriptionPersistence
-import com.eatngo.store.service.StoreSubscriptionService
+import com.eatngo.subscription.domain.StoreSubscription
+import com.eatngo.subscription.dto.StoreSubscriptionDto
+import com.eatngo.subscription.infra.StoreSubscriptionPersistence
+import com.eatngo.subscription.service.StoreSubscriptionService
 import org.springframework.stereotype.Service
 
 /**
@@ -42,11 +42,11 @@ class StoreSubscriptionServiceImpl(
             }
             existingSubscription
         } ?: run {
-            val newSubscription = StoreSubscription.create(userId, storeId)
+            val newSubscription = StoreSubscription.Companion.create(userId, storeId)
             storeSubscriptionPersistence.save(newSubscription)
         }
 
-        return StoreSubscriptionDto.from(
+        return StoreSubscriptionDto.Companion.from(
             subscription = subscription,
             userName = userName,
             storeName = store.name.value,
@@ -65,7 +65,7 @@ class StoreSubscriptionServiceImpl(
         val store = storePersistence.findById(subscription.storeId)
             ?: throw StoreException.StoreNotFound(subscription.storeId)
 
-        return StoreSubscriptionDto.from(
+        return StoreSubscriptionDto.Companion.from(
             subscription = subscription,
             userName = userName,
             storeName = store.name.value,
@@ -86,7 +86,7 @@ class StoreSubscriptionServiceImpl(
 
         return subscriptions.map { subscription ->
             val store = stores[subscription.storeId] ?: throw StoreException.StoreNotFound(subscription.storeId)
-            StoreSubscriptionDto.from(
+            StoreSubscriptionDto.Companion.from(
                 subscription = subscription,
                 userName = userName,
                 storeName = store.name.value,
@@ -106,7 +106,7 @@ class StoreSubscriptionServiceImpl(
 
         return storeSubscriptionPersistence.findByStoreId(storeId)
             .map { subscription ->
-                StoreSubscriptionDto.from(
+                StoreSubscriptionDto.Companion.from(
                     subscription = subscription,
                     userName = userName,
                     storeName = store.name.value,
