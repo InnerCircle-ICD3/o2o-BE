@@ -1,5 +1,6 @@
 package com.eatngo.subscription.domain
 
+import com.eatngo.common.exception.StoreException
 import java.time.LocalDateTime
 
 /**
@@ -15,6 +16,9 @@ class StoreSubscription(
     var deletedAt: LocalDateTime? = null,               // 삭제일(softDel용, 삭제 시간이 존재하면 softDel)
 ) {
     companion object {
+        /**
+         * 새로운 구독 생성
+         */
         fun create(
             userId: Long,
             storeId: Long
@@ -30,10 +34,57 @@ class StoreSubscription(
     }
 
     /**
+     * 구독 상태 확인
+     */
+    fun isActive(): Boolean = deletedAt == null
+
+    /**
+     * 구독 취소
+     * 이미 취소된 구독인 경우 예외 발생
+     */
+    fun softDelete() {
+        if (deletedAt != null) {
+            throw StoreException.SubscriptionAlreadyCanceled(id)
+        }
+        deletedAt = LocalDateTime.now()
+        updatedAt = deletedAt!!
+    }
+
+    /**
      * 재구독
+     * 이미 활성화된 구독인 경우 예외 발생
      */
     fun restore() {
+        if (deletedAt == null) {
+            throw StoreException.SubscriptionAlreadyActive(id)
+        }
         deletedAt = null
         updatedAt = LocalDateTime.now()
+    }
+
+    /**
+     * 구독 상태 변경 (토글)
+     * 현재 상태에 따라 구독 취소 또는 재구독 수행
+     * @return 변경 후 구독 상태 (true: 활성화, false: 취소됨)
+     */
+    fun toggleSubscription(): Boolean {
+        return if (isActive()) {
+            softDelete()
+            false
+        } else {
+            restore()
+            true
+        }
+    }
+
+    /**
+     * 사용자 소유 구독인지 확인
+     * @param customerId 고객 ID
+     * @throws StoreException.SubscriptionForbidden 구독 소유자가 아닌 경우
+     */
+    fun validateOwnership(customerId: Long) {
+        if (userId != customerId) {
+            throw StoreException.SubscriptionForbidden(customerId, id)
+        }
     }
 }
