@@ -1,15 +1,13 @@
 package com.eatngo.product.event
 
-import com.eatngo.common.exception.StockException.StockEmpty
-import com.eatngo.common.exception.StockException.StockNotFound
 import com.eatngo.inventory.event.StockEventPublisher
-import com.eatngo.order.event.CreateOrderEvent
-import com.eatngo.inventory.dto.StockDto
+import com.eatngo.order.event.OrderCanceledEvent
+import com.eatngo.order.event.OrderCreatedEvent
+import com.eatngo.order.event.OrderEvent
 import com.eatngo.product.infra.ProductCachePersistence
 import com.eatngo.product.infra.ProductPersistence
+import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Component
-import org.springframework.transaction.event.TransactionPhase.AFTER_COMMIT
-import org.springframework.transaction.event.TransactionalEventListener
 
 @Component
 class ProductEventListener(
@@ -18,42 +16,21 @@ class ProductEventListener(
     private val stockEventPublisher: StockEventPublisher
 ) {
 
-    @TransactionalEventListener(phase = AFTER_COMMIT)
-    fun handleOrderEvent(event: CreateOrderEvent) {
-        val decreasedStock: Int = decreaseStock(event.productId, event.orderId)
-        publishEventToOrder(decreasedStock, event)
-    }
-
-    private fun decreaseStock(productId: Long, orderId: Long): Int {
-        val decreasedStock: Int = try {
-            productCachePersistence.decreaseStock(productId, 1)
-        } catch (e: StockNotFound) {
-            handleSoldOutEvent(orderId, productId); -1
-        } catch (e: StockEmpty) {
-            handleSoldOutEvent(orderId, productId); -1
-        }
-        return decreasedStock
-    }
-
-    private fun publishEventToOrder(decreasedStock: Int, event: CreateOrderEvent) {
-        when (decreasedStock) {
-            0 -> {
-                productPersistence.updateStock(event.productId, 0)
-                handleSoldOutEvent(event.orderId, event.productId)
+    @EventListener
+    fun handleOrderEvent(event: OrderEvent) {
+        when (event) {
+            is OrderCreatedEvent -> {
+                for (orderItem in event.order.orderItems) {
+                    productCachePersistence.decreaseStock(orderItem.productId, orderItem.quantity)
+                    // TODO 재고 정보 search 및 market 에게 알려주기 event 기반
+                }
             }
-            -1 -> return
-            else -> {
-                stockEventPublisher.publishDecreaseEvent(
-                    StockDto(event.orderId, event.productId, decreasedStock)
-                )
+
+            is OrderCanceledEvent -> {
+                // TODO
             }
         }
-    }
 
-    private fun handleSoldOutEvent(orderId: Long, productId: Long) {
-        stockEventPublisher.publishSoldOutEvent(
-            StockDto(orderId, productId, 0)
-        )
     }
 
 }
