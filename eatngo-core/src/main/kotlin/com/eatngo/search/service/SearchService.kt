@@ -3,7 +3,6 @@ package com.eatngo.search.service
 import com.eatngo.common.type.CoordinateVO
 import com.eatngo.search.domain.SearchStore
 import com.eatngo.search.dto.Box
-import com.eatngo.search.dto.SearchStoreDto
 import com.eatngo.search.dto.SearchStoreMap
 import com.eatngo.search.dto.SearchStoreMapResultDto
 import com.eatngo.search.dto.SearchStoreQueryDto
@@ -38,6 +37,8 @@ class SearchService(
     ): SearchStoreResultDto {
         // TODO : 검색 반경, 검색 쿼리 등 검증 필요
 
+        // 검색 쿼리 검증
+
         val searchStoreList: List<SearchStore> =
             searchStoreRepository.searchStore(
                 longitude = searchQuery.viewCoordinate.longitude,
@@ -48,14 +49,9 @@ class SearchService(
                 size = size,
             )
 
-        return SearchStoreResultDto(
-            storeList =
-                searchStoreList.map {
-                    SearchStoreDto.from(
-                        userCoordinate = searchQuery.viewCoordinate,
-                        searchStore = it,
-                    )
-                },
+        return SearchStoreResultDto.from(
+            userCoordinate = searchQuery.viewCoordinate,
+            searchStoreList = searchStoreList,
         )
     }
 

@@ -7,11 +7,54 @@ import java.time.LocalDateTime
 data class SearchStoreQueryDto(
     val viewCoordinate: CoordinateVO, // 검색하는 유저의 위치 정보
     val filter: SearchFilter? = null, // 검색필터 -> 위치 기반 검색에서는 MVP 에서 필터링 하지 않기 때문에 null
-)
+) {
+    companion object {
+        fun from(
+            latitude: Double,
+            longitude: Double,
+            searchText: String? = null,
+            storeCategory: String? = null,
+            time: LocalDateTime? = null,
+            status: Int = 9, // 0: 영업종료, 1: 영업중, 9: 전체 상태
+        ): SearchStoreQueryDto {
+            val viewCoordinate = CoordinateVO.from(latitude, longitude)
+
+            val filter =
+                SearchFilter.from(
+                    storeCategory = storeCategory,
+                    time = time,
+                    searchText = searchText,
+                    status = status,
+                )
+
+            return SearchStoreQueryDto(
+                viewCoordinate = viewCoordinate,
+                filter = filter,
+            )
+        }
+    }
+}
 
 data class SearchFilter(
-    val category: StoreEnum.StoreCategory?, // 매장 카테고리
+    val storeCategory: StoreEnum.StoreCategory?, // 매장 카테고리
     val time: LocalDateTime?, // 픽업 가능 시간
     val searchText: String?, // 검색어(대상 필드: 매장명, 음식명, 카테고리)
     val status: Int, // 매장 상태(0: 영업종료, 1: 영업중, 9: 전체 상태)
-)
+) {
+    companion object {
+        fun from(
+            storeCategory: String? = null,
+            time: LocalDateTime? = null,
+            searchText: String? = null,
+            status: Int = 9,
+        ): SearchFilter {
+            val storeCategory = storeCategory?.let { StoreEnum.StoreCategory.fromString(it) }
+            return SearchFilter(
+                storeCategory = storeCategory,
+                time = time,
+                searchText = searchText,
+                status = status,
+            )
+        }
+    }
+}

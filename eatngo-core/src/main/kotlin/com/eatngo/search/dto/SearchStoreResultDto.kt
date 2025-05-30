@@ -8,7 +8,20 @@ import java.time.LocalDateTime
 
 data class SearchStoreResultDto(
     val storeList: List<SearchStoreDto>,
-)
+) {
+    companion object {
+        fun from(
+            userCoordinate: CoordinateVO,
+            searchStoreList: List<SearchStore>,
+        ): SearchStoreResultDto =
+            SearchStoreResultDto(
+                storeList =
+                    searchStoreList.map { searchStore ->
+                        SearchStoreDto.from(userCoordinate, searchStore)
+                    },
+            )
+    }
+}
 
 data class SearchStoreDto(
     val storeId: Long,

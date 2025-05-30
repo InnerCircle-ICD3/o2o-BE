@@ -15,7 +15,13 @@ object StoreEnum {
         ;
 
         companion object {
-            fun fromString(value: String?): StoreCategory? = entries.find { it.name == value }
+            fun fromString(value: String?): StoreCategory? {
+                if (value.isNullOrBlank()) return null
+
+                return entries.find { it.name == value }
+                    ?: entries.find { it.category == value }
+                    ?: throw IllegalArgumentException("존재하지 않는 카테고리 입니다: $value")
+            }
         }
     }
 }

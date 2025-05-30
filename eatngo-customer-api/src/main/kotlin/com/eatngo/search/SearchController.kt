@@ -1,8 +1,6 @@
 package com.eatngo.search
 
 import com.eatngo.common.type.CoordinateVO
-import com.eatngo.search.constant.StoreEnum
-import com.eatngo.search.dto.SearchFilter
 import com.eatngo.search.dto.SearchStoreMapResultDto
 import com.eatngo.search.dto.SearchStoreQueryDto
 import com.eatngo.search.dto.SearchStoreResultDto
@@ -28,7 +26,7 @@ class SearchController(
         @RequestParam latitude: Double,
         @RequestParam longitude: Double,
         @RequestParam searchText: String?,
-        @RequestParam category: String?,
+        @RequestParam storeCategory: String?,
         @RequestParam time: LocalDateTime?,
         @RequestParam status: StoreStatus = StoreStatus.ALL,
         // TODO : 우선 BE, FE 모두 page+size로 구현 => 추후 개선
@@ -37,19 +35,13 @@ class SearchController(
     ): ResponseEntity<SearchStoreResultDto> {
         val searchResult =
             searchService.searchStore(
-                SearchStoreQueryDto(
-                    viewCoordinate =
-                        CoordinateVO.from(
-                            latitude = latitude,
-                            longitude = longitude,
-                        ),
-                    filter =
-                        SearchFilter(
-                            category = StoreEnum.StoreCategory.fromString(category),
-                            time = time,
-                            searchText = searchText,
-                            status = status.statusCode,
-                        ),
+                SearchStoreQueryDto.from(
+                    latitude = latitude,
+                    longitude = longitude,
+                    searchText = searchText,
+                    storeCategory = storeCategory,
+                    time = time,
+                    status = status.statusCode,
                 ),
                 page = page,
                 size = size,
