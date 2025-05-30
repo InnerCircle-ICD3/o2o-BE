@@ -8,7 +8,6 @@ import com.eatngo.search.dto.SearchFilter
 import com.eatngo.search.dto.SearchStoreWithDistance
 import com.eatngo.search.infra.SearchStoreRepository
 import org.bson.Document
-import org.bson.conversions.Bson
 import org.springframework.data.geo.Box
 import org.springframework.data.geo.GeoResults
 import org.springframework.data.geo.Metrics
@@ -131,7 +130,7 @@ class SearchStoreRepositoryImpl(
             makeSearchQuery(
                 longitude = longitude,
                 latitude = latitude,
-                maxDistance = maxDistance,
+                maxDistanceKm = maxDistance,
                 searchText = searchText,
             )
         val skipOp = Aggregation.skip(page.toLong() * size)
@@ -198,54 +197,11 @@ class SearchStoreRepositoryImpl(
     fun makeSearchQuery(
         longitude: Double,
         latitude: Double,
-        maxDistance: Double,
+        maxDistanceKm: Double,
         searchText: String,
     ): AggregationOperation {
-        val filters = mutableListOf<Bson>()
-        val must = mutableListOf<Bson>()
+        val maxDistance = maxDistanceKm * 1000 // km 단위를 meter로 변환
 
-        // 위치 기반 필터
-        filters.add(
-            Document(
-                "geoWithin",
-                Document(
-                    "circle",
-                    Document()
-                        .append(
-                            "center",
-                            Document()
-                                .append("type", "Point")
-                                .append("coordinates", listOf(longitude, latitude)),
-                        ).append("radius", maxDistance), // meter 단위
-                ).append("path", "coordinate"),
-            ),
-        )
-
-        // 검색어 필터
-        must.add(
-            Document(
-                "text",
-                Document("query", searchText)
-                    .append("path", listOf("storeName", "foodCategory")),
-            ),
-        )
-
-        // MongoDB Atlas Search 쿼리 생성
-        val score =
-            Document(
-                "score",
-                Document(
-                    "function",
-                    Document(
-                        "distance",
-                        Document(
-                            "origin",
-                            Document("type", "Point")
-                                .append("coordinates", listOf(longitude, latitude)),
-                        ).append("path", "coordinate"),
-                    ),
-                ),
-            )
         val searchQuery =
             Document(
                 "\$search",
@@ -253,9 +209,34 @@ class SearchStoreRepositoryImpl(
                     .append("index", searchStoreIndex)
                     .append(
                         "compound",
-                        Document("filter", filters)
-                            .append("must", must),
-                    ).append("score", score),
+                        Document()
+                            .append(
+                                "must",
+                                listOf(
+                                    // 텍스트 검색 → 관련성 기반 정렬
+                                    Document(
+                                        "text",
+                                        Document("query", searchText)
+                                            .append("path", listOf("storeName", "foodCategory")),
+                                    ),
+                                ),
+                            ).append(
+                                "filter",
+                                listOf(
+                                    // 거리 필터 (maxDistance)
+                                    Document(
+                                        "range",
+                                        Document("path", "coordinate")
+                                            .append("lte", maxDistance)
+                                            .append(
+                                                "origin",
+                                                Document("type", "Point")
+                                                    .append("coordinates", listOf(longitude, latitude)),
+                                            ).append("unit", "meter"),
+                                    ),
+                                ),
+                            ),
+                    ),
             )
 
         return AggregationOperation { _: AggregationOperationContext -> searchQuery }
