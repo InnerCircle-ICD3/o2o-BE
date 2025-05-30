@@ -1,10 +1,10 @@
 package com.eatngo.mongo.repository.search
 
+import com.eatngo.common.constant.StoreEnum
 import com.eatngo.mongo.entity.search.SearchStoreEntity
 import com.eatngo.search.domain.SearchStore
 import com.eatngo.search.dto.AutoCompleteStoreNameDto
 import com.eatngo.search.dto.SearchFilter
-import com.eatngo.search.dto.StoreStatus
 import com.eatngo.search.infra.SearchStoreRepository
 import org.bson.Document
 import org.bson.conversions.Bson
@@ -138,54 +138,63 @@ class SearchStoreRepositoryImpl(
                 "geoWithin",
                 Document(
                     "circle",
-                    Document(
-                        "center",
-                        Document("type", "Point").append(
-                            "coordinates",
-                            listOf(longitude, latitude),
-                        ),
-                    ),
-                ).append("radius", maxDistance),
-            ).append("path", "coordinate"),
+                    Document()
+                        .append(
+                            "center",
+                            Document()
+                                .append("type", "Point")
+                                .append("coordinates", listOf(longitude, latitude)),
+                        ).append("radius", maxDistance), // meter 단위
+                ).append("path", "coordinate"),
+            ),
         )
 
         // 선택적: 카테고리 필터
         searchFilter?.storeCategory?.let {
             filters.add(
                 Document(
-                    "text",
-                    Document("query", it)
+                    "equals",
+                    Document()
+                        .append("value", it)
                         .append("path", "storeCategory"),
                 ),
             )
         }
 
         // 선택적: 시간 필터
-        searchFilter?.time?.let {
-            filters.add(
+        searchFilter?.time?.let { currentTime ->
+            val pickupTimeCondition =
                 Document(
-                    "range",
-                    Document("path", "openTime")
-                        .append("lte", it),
-                ),
-            )
-            filters.add(
-                Document(
-                    "range",
-                    Document("path", "closeTime")
-                        .append("gte", it),
-                ),
-            )
+                    "compound",
+                    Document(
+                        "must",
+                        listOf(
+                            Document(
+                                "range",
+                                Document()
+                                    .append("path", "pickupHour.openTime")
+                                    .append("lte", currentTime),
+                            ),
+                            Document(
+                                "range",
+                                Document()
+                                    .append("path", "pickupHour.closeTime")
+                                    .append("gte", currentTime),
+                            ),
+                        ),
+                    ),
+                )
+            filters.add(pickupTimeCondition)
         }
 
-        // 선택적: 상태 필터
+        // 선택적: 상태 필터 TODO: businessHours 필터링 로직 추가 필요
         searchFilter?.status?.let {
-            if (it == StoreStatus.OPEN.statusCode) {
+            if (it == StoreEnum.StoreStatus.OPEN) {
                 filters.add(
                     Document(
                         "equals",
-                        Document("value", true)
-                            .append("path", "open"),
+                        Document("query", StoreEnum.StoreStatus.OPEN)
+                            .append("path", "status"),
                     ),
                 )
             }
