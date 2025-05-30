@@ -20,7 +20,21 @@ data class SearchStoreResultDto(
             SearchStoreResultDto(
                 storeList =
                     searchStoreList.map { searchStore ->
-                        SearchStoreDto.from(userCoordinate, searchStore)
+                        SearchStoreDto.from(
+                            searchStore,
+                            DistanceCalculator.calculateDistance(
+                                from = searchStore.coordinate.toVO(),
+                                to = userCoordinate,
+                            ),
+                        )
+                    },
+            )
+
+        fun from(searchStoreList: List<SearchStoreWithDistance>): SearchStoreResultDto =
+            SearchStoreResultDto(
+                storeList =
+                    searchStoreList.map { searchStore ->
+                        SearchStoreDto.from(searchStore.store, searchStore.distance)
                     },
             )
     }
@@ -46,8 +60,8 @@ data class SearchStoreDto(
 ) {
     companion object {
         fun from(
-            userCoordinate: CoordinateVO,
             searchStore: SearchStore,
+            distanceKm: Double,
         ): SearchStoreDto =
             SearchStoreDto(
                 storeId = searchStore.storeId,
@@ -57,11 +71,7 @@ data class SearchStoreDto(
                 foodCategory = searchStore.foodCategory,
                 roadNameAddress = searchStore.roadNameAddress,
                 coordinate = searchStore.coordinate.toVO(),
-                distanceKm =
-                    DistanceCalculator.calculateDistance(
-                        from = searchStore.coordinate.toVO(),
-                        to = userCoordinate,
-                    ),
+                distanceKm = distanceKm,
                 status = searchStore.status.toStoreStatus(),
                 businessHours =
                     BusinessHourVO.fromList(

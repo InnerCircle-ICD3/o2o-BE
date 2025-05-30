@@ -5,10 +5,14 @@ import com.eatngo.search.domain.SearchStore
 import com.eatngo.search.domain.SearchStoreStatus
 import com.eatngo.search.dto.AutoCompleteStoreNameDto
 import com.eatngo.search.dto.SearchFilter
+import com.eatngo.search.dto.SearchStoreWithDistance
 import com.eatngo.search.infra.SearchStoreRepository
 import org.bson.Document
 import org.bson.conversions.Bson
 import org.springframework.data.geo.Box
+import org.springframework.data.geo.GeoResults
+import org.springframework.data.geo.Metrics
+import org.springframework.data.geo.Point
 import org.springframework.data.geo.Shape
 import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.data.mongodb.core.aggregation.Aggregation
@@ -16,6 +20,7 @@ import org.springframework.data.mongodb.core.aggregation.AggregationOperation
 import org.springframework.data.mongodb.core.aggregation.AggregationOperationContext
 import org.springframework.data.mongodb.core.geo.GeoJsonPoint
 import org.springframework.data.mongodb.core.query.Criteria
+import org.springframework.data.mongodb.core.query.NearQuery
 import org.springframework.data.mongodb.core.query.Query
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime
@@ -55,16 +60,17 @@ class SearchStoreRepositoryImpl(
         searchFilter: SearchFilter,
         page: Int,
         size: Int,
-    ): List<SearchStore> {
-        val query = Query()
+    ): List<SearchStoreWithDistance> {
         // 필수 : 위치 기반 필터링
-        query.addCriteria(
-            Criteria
-                .where("coordinate")
-                .nearSphere(GeoJsonPoint(longitude, latitude))
-                .maxDistance(maxDistance),
-        )
+        val point = Point(longitude, latitude)
+        val nearQuery =
+            NearQuery
+                .near(point, Metrics.KILOMETERS)
+                .maxDistance(maxDistance) // km 단위로 사용
+                .spherical(true)
 
+        // 서브쿼리 생성
+        val query = Query()
         // 선택 : 카테고리 필터링
         searchFilter.storeCategory?.let {
             query.addCriteria(
@@ -101,9 +107,15 @@ class SearchStoreRepositoryImpl(
             )
         }
 
-        val result = mongoTemplate.find(query, SearchStoreEntity::class.java)
-        return result.map {
-            it.to()
+        // Criteria가 있으면 NearQuery에 붙여주기
+        nearQuery.query(query)
+
+        val geoResults: GeoResults<SearchStoreEntity> = mongoTemplate.geoNear(nearQuery, SearchStoreEntity::class.java)
+        return geoResults.content.map {
+            SearchStoreWithDistance(
+                store = it.content.to(),
+                distance = it.distance?.value ?: 0.0, // 거리 값이 없을 경우 0.0으로 처리
+            )
         }
     }
 

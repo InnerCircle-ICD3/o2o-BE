@@ -9,6 +9,7 @@ import com.eatngo.search.dto.Box
 import com.eatngo.search.dto.SearchStoreMap
 import com.eatngo.search.dto.SearchStoreMapResultDto
 import com.eatngo.search.dto.SearchStoreResultDto
+import com.eatngo.search.dto.SearchStoreWithDistance
 import com.eatngo.search.dto.SearchSuggestionDto
 import com.eatngo.search.dto.SearchSuggestionResultDto
 import com.eatngo.search.dto.StoreFilterDto
@@ -36,11 +37,11 @@ class SearchService(
     fun listStore(
         storeFilterDto: StoreFilterDto,
         // TODO: 검색반경 프론트와 논의 필요
-        searchDistance: Double = 2000.0,
+        searchDistance: Double = 0.2, // 200m
         page: Int = 0,
         size: Int = 20,
     ): SearchStoreResultDto {
-        val listStore: List<SearchStore> =
+        val listStore: List<SearchStoreWithDistance> =
             searchStoreRepository
                 .listStore(
                     longitude = storeFilterDto.viewCoordinate.longitude,
@@ -51,7 +52,6 @@ class SearchService(
                     size = size,
                 ).orThrow { SearchException.SearchStoreListFailed(storeFilterDto.viewCoordinate, storeFilterDto.filter) }
         return SearchStoreResultDto.from(
-            userCoordinate = storeFilterDto.viewCoordinate,
             searchStoreList = listStore,
         )
     }
@@ -66,7 +66,7 @@ class SearchService(
     fun searchStore(
         storeSearchFilterDto: StoreSearchFilterDto,
         // TODO: 검색반경 프론트와 논의 필요
-        searchDistance: Double = 2000.0,
+        searchDistance: Double = 0.2, // 200m
         page: Int,
         size: Int,
     ): SearchStoreResultDto {

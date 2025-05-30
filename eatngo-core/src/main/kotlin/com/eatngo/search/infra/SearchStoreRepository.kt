@@ -4,6 +4,7 @@ import com.eatngo.search.domain.SearchStore
 import com.eatngo.search.dto.AutoCompleteStoreNameDto
 import com.eatngo.search.dto.Box
 import com.eatngo.search.dto.SearchFilter
+import com.eatngo.search.dto.SearchStoreWithDistance
 
 interface SearchStoreRepository {
     fun findBox(box: Box): List<SearchStore>
@@ -15,7 +16,7 @@ interface SearchStoreRepository {
         searchFilter: SearchFilter,
         page: Int = 0,
         size: Int = 20,
-    ): List<SearchStore>
+    ): List<SearchStoreWithDistance>
 
     fun searchStore(
         longitude: Double,
