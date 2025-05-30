@@ -6,6 +6,8 @@ import com.eatngo.redis.utils.writeValueToJson
 import com.eatngo.search.dto.SearchStoreMap
 import com.eatngo.search.infra.SearchMapRedisRepository
 import com.fasterxml.jackson.databind.ObjectMapper
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.stereotype.Repository
 
@@ -17,7 +19,9 @@ import org.springframework.stereotype.Repository
  */
 @Repository
 class SearchMapMapRedisRepositoryImpl(
+    @Autowired @Qualifier("stringRedisTemplate")
     private val redisTemplate: RedisTemplate<String, String>,
+    @Autowired
     private val objectMapper: ObjectMapper,
 ) : SearchMapRedisRepository {
     override fun getKey(topLeft: CoordinateVO): String {
