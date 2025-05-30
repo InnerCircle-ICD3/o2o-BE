@@ -32,7 +32,7 @@ class SearchService(
      */
     fun searchStore(
         searchQuery: SearchStoreQueryDto,
-        // TODO: 검색반경, 페이징 방식 프론트와 논의 필요
+        // TODO: 검색반경 프론트와 논의 필요
         searchDistance: Double = 2000.0,
         page: Int,
         size: Int,
@@ -73,21 +73,27 @@ class SearchService(
 
         // 검색 결과가 없으면 MongoDB에서 검색하여 가져온 뒤 캐싱한다
         if (seachStoreMapList.isEmpty()) {
-            val searchStoreList: List<SearchStore> = searchStoreRepository.findBox(box)
+            val searchStoreList: List<SearchStore> =
+                searchStoreRepository.findBox(box).orThrow {
+                    SearchException.SearchStoreMapFailed(searchQuery)
+                }
 
             // Redis에 저장
-            searchMapRedisRepository.save(
-                key = redisKey,
-                value =
-                    searchStoreList.map {
-                        SearchStoreMap.from(it)
-                    },
-            )
+            searchMapRedisRepository
+                .save(
+                    key = redisKey,
+                    value =
+                        searchStoreList.map {
+                            SearchStoreMap.from(it)
+                        },
+                ).orThrow {
+                    SearchException.SearchStoreMapCacheFailed(redisKey)
+                }
         }
 
-        return SearchStoreMapResultDto(
+        return SearchStoreMapResultDto.from(
             box = box,
-            storeList = seachStoreMapList,
+            searchStoreMapList = seachStoreMapList,
         )
     }
 
@@ -99,9 +105,12 @@ class SearchService(
      */
     fun searchSuggestions(keyword: String): List<String> {
         val searchRecommendList: List<String> =
-            searchStoreRepository.searchStoreRecommend(
-                keyword = keyword,
-            )
+            searchStoreRepository
+                .searchStoreRecommend(
+                    keyword = keyword,
+                ).orThrow {
+                    SearchException.SearchSuggestionFailed(keyword)
+                }
         return searchRecommendList
     }
 
@@ -126,6 +135,6 @@ class SearchService(
         val topLeft = CoordinateVO.from(longitude = leftLng, latitude = topLat) // 서쪽 + 북쪽
         val bottomRight = CoordinateVO.from(longitude = rightLng, latitude = bottomLat) // 동쪽 + 남쪽
 
-        return Box(topLeft, bottomRight)
+        return Box.from(topLeft, bottomRight)
     }
 }

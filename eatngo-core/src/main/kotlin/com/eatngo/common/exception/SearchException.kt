@@ -33,4 +33,28 @@ open class SearchException(
             "${BusinessErrorCode.SEARCH_STORE_LIST_FAILED.message} (searchQuery: $searchQuery)",
             mapOf("searchQuery" to searchQuery),
         )
+
+    class SearchStoreMapFailed(
+        searchQuery: SearchStoreQueryDto,
+    ) : SearchException(
+            BusinessErrorCode.SEARCH_STORE_MAP_FAILED,
+            "${BusinessErrorCode.SEARCH_STORE_MAP_FAILED.message} (searchQuery: $searchQuery)",
+            mapOf("searchQuery" to searchQuery),
+        )
+
+    class SearchStoreMapCacheFailed(
+        key: String,
+    ) : SearchException(
+            BusinessErrorCode.SEARCH_STORE_MAP_CACHE_FAILED,
+            "${BusinessErrorCode.SEARCH_STORE_MAP_CACHE_FAILED.message} (key: $key)",
+            mapOf("key" to key),
+        )
+
+    class SearchSuggestionFailed(
+        keyword: String,
+    ) : SearchException(
+            BusinessErrorCode.SEARCH_SUGGESTION_FAILED,
+            "${BusinessErrorCode.SEARCH_SUGGESTION_FAILED.message} (keyword: $keyword)",
+            mapOf("keyword" to keyword),
+        )
 }
