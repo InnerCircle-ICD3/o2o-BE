@@ -2,7 +2,6 @@ package com.eatngo.mongo.entity.search
 
 import com.eatngo.common.constant.StoreEnum
 import com.eatngo.search.domain.Coordinate
-import com.eatngo.search.domain.DayOfWeek
 import com.eatngo.search.domain.SearchStore
 import com.eatngo.search.domain.SearchStoreStatus
 import com.eatngo.search.domain.TimeRange
@@ -11,6 +10,7 @@ import org.springframework.data.mongodb.core.geo.GeoJsonPoint
 import org.springframework.data.mongodb.core.index.GeoSpatialIndexed
 import org.springframework.data.mongodb.core.mapping.Document
 import org.springframework.data.mongodb.core.mapping.Field
+import java.time.DayOfWeek
 import java.time.LocalDateTime
 
 @Document(collection = "SearchStore")
