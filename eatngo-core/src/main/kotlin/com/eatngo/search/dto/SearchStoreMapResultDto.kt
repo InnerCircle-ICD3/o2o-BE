@@ -19,7 +19,7 @@ data class SearchStoreMap(
             SearchStoreMap(
                 storeID = searchStore.storeId,
                 storeName = searchStore.storeName,
-                coordinate = searchStore.location,
+                coordinate = searchStore.coordinate,
             )
     }
 }
