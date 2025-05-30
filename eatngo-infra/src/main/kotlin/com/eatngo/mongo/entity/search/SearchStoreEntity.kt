@@ -24,7 +24,7 @@ class SearchStoreEntity(
     var closeTime: LocalDateTime = LocalDateTime.of(LocalDate.now(), LocalTime.of(22, 0)), // 매장 마감 시간
     var roadAddress: String = "",
     @GeoSpatialIndexed
-    var location: GeoJsonPoint = GeoJsonPoint(0.0, 0.0),
+    var coordinate: GeoJsonPoint = GeoJsonPoint(0.0, 0.0),
     var updatedAt: LocalDateTime = LocalDateTime.now(), // 마지막 업데이트 시간
     var createdAt: LocalDateTime = LocalDateTime.now(), // 생성 시간
 ) {
@@ -41,7 +41,7 @@ class SearchStoreEntity(
                     closeTime = closeTime,
                 ),
             roadAddress = roadAddress,
-            location = toPoint(location),
+            coordinate = toPoint(coordinate),
             updatedAt = updatedAt,
             createdAt = createdAt,
         )
@@ -57,10 +57,10 @@ class SearchStoreEntity(
                 open = searchStore.open,
                 openTime = searchStore.businessHours.openTime,
                 closeTime = searchStore.businessHours.closeTime,
-                location =
+                coordinate =
                     toGeoJsonPoint(
-                        searchStore.location.latitude,
-                        searchStore.location.longitude,
+                        searchStore.coordinate.latitude,
+                        searchStore.coordinate.longitude,
                     ),
                 updatedAt = searchStore.updatedAt,
                 createdAt = searchStore.createdAt,

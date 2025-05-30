@@ -35,7 +35,7 @@ class SearchStoreRepositoryImpl(
         val query = Query()
         query.addCriteria(
             Criteria
-                .where("location")
+                .where("coordinate")
                 .within(mongoBox),
         )
         return mongoTemplate.find(query, SearchStoreEntity::class.java).map {
@@ -60,7 +60,7 @@ class SearchStoreRepositoryImpl(
      *                     "$numberDouble": "2000"
      *                   }
      *                 },
-     *                 "path": "location"
+     *                 "path": "coordinate"
      *               }
      *             },
      *             // 선택적으로 조건 추가 (category 존재할 경우에만)
@@ -107,7 +107,7 @@ class SearchStoreRepositoryImpl(
      *                 "type": "Point",
      *                 "coordinates": [lng, lat]
      *               },
-     *               "path": "location"
+     *               "path": "coordinate"
      *             }
      *           }
      *         }
@@ -208,7 +208,7 @@ class SearchStoreRepositoryImpl(
                         ),
                     ),
                 ).append("radius", maxDistance),
-            ).append("path", "location"),
+            ).append("path", "coordinate"),
         )
 
         // 선택적: 카테고리 필터
@@ -276,7 +276,7 @@ class SearchStoreRepositoryImpl(
                             "origin",
                             Document("type", "Point")
                                 .append("coordinates", listOf(longitude, latitude)),
-                        ).append("path", "location"),
+                        ).append("path", "coordinate"),
                     ),
                 ),
             )
