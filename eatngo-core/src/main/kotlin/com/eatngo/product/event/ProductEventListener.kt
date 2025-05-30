@@ -1,6 +1,7 @@
 package com.eatngo.product.event
 
 import com.eatngo.inventory.event.StockEventPublisher
+import com.eatngo.order.domain.OrderItem
 import com.eatngo.order.event.OrderCanceledEvent
 import com.eatngo.order.event.OrderCreatedEvent
 import com.eatngo.order.event.OrderEvent
@@ -8,8 +9,10 @@ import com.eatngo.product.infra.ProductCachePersistence
 import com.eatngo.product.infra.ProductPersistence
 import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Component
+import org.springframework.transaction.annotation.Transactional
 
 @Component
+@Transactional
 class ProductEventListener(
     private val productCachePersistence: ProductCachePersistence,
     private val productPersistence: ProductPersistence,
@@ -21,16 +24,50 @@ class ProductEventListener(
         when (event) {
             is OrderCreatedEvent -> {
                 for (orderItem in event.order.orderItems) {
-                    productCachePersistence.decreaseStock(orderItem.productId, orderItem.quantity)
-                    // TODO 재고 정보 search 및 market 에게 알려주기 event 기반
+                    decreaseStock(orderItem)
                 }
             }
 
             is OrderCanceledEvent -> {
                 // TODO
+
             }
         }
 
     }
+
+    fun decreaseStock(orderItem: OrderItem) {
+        productCachePersistence.decreaseStock(orderItem.productId, orderItem.quantity)
+        // TODO 재고 정보 search 및 market 에게 알려주기 event 기반 -> 이벤트 한번에 모아 보낼지 따로 따로 보낼지도 고민 필요!
+    }
+
+    fun rollbackStock(orderItem: OrderItem) {
+        // TODO 재고 롤백 기능 호출
+        // TODO market 및 search 에게 event 보내기
+    }
+
+//    @CachePut("inventory", key = "#orderItem.productId")
+//    fun decreaseStock(
+//        orderItem: OrderItem
+//    ): InventoryDto {
+////        productCachePersistence.decreaseStock(orderItem.productId, orderItem.quantity)
+//        // TODO 재고 정보 search 및 market 에게 알려주기 event 기반 -> 이벤트 한번에 모아 보낼지 따로 따로 보낼지도 고민 필요!
+////        stockEventPublisher.~~
+//        return InventoryDto(
+//            quantity = TODO(),
+//            stock = TODO()
+//        )
+//    }
+//
+//    @CachePut("inventory", key = "#orderItem.productId")
+//    fun rollbackStock(
+//        orderItem: OrderItem
+//    ): InventoryDto {
+////        stockEventPublisher.~~
+//        return InventoryDto(
+//            quantity = TODO(),
+//            stock = TODO()
+//        )
+//    }
 
 }
