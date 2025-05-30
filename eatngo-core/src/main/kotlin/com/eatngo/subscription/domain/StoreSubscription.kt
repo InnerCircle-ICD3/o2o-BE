@@ -1,4 +1,4 @@
-package com.eatngo.store.domain
+package com.eatngo.subscription.domain
 
 import java.time.LocalDateTime
 

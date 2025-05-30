@@ -3,7 +3,7 @@ package com.eatngo.store.controller
 import com.eatngo.auth.annotaion.StoreOwnerId
 import com.eatngo.common.response.ApiResponse
 import com.eatngo.store.dto.SubscriptionResponseForStoreOwner
-import com.eatngo.store.service.StoreSubscriptionService
+import com.eatngo.subscription.service.StoreSubscriptionService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.web.bind.annotation.*

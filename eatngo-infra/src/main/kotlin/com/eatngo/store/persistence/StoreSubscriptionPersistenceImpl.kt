@@ -1,7 +1,7 @@
 package com.eatngo.store.persistence
 
-import com.eatngo.store.domain.StoreSubscription
-import com.eatngo.store.infra.StoreSubscriptionPersistence
+import com.eatngo.subscription.domain.StoreSubscription
+import com.eatngo.subscription.infra.StoreSubscriptionPersistence
 import org.springframework.stereotype.Component
 
 /**
