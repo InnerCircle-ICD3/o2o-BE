@@ -11,6 +11,13 @@ enum class SearchStoreStatus(
     ;
 
     companion object {
+        fun from(status: StoreEnum.StoreStatus): SearchStoreStatus =
+            when (status) {
+                StoreEnum.StoreStatus.PENDING -> PENDING
+                StoreEnum.StoreStatus.OPEN -> OPEN
+                StoreEnum.StoreStatus.CLOSED -> CLOSED
+            }
+
         fun from(code: Int): SearchStoreStatus =
             when (code) {
                 0 -> PENDING

@@ -2,6 +2,7 @@ package com.eatngo.mongo.repository.search
 
 import com.eatngo.mongo.entity.search.SearchStoreEntity
 import com.eatngo.search.domain.SearchStore
+import com.eatngo.search.domain.SearchStoreStatus
 import com.eatngo.search.dto.AutoCompleteStoreNameDto
 import com.eatngo.search.dto.SearchFilter
 import com.eatngo.search.infra.SearchStoreRepository
@@ -17,6 +18,7 @@ import org.springframework.data.mongodb.core.geo.GeoJsonPoint
 import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query
 import org.springframework.stereotype.Component
+import java.time.LocalDateTime
 import com.eatngo.search.dto.Box as CoreBox
 
 @Component
@@ -70,8 +72,34 @@ class SearchStoreRepositoryImpl(
             )
         }
 
-        // TODO 선택 : 시간 필터링
-        // TODO 선택 : 매장 상태 필터링
+        // 선택 : 픽업 가능 시간 필터링
+        val now = LocalDateTime.now()
+        val currentDayOfWeek = now.dayOfWeek
+        val currentTime = now.toLocalTime()
+        searchFilter.time?.let {
+            query.addCriteria(
+                Criteria
+                    .where("pickupHour.openTime")
+                    .lte(currentTime)
+                    .and("pickupHour.closeTime")
+                    .gt(currentTime),
+            )
+        }
+
+        // 선택 : 예약 가능 상태 필터링 -> TODO 로직 확인 필요...(매장 오픈 시간과 상태로 예약 가능 상태 필터링)
+        searchFilter.status?.let {
+            query.addCriteria(
+                Criteria
+                    .where("businessHours.$currentDayOfWeek.openTime")
+                    .lte(currentTime)
+                    .and("businessHours.$currentDayOfWeek.closeTime")
+                    .gt(currentTime),
+            )
+
+            query.addCriteria(
+                Criteria.where("status").`is`(SearchStoreStatus.from(it).code),
+            )
+        }
 
         val result = mongoTemplate.find(query, SearchStoreEntity::class.java)
         return result.map {
