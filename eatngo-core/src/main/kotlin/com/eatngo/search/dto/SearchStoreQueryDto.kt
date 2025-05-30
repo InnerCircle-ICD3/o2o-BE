@@ -1,7 +1,9 @@
 package com.eatngo.search.dto
 
 import com.eatngo.common.constant.StoreEnum
+import com.eatngo.common.exception.SearchException
 import com.eatngo.common.type.CoordinateVO
+import com.eatngo.extension.orThrow
 import java.time.LocalDateTime
 
 data class SearchStoreQueryDto(
@@ -17,15 +19,21 @@ data class SearchStoreQueryDto(
             time: LocalDateTime? = null,
             status: Int = 9, // 0: 영업종료, 1: 영업중, 9: 전체 상태
         ): SearchStoreQueryDto {
-            val viewCoordinate = CoordinateVO.from(latitude, longitude)
+            val viewCoordinate =
+                CoordinateVO.from(latitude, longitude).orThrow {
+                    SearchException.SearchInvalidCoordinate(latitude, longitude)
+                }
 
             val filter =
-                SearchFilter.from(
-                    storeCategory = storeCategory,
-                    time = time,
-                    searchText = searchText,
-                    status = status,
-                )
+                SearchFilter
+                    .from(
+                        storeCategory = storeCategory,
+                        time = time,
+                        searchText = searchText,
+                        status = status,
+                    ).orThrow {
+                        SearchException.SearchInvalidFilter()
+                    }
 
             return SearchStoreQueryDto(
                 viewCoordinate = viewCoordinate,

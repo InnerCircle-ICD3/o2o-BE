@@ -1,6 +1,8 @@
 package com.eatngo.search.service
 
+import com.eatngo.common.exception.SearchException
 import com.eatngo.common.type.CoordinateVO
+import com.eatngo.extension.orThrow
 import com.eatngo.search.domain.SearchStore
 import com.eatngo.search.dto.Box
 import com.eatngo.search.dto.SearchStoreMap
@@ -35,19 +37,16 @@ class SearchService(
         page: Int,
         size: Int,
     ): SearchStoreResultDto {
-        // TODO : 검색 반경, 검색 쿼리 등 검증 필요
-
-        // 검색 쿼리 검증
-
         val searchStoreList: List<SearchStore> =
-            searchStoreRepository.searchStore(
-                longitude = searchQuery.viewCoordinate.longitude,
-                latitude = searchQuery.viewCoordinate.latitude,
-                maxDistance = searchDistance,
-                searchFilter = searchQuery.filter,
-                page = page,
-                size = size,
-            )
+            searchStoreRepository
+                .searchStore(
+                    longitude = searchQuery.viewCoordinate.longitude,
+                    latitude = searchQuery.viewCoordinate.latitude,
+                    maxDistance = searchDistance,
+                    searchFilter = searchQuery.filter,
+                    page = page,
+                    size = size,
+                ).orThrow { SearchException.SearchStoreListFailed(searchQuery) }
 
         return SearchStoreResultDto.from(
             userCoordinate = searchQuery.viewCoordinate,
