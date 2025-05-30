@@ -6,9 +6,9 @@ import com.eatngo.extension.orThrow
 import com.eatngo.search.domain.SearchStore
 import com.eatngo.search.dto.AutoCompleteStoreNameDto
 import com.eatngo.search.dto.Box
+import com.eatngo.search.dto.SearchFilter
 import com.eatngo.search.dto.SearchStoreMap
 import com.eatngo.search.dto.SearchStoreMapResultDto
-import com.eatngo.search.dto.SearchStoreQueryDto
 import com.eatngo.search.dto.SearchStoreResultDto
 import com.eatngo.search.dto.SearchSuggestionDto
 import com.eatngo.search.dto.SearchSuggestionResultDto
@@ -26,15 +26,45 @@ class SearchService(
     val cacheBoxSize = 0.005
 
     /**
-     * 가게 검색 API
-     * TODO: 검색 결과 캐싱 / page-size 방색에서 sort-offset 등 개선된 방식으로 변경
-     * @param searchQuery 검색 쿼리
+     * 매장 리스트 조회 API
+     * @param userCoordinate 검색하는 유저의 위치 정보
+     * @param searchFilter 검색 필터
+     * @param page 페이지 번호
+     * @param size 페이지 사이즈
+     * @return 검색 결과 DTO
+     */
+    fun listStore(
+        userCoordinate: CoordinateVO,
+        searchFilter: SearchFilter,
+        page: Int = 0,
+        size: Int = 20,
+    ): SearchStoreResultDto {
+        val listStore: List<SearchStore> =
+            searchStoreRepository
+                .listStore(
+                    longitude = userCoordinate.longitude,
+                    latitude = userCoordinate.latitude,
+                    searchFilter = searchFilter,
+                    page = page,
+                    size = size,
+                ).orThrow { SearchException.SearchStoreListFailed(userCoordinate, searchFilter) }
+        return SearchStoreResultDto.from(
+            userCoordinate = userCoordinate,
+            searchStoreList = listStore,
+        )
+    }
+
+    /**
+     * 가게 검색 API - 검색어 입력
+     * @param userCoordinate 검색하는 유저의 위치 정보
+     * @param searchText 검색어
      * @param page 페이지 번호
      * @param size 페이지 사이즈
      * @return 검색 결과 DTO
      */
     fun searchStore(
-        searchQuery: SearchStoreQueryDto,
+        userCoordinate: CoordinateVO,
+        searchText: String,
         // TODO: 검색반경 프론트와 논의 필요
         searchDistance: Double = 2000.0,
         page: Int,
@@ -43,31 +73,31 @@ class SearchService(
         val searchStoreList: List<SearchStore> =
             searchStoreRepository
                 .searchStore(
-                    longitude = searchQuery.viewCoordinate.longitude,
-                    latitude = searchQuery.viewCoordinate.latitude,
+                    longitude = userCoordinate.longitude,
+                    latitude = userCoordinate.latitude,
                     maxDistance = searchDistance,
-                    searchFilter = searchQuery.filter,
+                    searchText = searchText,
                     page = page,
                     size = size,
-                ).orThrow { SearchException.SearchStoreListFailed(searchQuery) }
+                ).orThrow { SearchException.SearchStoreSearchFailed(userCoordinate, searchText) }
 
         return SearchStoreResultDto.from(
-            userCoordinate = searchQuery.viewCoordinate,
+            userCoordinate = userCoordinate,
             searchStoreList = searchStoreList,
         )
     }
 
     /**
      * 지도 검색 API
-     * @param searchQuery 검색 쿼리
+     * @param userCoordinate 검색하는 사용자의 위치 정보
      * @return 지도 검색 결과 DTO
      */
-    fun searchStoreMap(searchQuery: SearchStoreQueryDto): SearchStoreMapResultDto {
+    fun searchStoreMap(userCoordinate: CoordinateVO): SearchStoreMapResultDto {
         // center 값을 기준으로 해당하는 box 좌표를 구한다.
         val box: Box =
             getBox(
-                longitude = searchQuery.viewCoordinate.longitude,
-                latitude = searchQuery.viewCoordinate.latitude,
+                longitude = userCoordinate.longitude,
+                latitude = userCoordinate.latitude,
             )
 
         // Redis에서 box 검색 결과를 가져온다. -> 위경도 기중 0.005 단위로 박스 매핑
@@ -78,7 +108,7 @@ class SearchService(
         if (seachStoreMapList.isEmpty()) {
             val searchStoreList: List<SearchStore> =
                 searchStoreRepository.findBox(box).orThrow {
-                    SearchException.SearchStoreMapFailed(searchQuery)
+                    SearchException.SearchStoreMapFailed(userCoordinate)
                 }
 
             // Redis에 저장

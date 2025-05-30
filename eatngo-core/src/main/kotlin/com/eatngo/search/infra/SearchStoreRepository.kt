@@ -8,11 +8,19 @@ import com.eatngo.search.dto.SearchFilter
 interface SearchStoreRepository {
     fun findBox(box: Box): List<SearchStore>
 
+    fun listStore(
+        longitude: Double,
+        latitude: Double,
+        searchFilter: SearchFilter? = null,
+        page: Int = 0,
+        size: Int = 20,
+    ): List<SearchStore>
+
     fun searchStore(
         longitude: Double,
         latitude: Double,
         maxDistance: Double,
-        searchFilter: SearchFilter? = null,
+        searchText: String,
         page: Int = 0,
         size: Int = 20,
     ): List<SearchStore>

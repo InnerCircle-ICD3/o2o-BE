@@ -1,7 +1,8 @@
 package com.eatngo.common.exception
 
 import com.eatngo.common.error.BusinessErrorCode
-import com.eatngo.search.dto.SearchStoreQueryDto
+import com.eatngo.common.type.CoordinateVO
+import com.eatngo.search.dto.SearchFilter
 
 /**
  * 검색 관련 예외
@@ -27,19 +28,29 @@ open class SearchException(
         )
 
     class SearchStoreListFailed(
-        searchQuery: SearchStoreQueryDto,
+        coordinate: CoordinateVO,
+        searchFilter: SearchFilter,
     ) : SearchException(
             BusinessErrorCode.SEARCH_STORE_LIST_FAILED,
-            "${BusinessErrorCode.SEARCH_STORE_LIST_FAILED.message} (searchQuery: $searchQuery)",
-            mapOf("searchQuery" to searchQuery),
+            "${BusinessErrorCode.SEARCH_STORE_LIST_FAILED.message} (coordinate: $coordinate, searchFilter: $searchFilter)",
+            mapOf("coordinate" to coordinate, "searchFilter" to searchFilter),
+        )
+
+    class SearchStoreSearchFailed(
+        coordinate: CoordinateVO,
+        searchText: String,
+    ) : SearchException(
+            BusinessErrorCode.SEARCH_STORE_SEARCH_FAILED,
+            "${BusinessErrorCode.SEARCH_STORE_SEARCH_FAILED.message} (coordinate: $coordinate, searchText: $searchText)",
+            mapOf("coordinate" to coordinate, "searchText" to searchText),
         )
 
     class SearchStoreMapFailed(
-        searchQuery: SearchStoreQueryDto,
+        coordinate: CoordinateVO,
     ) : SearchException(
             BusinessErrorCode.SEARCH_STORE_MAP_FAILED,
-            "${BusinessErrorCode.SEARCH_STORE_MAP_FAILED.message} (searchQuery: $searchQuery)",
-            mapOf("searchQuery" to searchQuery),
+            "${BusinessErrorCode.SEARCH_STORE_MAP_FAILED.message} (coordinate: $coordinate)",
+            mapOf("coordinate" to coordinate),
         )
 
     class SearchStoreMapCacheFailed(
