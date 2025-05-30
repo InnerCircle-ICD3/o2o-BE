@@ -4,6 +4,7 @@ import com.eatngo.common.type.CoordinateVO
 import com.eatngo.search.dto.SearchStoreMapResultDto
 import com.eatngo.search.dto.SearchStoreQueryDto
 import com.eatngo.search.dto.SearchStoreResultDto
+import com.eatngo.search.dto.SearchSuggestionResultDto
 import com.eatngo.search.dto.StoreStatus
 import com.eatngo.search.service.SearchService
 import io.swagger.v3.oas.annotations.Operation
@@ -78,7 +79,7 @@ class SearchController(
     @GetMapping("/api/v1/search/suggestions")
     fun searchSuggestions(
         @RequestParam keyword: String,
-    ): ResponseEntity<List<String>> =
+    ): ResponseEntity<SearchSuggestionResultDto> =
         ResponseEntity.ok(
             searchService.searchSuggestions(keyword),
         )

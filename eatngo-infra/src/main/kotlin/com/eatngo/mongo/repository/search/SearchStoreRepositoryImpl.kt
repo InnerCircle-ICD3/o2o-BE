@@ -2,6 +2,7 @@ package com.eatngo.mongo.repository.search
 
 import com.eatngo.mongo.entity.search.SearchStoreEntity
 import com.eatngo.search.domain.SearchStore
+import com.eatngo.search.dto.AutoCompleteStoreNameDto
 import com.eatngo.search.dto.SearchFilter
 import com.eatngo.search.dto.StoreStatus
 import com.eatngo.search.infra.SearchStoreRepository
@@ -38,82 +39,14 @@ class SearchStoreRepositoryImpl(
                 .where("coordinate")
                 .within(mongoBox),
         )
-        return mongoTemplate.find(query, SearchStoreEntity::class.java).map {
+
+        val result = mongoTemplate.find(query, SearchStoreEntity::class.java)
+
+        return result.map {
             it.to()
         }
     }
 
-    /**
-     * {
-     *       "$search": {
-     *         "index": "search-store",
-     *         "compound": {
-     *           "filter": [
-     *             {
-     *               "geoWithin": {
-     *                 "circle": {
-     *                   "center": {
-     *                     "type": "Point",
-     *                     "coordinates": [lng, lat]
-     *                   },
-     *                   "radius": {
-     *                     "$numberDouble": "2000"
-     *                   }
-     *                 },
-     *                 "path": "coordinate"
-     *               }
-     *             },
-     *             // 선택적으로 조건 추가 (category 존재할 경우에만)
-     *             {
-     *               "equals": {
-     *                 "query": "카페",
-     *                 "path": "category"
-     *               }
-     *             },
-     *             // 선택적으로 조건 추가 (time 존재할 경우에만)
-     *             {
-     *               "range": {
-     *                 "path": "openTime",
-     *                 "lte": "2025-05-18T12:00:00Z"
-     *               }
-     *             },
-     *             {
-     *               "range": {
-     *                 "path": "closeTime",
-     *                 "gte": "2025-05-18T12:00:00Z"
-     *               }
-     *             },
-     *             // 선택적으로 조건 추가 (status 존재할 경우에만)
-     *             {
-     *               "equals": {
-     *                 "value": 1,
-     *                 "path": "status"
-     *               }
-     *             }
-     *           ],
-     *           "must": [
-     *             {
-     *               "text": {
-     *                 "query": "검색어",
-     *                 "path": ["storeName", "menuName", "category"]
-     *               }
-     *             }
-     *           ]
-     *         },
-     *         "score": {
-     *           "function": {
-     *             "distance": {
-     *               "origin": {
-     *                 "type": "Point",
-     *                 "coordinates": [lng, lat]
-     *               },
-     *               "path": "coordinate"
-     *             }
-     *           }
-     *         }
-     *       }
-     *     }
-     */
     override fun searchStore(
         longitude: Double,
         latitude: Double,
@@ -153,22 +86,28 @@ class SearchStoreRepositoryImpl(
     }
 
     /**
-     * TODO 검색어 자동완성 로직 수정 필요 -> DB를 탈지? -> 리서치 후 수정 일단 임시로...
+     * 검색어 자동완성 기능을 위한 MongoDB Atlas Search 쿼리
+     * @param keyword 검색어
+     * @param size 결과 개수
+     * @return 자동완성된 매장 이름 리스트
      */
-    override fun searchStoreRecommend(
+    override fun autocompleteStoreName(
         keyword: String,
         size: Int,
-    ): List<String> {
+    ): List<AutoCompleteStoreNameDto> {
         val searchOp = getAutocompleteOperation(keyword)
         val limitOp = Aggregation.limit(size.toLong())
+        val projectionOp =
+            Aggregation.project("_id", "storeName") // _id, storeName 필드만 추출
 
         val pipeline =
             Aggregation.newAggregation(
                 searchOp,
                 limitOp,
+                projectionOp,
             )
 
-        val searchResult =
+        val result =
             mongoTemplate
                 .aggregate(
                     pipeline,
@@ -176,13 +115,12 @@ class SearchStoreRepositoryImpl(
                     SearchStoreEntity::class.java,
                 ).mappedResults
 
-        // 검색어 자동완성 결과 리턴
-        val result =
-            searchResult.map {
-                it.storeName
-            }
-
-        return result
+        return result.map {
+            AutoCompleteStoreNameDto.from(
+                storeId = it.storeId,
+                storeName = it.storeName,
+            )
+        }
     }
 
     fun makeSearchQuery(

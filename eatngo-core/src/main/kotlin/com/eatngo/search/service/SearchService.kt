@@ -4,11 +4,14 @@ import com.eatngo.common.exception.SearchException
 import com.eatngo.common.type.CoordinateVO
 import com.eatngo.extension.orThrow
 import com.eatngo.search.domain.SearchStore
+import com.eatngo.search.dto.AutoCompleteStoreNameDto
 import com.eatngo.search.dto.Box
 import com.eatngo.search.dto.SearchStoreMap
 import com.eatngo.search.dto.SearchStoreMapResultDto
 import com.eatngo.search.dto.SearchStoreQueryDto
 import com.eatngo.search.dto.SearchStoreResultDto
+import com.eatngo.search.dto.SearchSuggestionDto
+import com.eatngo.search.dto.SearchSuggestionResultDto
 import com.eatngo.search.infra.SearchMapRedisRepository
 import com.eatngo.search.infra.SearchStoreRepository
 import org.springframework.stereotype.Service
@@ -99,19 +102,38 @@ class SearchService(
 
     /**
      * 검색어 자동완성 API
-     * TODO : 로직 전체 점검, 자동완성 범위(매장명, 카테고리 등) 점검
      * @param keyword 검색어
      * @return 검색어 자동완성 리스트
      */
-    fun searchSuggestions(keyword: String): List<String> {
-        val searchRecommendList: List<String> =
+    fun searchSuggestions(keyword: String): SearchSuggestionResultDto {
+        // 매장명은 autoComplete로 검색어 추천
+        val storeNameList: List<AutoCompleteStoreNameDto> =
             searchStoreRepository
-                .searchStoreRecommend(
+                .autocompleteStoreName(
                     keyword = keyword,
-                ).orThrow {
-                    SearchException.SearchSuggestionFailed(keyword)
-                }
-        return searchRecommendList
+                )
+        val storeSuggestionList =
+            storeNameList.map {
+                SearchSuggestionDto.from(
+                    value = it.storeName,
+                    field = "storeName",
+                    storeId = it.storeId,
+                )
+            }
+        // 음식명 추천은 ...
+        val foodCategoryList: List<String> = emptyList() // TODO: 음식명 추천 로직 추가 필요
+        val foodSuggestionList =
+            foodCategoryList.map {
+                SearchSuggestionDto.from(
+                    value = it,
+                    field = "foodCategory",
+                )
+            }
+
+        return SearchSuggestionResultDto.from(
+            storeNameList = storeSuggestionList,
+            foodList = foodSuggestionList,
+        )
     }
 
     /**

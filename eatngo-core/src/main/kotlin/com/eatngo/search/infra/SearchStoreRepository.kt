@@ -1,6 +1,7 @@
 package com.eatngo.search.infra
 
 import com.eatngo.search.domain.SearchStore
+import com.eatngo.search.dto.AutoCompleteStoreNameDto
 import com.eatngo.search.dto.Box
 import com.eatngo.search.dto.SearchFilter
 
@@ -16,8 +17,8 @@ interface SearchStoreRepository {
         size: Int = 20,
     ): List<SearchStore>
 
-    fun searchStoreRecommend(
+    fun autocompleteStoreName(
         keyword: String,
-        size: Int = 10,
-    ): List<String>
+        size: Int = 5,
+    ): List<AutoCompleteStoreNameDto>
 }
