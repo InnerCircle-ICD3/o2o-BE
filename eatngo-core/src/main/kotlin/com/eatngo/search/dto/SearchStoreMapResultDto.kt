@@ -29,7 +29,7 @@ data class SearchStoreMap(
             SearchStoreMap(
                 storeID = searchStore.storeId,
                 storeName = searchStore.storeName,
-                coordinate = searchStore.coordinate,
+                coordinate = searchStore.coordinate.toVO(),
             )
     }
 }
