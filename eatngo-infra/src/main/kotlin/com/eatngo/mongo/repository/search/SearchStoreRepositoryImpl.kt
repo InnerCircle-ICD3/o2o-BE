@@ -212,12 +212,12 @@ class SearchStoreRepositoryImpl(
         )
 
         // 선택적: 카테고리 필터
-        searchFilter?.category?.let {
+        searchFilter?.storeCategory?.let {
             filters.add(
                 Document(
                     "text",
                     Document("query", it)
-                        .append("path", "category"),
+                        .append("path", "storeCategory"),
                 ),
             )
         }
@@ -259,7 +259,7 @@ class SearchStoreRepositoryImpl(
                 Document(
                     "text",
                     Document("query", it)
-                        .append("path", listOf("storeName", "category")),
+                        .append("path", listOf("storeName", "foodCategory")),
                 ),
             )
         }
