@@ -1,7 +1,7 @@
 package com.eatngo.mongo.entity.search
 
+import com.eatngo.common.constant.StoreEnum
 import com.eatngo.common.type.CoordinateVO
-import com.eatngo.search.constant.StoreEnum
 import com.eatngo.search.domain.SearchStore
 import com.eatngo.search.dto.BusinessHoursDto
 import org.springframework.data.annotation.Id

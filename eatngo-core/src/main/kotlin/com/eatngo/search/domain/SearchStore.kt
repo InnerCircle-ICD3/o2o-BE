@@ -1,7 +1,7 @@
 package com.eatngo.search.domain
 
+import com.eatngo.common.constant.StoreEnum
 import com.eatngo.common.type.CoordinateVO
-import com.eatngo.search.constant.StoreEnum
 import com.eatngo.search.dto.BusinessHoursDto
 import java.time.LocalDateTime
 

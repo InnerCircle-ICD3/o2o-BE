@@ -1,8 +1,8 @@
 package com.eatngo.search.dto
 
+import com.eatngo.common.constant.StoreEnum
 import com.eatngo.common.type.CoordinateVO
 import com.eatngo.common.util.DistanceCalculator
-import com.eatngo.search.constant.StoreEnum
 import com.eatngo.search.domain.SearchStore
 import java.time.LocalDateTime
 

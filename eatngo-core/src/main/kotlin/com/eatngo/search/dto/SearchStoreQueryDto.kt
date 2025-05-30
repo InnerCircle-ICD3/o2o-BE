@@ -1,7 +1,7 @@
 package com.eatngo.search.dto
 
+import com.eatngo.common.constant.StoreEnum
 import com.eatngo.common.type.CoordinateVO
-import com.eatngo.search.constant.StoreEnum
 import java.time.LocalDateTime
 
 data class SearchStoreQueryDto(
