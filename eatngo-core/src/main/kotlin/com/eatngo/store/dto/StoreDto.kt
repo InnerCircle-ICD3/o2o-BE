@@ -55,7 +55,7 @@ data class StoreDto(
                 ),
                 businessNumber = store.businessNumber.value,
                 contactNumber = store.contactNumber?.value,
-                imageUrl = store.imageUrl?.value,
+                imageUrl = store.imageUrl,
                 businessHours = store.businessHours?.map {
                     BusinessHourDto(it.dayOfWeek, it.openTime, it.closeTime)
                 } ?: emptyList(),

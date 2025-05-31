@@ -45,17 +45,6 @@ value class ContactNumberVO(val value: String) {
 }
 
 @JvmInline
-value class ImageUrlVO(val value: String) {
-    init {
-        require(value.matches(Regex("^https?://.*"))) { "올바른 URL 형식이 아닙니다" }
-    }
-
-    companion object {
-        fun from(url: String): ImageUrlVO = ImageUrlVO(url)
-    }
-}
-
-@JvmInline
 value class BusinessHourVO(val value: Triple<DayOfWeek, LocalTime, LocalTime>) {
     init {
         require(value.second.isBefore(value.third)) { "영업 종료 시간은 시작 시간보다 이후여야 합니다" }

@@ -3,6 +3,7 @@ package com.eatngo.store.service.impl
 import com.eatngo.common.constant.StoreEnum
 import com.eatngo.common.exception.StoreException
 import com.eatngo.extension.orThrow
+import com.eatngo.file.FileStorageService
 import com.eatngo.store.domain.Store
 import com.eatngo.store.dto.StoreCreateDto
 import com.eatngo.store.dto.StoreUpdateDto
@@ -16,10 +17,14 @@ import org.springframework.stereotype.Service
 @Service
 class StoreServiceImpl(
     private val storePersistence: StorePersistence,
+    private val fileStorageService: FileStorageService
 ) : StoreService {
 
     override fun createStore(request: StoreCreateDto): Store {
         val store = Store.create(request)
+        store.apply {
+            imageUrl = request.imageUrl?.let { fileStorageService.resolveImageUrl(it) }
+        }
         return storePersistence.save(store)
     }
 
@@ -27,6 +32,9 @@ class StoreServiceImpl(
         val existingStore = storePersistence.findById(id).orThrow { StoreException.StoreNotFound(id) }
         existingStore.requireOwner(request.storeOwnerId)
         existingStore.update(request)
+        if (request.mainImageUrl != null) {
+            existingStore.imageUrl = fileStorageService.resolveImageUrl(request.mainImageUrl)
+        }
         return storePersistence.save(existingStore)
     }
 
