@@ -1,6 +1,5 @@
 package com.eatngo.search
 
-import com.eatngo.common.constant.StoreEnum
 import com.eatngo.common.type.CoordinateVO
 import com.eatngo.search.dto.SearchStoreMapResultDto
 import com.eatngo.search.dto.SearchStoreResultDto
@@ -31,7 +30,7 @@ class SearchController(
         @RequestParam longitude: Double,
         @RequestParam storeCategory: String?,
         @RequestParam time: String?, // HH:mm 형식의 시간 (ex: 12:30) TODO: VO로 정의하여 검증 로직 추가
-        @RequestParam status: StoreEnum.StoreStatus?,
+        @RequestParam onlyReservable: Boolean = false, // 픽업 가능 매장만 조회
         // TODO : 우선 BE, FE 모두 page+size로 구현 => 추후 개선
         @RequestParam page: Int = 0,
         @RequestParam size: Int = 20,
@@ -43,7 +42,7 @@ class SearchController(
                     longitude = longitude,
                     storeCategory = storeCategory,
                     time = time,
-                    status = status,
+                    onlyReservable = onlyReservable,
                 ),
                 page = page,
                 size = size,

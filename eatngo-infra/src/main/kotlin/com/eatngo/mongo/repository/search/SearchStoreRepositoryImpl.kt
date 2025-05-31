@@ -92,7 +92,7 @@ class SearchStoreRepositoryImpl(
         }
 
         // 선택 : 예약 가능 상태 필터링 -> TODO 로직 확인 필요...(매장 오픈 시간과 상태로 예약 가능 상태 필터링)
-        searchFilter.status?.let {
+        searchFilter.onlyReservable.let {
             query.addCriteria(
                 Criteria
                     .where("businessHours.$currentDayOfWeek.openTime")
@@ -102,7 +102,7 @@ class SearchStoreRepositoryImpl(
             )
 
             query.addCriteria(
-                Criteria.where("status").`is`(SearchStoreStatus.from(it).code),
+                Criteria.where("status").`is`(SearchStoreStatus.OPEN.code),
             )
         }
 

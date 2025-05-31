@@ -15,7 +15,7 @@ data class StoreFilterDto(
             longitude: Double,
             storeCategory: String?,
             time: String?,
-            status: StoreEnum.StoreStatus?,
+            onlyReservable: Boolean = false, // 매장 상태 (true: 영업중, false,null: 전체)
         ): StoreFilterDto {
             val viewCoordinate =
                 CoordinateVO.from(latitude, longitude).orThrow {
@@ -27,7 +27,7 @@ data class StoreFilterDto(
                     .from(
                         storeCategory = storeCategory,
                         time = time,
-                        status = status,
+                        onlyReservable = onlyReservable,
                     ).orThrow {
                         SearchException.SearchInvalidFilter()
                     }
@@ -43,19 +43,19 @@ data class StoreFilterDto(
 data class SearchFilter(
     val storeCategory: StoreEnum.StoreCategory?, // 매장 카테고리
     val time: String?, // 픽업 가능 시간 (HH:mm 형식) TODO: 검증로직
-    val status: StoreEnum.StoreStatus?, // 매장 상태
+    val onlyReservable: Boolean, // 매장 상태
 ) {
     companion object {
         fun from(
             storeCategory: String? = null,
             time: String? = null,
-            status: StoreEnum.StoreStatus?,
+            onlyReservable: Boolean = false, // 매장 상태 (true: 영업중, false,null: 전체)
         ): SearchFilter {
             val storeCategoryEnum = storeCategory?.let { StoreEnum.StoreCategory.fromString(it) }
             return SearchFilter(
                 storeCategory = storeCategoryEnum,
                 time = time,
-                status = status,
+                onlyReservable = onlyReservable,
             )
         }
     }
