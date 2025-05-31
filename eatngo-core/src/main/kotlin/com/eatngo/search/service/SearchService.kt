@@ -125,7 +125,9 @@ class SearchService(
 
         // Redis에서 box 검색 결과를 가져온다. -> 위경도 기중 0.005 단위로 박스 매핑
         val redisKey = searchMapRedisRepository.getKey(box.topLeft)
-        val seachStoreMapList: List<SearchStoreMap> = searchMapRedisRepository.findByKey(redisKey)
+        val seachStoreMapList: List<SearchStoreMap> = emptyList()
+        // TODO: 실제 DB 연동 이후 주석 해제
+//            searchMapRedisRepository.findByKey(redisKey)
 
         // 검색 결과가 없으면 MongoDB에서 검색하여 가져온 뒤 캐싱한다
         if (seachStoreMapList.isEmpty()) {
