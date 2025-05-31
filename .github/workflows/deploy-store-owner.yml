@@ -106,4 +106,5 @@ jobs:
             --service eatngo-store-owner-api-service \
             --task-definition eatngo-store-owner-api:${{ env.STORE_OWNER_REVISION }} \
             --force-new-deployment \
-            --region $AWS_REGION
+            --region $AWS_REGION \
+            --enable-execute-command
