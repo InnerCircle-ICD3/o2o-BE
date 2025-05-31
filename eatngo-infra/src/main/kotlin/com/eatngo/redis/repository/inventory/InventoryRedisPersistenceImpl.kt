@@ -2,6 +2,8 @@ package com.eatngo.redis.repository.inventory
 
 import com.eatngo.common.exception.StockException.StockEmpty
 import com.eatngo.common.exception.StockException.StockNotFound
+import com.eatngo.inventory.domain.Inventory
+import com.eatngo.inventory.dto.InventoryDto
 import com.eatngo.inventory.infra.InventoryCachePersistence
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.data.redis.core.script.DefaultRedisScript
@@ -34,5 +36,19 @@ class InventoryRedisPersistenceImpl(
             -2L -> throw StockNotFound(productId)
         }
         return result.toInt()
+    }
+
+    override fun findByProductId(productId: Long): InventoryDto? {
+        val key = pKey(productId)
+        val quantityValue = redisTemplate.opsForHash<String, String>()
+            .get(key, "quantity") ?: return null
+
+        val stockValue = redisTemplate.opsForHash<String, String>()
+            .get(key, "stock") ?: return null
+
+        return InventoryDto(
+            quantity = quantityValue.toInt(),
+            stock = stockValue.toInt()
+        )
     }
 }

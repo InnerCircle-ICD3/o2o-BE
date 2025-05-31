@@ -1,11 +1,15 @@
 package com.eatngo.product.event
 
+import com.eatngo.common.exception.InventoryException.InventoryNotFound
+import com.eatngo.extension.orThrow
+import com.eatngo.inventory.dto.InventoryDto
+import com.eatngo.inventory.event.InventoryEventPublisher
 import com.eatngo.inventory.event.StockEventPublisher
+import com.eatngo.inventory.infra.InventoryCachePersistence
 import com.eatngo.order.domain.OrderItem
 import com.eatngo.order.event.OrderCanceledEvent
 import com.eatngo.order.event.OrderCreatedEvent
 import com.eatngo.order.event.OrderEvent
-import com.eatngo.inventory.infra.InventoryCachePersistence
 import com.eatngo.product.infra.ProductPersistence
 import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Component
@@ -15,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional
 class ProductEventListener(
     private val inventoryCachePersistence: InventoryCachePersistence,
+    private val inventoryEventPublisher: InventoryEventPublisher,
     private val productPersistence: ProductPersistence,
     private val stockEventPublisher: StockEventPublisher
 ) {
@@ -38,12 +43,25 @@ class ProductEventListener(
 
     fun processStockDecreaseTask(orderItem: OrderItem) {
         inventoryCachePersistence.decreaseStock(orderItem.productId, orderItem.quantity)
-        // TODO 재고 정보 search 및 market 에게 알려주기 event 기반 -> 이벤트 한번에 모아 보낼지 따로 따로 보낼지도 고민 필요!
+        val inventoryDto: InventoryDto = inventoryCachePersistence.findByProductId(orderItem.productId)
+            .orThrow { InventoryNotFound(orderItem.productId) }
+        inventoryEventPublisher.publishInventoryChangedEvent(
+            productId = orderItem.productId,
+            quantity = inventoryDto.quantity,
+            stock = inventoryDto.stock
+        )
     }
 
     fun processStockRollbackTask(orderItem: OrderItem) {
         // TODO 다음 PR 재고 롤백 기능 호출
-        // TODO market 및 search 에게 event 보내기
+
+        val inventoryDto: InventoryDto = inventoryCachePersistence.findByProductId(orderItem.productId)
+            .orThrow { InventoryNotFound(orderItem.productId) }
+        inventoryEventPublisher.publishInventoryChangedEvent(
+            productId = orderItem.productId,
+            quantity = inventoryDto.quantity,
+            stock = inventoryDto.stock
+        )
     }
 
     /**

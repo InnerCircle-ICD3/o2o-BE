@@ -1,6 +1,6 @@
-package com.eatngo.inventory.dto
+package com.eatngo.inventory.event
 
-data class StockDto(
+data class StockEvent(
     val orderId: Long,
     val productId: Long,
     val quantity: Int
