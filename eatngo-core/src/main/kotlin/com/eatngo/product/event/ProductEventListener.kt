@@ -48,12 +48,12 @@ class ProductEventListener(
             .orThrow { ProductNotFound(orderItem.productId) }
             .storeId
 
-        when (val status = storeTotalInventoryTypeDecider.decideInventoryType(storeId)) {
+        when (val eventType = storeTotalInventoryTypeDecider.decideInventoryType(storeId)) {
             InventoryChangedType.ADEQUATE_STOCK -> return
             else -> inventoryEventPublisher.publishInventoryChangedEvent(
                 InventoryChangedEvent(
                     productId = orderItem.productId,
-                    inventoryChangedType = status
+                    inventoryChangedType = eventType
                 )
             )
         }

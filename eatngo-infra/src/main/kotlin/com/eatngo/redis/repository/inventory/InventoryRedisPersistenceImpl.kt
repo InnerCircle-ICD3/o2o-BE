@@ -39,9 +39,9 @@ class InventoryRedisPersistenceImpl(
 
     override fun findByProductId(productId: Long): InventoryDto? {
         val key = pKey(productId)
+
         val quantityValue = redisTemplate.opsForHash<String, String>()
             .get(key, "quantity") ?: return null
-
         val stockValue = redisTemplate.opsForHash<String, String>()
             .get(key, "stock") ?: return null
 
@@ -51,7 +51,14 @@ class InventoryRedisPersistenceImpl(
         )
     }
 
-    override fun rollbackStock(productId: Long, stockQuantity: Int) {
-        TODO("Not yet implemented")
+    override fun rollbackStock(productId: Long, stockQuantityToIncrease: Int): Int {
+        val key = pKey(productId)
+
+        val existingStockValue = redisTemplate.opsForHash<String, String>()
+            .get(key, "stock") ?: StockNotFound(productId)
+        val increasedStockValue = redisTemplate.opsForHash<String, String>()
+            .increment(key, "stock", stockQuantityToIncrease.toLong()) ?: StockNotFound(productId)
+
+        return (increasedStockValue as Long).toInt()
     }
 }
