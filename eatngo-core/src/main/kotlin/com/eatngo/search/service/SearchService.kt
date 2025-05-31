@@ -42,16 +42,17 @@ class SearchService(
         size: Int = 20,
     ): SearchStoreResultDto {
         // TODO: 목데이터 삭제 이후 var -> val
-        var listStore: List<SearchStoreWithDistance> =
-            searchStoreRepository
-                .listStore(
-                    longitude = storeFilterDto.viewCoordinate.longitude,
-                    latitude = storeFilterDto.viewCoordinate.latitude,
-                    maxDistance = searchDistance,
-                    searchFilter = storeFilterDto.filter,
-                    page = page,
-                    size = size,
-                ).orThrow { SearchException.SearchStoreListFailed(storeFilterDto.viewCoordinate, storeFilterDto.filter) }
+        var listStore: List<SearchStoreWithDistance> = emptyList()
+        // TODO: 실제 DB 연동 이후 주석 해제
+//            searchStoreRepository
+//                .listStore(
+//                    longitude = storeFilterDto.viewCoordinate.longitude,
+//                    latitude = storeFilterDto.viewCoordinate.latitude,
+//                    maxDistance = searchDistance,
+//                    searchFilter = storeFilterDto.filter,
+//                    page = page,
+//                    size = size,
+//                ).orThrow { SearchException.SearchStoreListFailed(storeFilterDto.viewCoordinate, storeFilterDto.filter) }
 
         // TODO: 삭제 예정(테스트 기간 Mock 데이터)
         if (listStore.isEmpty()) {
@@ -85,16 +86,17 @@ class SearchService(
         size: Int,
     ): SearchStoreResultDto {
         // TODO: 목데이터 삭제 이후 var -> val
-        var searchStoreList: List<SearchStore> =
-            searchStoreRepository
-                .searchStore(
-                    longitude = storeSearchFilterDto.viewCoordinate.longitude,
-                    latitude = storeSearchFilterDto.viewCoordinate.latitude,
-                    maxDistance = searchDistance,
-                    searchText = storeSearchFilterDto.searchText,
-                    page = page,
-                    size = size,
-                ).orThrow { SearchException.SearchStoreSearchFailed(storeSearchFilterDto.viewCoordinate, storeSearchFilterDto.searchText) }
+        var searchStoreList: List<SearchStore> = emptyList()
+        // TODO: 실제 DB 연동 이후 주석 해제
+//            searchStoreRepository
+//                .searchStore(
+//                    longitude = storeSearchFilterDto.viewCoordinate.longitude,
+//                    latitude = storeSearchFilterDto.viewCoordinate.latitude,
+//                    maxDistance = searchDistance,
+//                    searchText = storeSearchFilterDto.searchText,
+//                    page = page,
+//                    size = size,
+//                ).orThrow { SearchException.SearchStoreSearchFailed(storeSearchFilterDto.viewCoordinate, storeSearchFilterDto.searchText) }
 
         // TODO: 삭제 예정(테스트 기간 Mock 데이터)
         if (searchStoreList.isEmpty()) {
@@ -128,10 +130,11 @@ class SearchService(
         // 검색 결과가 없으면 MongoDB에서 검색하여 가져온 뒤 캐싱한다
         if (seachStoreMapList.isEmpty()) {
             // TODO: 목데이터 삭제 이후 var -> val
-            var searchStoreList: List<SearchStore> =
-                searchStoreRepository.findBox(box).orThrow {
-                    SearchException.SearchStoreMapFailed(userCoordinate)
-                }
+            var searchStoreList: List<SearchStore> = emptyList()
+            // TODO: 실제 DB 연동 이후 주석 해제
+//                searchStoreRepository.findBox(box).orThrow {
+//                    SearchException.SearchStoreMapFailed(userCoordinate)
+//                }
             // TODO: 삭제 예정(테스트 기간 Mock 데이터)
             if (searchStoreList.isEmpty()) {
                 // Mock 데이터 생성
@@ -164,11 +167,12 @@ class SearchService(
      */
     fun searchSuggestions(keyword: String): SearchSuggestionResultDto {
         // 매장명은 autoComplete로 검색어 추천
-        val storeNameList: List<AutoCompleteStoreNameDto> =
-            searchStoreRepository
-                .autocompleteStoreName(
-                    keyword = keyword,
-                )
+        val storeNameList: List<AutoCompleteStoreNameDto> = emptyList()
+        // TODO: DB 연동 이후 주석 해제
+//            searchStoreRepository
+//                .autocompleteStoreName(
+//                    keyword = keyword,
+//                )
         val storeSuggestionList =
             storeNameList.map {
                 SearchSuggestionDto.from(
