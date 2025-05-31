@@ -3,8 +3,7 @@ package com.eatngo.product.event
 import com.eatngo.common.exception.ProductException.ProductNotFound
 import com.eatngo.extension.orThrow
 import com.eatngo.inventory.event.InventoryChangedEvent
-import com.eatngo.inventory.event.InventoryChangedType.ADEQUATE_STOCK
-import com.eatngo.inventory.event.InventoryChangedType.RESTOCKED
+import com.eatngo.inventory.event.InventoryChangedType
 import com.eatngo.inventory.event.InventoryEventPublisher
 import com.eatngo.inventory.infra.InventoryCachePersistence
 import com.eatngo.order.domain.OrderItem
@@ -12,7 +11,6 @@ import com.eatngo.order.event.OrderCanceledEvent
 import com.eatngo.order.event.OrderCreatedEvent
 import com.eatngo.order.event.OrderEvent
 import com.eatngo.product.infra.ProductPersistence
-import com.eatngo.product.service.ProductService
 import com.eatngo.product.service.StoreTotalInventoryTypeDecider
 import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Component
@@ -25,7 +23,6 @@ class ProductEventListener(
     private val inventoryEventPublisher: InventoryEventPublisher,
     private val productPersistence: ProductPersistence,
     private val storeTotalInventoryTypeDecider: StoreTotalInventoryTypeDecider,
-    private val productService: ProductService
 ) {
 
     @EventListener
@@ -50,20 +47,13 @@ class ProductEventListener(
         val storeId = productPersistence.findById(orderItem.productId)
             .orThrow { ProductNotFound(orderItem.productId) }
             .storeId
-        val initialStock = productService.findTotalInitialStocks(storeId)
 
-        when (
-            val eventType = storeTotalInventoryTypeDecider.decideInventoryType(
-                storeId = storeId,
-                initialStock = initialStock
-            )
-        ) {
-            ADEQUATE_STOCK -> return
-            RESTOCKED -> return
+        when (val status = storeTotalInventoryTypeDecider.decideInventoryType(storeId)) {
+            InventoryChangedType.ADEQUATE_STOCK -> return
             else -> inventoryEventPublisher.publishInventoryChangedEvent(
                 InventoryChangedEvent(
                     productId = orderItem.productId,
-                    inventoryChangedType = eventType
+                    inventoryChangedType = status
                 )
             )
         }
