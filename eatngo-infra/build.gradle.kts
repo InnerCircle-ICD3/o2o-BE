@@ -46,9 +46,3 @@ tasks.jar {
     enabled = true
     archiveFileName.set("${project.name}.jar")
 }
-
-tasks.test {
-    useJUnitPlatform {
-        excludeTags("integration")
-    }
-}

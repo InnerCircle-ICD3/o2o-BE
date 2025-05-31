@@ -56,9 +56,7 @@ subprojects {
 }
 
 tasks.test {
-    useJUnitPlatform {
-        excludeTags("integration")
-    }
+    useJUnitPlatform()
 }
 
 kotlin {
