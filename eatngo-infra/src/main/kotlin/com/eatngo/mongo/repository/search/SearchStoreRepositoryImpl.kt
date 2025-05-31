@@ -93,11 +93,13 @@ class SearchStoreRepositoryImpl(
 
         // 선택 : 예약 가능 상태 필터링 -> TODO 로직 확인 필요...(매장 오픈 시간과 상태로 예약 가능 상태 필터링)
         searchFilter.onlyReservable.let {
+            val openTimeField = "businessHours.$currentDayOfWeek.openTime"
+            val closeTimeField = "businessHours.$currentDayOfWeek.closeTime"
             query.addCriteria(
                 Criteria
-                    .where("businessHours.$currentDayOfWeek.openTime")
+                    .where(openTimeField)
                     .lte(currentTime)
-                    .and("businessHours.$currentDayOfWeek.closeTime")
+                    .and(closeTimeField)
                     .gt(currentTime),
             )
 
