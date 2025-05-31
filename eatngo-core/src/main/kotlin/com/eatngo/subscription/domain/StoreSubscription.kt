@@ -39,18 +39,6 @@ class StoreSubscription(
     fun isActive(): Boolean = deletedAt == null
 
     /**
-     * 구독 취소
-     * 이미 취소된 구독인 경우 예외 발생
-     */
-    fun softDelete() {
-        if (deletedAt != null) {
-            throw StoreException.SubscriptionAlreadyCanceled(id)
-        }
-        deletedAt = LocalDateTime.now()
-        updatedAt = deletedAt!!
-    }
-
-    /**
      * 재구독
      * 이미 활성화된 구독인 경우 예외 발생
      */
@@ -69,7 +57,6 @@ class StoreSubscription(
      */
     fun toggleSubscription(): Boolean {
         return if (isActive()) {
-            softDelete()
             false
         } else {
             restore()

@@ -2,6 +2,7 @@ package com.eatngo.subscription.rdb.repository
 
 import com.eatngo.subscription.rdb.entity.StoreSubscriptionJpaEntity
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
@@ -39,4 +40,14 @@ interface StoreSubscriptionJpaRepository : JpaRepository<StoreSubscriptionJpaEnt
      */
     @Query("SELECT s.storeId FROM StoreSubscriptionJpaEntity s WHERE s.userId = :userId")
     fun findStoreIdsByUserId(@Param("userId") userId: Long): List<Long>
-} 
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query(
+        """
+        UPDATE StoreSubscriptionJpaEntity s
+        SET s.deletedAt = CURRENT_TIMESTAMP
+        WHERE s.id = :id
+    """
+    )
+    fun softDeleteById(id: Long): Int
+}

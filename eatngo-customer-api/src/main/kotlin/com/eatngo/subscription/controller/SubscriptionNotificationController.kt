@@ -1,6 +1,6 @@
 package com.eatngo.subscription.controller
 
-import com.eatngo.auth.annotaion.CustomerId
+import com.eatngo.auth.annotation.CustomerId
 import com.eatngo.subscription.notification.SubscriptionNotificationService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag

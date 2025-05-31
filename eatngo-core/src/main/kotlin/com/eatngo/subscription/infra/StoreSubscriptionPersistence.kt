@@ -32,9 +32,9 @@ interface StoreSubscriptionPersistence {
     fun save(subscription: StoreSubscription): StoreSubscription
 
     /**
-     * 상점 구독 삭제
+     * 상점 구독 삭제(soft delete)
      */
-    fun softDelete(id: Long): Boolean
+    fun deleteById(id: Long): Boolean
 
     /**
      * 사용자 ID로 상점 구독 여부 조회

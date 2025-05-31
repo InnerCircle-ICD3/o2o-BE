@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit
 
 /**
  * 구독 알림 서비스
- * SSE(Server-Sent Events)를 사용하여 실시간 알림을 제공합니다.
+ * SSE(Server-Sent Events)
  */
 @Service
 class SubscriptionNotificationService(

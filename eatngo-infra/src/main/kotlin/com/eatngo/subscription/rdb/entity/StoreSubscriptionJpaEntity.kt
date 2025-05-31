@@ -32,24 +32,14 @@ class StoreSubscriptionJpaEntity(
     val storeId: Long
 ) : BaseJpaEntity() {
     companion object {
-        /**
-         * StoreSubscription 도메인 모델을 JPA 엔티티로 변환
-         */
         fun from(subscription: StoreSubscription): StoreSubscriptionJpaEntity {
             return StoreSubscriptionJpaEntity(
                 id = subscription.id,
                 userId = subscription.userId,
                 storeId = subscription.storeId
-            ).apply {
-                this.createdAt = subscription.createdAt
-                this.updatedAt = subscription.updatedAt
-                this.deletedAt = subscription.deletedAt
-            }
+            )
         }
 
-        /**
-         * JPA 엔티티를 StoreSubscription 도메인 모델로 변환
-         */
         fun toSubscription(entity: StoreSubscriptionJpaEntity): StoreSubscription {
             return StoreSubscription(
                 id = entity.id,

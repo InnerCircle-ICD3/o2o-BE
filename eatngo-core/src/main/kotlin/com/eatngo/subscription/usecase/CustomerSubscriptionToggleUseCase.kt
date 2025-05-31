@@ -1,13 +1,13 @@
 package com.eatngo.subscription.usecase
 
 import com.eatngo.common.exception.StoreException
-import com.eatngo.store.infra.StorePersistence
+import com.eatngo.store.service.StoreService
 import com.eatngo.subscription.domain.StoreSubscription
 import com.eatngo.subscription.dto.StoreSubscriptionDto
 import com.eatngo.subscription.event.SubscriptionCanceledEvent
 import com.eatngo.subscription.event.SubscriptionCreatedEvent
 import com.eatngo.subscription.event.SubscriptionResumedEvent
-import com.eatngo.subscription.infra.StoreSubscriptionPersistence
+import com.eatngo.subscription.service.StoreSubscriptionService
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -18,8 +18,7 @@ import org.springframework.transaction.annotation.Transactional
  */
 @Service
 class CustomerSubscriptionToggleUseCase(
-    private val storeSubscriptionPersistence: StoreSubscriptionPersistence,
-    private val storePersistence: StorePersistence,
+    private val storeSubscriptionService: StoreSubscriptionService,
     private val eventPublisher: ApplicationEventPublisher
 ) {
 
@@ -31,63 +30,46 @@ class CustomerSubscriptionToggleUseCase(
      */
     @Transactional
     fun toggle(storeId: Long, customerId: Long): StoreSubscriptionDto {
-        // 매장 존재 확인
-        val store = storePersistence.findById(storeId)
-            ?: throw StoreException.StoreNotFound(storeId)
+        val dto = storeSubscriptionService.toggleSubscription(storeId, customerId)
 
-        // 구독 존재 확인
-        val subscription = storeSubscriptionPersistence.findByUserIdAndStoreId(customerId, storeId)?.let { existingSubscription ->
-            // 구독이 존재하면 토글 (활성화 상태에 따라 취소 또는 재개)
-            val wasActive = existingSubscription.isActive()
-            existingSubscription.toggleSubscription()
-            val savedSubscription = storeSubscriptionPersistence.save(existingSubscription)
-            
-            // 이벤트 발행
-            if (wasActive) {
+        // 구독 상태에 따라 이벤트 발행
+        when {
+            // 구독이 활성화된 경우 (생성 또는 복구)
+            dto.deletedAt == null && dto.createdAt == dto.updatedAt -> {
+                // 최초 생성
                 eventPublisher.publishEvent(
-                    SubscriptionCanceledEvent(
-                        subscriptionId = savedSubscription.id,
-                        customerId = savedSubscription.userId,
-                        storeId = savedSubscription.storeId,
-                        timestamp = savedSubscription.updatedAt
-                    )
-                )
-            } else {
-                eventPublisher.publishEvent(
-                    SubscriptionResumedEvent(
-                        subscriptionId = savedSubscription.id,
-                        customerId = savedSubscription.userId,
-                        storeId = savedSubscription.storeId,
-                        timestamp = savedSubscription.updatedAt
+                    SubscriptionCreatedEvent(
+                        subscriptionId = dto.id,
+                        customerId = dto.userId,
+                        storeId = dto.storeId,
+                        timestamp = dto.createdAt
                     )
                 )
             }
-            
-            savedSubscription
-        } ?: run {
-            // 구독이 존재하지 않으면 새로 생성
-            val newSubscription = StoreSubscription.create(customerId, storeId)
-            val savedSubscription = storeSubscriptionPersistence.save(newSubscription)
-            
-            // 구독 생성 이벤트 발행
-            eventPublisher.publishEvent(
-                SubscriptionCreatedEvent(
-                    subscriptionId = savedSubscription.id,
-                    customerId = savedSubscription.userId,
-                    storeId = savedSubscription.storeId,
-                    timestamp = savedSubscription.createdAt
+            dto.deletedAt == null && dto.createdAt != dto.updatedAt -> {
+                // 재구독
+                eventPublisher.publishEvent(
+                    SubscriptionResumedEvent(
+                        subscriptionId = dto.id,
+                        customerId = dto.userId,
+                        storeId = dto.storeId,
+                        timestamp = dto.updatedAt
+                    )
                 )
-            )
-            
-            savedSubscription
+            }
+            // 구독이 비활성화(취소/soft delete)된 경우
+            dto.deletedAt != null -> {
+                eventPublisher.publishEvent(
+                    SubscriptionCanceledEvent(
+                        subscriptionId = dto.id,
+                        customerId = dto.userId,
+                        storeId = dto.storeId,
+                        timestamp = dto.updatedAt
+                    )
+                )
+            }
         }
 
-        // DTO 변환 및 반환
-        return StoreSubscriptionDto.from(
-            subscription = subscription,
-            storeName = store.name.value,
-            mainImageUrl = store.imageUrl?.value,
-            status = store.status
-        )
+        return dto
     }
-} 
+}
