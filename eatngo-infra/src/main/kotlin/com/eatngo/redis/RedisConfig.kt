@@ -62,9 +62,11 @@ class RedisConfig(
                 )
             )
             .entryTtl(Duration.ofMinutes(60))
+            .disableCachingNullValues()
 
         return RedisCacheManager.builder(factory)
             .cacheDefaults(config)
+            .transactionAware() // transaction commit 이후 redis AOP 작동
             .build()
     }
 }
