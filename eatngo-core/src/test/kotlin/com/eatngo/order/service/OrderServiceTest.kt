@@ -1,10 +1,12 @@
 package com.eatngo.order.service
 
+import com.eatngo.common.response.Cursor
 import com.eatngo.order.domain.Order
 import com.eatngo.order.domain.OrderItem
 import com.eatngo.order.domain.Status
 import com.eatngo.order.dto.OrderCreateDto
 import com.eatngo.order.dto.OrderItemCreateDto
+import com.eatngo.order.dto.OrderQueryParamDto
 import com.eatngo.order.infra.OrderPersistence
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
@@ -32,6 +34,10 @@ class MockOrderPersistenceImpl : OrderPersistence {
     }
 
     override fun findById(id: Long): Order? {
+        throw NotImplementedError()
+    }
+
+    override fun findAllByQueryParameter(queryParam: OrderQueryParamDto): Cursor<Order> {
         throw NotImplementedError()
     }
 }
