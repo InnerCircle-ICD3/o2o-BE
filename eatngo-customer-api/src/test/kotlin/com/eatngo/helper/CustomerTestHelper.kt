@@ -2,6 +2,7 @@ package com.eatngo.helper
 
 import com.eatngo.auth.dto.LoginCustomer
 import com.eatngo.auth.token.TokenProvider
+import com.eatngo.customer.service.CustomerAddressService
 import com.eatngo.customer.service.CustomerService
 import com.eatngo.user_account.oauth2.constants.Oauth2Provider
 import com.eatngo.user_account.oauth2.dto.KakaoOAuth2
@@ -12,6 +13,7 @@ import org.springframework.boot.test.context.TestComponent
 class CustomerTestHelper(
     private val userAccountService: UserAccountService,
     private val customerService: CustomerService,
+    private val customerAddressService: CustomerAddressService,
     private val tokenProvider: TokenProvider,
 ) {
     fun 유저_생성_및_토큰_반환(): Pair<String, LoginCustomer> {
@@ -45,6 +47,8 @@ class CustomerTestHelper(
         try {
             customerService.deleteCustomer(loginCustomer.customerId)
             userAccountService.deleteAccount(loginCustomer.userAccountId)
+            customerAddressService.getAddressList(loginCustomer.customerId)
+                .map { customerAddressService.deleteAddress(it.customerId, it.id) }
         } catch (e: Exception) {
             println("데이터 삭제 실패: ${e.message}")
         }

@@ -1,6 +1,7 @@
 package com.eatngo.customer.rdb.entity
 
 import com.eatngo.common.BaseJpaEntity
+import com.eatngo.common.type.Address
 import com.eatngo.common.type.CoordinateVO
 import com.eatngo.constants.DELETED_FILTER
 import com.eatngo.customer.domain.CustomerAddress
@@ -45,25 +46,28 @@ data class CustomerAddressJpaEntity(
             customer: CustomerJpaEntity,
             customerAddress: CustomerAddress
         ): CustomerAddressJpaEntity =
-            CustomerAddressJpaEntity(
-                customer = customer,
-                roadNameAddress = customerAddress.address.roadNameAddress,
-                lotNumberAddress = customerAddress.address.lotNumberAddress,
-                buildingName = customerAddress.address.buildingName,
-                zipCode = customerAddress.address.zipCode,
-                region1DepthName = customerAddress.address.region1DepthName,
-                region2DepthName = customerAddress.address.region2DepthName,
-                region3DepthName = customerAddress.address.region3DepthName,
-                coordinate = customerAddress.address.coordinate,
-                customerAddressType = customerAddress.customerAddressType,
-                description = customerAddress.description
-            )
+            with(customerAddress) {
+                CustomerAddressJpaEntity(
+                    customer = customer,
+                    roadNameAddress = address.roadNameAddress,
+                    lotNumberAddress = address.lotNumberAddress,
+                    buildingName = address.buildingName,
+                    zipCode = address.zipCode,
+                    region1DepthName = address.region1DepthName,
+                    region2DepthName = address.region2DepthName,
+                    region3DepthName = address.region3DepthName,
+                    coordinate = address.coordinate,
+                    customerAddressType = customerAddressType,
+                    description = description
+                )
+            }
+
 
         fun toCustomerAddress(customerAddressJpaEntity: CustomerAddressJpaEntity): CustomerAddress {
             return CustomerAddress(
-                addressId = customerAddressJpaEntity.id,
+                id = customerAddressJpaEntity.id,
                 customerId = customerAddressJpaEntity.customer.id,
-                address = com.eatngo.common.type.Address(
+                address = Address(
                     roadNameAddress = customerAddressJpaEntity.roadNameAddress,
                     lotNumberAddress = customerAddressJpaEntity.lotNumberAddress,
                     buildingName = customerAddressJpaEntity.buildingName,

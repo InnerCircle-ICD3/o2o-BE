@@ -15,34 +15,48 @@ class CustomerAddressService(
     private val customerAddressPersistence: CustomerAddressPersistence,
     private val customerAddressRedisRepository: CustomerAddressRedisRepository,
 ) {
-    fun getAddressList(customerId: Long): List<CustomerAddressDto> = customerPersistence.findById(customerId)
-        .orThrow { CustomerException.CustomerNotFound(customerId) }
-        .let {
-            val customer = it
-            customerAddressRedisRepository.findCustomerAddress(customerAddressRedisRepository.getKey(it.id))
-                .ifEmpty { customerAddressPersistence.findByCustomer(customer) }
-                .map(CustomerAddressDto.Companion::from)
-        }
+    fun getAddressList(customerId: Long): Set<CustomerAddressDto> {
+        val redisKey = customerAddressRedisRepository.getKey(customerId)
+        val cachedAddress = customerAddressRedisRepository.findCustomerAddress(redisKey)
 
-    fun addAddress(customerId: Long, addressCreateDto: AddressCreateDto): Long = customerPersistence.findById(customerId)
-        .orThrow { CustomerException.CustomerNotFound(customerId) }
-        .let {
-            customerAddressPersistence.save(it, addressCreateDto.toCustomerAddress())
-                .let {
-                    val redisKey = customerAddressRedisRepository.getKey(it.customerId!!)
-                    customerAddressRedisRepository.save(
-                        key = redisKey,
-                        address = it,
-                    )
-                    it.addressId!!
-                }
-        }
+        return if (cachedAddress.isNotEmpty()) {
+            cachedAddress
+        } else {
+            val customer = customerPersistence.findById(customerId)
+                .orThrow { CustomerException.CustomerNotFound(customerId) }
 
-    fun deleteAddress(customerId: Long, addressId: Long) =
+            val addresses = customerAddressPersistence.findByCustomer(customer)
+
+            val dtoSet = addresses.map { CustomerAddressDto.from(it) }.toMutableSet()
+
+            customerAddressRedisRepository.save(
+                key = redisKey,
+                addresses = dtoSet
+            )
+            dtoSet
+        }
+    }
+
+
+    fun addAddress(customerId: Long, addressCreateDto: AddressCreateDto): Long =
+        customerPersistence.findById(customerId)
+            .orThrow { CustomerException.CustomerNotFound(customerId) }
+            .let { customer ->
+                val savedAddress = customerAddressPersistence.save(customer, addressCreateDto.toCustomerAddress())
+
+                val redisKey = customerAddressRedisRepository.getKey(savedAddress.customerId!!)
+                customerAddressRedisRepository.save(
+                    key = redisKey,
+                    addresses = mutableSetOf(CustomerAddressDto.from(savedAddress))
+                )
+                savedAddress.id!!
+            }
+
+    fun deleteAddress(customerId: Long, id: Long): Unit =
         customerPersistence.findById(customerId)
             .orThrow { CustomerException.CustomerNotFound(customerId) }
             .let {
-                customerAddressPersistence.deleteById(addressId)
+                customerAddressPersistence.deleteById(id)
             }
             .also {
                 val key = customerAddressRedisRepository.getKey(customerId)

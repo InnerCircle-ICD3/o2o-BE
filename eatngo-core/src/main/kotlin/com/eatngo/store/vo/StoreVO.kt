@@ -2,9 +2,10 @@ package com.eatngo.store.vo
 
 import com.eatngo.common.constant.StoreEnum
 import com.eatngo.store.dto.BusinessHourDto
+import com.fasterxml.jackson.annotation.JsonCreator
+import com.fasterxml.jackson.annotation.JsonValue
 import java.time.DayOfWeek
 import java.time.LocalTime
-import kotlin.text.isNotBlank
 
 @JvmInline
 value class StoreNameVO(val value: String) {
@@ -24,6 +25,7 @@ value class BusinessNumberVO(val value: String) {
         require(value.length == 10) { "사업자등록번호는 10자리여야 합니다" }
         require(value.all { it.isDigit() }) { "사업자등록번호는 숫자만 포함해야 합니다" }
     }
+
     companion object {
         fun from(number: String): BusinessNumberVO = BusinessNumberVO(number)
     }
@@ -113,7 +115,9 @@ value class FoodCategoryVO(val value: String) {
 }
 
 @JvmInline
-value class DescriptionVO(val value: String) {
+value class DescriptionVO @JsonCreator constructor(
+    @get:JsonValue val value: String
+) {
     init {
         require(value.length <= 500) { "설명은 500자를 초과할 수 없습니다" }
     }
@@ -124,7 +128,9 @@ value class DescriptionVO(val value: String) {
 }
 
 @JvmInline
-value class RoadNameAddressVO(val value: String) {
+value class RoadNameAddressVO @JsonCreator constructor(
+    @get:JsonValue val value: String
+) {
     init {
         require(value.isNotBlank()) { "도로명 주소는 비어있을 수 없습니다" }
     }
@@ -137,7 +143,9 @@ value class RoadNameAddressVO(val value: String) {
 }
 
 @JvmInline
-value class LotNumberAddressVO(val value: String) {
+value class LotNumberAddressVO @JsonCreator constructor(
+    @get:JsonValue val value: String
+) {
     init {
         require(value.isNotBlank()) { "지번 주소는 비어있을 수 없습니다" }
     }
@@ -150,7 +158,9 @@ value class LotNumberAddressVO(val value: String) {
 }
 
 @JvmInline
-value class ZipCodeVO(val value: String) {
+value class ZipCodeVO @JsonCreator constructor(
+    @get:JsonValue val value: String
+) {
     init {
         require(value.isNotBlank()) { "우편번호는 비어있을 수 없습니다" }
         require(value.length == 5) { "우편번호는 5자리여야 합니다" }

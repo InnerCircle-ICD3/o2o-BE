@@ -53,12 +53,24 @@ class CustomerAddressControllerTest(
         describe("GET /api/v1/customers/address") {
             it("고객 주소 정보를 성공적으로 조회한다") {
                 val (token, loginCustomer) = customerTestHelper.유저_생성_및_토큰_반환()
+
                 고객_주소_정보_생성_성공(token)
+
                 val customerDtos = 고객_주소_정보_조회_성공(token)
                 val addressCreateDto = addressCreateDto()
                 customerDtos.size shouldBe 1
                 customerDtos[0] shouldBe CustomerAddressDto(
-                    address = addressCreateDto.address,
+                    id = customerDtos[0].id,
+                    customerId = loginCustomer.customerId,
+                    roadNameAddress = RoadNameAddressVO.from(addressCreateDto.address.roadNameAddress.value),
+                    lotNumberAddress = LotNumberAddressVO.from(addressCreateDto.address.lotNumberAddress.value),
+                    buildingName = addressCreateDto.address.buildingName,
+                    zipCode = ZipCodeVO.from(addressCreateDto.address.zipCode.value),
+                    region1DepthName = addressCreateDto.address.region1DepthName,
+                    region2DepthName = addressCreateDto.address.region2DepthName,
+                    region3DepthName = addressCreateDto.address.region3DepthName,
+                    latitude = addressCreateDto.address.coordinate.latitude,
+                    longitude = addressCreateDto.address.coordinate.longitude,
                     customerAddressType = addressCreateDto.customerAddressType,
                     description = addressCreateDto.description
                 )

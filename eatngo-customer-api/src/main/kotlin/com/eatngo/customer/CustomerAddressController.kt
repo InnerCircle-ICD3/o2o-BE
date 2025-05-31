@@ -20,7 +20,7 @@ class CustomerAddressController(
     @GetMapping
     fun getAddressList(
         @CustomerId customerId: Long,
-    ): ResponseEntity<ApiResponse<List<CustomerAddressDto>>> {
+    ): ResponseEntity<ApiResponse<Set<CustomerAddressDto>>> {
         return ResponseEntity.ok(
             ApiResponse.success(
                 customerAddressService.getAddressList(customerId)

@@ -1,15 +1,15 @@
 package com.eatngo.customer.infra
 
-import com.eatngo.customer.domain.CustomerAddress
+import com.eatngo.customer.dto.CustomerAddressDto
 
 interface CustomerAddressRedisRepository {
     fun getKey(customerId: Long): String
 
-    fun findCustomerAddress(key: String): List<CustomerAddress>
+    fun findCustomerAddress(key: String): MutableSet<CustomerAddressDto>
 
     fun save(
         key: String,
-        address: CustomerAddress,
+        addresses: MutableSet<CustomerAddressDto>,
     )
 
     fun deleteValue(

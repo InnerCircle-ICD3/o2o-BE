@@ -1,8 +1,7 @@
 package com.eatngo.redis.repository.customer
 
-import com.eatngo.customer.domain.CustomerAddress
+import com.eatngo.customer.dto.CustomerAddressDto
 import com.eatngo.customer.infra.CustomerAddressRedisRepository
-import com.eatngo.redis.utils.writeValueToJson
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.stereotype.Repository
@@ -14,17 +13,21 @@ class CustomerAddressRedisRepositoryImpl(
 ) : CustomerAddressRedisRepository {
     override fun getKey(customerId: Long): String = "customer:$customerId:address"
 
-    override fun findCustomerAddress(key: String): List<CustomerAddress> {
-        return stringRedisTemplate.opsForList().range(key, 0, -1)
-            ?.map { address -> objectMapper.readValue(address, CustomerAddress::class.java) }
-            ?: emptyList()
-    }
+    override fun findCustomerAddress(key: String) =
+        stringRedisTemplate.opsForSet()
+            .members(key)
+            ?.map { objectMapper.readValue(it, CustomerAddressDto::class.java) }
+            ?.toMutableSet()
+            ?: mutableSetOf()
 
     override fun save(
         key: String,
-        address: CustomerAddress,
+        addresses: MutableSet<CustomerAddressDto>,
     ) {
-        stringRedisTemplate.opsForList().rightPush(key, objectMapper.writeValueToJson(address))
+        addresses.forEach {
+            val json = objectMapper.writeValueAsString(it)
+            stringRedisTemplate.opsForSet().add(key, json)
+        }
     }
 
     override fun deleteValue(
