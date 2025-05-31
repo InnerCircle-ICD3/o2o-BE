@@ -3,6 +3,7 @@ package com.eatngo.product.service
 import com.eatngo.common.exception.InventoryException.InventoryNotFound
 import com.eatngo.extension.orThrow
 import com.eatngo.inventory.event.InventoryChangedType
+import com.eatngo.inventory.event.InventoryChangedType.*
 import com.eatngo.inventory.infra.InventoryPersistence
 import com.eatngo.product.domain.Product
 import com.eatngo.product.infra.ProductPersistence
@@ -21,7 +22,7 @@ class StoreTotalInventoryTypeDecider(
     }
 
     @Cacheable("storeProducts", key = "#storeId")
-    fun decideInventoryType(storeId: Long): InventoryChangedType {
+    fun decideInventoryType(storeId: Long, initialStock: Int): InventoryChangedType {
         val allProducts: List<Product> = productPersistence.findAllByStoreId(storeId)
 
         val totalStockQuantity = allProducts.asSequence()
@@ -32,11 +33,15 @@ class StoreTotalInventoryTypeDecider(
             }
             .sum()
 
+        if (initialStock == 0 && totalStockQuantity > 0) {
+            return RESTOCKED
+        }
+
         return when {
-            totalStockQuantity == 0 -> InventoryChangedType.OUT_OF_STOCK
-            totalStockQuantity <= LOW_STOCK_THRESHOLD -> InventoryChangedType.LOW_STOCK
-            totalStockQuantity >= IN_STOCK_THRESHOLD -> InventoryChangedType.IN_STOCK
-            else -> InventoryChangedType.ADEQUATE_STOCK
+            totalStockQuantity == 0 -> OUT_OF_STOCK
+            totalStockQuantity <= LOW_STOCK_THRESHOLD -> LOW_STOCK
+            totalStockQuantity >= IN_STOCK_THRESHOLD -> IN_STOCK
+            else -> ADEQUATE_STOCK
         }
     }
 
