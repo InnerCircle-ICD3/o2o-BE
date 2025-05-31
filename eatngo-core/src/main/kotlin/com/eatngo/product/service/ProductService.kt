@@ -1,7 +1,6 @@
 package com.eatngo.product.service
 
 import com.eatngo.common.exception.ProductException.ProductNotFound
-import com.eatngo.common.exception.StoreException
 import com.eatngo.common.exception.StoreException.StoreNotFound
 import com.eatngo.extension.orThrow
 import com.eatngo.file.FileStorageService
@@ -137,12 +136,9 @@ class ProductService(
         val product: Product = productPersistence.findById(productCurrentStockDto.id)
             .orThrow { ProductNotFound(productCurrentStockDto.id) }
         val savedProduct = productPersistence.save(product)
-        val changedInventory: InventoryDto = inventoryService.toggleInventory(productCurrentStockDto)
 
         val store: Store = storePersistence.findById(product.storeId).orThrow { StoreNotFound(product.storeId) }
-        storeTotalInventoryTypeDecider.decideInventoryType(
-            storeId = store.id
-        )
+        val changedInventory: InventoryDto = inventoryService.toggleInventory(productCurrentStockDto, store.id)
 
         return ProductAfterStockDto.create(savedProduct, changedInventory)
     }
@@ -168,14 +164,21 @@ class ProductService(
         )
 
         val savedProduct: Product = productPersistence.save(product)
-        val changedInventory: InventoryDto = inventoryService.modifyInventory(productDto)
-
-        storeTotalInventoryTypeDecider.decideInventoryType(productDto.storeId)
+        val changedInventory: InventoryDto =
+            inventoryService.modifyInventory(productDto, findTotalInitialStocks(product.storeId))
 
         return ProductDto.from(
             savedProduct,
             savedProduct.imageUrl?.let(fileStorageService::resolveImageUrl),
             changedInventory
         )
+    }
+
+    fun findTotalInitialStocks(storeId: Long): Int {
+        return productPersistence.findAllByStoreId(storeId)
+            .map { product ->
+                inventoryService.getInventoryDetails(product.id)
+            }
+            .sumOf { i -> i.stock }
     }
 }
