@@ -42,7 +42,7 @@ class StoreSubscriptionServiceImpl(
         return StoreSubscriptionDto.from(
             subscription = resultSubscription,
             storeName = store.name.value,
-            mainImageUrl = store.imageUrl?.value,
+            mainImageUrl = store.imageUrl,
             status = store.status,
             discountRate = tempProductInfo.discountRate,
             originalPrice = tempProductInfo.originalPrice,
@@ -57,7 +57,7 @@ class StoreSubscriptionServiceImpl(
         return StoreSubscriptionDto.from(
             subscription = subscription,
             storeName = store.name.value,
-            mainImageUrl = store.imageUrl?.value,
+            mainImageUrl = store.imageUrl,
             status = store.status,
             discountRate = tempProductInfo.discountRate,
             originalPrice = tempProductInfo.originalPrice,
@@ -75,7 +75,7 @@ class StoreSubscriptionServiceImpl(
             StoreSubscriptionDto.from(
                 subscription = subscription,
                 storeName = store.name.value,
-                mainImageUrl = store.imageUrl?.value,
+                mainImageUrl = store.imageUrl,
                 status = store.status,
                 discountRate = tempProductInfo.discountRate,
                 originalPrice = tempProductInfo.originalPrice,
@@ -92,7 +92,7 @@ class StoreSubscriptionServiceImpl(
                 StoreSubscriptionDto.from(
                     subscription = subscription,
                     storeName = store.name.value,
-                    mainImageUrl = store.imageUrl?.value,
+                    mainImageUrl = store.imageUrl,
                     status = store.status,
                     discountRate = tempProductInfo.discountRate,
                     originalPrice = tempProductInfo.originalPrice,

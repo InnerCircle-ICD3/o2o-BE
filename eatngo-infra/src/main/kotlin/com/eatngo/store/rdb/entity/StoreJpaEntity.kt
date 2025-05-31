@@ -94,7 +94,7 @@ class StoreJpaEntity(
                 ),
                 businessNumber = store.businessNumber.value,
                 contactNumber = store.contactNumber?.value,
-                imageUrl = store.imageUrl?.value,
+                imageUrl = store.imageUrl,
                 businessHours = BusinessHoursJson(
                     hours = store.businessHours?.map {
                         BusinessHourJson(
@@ -131,7 +131,7 @@ class StoreJpaEntity(
                 ),
                 businessNumber = BusinessNumberVO.from(businessNumber),
                 contactNumber = contactNumber?.let { ContactNumberVO.from(it) },
-                imageUrl = imageUrl?.let { ImageUrlVO.from(it) },
+                imageUrl = imageUrl,
                 businessHours = businessHours.hours.map {
                     BusinessHourVO.from(
                         dayOfWeek = java.time.DayOfWeek.valueOf(it.dayOfWeek),
