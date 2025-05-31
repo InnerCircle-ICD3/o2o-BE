@@ -37,7 +37,10 @@ class StoreSubscriptionJpaEntity(
                 id = subscription.id,
                 userId = subscription.userId,
                 storeId = subscription.storeId
-            )
+            ).apply {
+                updatedAt = subscription.updatedAt
+                deletedAt = subscription.deletedAt
+            }
         }
 
         fun toSubscription(entity: StoreSubscriptionJpaEntity): StoreSubscription {

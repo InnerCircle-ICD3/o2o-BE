@@ -40,14 +40,4 @@ interface StoreSubscriptionJpaRepository : JpaRepository<StoreSubscriptionJpaEnt
      */
     @Query("SELECT s.storeId FROM StoreSubscriptionJpaEntity s WHERE s.userId = :userId")
     fun findStoreIdsByUserId(@Param("userId") userId: Long): List<Long>
-
-    @Modifying(clearAutomatically = true, flushAutomatically = true)
-    @Query(
-        """
-        UPDATE StoreSubscriptionJpaEntity s
-        SET s.deletedAt = CURRENT_TIMESTAMP
-        WHERE s.id = :id
-    """
-    )
-    fun softDeleteById(id: Long): Int
 }
