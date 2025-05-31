@@ -1,5 +1,6 @@
 package com.eatngo.search
 
+import com.eatngo.common.constant.StoreEnum
 import com.eatngo.common.type.CoordinateVO
 import com.eatngo.search.dto.SearchStoreMapResultDto
 import com.eatngo.search.dto.SearchStoreResultDto
@@ -8,6 +9,7 @@ import com.eatngo.search.dto.StoreFilterDto
 import com.eatngo.search.dto.StoreSearchFilterDto
 import com.eatngo.search.service.SearchService
 import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
@@ -26,9 +28,12 @@ class SearchController(
     )
     @GetMapping("/api/v1/store/list")
     fun listStore(
+        @Parameter(description = "중심 좌표의 위도 (latitude)", example = "37.566500")
         @RequestParam latitude: Double,
+        @Parameter(description = "중심 좌표의 경도 (latitude)", example = "126.978011")
         @RequestParam longitude: Double,
-        @RequestParam storeCategory: String?,
+        @Parameter(description = "필터링할 매장 카테고리", example = "BREAD")
+        @RequestParam storeCategory: StoreEnum.StoreCategory?,
         @RequestParam time: String?, // HH:mm 형식의 시간 (ex: 12:30) TODO: VO로 정의하여 검증 로직 추가
         @RequestParam onlyReservable: Boolean = false, // 픽업 가능 매장만 조회
         // TODO : 우선 BE, FE 모두 page+size로 구현 => 추후 개선
@@ -40,7 +45,7 @@ class SearchController(
                 StoreFilterDto.from(
                     latitude = latitude,
                     longitude = longitude,
-                    storeCategory = storeCategory,
+                    storeCategory = storeCategory?.category,
                     time = time,
                     onlyReservable = onlyReservable,
                 ),
