@@ -1,11 +1,12 @@
 package com.eatngo.customer.infra
 
+import com.eatngo.customer.domain.Customer
 import com.eatngo.customer.domain.CustomerAddress
 
 interface CustomerAddressPersistence {
-    fun save(customer: CustomerAddress): CustomerAddress
+    fun save(customer: Customer, customerAddress: CustomerAddress): CustomerAddress
 
-    fun findByCustomerId(customerId: Long): List<CustomerAddress>
+    fun findByCustomer(customer: Customer): List<CustomerAddress>
 
-    fun deleteById(id: Long): Boolean
+    fun deleteById(customerAddressId: Long)
 }
