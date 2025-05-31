@@ -124,5 +124,4 @@ jobs:
             --service eatngo-customer-api-service \
             --task-definition eatngo-customer-api:${{ env.CUSTOMER_REVISION }} \
             --force-new-deployment \
-            --region $AWS_REGION \
-            --enable-execute-command
+            --region $AWS_REGION
