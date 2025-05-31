@@ -100,9 +100,9 @@ class StoreJpaEntity(
                 storeCategories = store.storeCategoryInfo.storeCategory.map { it.value }.toMutableList(),
                 foodCategories = store.storeCategoryInfo.foodCategory?.map { it.value }?.toMutableList() ?: mutableListOf(),
                 status = store.status,
-                pickupDay = store.pickUpInfo.pickupDay,
-                pickupStartTime = store.pickUpInfo.pickupStartTime,
-                pickupEndTime = store.pickUpInfo.pickupEndTime
+                pickupDay = store.pickUpDay.pickupDay,
+                pickupStartTime = store.pickUpDay.pickupStartTime,
+                pickupEndTime = store.pickUpDay.pickupEndTime
             )
 
             store.businessHours?.forEach {
@@ -137,7 +137,7 @@ class StoreJpaEntity(
                     foodCategory = foodCategories.map { FoodCategoryVO.from(it) }
                 ),
                 status = status,
-                pickUpInfo = PickUpInfoVO.from(pickupDay, pickupStartTime, pickupEndTime),
+                pickUpDay = PickUpDayVO.from(pickupDay, pickupStartTime, pickupEndTime),
                 createdAt = createdAt,
                 updatedAt = updatedAt,
                 deletedAt = deletedAt

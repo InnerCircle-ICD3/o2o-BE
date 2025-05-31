@@ -32,10 +32,6 @@ interface StoreEvent {
         // 매장 정보 업데이트 이벤트
         fun fromInfoUpdate(store: Store, userId: Long): StoreEvent =
             StoreUpdatedEvent(store, userId)
-
-        // 픽업 정보 업데이트 이벤트
-        fun fromPickupUpdate(store: Store, userId: Long): StoreEvent =
-            StorePickupInfoUpdatedEvent(store, userId)
     }
 }
 
@@ -85,14 +81,6 @@ data class StoreClosedEvent(
  * 매장 승인대기 이벤트
  */
 data class StorePendingEvent(
-    val store: Store,
-    val userId: Long
-) : StoreEvent
-
-/**
- * 매장 픽업 정보 업데이트 이벤트
- */
-data class StorePickupInfoUpdatedEvent(
     val store: Store,
     val userId: Long
 ) : StoreEvent

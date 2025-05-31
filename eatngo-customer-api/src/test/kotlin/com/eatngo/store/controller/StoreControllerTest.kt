@@ -184,34 +184,6 @@
 //        }
 //    }
 //
-//    describe("updateStorePickupInfo") {
-//        val pickupInfoUpdateRequest = PickupInfoUpdateRequest(
-//            pickupStartTime = "08:00",
-//            pickupEndTime = "22:00",
-//            pickupAvailableForTomorrow = true
-//        )
-//
-//        it("매장 픽업 정보를 변경한다") {
-//            // Given
-//            val updatedResponse = storeResponse.copy(
-//                pickupStartTime = "08:00",
-//                pickupEndTime = "22:00",
-//                pickupAvailableForTomorrow = true
-//            )
-//
-//            coEvery { storeService.updateStorePickupInfo(storeId, pickupInfoUpdateRequest) } returns updatedResponse
-//
-//            // When
-//            val result = storeController.updateStorePickupInfo(storeId, pickupInfoUpdateRequest)
-//
-//            // Then
-//            result.shouldBeTypeOf<ApiResponse.Success<StoreDto>>()
-//            result.data.pickupStartTime shouldBe "08:00"
-//            result.data.pickupEndTime shouldBe "22:00"
-//
-//            coVerify { storeService.updateStorePickupInfo(storeId, pickupInfoUpdateRequest) }
-//        }
-//    }
 //
 //    describe("deleteStore") {
 //        it("매장을 삭제한다") {

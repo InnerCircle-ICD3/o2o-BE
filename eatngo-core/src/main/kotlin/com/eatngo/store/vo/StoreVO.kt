@@ -75,19 +75,12 @@ value class BusinessHourVO(val value: Triple<DayOfWeek, LocalTime, LocalTime>) {
 }
 
 @JvmInline
-value class PickUpInfoVO(val value: Triple<StoreEnum.PickupDay, LocalTime, LocalTime>) {
-    init {
-        requireNotNull(value.first) { "pickupDay는 null일 수 없습니다." }
-        require(value.second.isBefore(value.third)) { "픽업 종료 시간은 시작 시간보다 이후여야 합니다" }
-    }
-
-    val pickupDay: StoreEnum.PickupDay get() = value.first
-    val pickupStartTime: LocalTime get() = value.second
-    val pickupEndTime: LocalTime get() = value.third
-
+value class PickUpDayVO(val pickupDay: StoreEnum.PickupDay) {
     companion object {
-        fun from(pickupDay: StoreEnum.PickupDay, pickupStartTime: LocalTime, pickupEndTime: LocalTime): PickUpInfoVO =
-            PickUpInfoVO(Triple(pickupDay, pickupStartTime, pickupEndTime))
+        fun from(day: String?): PickUpDayVO {
+            require(!day.isNullOrBlank()) { "pickupDay는 null이거나 빈 값일 수 없습니다." }
+            return PickUpDayVO(StoreEnum.PickupDay.valueOf(day.uppercase()))
+        }
     }
 }
 
