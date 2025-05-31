@@ -68,7 +68,7 @@ class CustomerApiExceptionHandler {
             .body(ApiResponse.error(e.errorCode.code, e.message))
     }
 
-    @ExceptionHandler(CustomerException::class, CustomerAddressException::class)
+    @ExceptionHandler(CustomerException::class)
     fun handleCustomerException(e: CustomerException, request: HttpServletRequest): ResponseEntity<ApiResponse<Nothing>> {
         val context = buildLogContext(request, e.data)
 
