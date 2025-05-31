@@ -1,9 +1,9 @@
-package com.eatngo.inventory.persistence
+package com.eatngo.inventory.batch
 
 import com.eatngo.inventory.domain.Inventory
-import com.eatngo.inventory.infra.InventoryCachePersistence
 import com.eatngo.inventory.infra.InventoryPersistence
 import org.slf4j.LoggerFactory
+import org.springframework.data.redis.core.Cursor
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.data.redis.core.ScanOptions
 import org.springframework.scheduling.annotation.Scheduled
@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional
 @Component
 class InventorySyncScheduler(
     private val inventoryPersistence: InventoryPersistence,
-    private val redisTemplate: RedisTemplate<String, String>
+    private val redisTemplate: RedisTemplate<String, String>,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -23,8 +23,7 @@ class InventorySyncScheduler(
         private const val CHUNK_SIZE = 500
     }
 
-    // 스케줄링 시간 조정 필요!
-    @Scheduled(cron = "0 0 3 * * ?")
+    @Scheduled(cron = "0 0 * * * ?")
     @Transactional
     fun syncInventoryFromRedisToRdb() {
         val productStockMap = fetchRedisProductStocks()
@@ -39,12 +38,12 @@ class InventorySyncScheduler(
     }
 
     private fun fetchRedisProductStocks(): MutableMap<Long, Int> {
-        val scanOptions = ScanOptions.scanOptions()
+        val scanOptions: ScanOptions = ScanOptions.scanOptions()
             .match("$REDIS_KEY_PREFIX*")
             .count(SCAN_COUNT)
             .build()
 
-        val cursor = redisTemplate.scan(scanOptions)
+        val cursor: Cursor<String> = redisTemplate.scan(scanOptions)
         val productStockMap = mutableMapOf<Long, Int>()
 
         cursor.use {
