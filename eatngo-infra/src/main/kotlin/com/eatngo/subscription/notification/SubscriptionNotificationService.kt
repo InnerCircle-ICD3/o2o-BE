@@ -1,12 +1,10 @@
 package com.eatngo.subscription.notification
 
 import com.eatngo.redis.utils.writeValueToJson
-import com.eatngo.subscription.event.SubscriptionCanceledEvent
-import com.eatngo.subscription.event.SubscriptionCreatedEvent
-import com.eatngo.subscription.event.SubscriptionResumedEvent
+import com.eatngo.subscription.event.SubscriptionEvent
+import com.eatngo.subscription.event.SubscriptionEventStatus
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.event.EventListener
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.stereotype.Service
@@ -154,13 +152,16 @@ class SubscriptionNotificationService(
     }
     
     /**
-     * 구독 생성 이벤트 처리
+     * 구독 이벤트 처리
      */
     @EventListener
-    fun handleSubscriptionCreated(event: SubscriptionCreatedEvent) {
-        val type = NotificationType.SUBSCRIPTION_CREATED
-        val message = "새로운 매장 구독이 생성되었습니다."
-        
+    fun handleSubscriptionEvent(event: SubscriptionEvent) {
+        val (type, message) = when (event.status) {
+            SubscriptionEventStatus.CREATED -> NotificationType.SUBSCRIPTION_CREATED to "새로운 매장 구독이 생성되었습니다."
+            SubscriptionEventStatus.CANCELED -> NotificationType.SUBSCRIPTION_CANCELED to "매장 구독이 취소되었습니다."
+            SubscriptionEventStatus.RESUMED -> NotificationType.SUBSCRIPTION_RESUMED to "매장 구독이 재개되었습니다."
+        }
+
         // 알림 데이터 생성
         val payload = NotificationPayload(
             type = type,
@@ -170,64 +171,14 @@ class SubscriptionNotificationService(
             timestamp = event.timestamp.toString(),
             message = message
         )
-        
+
         // Redis에 알림 발행
         publishNotification(payload)
-        
+
         // 비동기로 이미터에 알림 전송
         sendNotificationAsync(event.customerId, null, payload)
     }
-    
-    /**
-     * 구독 취소 이벤트 처리
-     */
-    @EventListener
-    fun handleSubscriptionCanceled(event: SubscriptionCanceledEvent) {
-        val type = NotificationType.SUBSCRIPTION_CANCELED
-        val message = "매장 구독이 취소되었습니다."
-        
-        // 알림 데이터 생성
-        val payload = NotificationPayload(
-            type = type,
-            subscriptionId = event.subscriptionId,
-            customerId = event.customerId,
-            storeId = event.storeId,
-            timestamp = event.timestamp.toString(),
-            message = message
-        )
-        
-        // Redis에 알림 발행
-        publishNotification(payload)
-        
-        // 비동기로 이미터에 알림 전송
-        sendNotificationAsync(event.customerId, null, payload)
-    }
-    
-    /**
-     * 구독 재개 이벤트 처리
-     */
-    @EventListener
-    fun handleSubscriptionResumed(event: SubscriptionResumedEvent) {
-        val type = NotificationType.SUBSCRIPTION_RESUMED
-        val message = "매장 구독이 재개되었습니다."
-        
-        // 알림 데이터 생성
-        val payload = NotificationPayload(
-            type = type,
-            subscriptionId = event.subscriptionId,
-            customerId = event.customerId,
-            storeId = event.storeId,
-            timestamp = event.timestamp.toString(),
-            message = message
-        )
-        
-        // Redis에 알림 발행
-        publishNotification(payload)
-        
-        // 비동기로 이미터에 알림 전송
-        sendNotificationAsync(event.customerId, null, payload)
-    }
-    
+
     /**
      * Redis에 알림 발행
      */
