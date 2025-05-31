@@ -24,7 +24,7 @@ class StorePersistenceImpl(
 
     @SoftDeletedFilter
     override fun findAllByIds(storeIds: List<Long>): List<Store> =
-        storeRdbRepository.findAllByIds(storeIds)
+        storeRdbRepository.findAllByIdIn(storeIds)
             .map { StoreJpaEntity.toStore(it) }
 
     @SoftDeletedFilter
