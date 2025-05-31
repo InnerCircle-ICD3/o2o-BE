@@ -37,12 +37,6 @@ class InventoryRedisPersistenceImpl(
         return result.toInt()
     }
 
-    // status 랑 productId
-    // 재고 sold out => 1개라도 다 떨어지면 그때 확인 -> productId
-    // 마감 임박 상태 ->
-    // 재고 충분 ->
-    // 재고가 채워졌을 때 이벤트 발행 필요 -> Event 발행 ->
-
     override fun findByProductId(productId: Long): InventoryDto? {
         val key = pKey(productId)
         val quantityValue = redisTemplate.opsForHash<String, String>()
@@ -55,5 +49,9 @@ class InventoryRedisPersistenceImpl(
             quantity = quantityValue.toInt(),
             stock = stockValue.toInt()
         )
+    }
+
+    override fun rollbackStock(productId: Long, stockQuantity: Int) {
+        TODO("Not yet implemented")
     }
 }
