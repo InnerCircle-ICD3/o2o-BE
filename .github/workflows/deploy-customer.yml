@@ -79,7 +79,6 @@ jobs:
         
           jq \
           --arg IMAGE "$IMAGE_URI" \
-          --arg SPRING_PROFILE "dev" \
           '{
             family,
             networkMode,
@@ -87,13 +86,7 @@ jobs:
             cpu,
             memory,
             executionRoleArn,
-            containerDefinitions: (
-              .containerDefinitions | map(
-                .image = $IMAGE
-                | .environment = += [
-                    { name: "SPRING_PROFILES_ACTIVE", value: $SPRING_PROFILE }
-                ]
-            )),
+            containerDefinitions: (.containerDefinitions | map(.image = $IMAGE)),
           }' task-def-raw.json > task-def-customer.json
 
           aws ecs register-task-definition \
