@@ -55,8 +55,13 @@ class SecurityConfig(
                 it.logoutRequestMatcher(AntPathRequestMatcher("/oauth2/logout", "POST"))
                     .logoutSuccessUrl("/")
                     .invalidateHttpSession(true)
+                    .logoutSuccessHandler { request, response, authentication ->
+                        request.cookies
+                            ?.find { cookie -> cookie.name == ACCESS_TOKEN }
+                            ?.value
+                            ?.let { tokenProvider.deleteRefreshToken(it) }
+                    }
                     .deleteCookies(ACCESS_TOKEN)
-                // TODO logout handler 추가하기 (logout api + redis refresh token 삭제)
             }
 
         return http.build()

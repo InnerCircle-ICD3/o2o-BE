@@ -52,6 +52,7 @@ class RedisConfig(
         template.connectionFactory = redisConnectionFactory
         template.keySerializer = stringSerializer
         template.hashKeySerializer = stringSerializer
+        template.valueSerializer = stringSerializer
         return template
     }
 
