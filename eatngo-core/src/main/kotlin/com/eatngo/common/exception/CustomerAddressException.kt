@@ -16,13 +16,13 @@ open class CustomerAddressException(
         mapOf("customerAddressId" to customerAddressId)
     )
 
-    class CustomerAddressAlreadyExists(addressId: Long, id: RoadNameAddressVO, lotNumberAddress: LotNumberAddressVO) :
+    class CustomerAddressAlreadyExists(id: Long, roadNameAddressVO: RoadNameAddressVO, lotNumberAddress: LotNumberAddressVO) :
         CustomerAddressException(
             BusinessErrorCode.CUSTOMER_ADDRESS_ALREADY_EXISTS,
-            "${BusinessErrorCode.CUSTOMER_ADDRESS_ALREADY_EXISTS.message} (ID: $addressId, Road Name: $id, Lot Number: $lotNumberAddress)",
+            "${BusinessErrorCode.CUSTOMER_ADDRESS_ALREADY_EXISTS.message} (ID: $id, Road Name: $roadNameAddressVO, Lot Number: $lotNumberAddress)",
             mapOf(
-                "addressId" to addressId,
-                "roadNameAddress" to id,
+                "addressId" to id,
+                "roadNameAddress" to roadNameAddressVO,
                 "lotNumberAddress" to lotNumberAddress
             )
         )

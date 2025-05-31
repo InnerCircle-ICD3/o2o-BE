@@ -87,7 +87,7 @@ class CustomerApiExceptionHandler {
     }
 
     @ExceptionHandler(CustomerAddressException::class)
-    fun handleCustomerException(e: CustomerAddressException, request: HttpServletRequest): ResponseEntity<ApiResponse<Nothing>> {
+    fun handleCustomerAddressException(e: CustomerAddressException, request: HttpServletRequest): ResponseEntity<ApiResponse<Nothing>> {
         val context = buildLogContext(request, e.data)
 
         // HTTP 상태 결정

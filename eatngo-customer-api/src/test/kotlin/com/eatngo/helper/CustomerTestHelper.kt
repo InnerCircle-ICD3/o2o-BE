@@ -48,7 +48,7 @@ class CustomerTestHelper(
             customerService.deleteCustomer(loginCustomer.customerId)
             userAccountService.deleteAccount(loginCustomer.userAccountId)
             customerAddressService.getAddressList(loginCustomer.customerId)
-                .map { customerAddressService.deleteAddress(it.customerId, it.id) }
+                .forEach { customerAddressService.deleteAddress(it.customerId, it.id) }
         } catch (e: Exception) {
             println("데이터 삭제 실패: ${e.message}")
         }
