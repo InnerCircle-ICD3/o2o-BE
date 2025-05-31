@@ -1,40 +1,44 @@
 package com.eatngo.customer.dto
 
-import com.eatngo.common.type.CoordinateVO
 import com.eatngo.customer.domain.CustomerAddress
 import com.eatngo.customer.domain.CustomerAddressType
+import com.eatngo.store.vo.LotNumberAddressVO
+import com.eatngo.store.vo.RoadNameAddressVO
+import com.eatngo.store.vo.ZipCodeVO
 
-/**
- * TODO: 현주님 코드 가져옴 -> 공통적으로 사용하는 Address는 common쪽으로 빼야 할듯?
- */
 data class CustomerAddressDto(
-    val roadAddress: RoadAddressDto, // 도로명 주소
-    val legalAddress: LegalAddressDto?, // 법정동 주소
-    val coordinate: CoordinateVO, // 위경도
+    val id: Long, // 주소 ID
+    val customerId: Long, // 고객 ID
+    val roadNameAddress: RoadNameAddressVO,     // 도로명 주소
+    val lotNumberAddress: LotNumberAddressVO,   // 지번 주소
+    val buildingName: String?,                  // 건물명
+    val zipCode: ZipCodeVO,                     // 우편번호
+    val region1DepthName: String?,              // 시도명
+    val region2DepthName: String?,              // 시군구명
+    val region3DepthName: String?,              // 상세주소
+    val latitude: Double, // 위도
+    val longitude: Double, // 경도
     val customerAddressType: CustomerAddressType = CustomerAddressType.OTHER, // 주소 타입 (집, 회사, 기타)
-    val addressTypeDesc: String?, // 주소 설명
+    val description: String?, // 주소 설명
 ) {
     companion object {
         fun from(customerAddress: CustomerAddress): CustomerAddressDto =
-            CustomerAddressDto(
-                roadAddress =
-                    RoadAddressDto(
-                        fullAddress = customerAddress.fullAddress,
-                        zipCode = "", // TODO : 변환 필요
-                    ),
-                legalAddress = null, // TODO : 변환 필요
-                coordinate = customerAddress.coordinate,
-                customerAddressType = customerAddress.customerAddressType,
-                addressTypeDesc = customerAddress.addressTypeDesc,
-            )
+            with(customerAddress.address) {
+                CustomerAddressDto(
+                    id = customerAddress.id!!,
+                    customerId = customerAddress.customerId!!,
+                    roadNameAddress = RoadNameAddressVO.from(roadNameAddress.value),
+                    lotNumberAddress = LotNumberAddressVO.from(lotNumberAddress.value),
+                    buildingName = buildingName,
+                    zipCode = ZipCodeVO.from(zipCode.value),
+                    region1DepthName = region1DepthName,
+                    region2DepthName = region2DepthName,
+                    region3DepthName = region3DepthName,
+                    latitude = coordinate.latitude,
+                    longitude = coordinate.longitude,
+                    customerAddressType = customerAddress.customerAddressType,
+                    description = customerAddress.description
+                )
+            }
     }
 }
-
-data class RoadAddressDto(
-    val fullAddress: String,
-    val zipCode: String,
-)
-
-data class LegalAddressDto(
-    val fullAddress: String,
-)

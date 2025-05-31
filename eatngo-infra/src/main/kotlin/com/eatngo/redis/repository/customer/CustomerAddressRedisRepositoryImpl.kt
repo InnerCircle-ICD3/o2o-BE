@@ -1,31 +1,38 @@
 package com.eatngo.redis.repository.customer
 
-import com.eatngo.customer.domain.CustomerAddress
+import com.eatngo.customer.dto.CustomerAddressDto
 import com.eatngo.customer.infra.CustomerAddressRedisRepository
-import org.springframework.data.redis.core.RedisTemplate
+import com.fasterxml.jackson.databind.ObjectMapper
+import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.stereotype.Repository
 
 @Repository
 class CustomerAddressRedisRepositoryImpl(
-    private val redisTemplate: RedisTemplate<String, String>,
+    private val stringRedisTemplate: StringRedisTemplate,
+    private val objectMapper: ObjectMapper
 ) : CustomerAddressRedisRepository {
     override fun getKey(customerId: Long): String = "customer:$customerId:address"
 
-    override fun findCustomerAddress(key: String): List<CustomerAddress> {
-        TODO("Not yet implemented")
-    }
+    override fun findCustomerAddress(key: String) =
+        stringRedisTemplate.opsForSet()
+            .members(key)
+            ?.map { objectMapper.readValue(it, CustomerAddressDto::class.java) }
+            ?.toMutableSet()
+            ?: mutableSetOf()
 
     override fun save(
         key: String,
-        address: CustomerAddress,
-    ): String {
-        TODO("Not yet implemented")
+        addresses: MutableSet<CustomerAddressDto>,
+    ) {
+        addresses.forEach {
+            val json = objectMapper.writeValueAsString(it)
+            stringRedisTemplate.opsForSet().add(key, json)
+        }
     }
 
-    override fun deleteAddressId(
+    override fun deleteValue(
         key: String,
-        addressId: Long,
-    ): Boolean {
-        TODO("Not yet implemented")
+    ) {
+        stringRedisTemplate.unlink(key)
     }
 }
