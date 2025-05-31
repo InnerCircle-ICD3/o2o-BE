@@ -10,7 +10,6 @@ import org.hibernate.annotations.Filter
  * 매장 구독 JPA 엔티티
  */
 @Entity
-@Filter(name = DELETED_FILTER)
 @Table(
     name = "store_subscription",
     uniqueConstraints = [

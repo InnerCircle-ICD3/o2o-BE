@@ -37,11 +37,6 @@ interface StoreSubscriptionPersistence {
     fun save(subscription: StoreSubscription): StoreSubscription
 
     /**
-     * 사용자 ID로 상점 구독 여부 조회
-     */
-    fun existsByUserIdAndStoreId(userId: Long, storeId: Long): Boolean
-
-    /**
      * 매장 ID 목록으로 구독 정보 일괄 조회 (N+1 문제 해결)
      */
     fun findAllByStoreIds(storeIds: List<Long>): List<StoreSubscription>

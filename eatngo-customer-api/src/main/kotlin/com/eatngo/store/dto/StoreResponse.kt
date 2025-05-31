@@ -1,6 +1,5 @@
 package com.eatngo.store.dto
 
-import com.eatngo.common.constant.StoreEnum
 import java.time.LocalTime
 
 /**
