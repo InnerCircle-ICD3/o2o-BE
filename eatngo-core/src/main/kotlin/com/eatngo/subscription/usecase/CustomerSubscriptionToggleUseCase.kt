@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional
 
 /**
  * 고객 구독 토글 유스케이스
- * 구독 생성, 취소, 재개 기능을 제공합니다.
+ * 구독 생성, 취소, 재구독 기능을 제공
  */
 @Service
 class CustomerSubscriptionToggleUseCase(
@@ -24,9 +24,6 @@ class CustomerSubscriptionToggleUseCase(
 
     /**
      * 구독 토글 (생성/취소/재개)
-     * @param storeId 매장 ID
-     * @param customerId 고객 ID
-     * @return 구독 정보 DTO
      */
     @Transactional
     fun toggle(storeId: Long, customerId: Long): StoreSubscriptionDto {
