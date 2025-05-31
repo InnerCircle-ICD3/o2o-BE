@@ -2,12 +2,16 @@ package com.eatngo.mongo.repository.search
 
 import com.eatngo.mongo.entity.search.SearchStoreEntity
 import com.eatngo.search.domain.SearchStore
+import com.eatngo.search.domain.SearchStoreStatus
+import com.eatngo.search.dto.AutoCompleteStoreNameDto
 import com.eatngo.search.dto.SearchFilter
-import com.eatngo.search.dto.StoreStatus
+import com.eatngo.search.dto.SearchStoreWithDistance
 import com.eatngo.search.infra.SearchStoreRepository
 import org.bson.Document
-import org.bson.conversions.Bson
 import org.springframework.data.geo.Box
+import org.springframework.data.geo.GeoResults
+import org.springframework.data.geo.Metrics
+import org.springframework.data.geo.Point
 import org.springframework.data.geo.Shape
 import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.data.mongodb.core.aggregation.Aggregation
@@ -15,8 +19,10 @@ import org.springframework.data.mongodb.core.aggregation.AggregationOperation
 import org.springframework.data.mongodb.core.aggregation.AggregationOperationContext
 import org.springframework.data.mongodb.core.geo.GeoJsonPoint
 import org.springframework.data.mongodb.core.query.Criteria
+import org.springframework.data.mongodb.core.query.NearQuery
 import org.springframework.data.mongodb.core.query.Query
 import org.springframework.stereotype.Component
+import java.time.LocalDateTime
 import com.eatngo.search.dto.Box as CoreBox
 
 @Component
@@ -28,106 +34,106 @@ class SearchStoreRepositoryImpl(
     override fun findBox(box: CoreBox): List<SearchStore> {
         val mongoBox: Shape =
             Box(
-                GeoJsonPoint(box.topLeft.lng, box.topLeft.lat),
-                GeoJsonPoint(box.bottomRight.lng, box.bottomRight.lat),
+                GeoJsonPoint(box.topLeft.longitude, box.topLeft.latitude),
+                GeoJsonPoint(box.bottomRight.longitude, box.bottomRight.latitude),
             )
 
         val query = Query()
         query.addCriteria(
             Criteria
-                .where("location")
+                .where("coordinate")
                 .within(mongoBox),
         )
-        return mongoTemplate.find(query, SearchStoreEntity::class.java).map {
+
+        val result = mongoTemplate.find(query, SearchStoreEntity::class.java)
+
+        return result.map {
             it.to()
         }
     }
 
-    /**
-     * {
-     *       "$search": {
-     *         "index": "search-store",
-     *         "compound": {
-     *           "filter": [
-     *             {
-     *               "geoWithin": {
-     *                 "circle": {
-     *                   "center": {
-     *                     "type": "Point",
-     *                     "coordinates": [lng, lat]
-     *                   },
-     *                   "radius": {
-     *                     "$numberDouble": "2000"
-     *                   }
-     *                 },
-     *                 "path": "location"
-     *               }
-     *             },
-     *             // 선택적으로 조건 추가 (category 존재할 경우에만)
-     *             {
-     *               "equals": {
-     *                 "query": "카페",
-     *                 "path": "category"
-     *               }
-     *             },
-     *             // 선택적으로 조건 추가 (time 존재할 경우에만)
-     *             {
-     *               "range": {
-     *                 "path": "openTime",
-     *                 "lte": "2025-05-18T12:00:00Z"
-     *               }
-     *             },
-     *             {
-     *               "range": {
-     *                 "path": "closeTime",
-     *                 "gte": "2025-05-18T12:00:00Z"
-     *               }
-     *             },
-     *             // 선택적으로 조건 추가 (status 존재할 경우에만)
-     *             {
-     *               "equals": {
-     *                 "value": 1,
-     *                 "path": "status"
-     *               }
-     *             }
-     *           ],
-     *           "must": [
-     *             {
-     *               "text": {
-     *                 "query": "검색어",
-     *                 "path": ["storeName", "menuName", "category"]
-     *               }
-     *             }
-     *           ]
-     *         },
-     *         "score": {
-     *           "function": {
-     *             "distance": {
-     *               "origin": {
-     *                 "type": "Point",
-     *                 "coordinates": [lng, lat]
-     *               },
-     *               "path": "location"
-     *             }
-     *           }
-     *         }
-     *       }
-     *     }
-     */
-    override fun searchStore(
-        lng: Double,
-        lat: Double,
+    override fun listStore(
+        longitude: Double,
+        latitude: Double,
         maxDistance: Double,
-        searchFilter: SearchFilter?,
+        searchFilter: SearchFilter,
+        page: Int,
+        size: Int,
+    ): List<SearchStoreWithDistance> {
+        // 필수 : 위치 기반 필터링
+        val point = Point(longitude, latitude)
+        val nearQuery =
+            NearQuery
+                .near(point, Metrics.KILOMETERS)
+                .maxDistance(maxDistance) // km 단위로 사용
+                .spherical(true)
+
+        // 서브쿼리 생성
+        val query = Query()
+        // 선택 : 카테고리 필터링
+        searchFilter.storeCategory?.let {
+            query.addCriteria(
+                Criteria.where("storeCategory").`is`(it),
+            )
+        }
+
+        // 선택 : 픽업 가능 시간 필터링
+        val now = LocalDateTime.now()
+        val currentDayOfWeek = now.dayOfWeek
+        val currentTime = now.toLocalTime()
+        searchFilter.time?.let {
+            query.addCriteria(
+                Criteria
+                    .where("pickupHour.openTime")
+                    .lte(currentTime)
+                    .and("pickupHour.closeTime")
+                    .gt(currentTime),
+            )
+        }
+
+        // 선택 : 예약 가능 상태 필터링 -> TODO 로직 확인 필요...(매장 오픈 시간과 상태로 예약 가능 상태 필터링)
+        searchFilter.onlyReservable.let {
+            val openTimeField = "businessHours.$currentDayOfWeek.openTime"
+            val closeTimeField = "businessHours.$currentDayOfWeek.closeTime"
+            query.addCriteria(
+                Criteria
+                    .where(openTimeField)
+                    .lte(currentTime)
+                    .and(closeTimeField)
+                    .gt(currentTime),
+            )
+
+            query.addCriteria(
+                Criteria.where("status").`is`(SearchStoreStatus.OPEN.code),
+            )
+        }
+
+        // Criteria가 있으면 NearQuery에 붙여주기
+        nearQuery.query(query)
+
+        val geoResults: GeoResults<SearchStoreEntity> = mongoTemplate.geoNear(nearQuery, SearchStoreEntity::class.java)
+        return geoResults.content.map {
+            SearchStoreWithDistance(
+                store = it.content.to(),
+                distance = it.distance.value,
+            )
+        }
+    }
+
+    override fun searchStore(
+        longitude: Double,
+        latitude: Double,
+        maxDistance: Double,
+        searchText: String,
         page: Int,
         size: Int,
     ): List<SearchStore> {
         val searchOp =
             makeSearchQuery(
-                lng = lng,
-                lat = lat,
-                maxDistance = maxDistance,
-                searchFilter = searchFilter,
+                longitude = longitude,
+                latitude = latitude,
+                maxDistanceKm = maxDistance,
+                searchText = searchText,
             )
         val skipOp = Aggregation.skip(page.toLong() * size)
         val limitOp = Aggregation.limit(size.toLong())
@@ -153,22 +159,28 @@ class SearchStoreRepositoryImpl(
     }
 
     /**
-     * TODO 검색어 자동완성 로직 수정 필요 -> DB를 탈지? -> 리서치 후 수정 일단 임시로...
+     * 검색어 자동완성 기능을 위한 MongoDB Atlas Search 쿼리
+     * @param keyword 검색어
+     * @param size 결과 개수
+     * @return 자동완성된 매장 이름 리스트
      */
-    override fun searchStoreRecommend(
+    override fun autocompleteStoreName(
         keyword: String,
         size: Int,
-    ): List<String> {
+    ): List<AutoCompleteStoreNameDto> {
         val searchOp = getAutocompleteOperation(keyword)
         val limitOp = Aggregation.limit(size.toLong())
+        val projectionOp =
+            Aggregation.project("_id", "storeName") // _id, storeName 필드만 추출
 
         val pipeline =
             Aggregation.newAggregation(
                 searchOp,
                 limitOp,
+                projectionOp,
             )
 
-        val searchResult =
+        val result =
             mongoTemplate
                 .aggregate(
                     pipeline,
@@ -176,110 +188,22 @@ class SearchStoreRepositoryImpl(
                     SearchStoreEntity::class.java,
                 ).mappedResults
 
-        // 검색어 자동완성 결과 리턴
-        val result =
-            searchResult.map {
-                it.storeName
-            }
-
-        return result
+        return result.map {
+            AutoCompleteStoreNameDto.from(
+                storeId = it.storeId,
+                storeName = it.storeName,
+            )
+        }
     }
 
     fun makeSearchQuery(
-        lng: Double,
-        lat: Double,
-        maxDistance: Double,
-        searchFilter: SearchFilter?,
+        longitude: Double,
+        latitude: Double,
+        maxDistanceKm: Double,
+        searchText: String,
     ): AggregationOperation {
-        val filters = mutableListOf<Bson>()
-        val must = mutableListOf<Bson>()
+        val maxDistance = maxDistanceKm * 1000 // km 단위를 meter로 변환
 
-        // 필수: 위치 기반 필터
-        filters.add(
-            Document(
-                "geoWithin",
-                Document(
-                    "circle",
-                    Document(
-                        "center",
-                        Document("type", "Point").append(
-                            "coordinates",
-                            listOf(lng, lat),
-                        ),
-                    ),
-                ).append("radius", maxDistance),
-            ).append("path", "location"),
-        )
-
-        // 선택적: 카테고리 필터
-        searchFilter?.category?.let {
-            filters.add(
-                Document(
-                    "text",
-                    Document("query", it)
-                        .append("path", "category"),
-                ),
-            )
-        }
-
-        // 선택적: 시간 필터
-        searchFilter?.time?.let {
-            filters.add(
-                Document(
-                    "range",
-                    Document("path", "openTime")
-                        .append("lte", it),
-                ),
-            )
-            filters.add(
-                Document(
-                    "range",
-                    Document("path", "closeTime")
-                        .append("gte", it),
-                ),
-            )
-        }
-
-        // 선택적: 상태 필터
-        searchFilter?.status?.let {
-            if (it == StoreStatus.OPEN.statusCode) {
-                filters.add(
-                    Document(
-                        "equals",
-                        Document("value", true)
-                            .append("path", "open"),
-                    ),
-                )
-            }
-        }
-
-        // 선택적: 검색어 필터
-        searchFilter?.searchText?.let {
-            must.add(
-                Document(
-                    "text",
-                    Document("query", it)
-                        .append("path", listOf("storeName", "category")),
-                ),
-            )
-        }
-
-        // MongoDB Atlas Search 쿼리 생성
-        val score =
-            Document(
-                "score",
-                Document(
-                    "function",
-                    Document(
-                        "distance",
-                        Document(
-                            "origin",
-                            Document("type", "Point")
-                                .append("coordinates", listOf(lng, lat)),
-                        ).append("path", "location"),
-                    ),
-                ),
-            )
         val searchQuery =
             Document(
                 "\$search",
@@ -287,9 +211,34 @@ class SearchStoreRepositoryImpl(
                     .append("index", searchStoreIndex)
                     .append(
                         "compound",
-                        Document("filter", filters)
-                            .append("must", must),
-                    ).append("score", score),
+                        Document()
+                            .append(
+                                "must",
+                                listOf(
+                                    // 텍스트 검색 → 관련성 기반 정렬
+                                    Document(
+                                        "text",
+                                        Document("query", searchText)
+                                            .append("path", listOf("storeName", "foodCategory")),
+                                    ),
+                                ),
+                            ).append(
+                                "filter",
+                                listOf(
+                                    // 거리 필터 (maxDistance)
+                                    Document(
+                                        "range",
+                                        Document("path", "coordinate")
+                                            .append("lte", maxDistance)
+                                            .append(
+                                                "origin",
+                                                Document("type", "Point")
+                                                    .append("coordinates", listOf(longitude, latitude)),
+                                            ).append("unit", "meter"),
+                                    ),
+                                ),
+                            ),
+                    ),
             )
 
         return AggregationOperation { _: AggregationOperationContext -> searchQuery }

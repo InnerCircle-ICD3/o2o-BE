@@ -15,8 +15,12 @@ data class StoreCreateRequest(
 
     // 주소 정보 (Flat 구조)
     val roadNameAddress: String? = null,
-    val zipCode: String? = null,
     val lotNumberAddress: String? = null,
+    val buildingName: String? = null,
+    val zipCode: String? = null,
+    val region1DepthName: String? = null,
+    val region2DepthName: String? = null,
+    val region3DepthName: String? = null,
 
     // 위치 정보
     val latitude: Double? = null,
@@ -42,7 +46,11 @@ data class StoreCreateRequest(
             address = AddressDto(
                 roadNameAddress = this.roadNameAddress,
                 lotNumberAddress = this.lotNumberAddress,
+                buildingName = this.buildingName,
                 zipCode = this.zipCode,
+                region1DepthName = this.region1DepthName,
+                region2DepthName = this.region2DepthName,
+                region3DepthName = this.region3DepthName,
                 coordinate = CoordinateDto(
                     latitude = this.latitude ?: 0.0,
                     longitude = this.longitude ?: 0.0

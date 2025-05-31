@@ -1,11 +1,13 @@
 package com.eatngo.redis.repository.search
 
-import com.eatngo.common.type.Point
+import com.eatngo.common.type.CoordinateVO
 import com.eatngo.redis.utils.readValueFromJson
 import com.eatngo.redis.utils.writeValueToJson
 import com.eatngo.search.dto.SearchStoreMap
 import com.eatngo.search.infra.SearchMapRedisRepository
 import com.fasterxml.jackson.databind.ObjectMapper
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.stereotype.Repository
 
@@ -17,13 +19,15 @@ import org.springframework.stereotype.Repository
  */
 @Repository
 class SearchMapMapRedisRepositoryImpl(
+    @Autowired @Qualifier("stringRedisTemplate")
     private val redisTemplate: RedisTemplate<String, String>,
+    @Autowired
     private val objectMapper: ObjectMapper,
 ) : SearchMapRedisRepository {
-    override fun getKey(topLeft: Point): String {
-        val lat = topLeft.lat
-        val lng = topLeft.lng
-        return "searchMap:lat:$lat:lng:$lng"
+    override fun getKey(topLeft: CoordinateVO): String {
+        val latitude = topLeft.latitude
+        val longitude = topLeft.longitude
+        return "searchMap:lat:$latitude:lng:$longitude"
     }
 
     override fun save(

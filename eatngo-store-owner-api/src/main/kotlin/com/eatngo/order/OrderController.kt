@@ -2,27 +2,24 @@ package com.eatngo.order
 
 import com.eatngo.auth.annotaion.StoreOwnerId
 import com.eatngo.order.domain.Status
-import com.eatngo.order.dto.OrderDto
-import com.eatngo.order.dto.OrderItemDto
+import com.eatngo.order.dto.CursoredStoreOrderQueryParamDto
 import com.eatngo.order.dto.OrderStatusChangedDto
 import com.eatngo.order.usecase.StoreOrderStatusChangedUseCase
+import com.eatngo.order.usecase.StoreReadOrderUseCase
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RestController
-import java.time.LocalDateTime
+import org.springframework.web.bind.annotation.*
 
 @Tag(name = "주문", description = "주문 관련 API")
 @RestController
 class OrderController(
-    private val orderStatusChangedUseCase: StoreOrderStatusChangedUseCase
+    private val orderStatusChangedUseCase: StoreOrderStatusChangedUseCase,
+    private val storeReadOrderUseCase: StoreReadOrderUseCase
 ) {
     @PostMapping("/api/v1/orders/{orderId}/cancel")
     @Operation(summary = "주문 취소", description = "주문 취소")
-    fun cancelOrder(@PathVariable orderId: Long, @StoreOwnerId storeOwnerId: Long): ResponseEntity<Unit> =
+    fun cancelOrder(@StoreOwnerId storeOwnerId: Long, @PathVariable orderId: Long): ResponseEntity<Unit> =
         ResponseEntity.ok(
             orderStatusChangedUseCase.change(
                 OrderStatusChangedDto(orderId, storeOwnerId, Status.CANCELED)
@@ -31,91 +28,23 @@ class OrderController(
 
     @PostMapping("/api/v1/orders/{orderId}/confirm")
     @Operation(summary = "주문 승인", description = "주문 승인")
-    fun confirmOrder(@PathVariable orderId: Long, @StoreOwnerId storeOwnerId: Long): ResponseEntity<Unit> =
+    fun confirmOrder(@StoreOwnerId storeOwnerId: Long, @PathVariable orderId: Long): ResponseEntity<Unit> =
         ResponseEntity.ok(
             orderStatusChangedUseCase.change(
                 OrderStatusChangedDto(orderId, storeOwnerId, Status.CONFIRMED)
             )
         )
 
-    @GetMapping("/api/v1/store/{storeId}/orders")
+    @GetMapping("/api/v1/store/orders")
     @Operation(summary = "상점 주문 조회", description = "상점 주문 조회")
-    fun getOrdersByStoreId(@PathVariable("storeId") storeId: Long): ResponseEntity<List<OrderDto>> {
-        return ResponseEntity.ok(
-            listOf(
-                OrderDto(
-                    id = 1L,
-                    orderNumber = 1L,
-                    customerId = 1L,
-                    storeId = 1L,
-                    status = Status.DONE.toString(),
-                    orderItems = listOf(
-                        OrderItemDto(
-                            id = 1L,
-                            productId = 1L,
-                            productName = "Product 1",
-                            quantity = 1,
-                            price = 1000
-                        )
-                    ),
-                    createdAt = LocalDateTime.now(),
-                    updatedAt = LocalDateTime.now()
-                ),
-                OrderDto(
-                    id = 2L,
-                    orderNumber = 2L,
-                    customerId = 2L,
-                    storeId = 2L,
-                    status = Status.CANCELED.toString(),
-                    orderItems = listOf(
-                        OrderItemDto(
-                            id = 2L,
-                            productId = 2L,
-                            productName = "Product 1",
-                            quantity = 1,
-                            price = 1000
-                        )
-                    ),
-                    createdAt = LocalDateTime.now(),
-                    updatedAt = LocalDateTime.now()
-                ),
-                OrderDto(
-                    id = 3L,
-                    orderNumber = 3L,
-                    customerId = 3L,
-                    storeId = 3L,
-                    status = Status.CREATED.toString(),
-                    orderItems = listOf(
-                        OrderItemDto(
-                            id = 3L,
-                            productId = 3L,
-                            productName = "Product 1",
-                            quantity = 1,
-                            price = 1000
-                        )
-                    ),
-                    createdAt = LocalDateTime.now(),
-                    updatedAt = LocalDateTime.now()
-                ),
-                OrderDto(
-                    id = 4L,
-                    orderNumber = 4L,
-                    customerId = 4L,
-                    storeId = 4L,
-                    status = Status.CONFIRMED.toString(),
-                    orderItems = listOf(
-                        OrderItemDto(
-                            id = 4L,
-                            productId = 4L,
-                            productName = "Product 1",
-                            quantity = 1,
-                            price = 1000
-                        )
-                    ),
-                    createdAt = LocalDateTime.now(),
-                    updatedAt = LocalDateTime.now()
-                )
+    fun getOrdersByStoreId(
+        @StoreOwnerId storeOwnerId: Long,
+        @ModelAttribute cursoredStoreOrderQueryParamDto: CursoredStoreOrderQueryParamDto
+    ) =
+        storeReadOrderUseCase.findAllByQueryParameter(
+            CursoredStoreOrderQueryParamDto.toOrderQueryParamDto(
+                storeOwnerId,
+                cursoredStoreOrderQueryParamDto
             )
         )
-    }
 }

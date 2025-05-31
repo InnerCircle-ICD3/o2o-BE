@@ -2,6 +2,7 @@ package com.eatngo.store.domain
 
 import com.eatngo.common.constant.StoreEnum
 import com.eatngo.common.exception.StoreException
+import com.eatngo.common.type.Address
 import com.eatngo.common.type.CoordinateVO
 import com.eatngo.store.dto.StoreCreateDto
 import com.eatngo.store.dto.StoreDto
@@ -40,7 +41,11 @@ class Store(
                 address = Address(
                     roadNameAddress = RoadNameAddressVO.from(dto.address.roadNameAddress),
                     lotNumberAddress = LotNumberAddressVO.from(dto.address.lotNumberAddress),
+                    buildingName = dto.address.buildingName,
                     zipCode = ZipCodeVO.from(dto.address.zipCode),
+                    region1DepthName = dto.address.region1DepthName,
+                    region2DepthName = dto.address.region2DepthName,
+                    region3DepthName = dto.address.region3DepthName,
                     coordinate = CoordinateVO.from(
                         dto.address.coordinate.latitude ?: 0.0,
                         dto.address.coordinate.longitude ?: 0.0
@@ -79,7 +84,11 @@ class Store(
                 address = Address(
                     roadNameAddress = RoadNameAddressVO.from(request.address.roadNameAddress),
                     lotNumberAddress = LotNumberAddressVO.from(request.address.lotNumberAddress),
+                    buildingName = request.address.buildingName,
                     zipCode = ZipCodeVO.from(request.address.zipCode),
+                    region1DepthName = request.address.region1DepthName,
+                    region2DepthName = request.address.region2DepthName,
+                    region3DepthName = request.address.region3DepthName,
                     coordinate = CoordinateVO.from(
                         request.address.coordinate.latitude ?: 0.0,
                         request.address.coordinate.longitude ?: 0.0
@@ -129,7 +138,11 @@ class Store(
             this.address = Address(
                 roadNameAddress = RoadNameAddressVO.from(addr.roadNameAddress),
                 lotNumberAddress = LotNumberAddressVO.from(addr.lotNumberAddress),
+                buildingName = addr.buildingName,
                 zipCode = ZipCodeVO.from(addr.zipCode),
+                region1DepthName = addr.region1DepthName,
+                region2DepthName = addr.region2DepthName,
+                region3DepthName = addr.region3DepthName,
                 coordinate = CoordinateVO.from(
                     addr.coordinate.latitude ?: 0.0,
                     addr.coordinate.longitude ?: 0.0
@@ -226,16 +239,6 @@ class Store(
         updatedAt = LocalDateTime.now()
     }
 }
-
-/**
- * 매장 위치 정보
- */
-data class Address(
-    val roadNameAddress: RoadNameAddressVO,      // 도로명 주소 (VO)
-    val lotNumberAddress: LotNumberAddressVO,   // 지번 주소
-    val zipCode: ZipCodeVO,                      // 우편번호
-    val coordinate: CoordinateVO          // 위도, 경도
-)
 
 /**
  * 매장의 카테고리 정보(분류와 사용자 입력 카테고리)

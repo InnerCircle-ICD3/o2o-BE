@@ -5,6 +5,7 @@ import com.eatngo.store.domain.Store
 import java.time.DayOfWeek
 import java.time.LocalTime
 import java.time.LocalDateTime
+import kotlin.String
 
 
 /**
@@ -27,7 +28,7 @@ data class StoreDto(
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime,
     var deletedAt: LocalDateTime?,
-){
+) {
     companion object {
         fun from(store: Store): StoreDto {
             return StoreDto(
@@ -38,7 +39,11 @@ data class StoreDto(
                 address = AddressDto(
                     roadNameAddress = store.address.roadNameAddress.value,
                     lotNumberAddress = store.address.lotNumberAddress.value,
+                    buildingName = store.address.buildingName,
                     zipCode = store.address.zipCode.value,
+                    region1DepthName = store.address.region1DepthName,
+                    region2DepthName = store.address.region2DepthName,
+                    region3DepthName = store.address.region3DepthName,
                     coordinate = CoordinateDto(
                         latitude = store.address.coordinate.latitude,
                         longitude = store.address.coordinate.longitude
@@ -79,7 +84,11 @@ data class StoreDto(
 data class AddressDto(
     val roadNameAddress: String? = null,
     val lotNumberAddress: String? = null,
+    val buildingName: String? = null,
     val zipCode: String? = null,
+    val region1DepthName: String? = null,
+    val region2DepthName: String? = null,
+    val region3DepthName: String? = null,
     val coordinate: CoordinateDto
 )
 
@@ -90,21 +99,6 @@ data class BusinessHourDto(
     val dayOfWeek: DayOfWeek,
     val openTime: LocalTime,
     val closeTime: LocalTime
-)
-
-/**
- * 도로명 주소 DTO
- */
-data class RoadNameAddressDto(
-    val roadNameAddress: String? = null,
-    val zipCode: String? = null
-)
-
-/**
- * 법정동 주소 DTO
- */
-data class LotNumberAddressDto(
-    val lotNumberAddress: String? = null
 )
 
 /**

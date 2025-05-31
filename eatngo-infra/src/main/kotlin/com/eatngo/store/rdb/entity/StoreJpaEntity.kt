@@ -2,10 +2,13 @@ package com.eatngo.store.rdb.entity
 
 import com.eatngo.common.BaseJpaEntity
 import com.eatngo.common.constant.StoreEnum
+import com.eatngo.common.converter.JsonAttributeConverter
+import com.eatngo.common.type.Address
 import com.eatngo.common.type.CoordinateVO
 import com.eatngo.constants.DELETED_FILTER
 import com.eatngo.store.domain.*
 import com.eatngo.store.vo.*
+import com.fasterxml.jackson.annotation.JsonInclude
 import jakarta.persistence.*
 import org.hibernate.annotations.Filter
 import java.time.LocalTime
@@ -34,20 +37,10 @@ class StoreJpaEntity(
     @Column(columnDefinition = "TEXT")
     val description: String?,
 
-    @Column(nullable = false)
-    val roadNameAddress: String,
-
-    @Column(nullable = false)
-    val lotNumberAddress: String,
-
-    @Column(nullable = false)
-    val zipCode: String,
-
-    @Column(nullable = false)
-    val latitude: Double,
-
-    @Column(nullable = false)
-    val longitude: Double,
+//    @Column(columnDefinition = "jsonb", nullable = false) TODO: 나중에 진짜 db 환경에서는 컬럼 Jsonb로 변경 필요
+    @Column(columnDefinition = "TEXT", nullable = false)
+    @Convert(converter = AddressJsonConverter::class)
+    val address: AddressJson,
 
     @Column(name = "business_number", length = 10, nullable = false)
     val businessNumber: String,
@@ -90,11 +83,17 @@ class StoreJpaEntity(
                 storeOwnerId = store.storeOwnerId,
                 name = store.name.value,
                 description = store.description?.value,
-                roadNameAddress = store.address.roadNameAddress.value,
-                lotNumberAddress = store.address.lotNumberAddress.value,
-                zipCode = store.address.zipCode.value,
-                latitude = store.address.coordinate.latitude,
-                longitude = store.address.coordinate.longitude,
+                address = AddressJson(
+                    roadNameAddress = store.address.roadNameAddress.value,
+                    lotNumberAddress = store.address.lotNumberAddress.value,
+                    buildingName = store.address.buildingName,
+                    zipCode = store.address.zipCode.value,
+                    region1DepthName = store.address.region1DepthName,
+                    region2DepthName = store.address.region2DepthName,
+                    region3DepthName = store.address.region3DepthName,
+                    latitude = store.address.coordinate.latitude,
+                    longitude = store.address.coordinate.longitude
+                ),
                 businessNumber = store.businessNumber.value,
                 contactNumber = store.contactNumber?.value,
                 imageUrl = store.imageUrl?.value,
@@ -120,10 +119,14 @@ class StoreJpaEntity(
                 name = StoreNameVO.from(name),
                 description = description?.let { DescriptionVO.from(it) },
                 address = Address(
-                    roadNameAddress = RoadNameAddressVO.from(roadNameAddress),
-                    lotNumberAddress = LotNumberAddressVO.from(lotNumberAddress),
-                    zipCode = ZipCodeVO.from(zipCode),
-                    coordinate = CoordinateVO.from(latitude, longitude)
+                    roadNameAddress = RoadNameAddressVO.from(address.roadNameAddress),
+                    lotNumberAddress = LotNumberAddressVO.from(address.lotNumberAddress),
+                    buildingName = address.buildingName,
+                    zipCode = ZipCodeVO.from(address.zipCode),
+                    region1DepthName = address.region1DepthName,
+                    region2DepthName = address.region2DepthName,
+                    region3DepthName = address.region3DepthName,
+                    coordinate = CoordinateVO.from(address.latitude, address.longitude)
                 ),
                 businessNumber = BusinessNumberVO.from(businessNumber),
                 contactNumber = contactNumber?.let { ContactNumberVO.from(it) },
@@ -141,4 +144,20 @@ class StoreJpaEntity(
             )
         }
     }
-} 
+}
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
+data class AddressJson(
+    val roadNameAddress: String,
+    val lotNumberAddress: String,
+    val buildingName: String? = null,
+    val zipCode: String,
+    val region1DepthName: String? = null,
+    val region2DepthName: String? = null,
+    val region3DepthName: String? = null,
+    val latitude: Double,
+    val longitude: Double
+)
+
+@Converter(autoApply = false)
+class AddressJsonConverter : JsonAttributeConverter<AddressJson>(AddressJson::class.java)

@@ -35,7 +35,6 @@ enum class BusinessErrorCode(
     PAYMENT_ALREADY_PROCESSED("P002", "이미 처리된 결제입니다."),
     PAYMENT_AMOUNT_MISMATCH("P003", "결제 금액이 일치하지 않습니다."),
 
-
     // 매장 관련 오류
     STORE_NOT_FOUND("S001", "매장을 찾을 수 없습니다."),
     STORE_CLOSED("S002", "영업 종료된 매장입니다."),
@@ -54,8 +53,10 @@ enum class BusinessErrorCode(
     STORE_REGISTRATION_FAILED("S009", "매장 등록에 실패했습니다."),
     STORE_UPDATE_FAILED("S010", "매장 정보 수정에 실패했습니다."),
     STORE_DELETE_FAILED("S011", "매장 삭제에 실패했습니다."),
+
     // 매장 상태 관련 오류
     STORE_STATUS_INVALID("S012", "유효하지 않은 매장 상태입니다"),
+
     // 매장 권한 관련 오류
     STORE_OWNER_FORBIDDEN("S013", "해당 매장에 대한 권한이 없습니다."),
 
@@ -73,4 +74,13 @@ enum class BusinessErrorCode(
     PRODUCT_UPDATE_FAILED("M006", "메뉴 수정에 실패했습니다."),
     PRODUCT_DELETE_FAILED("M007", "메뉴 삭제에 실패했습니다."),
 
+    // 검색 관련 오류
+    SEARCH_INVALID_COORDINATE("H001", "유효하지 않은 좌표 입니다."),
+    SEARCH_INVALID_FILTER("H002", "유효하지 않은 검색 필터 입니다."),
+    SEARCH_STORE_LIST_FAILED("H003", "매장 목록 조회(필터링)에 실패했습니다."),
+    SEARCH_STORE_SEARCH_FAILED("H004", "매장 목록 조회(검색)에 실패했습니다."),
+    SEARCH_STORE_MAP_FAILED("H005", "매장 지도 조회에 실패했습니다."),
+    SEARCH_STORE_MAP_CACHE_FAILED("H006", "지도 정보 캐싱에 실패했습니다."),
+    SEARCH_SUGGESTION_FAILED("H007", "추천 검색어 조회에 실패했습니다."),
+    SEARCH_CATEGORY_NOT_FOUND("H008", "존재하지 않는 카테고리 입니다."),
 }

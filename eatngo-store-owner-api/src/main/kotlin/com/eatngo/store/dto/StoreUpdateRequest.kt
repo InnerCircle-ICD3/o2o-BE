@@ -14,8 +14,12 @@ data class StoreUpdateRequest(
 
     // 주소 정보 (flat)
     val roadNameAddress: String? = null,
-    val zipCode: String? = null,
     val lotNumberAddress: String? = null,
+    val buildingName: String? = null,
+    val zipCode: String? = null,
+    val region1DepthName: String? = null,
+    val region2DepthName: String? = null,
+    val region3DepthName: String? = null,
 
     // 위치 정보
     val latitude: Double? = null,
@@ -42,7 +46,11 @@ data class StoreUpdateRequest(
             AddressDto(
                 roadNameAddress = roadNameAddress,
                 lotNumberAddress = lotNumberAddress,
+                buildingName = buildingName,
                 zipCode = zipCode,
+                region1DepthName = region1DepthName,
+                region2DepthName = region2DepthName,
+                region3DepthName = region3DepthName,
                 coordinate = CoordinateDto(
                     latitude = latitude,
                     longitude = longitude

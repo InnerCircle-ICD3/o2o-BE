@@ -1,10 +1,12 @@
 package com.eatngo.order.service
 
 import com.eatngo.common.exception.OrderException
+import com.eatngo.common.response.Cursor
 import com.eatngo.extension.orThrow
 import com.eatngo.order.domain.Order
 import com.eatngo.order.domain.OrderItem
 import com.eatngo.order.dto.OrderCreateDto
+import com.eatngo.order.dto.OrderQueryParamDto
 import com.eatngo.order.infra.OrderPersistence
 import com.github.f4b6a3.tsid.TsidCreator
 import org.springframework.stereotype.Service
@@ -39,4 +41,7 @@ class OrderService(
     fun update(order: Order): Order {
         return orderPersistence.save(order)
     }
+
+    fun findAllByQueryParam(queryParam: OrderQueryParamDto): Cursor<Order> =
+        orderPersistence.findAllByQueryParameter(queryParam)
 }
