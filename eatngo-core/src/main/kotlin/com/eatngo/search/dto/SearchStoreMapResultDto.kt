@@ -31,6 +31,13 @@ data class SearchStoreMap(
                 storeName = searchStore.storeName,
                 coordinate = searchStore.coordinate.toVO(),
             )
+
+        fun getMockSearchStoreMapList(): List<SearchStoreMap> =
+            listOf(
+                SearchStoreMap(storeID = 1L, storeName = "피자가게 이름", coordinate = CoordinateVO.from(37.566500, 126.978000)),
+                SearchStoreMap(storeID = 2L, storeName = "피자나라 치킨공주", coordinate = CoordinateVO.from(37.567000, 126.979000)),
+                SearchStoreMap(storeID = 3L, storeName = "치킨집", coordinate = CoordinateVO.from(37.568000, 126.980000)),
+            )
     }
 }
 

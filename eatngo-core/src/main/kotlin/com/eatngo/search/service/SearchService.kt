@@ -1,8 +1,6 @@
 package com.eatngo.search.service
 
-import com.eatngo.common.exception.SearchException
 import com.eatngo.common.type.CoordinateVO
-import com.eatngo.extension.orThrow
 import com.eatngo.search.domain.SearchStore
 import com.eatngo.search.dto.AutoCompleteStoreNameDto
 import com.eatngo.search.dto.Box
@@ -123,40 +121,33 @@ class SearchService(
                 latitude = userCoordinate.latitude,
             )
 
+        // TODO: 목데이터 삭제 이후 주석 해제
         // Redis에서 box 검색 결과를 가져온다. -> 위경도 기중 0.005 단위로 박스 매핑
-        val redisKey = searchMapRedisRepository.getKey(box.topLeft)
-        val seachStoreMapList: List<SearchStoreMap> = searchMapRedisRepository.findByKey(redisKey)
-
-        // 검색 결과가 없으면 MongoDB에서 검색하여 가져온 뒤 캐싱한다
-        if (seachStoreMapList.isEmpty()) {
-            // TODO: 목데이터 삭제 이후 var -> val
-            var searchStoreList: List<SearchStore> = emptyList()
-            // TODO: 실제 DB 연동 이후 주석 해제
+//        val redisKey = searchMapRedisRepository.getKey(box.topLeft)
+//        val seachStoreMapList: List<SearchStoreMap> = searchMapRedisRepository.findByKey(redisKey)
+//
+//        // 검색 결과가 없으면 MongoDB에서 검색하여 가져온 뒤 캐싱한다
+//        if (seachStoreMapList.isEmpty()) {
+//            val searchStoreList: List<SearchStore> =
 //                searchStoreRepository.findBox(box).orThrow {
 //                    SearchException.SearchStoreMapFailed(userCoordinate)
 //                }
-            // TODO: 삭제 예정(테스트 기간 Mock 데이터)
-            if (searchStoreList.isEmpty()) {
-                // Mock 데이터 생성
-                searchStoreList = SearchStore.getMockSearchStoreList()
-            }
-
-            // Redis에 저장
-            searchMapRedisRepository
-                .save(
-                    key = redisKey,
-                    value =
-                        searchStoreList.map {
-                            SearchStoreMap.from(it)
-                        },
-                ).orThrow {
-                    SearchException.SearchStoreMapCacheFailed(redisKey)
-                }
-        }
+//            // Redis에 저장
+//            searchMapRedisRepository
+//                .save(
+//                    key = redisKey,
+//                    value =
+//                        searchStoreList.map {
+//                            SearchStoreMap.from(it)
+//                        },
+//                ).orThrow {
+//                    SearchException.SearchStoreMapCacheFailed(redisKey)
+//                }
+//        }
 
         return SearchStoreMapResultDto.from(
             box = box,
-            searchStoreMapList = seachStoreMapList,
+            searchStoreMapList = SearchStoreMap.getMockSearchStoreMapList(),
         )
     }
 
