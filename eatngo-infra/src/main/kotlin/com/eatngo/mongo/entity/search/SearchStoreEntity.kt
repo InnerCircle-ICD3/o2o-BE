@@ -1,6 +1,8 @@
 package com.eatngo.mongo.entity.search
 
 import com.eatngo.common.constant.StoreEnum
+import com.eatngo.common.exception.SearchException
+import com.eatngo.extension.orThrow
 import com.eatngo.search.domain.Coordinate
 import com.eatngo.search.domain.SearchStore
 import com.eatngo.search.domain.SearchStoreStatus
@@ -38,7 +40,9 @@ class SearchStoreEntity(
             storeImage = storeImage,
             storeCategory =
                 storeCategory.map {
-                    StoreEnum.StoreCategory.valueOf(it)
+                    StoreEnum.StoreCategory.valueOf(it).orThrow {
+                        SearchException.SearchCategoryNotFound(it)
+                    }
                 },
             foodCategory = foodCategory,
             roadNameAddress = roadNameAddress,

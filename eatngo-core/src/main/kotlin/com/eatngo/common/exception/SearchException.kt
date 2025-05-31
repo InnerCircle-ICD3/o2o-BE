@@ -68,4 +68,12 @@ open class SearchException(
             "${BusinessErrorCode.SEARCH_SUGGESTION_FAILED.message} (keyword: $keyword)",
             mapOf("keyword" to keyword),
         )
+
+    class SearchCategoryNotFound(
+        category: String,
+    ) : SearchException(
+            BusinessErrorCode.SEARCH_CATEGORY_NOT_FOUND,
+            "${BusinessErrorCode.SEARCH_CATEGORY_NOT_FOUND.message} (category: $category)",
+            mapOf("category" to category),
+        )
 }

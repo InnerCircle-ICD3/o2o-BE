@@ -76,4 +76,5 @@ enum class BusinessErrorCode(
     SEARCH_STORE_MAP_FAILED("H005", "매장 지도 조회에 실패했습니다."),
     SEARCH_STORE_MAP_CACHE_FAILED("H006", "지도 정보 캐싱에 실패했습니다."),
     SEARCH_SUGGESTION_FAILED("H007", "추천 검색어 조회에 실패했습니다."),
+    SEARCH_CATEGORY_NOT_FOUND("H008", "존재하지 않는 카테고리 입니다."),
 }
