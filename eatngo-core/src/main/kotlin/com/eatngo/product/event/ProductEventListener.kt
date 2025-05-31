@@ -1,15 +1,18 @@
 package com.eatngo.product.event
 
-import com.eatngo.common.exception.InventoryException.InventoryNotFound
+import com.eatngo.common.exception.ProductException.ProductNotFound
 import com.eatngo.extension.orThrow
-import com.eatngo.inventory.dto.InventoryDto
+import com.eatngo.inventory.event.InventoryChangedEvent
+import com.eatngo.inventory.event.InventoryChangedType
 import com.eatngo.inventory.event.InventoryEventPublisher
 import com.eatngo.inventory.event.StockEventPublisher
 import com.eatngo.inventory.infra.InventoryCachePersistence
+import com.eatngo.inventory.infra.InventoryPersistence
 import com.eatngo.order.domain.OrderItem
 import com.eatngo.order.event.OrderCanceledEvent
 import com.eatngo.order.event.OrderCreatedEvent
 import com.eatngo.order.event.OrderEvent
+import com.eatngo.product.domain.Product
 import com.eatngo.product.infra.ProductPersistence
 import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Component
@@ -20,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional
 class ProductEventListener(
     private val inventoryCachePersistence: InventoryCachePersistence,
     private val inventoryEventPublisher: InventoryEventPublisher,
+    private val inventoryPersistence: InventoryPersistence,
     private val productPersistence: ProductPersistence,
     private val stockEventPublisher: StockEventPublisher
 ) {
@@ -35,60 +39,60 @@ class ProductEventListener(
 
             is OrderCanceledEvent -> {
                 // TODO
-
             }
         }
 
     }
 
-    fun processStockDecreaseTask(orderItem: OrderItem) {
+    private fun processStockDecreaseTask(orderItem: OrderItem) {
         inventoryCachePersistence.decreaseStock(orderItem.productId, orderItem.quantity)
-        val inventoryDto: InventoryDto = inventoryCachePersistence.findByProductId(orderItem.productId)
-            .orThrow { InventoryNotFound(orderItem.productId) }
-        inventoryEventPublisher.publishInventoryChangedEvent(
-            productId = orderItem.productId,
-            quantity = inventoryDto.quantity,
-            stock = inventoryDto.stock
-        )
+        publishEvent(orderItem)
     }
 
-    fun processStockRollbackTask(orderItem: OrderItem) {
+    private fun processStockRollbackTask(orderItem: OrderItem) {
         // TODO 다음 PR 재고 롤백 기능 호출
-
-        val inventoryDto: InventoryDto = inventoryCachePersistence.findByProductId(orderItem.productId)
-            .orThrow { InventoryNotFound(orderItem.productId) }
-        inventoryEventPublisher.publishInventoryChangedEvent(
-            productId = orderItem.productId,
-            quantity = inventoryDto.quantity,
-            stock = inventoryDto.stock
-        )
+        publishEvent(orderItem)
     }
 
-    /**
-     * 이전 버전 잠시 관리
-     */
-//    @CachePut("inventory", key = "#orderItem.productId")
-//    fun decreaseStock(
-//        orderItem: OrderItem
-//    ): InventoryDto {
-////        productCachePersistence.decreaseStock(orderItem.productId, orderItem.quantity)
-//        // TODO 재고 정보 search 및 market 에게 알려주기 event 기반 -> 이벤트 한번에 모아 보낼지 따로 따로 보낼지도 고민 필요!
-////        stockEventPublisher.~~
-//        return InventoryDto(
-//            quantity = TODO(),
-//            stock = TODO()
-//        )
-//    }
-//
-//    @CachePut("inventory", key = "#orderItem.productId")
-//    fun rollbackStock(
-//        orderItem: OrderItem
-//    ): InventoryDto {
-////        stockEventPublisher.~~
-//        return InventoryDto(
-//            quantity = TODO(),
-//            stock = TODO()
-//        )
-//    }
+    private fun publishEvent(orderItem: OrderItem) {
+        val storeId: Long = productPersistence.findById(orderItem.productId)
+            .orThrow { ProductNotFound(orderItem.productId) }
+            .storeId
+        val allProducts: List<Product> = productPersistence.findAllByStoreId(storeId)
+        val inventoryDtos = allProducts.map { p -> inventoryCachePersistence.findByProductId(p.id) }
+
+        if (inventoryDtos.isEmpty()) {
+            inventoryEventPublisher.publishInventoryChangedEvent(
+                InventoryChangedEvent(
+                    productId = orderItem.productId,
+                    inventoryChangedType = InventoryChangedType.OUT_OF_STOCK
+                )
+            )
+        }
+
+        val totalStock = inventoryDtos.sumOf { it?.stock ?: 0 }
+        if (totalStock == 0) {
+            inventoryEventPublisher.publishInventoryChangedEvent(
+                InventoryChangedEvent(
+                    productId = orderItem.productId,
+                    inventoryChangedType = InventoryChangedType.OUT_OF_STOCK
+                )
+            )
+        } else if (totalStock <= 3) {
+            inventoryEventPublisher.publishInventoryChangedEvent(
+                InventoryChangedEvent(
+                    productId = orderItem.productId,
+                    inventoryChangedType = InventoryChangedType.LOW_STOCK
+                )
+            )
+        } else if (totalStock >= 5) {
+            inventoryEventPublisher.publishInventoryChangedEvent(
+                InventoryChangedEvent(
+                    productId = orderItem.productId,
+                    inventoryChangedType = InventoryChangedType.IN_STOCK
+                )
+            )
+        }
+    }
 
 }

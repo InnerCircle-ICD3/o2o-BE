@@ -2,7 +2,6 @@ package com.eatngo.redis.repository.inventory
 
 import com.eatngo.common.exception.StockException.StockEmpty
 import com.eatngo.common.exception.StockException.StockNotFound
-import com.eatngo.inventory.domain.Inventory
 import com.eatngo.inventory.dto.InventoryDto
 import com.eatngo.inventory.infra.InventoryCachePersistence
 import org.springframework.data.redis.core.RedisTemplate
@@ -27,9 +26,9 @@ class InventoryRedisPersistenceImpl(
         """
     }
 
-    override fun decreaseStock(productId: Long, quantity: Int): Int {
+    override fun decreaseStock(productId: Long, stockQuantityToDecrease: Int): Int {
         val script = DefaultRedisScript(LUA_DEC_STOCK, Long::class.java)
-        val result = redisTemplate.execute(script, listOf(pKey(productId)), quantity.toString())
+        val result = redisTemplate.execute(script, listOf(pKey(productId)), stockQuantityToDecrease.toString())
             ?: -2L
         when (result) {
             -1L -> throw StockEmpty(productId)
@@ -37,6 +36,12 @@ class InventoryRedisPersistenceImpl(
         }
         return result.toInt()
     }
+
+    // status 랑 productId
+    // 재고 sold out => 1개라도 다 떨어지면 그때 확인 -> productId
+    // 마감 임박 상태 ->
+    // 재고 충분 ->
+    // 재고가 채워졌을 때 이벤트 발행 필요 -> Event 발행 ->
 
     override fun findByProductId(productId: Long): InventoryDto? {
         val key = pKey(productId)

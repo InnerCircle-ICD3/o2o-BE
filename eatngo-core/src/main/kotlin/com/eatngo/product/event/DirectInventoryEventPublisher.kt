@@ -10,18 +10,8 @@ class DirectInventoryEventPublisher(
     private val eventPublisher: ApplicationEventPublisher
 ) : InventoryEventPublisher {
 
-    override fun publishInventoryChangedEvent(
-        productId: Long,
-        quantity: Int,
-        stock: Int
-    ) {
-        eventPublisher.publishEvent(
-            InventoryChangedEvent(
-                productId = productId,
-                quantity = quantity,
-                stock = stock
-            )
-        )
+    override fun publishInventoryChangedEvent(inventoryChangedEvent: InventoryChangedEvent) {
+        eventPublisher.publishEvent(inventoryChangedEvent)
     }
 
 }
