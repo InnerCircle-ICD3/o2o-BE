@@ -23,7 +23,7 @@ class Store(
     val businessNumber: BusinessNumberVO, // 사업자등록 번호
     var contactNumber: ContactNumberVO?,  // 매장 or 점주 전화번호
     var imageUrl: ImageUrlVO?,            // 대표 이미지 url(카드뷰에 보이는 이미지)
-    var businessHours: List<BusinessHourVO>?, // 영업시간(픽업시간과는 다름, 단순 정보제공용 및 확장성 고려해 추가)
+    var businessHours: List<BusinessHourVO>?, // 매장의 픽업시간
     var storeCategoryInfo: StoreCategoryInfo, // 매장의 카테고리 정보들
     var status: StoreEnum.StoreStatus = StoreEnum.StoreStatus.PENDING, // 매장 상태(기본: 승인대기중)
     var pickUpDay: PickUpDayVO,         // 오늘/내일 픽업

@@ -75,12 +75,14 @@ value class BusinessHourVO(val value: Triple<DayOfWeek, LocalTime, LocalTime>) {
 }
 
 @JvmInline
-value class PickUpDayVO(val pickupDay: StoreEnum.PickupDay) {
+value class PickUpDayVO(val pickUpDay: StoreEnum.PickupDay) {
     companion object {
         fun from(day: String?): PickUpDayVO {
-            require(!day.isNullOrBlank()) { "pickupDay는 null이거나 빈 값일 수 없습니다." }
+            require(!day.isNullOrBlank()) { "pickUpDay는 null이거나 빈 값일 수 없습니다." }
             return PickUpDayVO(StoreEnum.PickupDay.valueOf(day.uppercase()))
         }
+
+        fun from(pickUpDay: StoreEnum.PickupDay): PickUpDayVO = PickUpDayVO(pickUpDay)
     }
 }
 
