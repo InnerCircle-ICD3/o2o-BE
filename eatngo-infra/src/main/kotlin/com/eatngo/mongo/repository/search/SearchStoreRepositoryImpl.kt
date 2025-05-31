@@ -113,7 +113,7 @@ class SearchStoreRepositoryImpl(
         return geoResults.content.map {
             SearchStoreWithDistance(
                 store = it.content.to(),
-                distance = it.distance?.value ?: 0.0, // 거리 값이 없을 경우 0.0으로 처리
+                distance = it.distance.value,
             )
         }
     }
