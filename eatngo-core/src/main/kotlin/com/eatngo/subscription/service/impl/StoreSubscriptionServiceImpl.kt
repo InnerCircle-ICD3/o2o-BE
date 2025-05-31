@@ -8,6 +8,7 @@ import com.eatngo.subscription.dto.StoreSubscriptionDto
 import com.eatngo.subscription.infra.StoreSubscriptionPersistence
 import com.eatngo.subscription.service.StoreSubscriptionService
 import org.springframework.stereotype.Service
+import java.time.LocalDateTime
 
 /**
  * 상점 구독 서비스 구현체
@@ -28,23 +29,14 @@ class StoreSubscriptionServiceImpl(
     override fun toggleSubscription(storeId: Long, customerId: Long): StoreSubscriptionDto {
         val store = storePersistence.findById(storeId).orThrow { StoreException.StoreNotFound(storeId) }
 
-        val subscription = storeSubscriptionPersistence.findByUserIdAndStoreId(customerId, storeId)
-        val resultSubscription = when {
-            // 이미 soft delete된 구독이 있으면 복구(재구독)
-            subscription != null && subscription.deletedAt != null -> {
-                subscription.restore()
-                storeSubscriptionPersistence.save(subscription)
-            }
-            // 활성 구독이면 soft delete 처리
-            subscription != null && subscription.deletedAt == null -> {
-                storeSubscriptionPersistence.deleteById(subscription.id)
-                storeSubscriptionPersistence.findByUserIdAndStoreId(customerId, storeId)!!
-            }
-            // 구독이 없으면 새로 생성
-            else -> {
-                val newSubscription = StoreSubscription.create(customerId, storeId)
-                storeSubscriptionPersistence.save(newSubscription)
-            }
+        val subscription = storeSubscriptionPersistence.findAllByUserIdAndStoreId(customerId, storeId)
+        val resultSubscription = if (subscription == null) {
+            // 신규 구독 (INSERT)
+            storeSubscriptionPersistence.save(StoreSubscription.create(customerId, storeId))
+        } else {
+            // 기존 row가 있으면 (UPDATE)
+            subscription.toggleOrRestore()
+            storeSubscriptionPersistence.save(subscription)
         }
 
         return StoreSubscriptionDto.from(

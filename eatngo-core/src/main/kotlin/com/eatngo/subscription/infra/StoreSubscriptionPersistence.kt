@@ -7,7 +7,7 @@ import com.eatngo.subscription.domain.StoreSubscription
  */
 interface StoreSubscriptionPersistence {
     /**
-     * 구독 ID로 상점 구독 조회
+     * 구독 ID로 상점 구독 조회(활성구독만)
      */
     fun findById(id: Long): StoreSubscription?
 
@@ -27,14 +27,14 @@ interface StoreSubscriptionPersistence {
     fun findByUserIdAndStoreId(userId: Long, storeId: Long): StoreSubscription?
 
     /**
+     * 사용자 ID와 상점 ID로 상점 구독 조회 - deleted 된 것도 전부 조회
+     */
+    fun findAllByUserIdAndStoreId(userId: Long, storeId: Long): StoreSubscription?
+
+    /**
      * 상점 구독 저장
      */
     fun save(subscription: StoreSubscription): StoreSubscription
-
-    /**
-     * 상점 구독 삭제(soft delete)
-     */
-    fun deleteById(id: Long): Boolean
 
     /**
      * 사용자 ID로 상점 구독 여부 조회

@@ -33,30 +33,27 @@ class StoreSubscription(
         }
     }
 
-    /**
-     * 구독 상태 확인
-     */
     fun isActive(): Boolean = deletedAt == null
 
-    /**
-     * 재구독
-     * 이미 활성화된 구독인 경우 예외 발생
-     */
     fun restore() {
-        if (deletedAt == null) {
-            throw StoreException.SubscriptionAlreadyActive(id)
-        }
+        if (isActive()) throw StoreException.SubscriptionAlreadyActive(id)
         deletedAt = null
         updatedAt = LocalDateTime.now()
     }
 
+    fun softDelete() {
+        if (!isActive()) throw StoreException.SubscriptionAlreadyCanceled(id)
+        deletedAt = LocalDateTime.now()
+        updatedAt = LocalDateTime.now()
+    }
+
     /**
-     * 구독 상태 변경 (토글)
-     * 현재 상태에 따라 구독 취소 또는 재구독 수행
-     * @return 변경 후 구독 상태 (true: 활성화, false: 취소됨)
+     * 구독 토글/재구독 통합 메서드
+     * @return 토글 후 활성화 여부 (true: 활성, false: 비활성)
      */
-    fun toggleSubscription(): Boolean {
+    fun toggleOrRestore(): Boolean {
         return if (isActive()) {
+            softDelete()
             false
         } else {
             restore()

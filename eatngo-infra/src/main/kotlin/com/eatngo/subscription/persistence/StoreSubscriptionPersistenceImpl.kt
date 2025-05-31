@@ -38,15 +38,16 @@ class StoreSubscriptionPersistenceImpl(
             ?.let { StoreSubscriptionJpaEntity.toSubscription(it) }
     }
 
+    override fun findAllByUserIdAndStoreId(userId: Long, storeId: Long): StoreSubscription? {
+        return storeSubscriptionRdbRepository.findByUserIdAndStoreId(userId, storeId)
+            ?.let { StoreSubscriptionJpaEntity.toSubscription(it) }
+    }
+
     override fun save(subscription: StoreSubscription): StoreSubscription {
         val entity = StoreSubscriptionJpaEntity.from(subscription)
         val savedEntity = storeSubscriptionRdbRepository.save(entity)
         return StoreSubscriptionJpaEntity.toSubscription(savedEntity)
     }
-
-    override fun deleteById(id: Long): Boolean =
-        storeSubscriptionRdbRepository.softDeleteById(id) > 0
-
 
     override fun existsByUserIdAndStoreId(userId: Long, storeId: Long): Boolean {
         return storeSubscriptionRdbRepository.existsByUserIdAndStoreId(userId, storeId)
