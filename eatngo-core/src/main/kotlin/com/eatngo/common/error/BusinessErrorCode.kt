@@ -69,11 +69,11 @@ enum class BusinessErrorCode(
     PRODUCT_DELETE_FAILED("M007", "메뉴 삭제에 실패했습니다."),
 
     // 검색 관련 오류
-    SEARCH_INVALID_COORDINATE("S001", "유효하지 않은 좌표 입니다."),
-    SEARCH_INVALID_FILTER("S002", "유효하지 않은 검색 필터 입니다."),
-    SEARCH_STORE_LIST_FAILED("S003", "매장 목록 조회(필터링)에 실패했습니다."),
-    SEARCH_STORE_SEARCH_FAILED("S004", "매장 목록 조회(검색)에 실패했습니다."),
-    SEARCH_STORE_MAP_FAILED("S005", "매장 지도 조회에 실패했습니다."),
-    SEARCH_STORE_MAP_CACHE_FAILED("S006", "지도 정보 캐싱에 실패했습니다."),
-    SEARCH_SUGGESTION_FAILED("S007", "추천 검색어 조회에 실패했습니다."),
+    SEARCH_INVALID_COORDINATE("H001", "유효하지 않은 좌표 입니다."),
+    SEARCH_INVALID_FILTER("H002", "유효하지 않은 검색 필터 입니다."),
+    SEARCH_STORE_LIST_FAILED("H003", "매장 목록 조회(필터링)에 실패했습니다."),
+    SEARCH_STORE_SEARCH_FAILED("H004", "매장 목록 조회(검색)에 실패했습니다."),
+    SEARCH_STORE_MAP_FAILED("H005", "매장 지도 조회에 실패했습니다."),
+    SEARCH_STORE_MAP_CACHE_FAILED("H006", "지도 정보 캐싱에 실패했습니다."),
+    SEARCH_SUGGESTION_FAILED("H007", "추천 검색어 조회에 실패했습니다."),
 }
