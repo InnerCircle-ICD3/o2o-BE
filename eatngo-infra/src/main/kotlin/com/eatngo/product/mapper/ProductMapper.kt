@@ -2,7 +2,6 @@ package com.eatngo.product.mapper
 
 import com.eatngo.product.domain.*
 import com.eatngo.product.domain.Product.*
-import com.eatngo.product.entity.InventoryEmbeddable
 import com.eatngo.product.entity.ProductEntity
 import com.eatngo.product.entity.ProductPriceEmbeddable
 import com.eatngo.product.entity.ProductType.*
@@ -23,10 +22,6 @@ class ProductMapper {
                 id = product.id,
                 name = product.name,
                 description = product.description,
-                inventory = InventoryEmbeddable(
-                    product.inventory.quantity,
-                    product.inventory.stock
-                ),
                 price = ProductPriceEmbeddable(
                     product.price.originalPrice,
                     product.price.discountRate,
@@ -46,16 +41,14 @@ class ProductMapper {
             val createdAt = entity.createdAt
             val updatedAt = entity.updatedAt
 
-            val inventory = Inventory(entity.inventory.quantity, entity.inventory.stock)
             val price = ProductPrice(entity.price.originalPrice, entity.price.discountRate)
-            val foodTypes = FoodTypes(entity.foodTypes.map { name -> Food(name) })
+            val foodTypes = FoodTypes(entity.foodTypes.map { Food(it) })
 
             return when (entity.productType) {
                 L -> LargeEatNGoBag(
                     id = productId,
                     name = entity.name,
                     description = entity.description,
-                    inventory = inventory,
                     price = price,
                     imageUrl = entity.imageUrl,
                     storeId = entity.storeId,
@@ -70,7 +63,6 @@ class ProductMapper {
                     id = productId,
                     name = entity.name,
                     description = entity.description,
-                    inventory = inventory,
                     price = price,
                     imageUrl = entity.imageUrl,
                     storeId = entity.storeId,
@@ -85,7 +77,6 @@ class ProductMapper {
                     id = productId,
                     name = entity.name,
                     description = entity.description,
-                    inventory = inventory,
                     price = price,
                     imageUrl = entity.imageUrl,
                     storeId = entity.storeId,

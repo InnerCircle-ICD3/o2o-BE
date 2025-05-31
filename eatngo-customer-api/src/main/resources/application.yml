@@ -31,6 +31,8 @@ spring:
       host: localhost
       port: 6379
       password: eatngolocal
+      repositories:
+        enabled: false
 
 cloud:
   aws:
@@ -61,3 +63,4 @@ logging:
   level:
     org.hibernate.SQL: debug
     org.hibernate.orm.jdbc.bind: trace
+

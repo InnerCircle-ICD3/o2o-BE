@@ -4,3 +4,9 @@ cloud:
       static: us-east-1
     s3:
       bucket: eatgoeatgo
+
+spring:
+  data:
+    redis:
+      repositories:
+        enabled: false

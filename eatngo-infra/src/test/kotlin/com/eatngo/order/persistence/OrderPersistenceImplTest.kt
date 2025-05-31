@@ -10,13 +10,14 @@ import com.eatngo.user_account.domain.UserAccount
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.longs.shouldBeGreaterThan
 import io.kotest.matchers.shouldBe
+import org.junit.jupiter.api.Tag
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 
-
+@Tag("integration")
 @SpringBootTest(classes = [TestApplication::class])
 @ActiveProfiles("test")
 @Transactional

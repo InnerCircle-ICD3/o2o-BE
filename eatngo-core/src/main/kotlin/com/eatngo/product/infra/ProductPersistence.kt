@@ -8,11 +8,3 @@ interface ProductPersistence {
     fun findAllByStoreId(storeId: Long): List<Product>
     fun findByIdAndStoreId(productId: Long, storeId: Long): Product?
 }
-
-fun ProductPersistence.findByIdOrThrow(productId: Long): Product {
-    return this.findById(productId) ?: throw IllegalArgumentException("상품을 찾을 수 없습니다.")
-}
-
-fun ProductPersistence.findByIdAndStoreIdOrElseThrow(productId: Long, storeId: Long): Product {
-    return this.findByIdAndStoreId(productId, storeId) ?: throw IllegalArgumentException("상품을 찾을 수 없습니다.")
-}
