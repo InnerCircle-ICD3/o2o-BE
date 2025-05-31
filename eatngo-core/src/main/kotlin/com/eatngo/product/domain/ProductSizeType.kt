@@ -9,7 +9,7 @@ enum class ProductSizeType(
 
     companion object {
         fun fromValue(value: String): ProductSizeType =
-            entries.firstOrNull() { it.value.equals(value, ignoreCase = true) }
+            entries.firstOrNull { it.value.equals(value, ignoreCase = true) }
                 ?: throw IllegalArgumentException("$value 를 찾을 수 없습니다.")
     }
 
