@@ -27,12 +27,10 @@ data class StoreCreateRequest(
     val longitude: Double? = null,
 
     // 운영 정보
-    val pickupStartTime: String? = null,
-    val pickupEndTime: String? = null,
     val pickupDay: String? = null,
+    val businessHours: List<Map<String, Any>>? = null,
 
     // 부가 정보
-    val businessHours: List<Map<String, Any>>? = null,
     val contact: String? = null,
     val description: String? = null,
     val mainImageUrl: String? = null,
@@ -67,11 +65,7 @@ data class StoreCreateRequest(
             contactNumber = this.contact,
             description = this.description,
             imageUrl = this.mainImageUrl,
-            pickUpInfo = PickUpInfoDto(
-                pickupStartTime = this.pickupStartTime?.let { LocalTime.parse(it) },
-                pickupEndTime = this.pickupEndTime?.let { LocalTime.parse(it) },
-                pickupDay = StoreEnum.PickupDay.valueOf(this.pickupDay!!.uppercase())
-            ),
+            pickUpDay = pickupDay,
             storeCategoryInfo = StoreCategoryInfoDto(
                 storeCategory = this.storeCategory,
                 foodCategory = this.foodCategory

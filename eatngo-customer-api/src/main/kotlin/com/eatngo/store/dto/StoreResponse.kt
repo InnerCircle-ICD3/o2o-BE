@@ -11,9 +11,9 @@ data class StoreResponse(
     val name: String,
     val mainImageUrl: String?,
     val status: String,
-    val pickupStartTime: LocalTime?,
-    val pickupEndTime: LocalTime?,
     val pickupDay: String?,
+    val todayPickupStartTime: LocalTime?,
+    val todayPickupEndTime: LocalTime?,
     val distance: Double?,
     val ratingAverage: Double,
     val ratingCount: Int,
@@ -26,9 +26,9 @@ data class StoreResponse(
                 name = storeDto.name,
                 mainImageUrl = storeDto.imageUrl,
                 status = storeDto.status.name,
-                pickupStartTime = storeDto.pickUpInfo.pickupStartTime!!,
-                pickupEndTime = storeDto.pickUpInfo.pickupEndTime!!,
-                pickupDay = storeDto.pickUpInfo.pickupDay?.name,
+                todayPickupStartTime = storeDto.todayPickupStartTime,
+                todayPickupEndTime = storeDto.todayPickupEndTime,
+                pickupDay = storeDto.pickUpDay,
                 distance = distance,
                 ratingAverage = storeDto.reviewInfo.ratingAverage,
                 ratingCount = storeDto.reviewInfo.ratingCount,
@@ -50,14 +50,14 @@ data class StoreDetailResponse(
     val businessNumber: String,
     val businessHours: List<BusinessHourDto>,
     val address: AddressDto,
-    val pickupStartTime: LocalTime?,
-    val pickupEndTime: LocalTime?,
     val pickupDay: String?,
+    val todayPickupStartTime: LocalTime?,
+    val todayPickupEndTime: LocalTime?,
     val status: String,
     val ratingAverage: Double,
     val ratingCount: Int,
     val foodCategory: List<String>?,
-    val storeCategory: List<StoreEnum.StoreCategory>,
+    val storeCategory: List<String>?,
 ) {
     companion object {
         fun from(storeDto: StoreDto): StoreDetailResponse {
@@ -88,14 +88,14 @@ data class StoreDetailResponse(
                         longitude = storeDto.address.coordinate.longitude
                     )
                 ),
-                pickupStartTime = storeDto.pickUpInfo.pickupStartTime,
-                pickupEndTime = storeDto.pickUpInfo.pickupEndTime,
-                pickupDay = storeDto.pickUpInfo.pickupDay?.name,
+                todayPickupStartTime = storeDto.todayPickupStartTime,
+                todayPickupEndTime = storeDto.todayPickupEndTime,
+                pickupDay = storeDto.pickUpDay,
                 status = storeDto.status.name,
                 ratingAverage = storeDto.reviewInfo.ratingAverage,
                 ratingCount = storeDto.reviewInfo.ratingCount,
                 foodCategory = storeDto.storeCategoryInfo.foodCategory,
-                storeCategory = storeDto.storeCategoryInfo.storeCategory,
+                storeCategory = storeDto.storeCategoryInfo.storeCategory
             )
         }
     }
