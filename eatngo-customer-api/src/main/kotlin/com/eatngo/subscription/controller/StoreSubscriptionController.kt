@@ -1,9 +1,9 @@
-package com.eatngo.store.controller
+package com.eatngo.subscription.controller
 
 import com.eatngo.auth.annotation.CustomerId
 import com.eatngo.common.response.ApiResponse
-import com.eatngo.store.dto.StoreSubscriptionResponse
-import com.eatngo.store.dto.SubscriptionToggleResponse
+import com.eatngo.subscription.dto.StoreSubscriptionResponse
+import com.eatngo.subscription.dto.SubscriptionToggleResponse
 import com.eatngo.subscription.usecase.CustomerSubscriptionQueryUseCase
 import com.eatngo.subscription.usecase.CustomerSubscriptionToggleUseCase
 import io.swagger.v3.oas.annotations.Operation
