@@ -51,9 +51,9 @@ data class SearchFilter(
             time: String? = null,
             status: StoreEnum.StoreStatus?,
         ): SearchFilter {
-            val storeCategory = storeCategory?.let { StoreEnum.StoreCategory.fromString(it) }
+            val storeCategoryEnum = storeCategory?.let { StoreEnum.StoreCategory.fromString(it) }
             return SearchFilter(
-                storeCategory = storeCategory,
+                storeCategory = storeCategoryEnum,
                 time = time,
                 status = status,
             )
