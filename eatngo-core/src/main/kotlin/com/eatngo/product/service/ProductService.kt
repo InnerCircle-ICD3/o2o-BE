@@ -1,6 +1,8 @@
 package com.eatngo.product.service
 
 import com.eatngo.common.exception.ProductException.ProductNotFound
+import com.eatngo.common.exception.StoreException
+import com.eatngo.common.exception.StoreException.StoreNotFound
 import com.eatngo.extension.orThrow
 import com.eatngo.file.FileStorageService
 import com.eatngo.inventory.dto.InventoryDto
@@ -12,6 +14,8 @@ import com.eatngo.product.dto.ProductAfterStockDto
 import com.eatngo.product.dto.ProductCurrentStockDto
 import com.eatngo.product.dto.ProductDto
 import com.eatngo.product.infra.ProductPersistence
+import com.eatngo.store.domain.Store
+import com.eatngo.store.infra.StorePersistence
 import org.springframework.cache.annotation.CacheEvict
 import org.springframework.cache.annotation.CachePut
 import org.springframework.cache.annotation.Cacheable
@@ -25,7 +29,7 @@ class ProductService(
     private val productPersistence: ProductPersistence,
     private val fileStorageService: FileStorageService,
     private val inventoryService: InventoryService,
-    // TODO storeRepository
+    private val storePersistence: StorePersistence
 ) {
 
     @Caching(
@@ -35,7 +39,8 @@ class ProductService(
     fun createProduct(
         productDto: ProductDto,
     ): ProductDto {
-        // TODO storeRepo.findById()
+        val store: Store = storePersistence.findById(productDto.storeId)
+            .orThrow { StoreNotFound(productDto.storeId) }
         val price = ProductPrice.create(productDto.price.originalPrice)
         val foodTypes = FoodTypes.create(productDto.foodTypes)
 
@@ -46,7 +51,7 @@ class ProductService(
                     description = productDto.description,
                     price = price,
                     imageUrl = productDto.imageUrl,
-                    storeId = productDto.storeId,
+                    storeId = store.id,
                     foodTypes = foodTypes,
                 )
             }
@@ -57,7 +62,7 @@ class ProductService(
                     description = productDto.description,
                     price = price,
                     imageUrl = productDto.imageUrl,
-                    storeId = productDto.storeId,
+                    storeId = store.id,
                     foodTypes = foodTypes,
                 )
             }
@@ -68,7 +73,7 @@ class ProductService(
                     description = productDto.description,
                     price = price,
                     imageUrl = productDto.imageUrl,
-                    storeId = productDto.storeId,
+                    storeId = store.id,
                     foodTypes = foodTypes,
                 )
             }
@@ -89,8 +94,7 @@ class ProductService(
         storeId: Long,
         productId: Long
     ): ProductDto {
-        // TODO storePersistence.findById(storeId)
-        val product: Product = productPersistence.findById(productId)
+        val product: Product = productPersistence.findByIdAndStoreId(productId, storeId)
             .orThrow { ProductNotFound(productId) }
 
         val inventoryDetails: InventoryDto = inventoryService.getInventoryDetails(productId)
