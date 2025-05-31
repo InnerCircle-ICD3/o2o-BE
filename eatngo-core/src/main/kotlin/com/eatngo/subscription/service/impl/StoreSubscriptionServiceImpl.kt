@@ -2,6 +2,7 @@ package com.eatngo.subscription.service.impl
 
 import com.eatngo.common.exception.StoreException
 import com.eatngo.extension.orThrow
+import com.eatngo.product.infra.ProductPersistence
 import com.eatngo.store.infra.StorePersistence
 import com.eatngo.subscription.domain.StoreSubscription
 import com.eatngo.subscription.dto.StoreSubscriptionDto
@@ -17,7 +18,7 @@ import java.time.LocalDateTime
 class StoreSubscriptionServiceImpl(
     private val storeSubscriptionPersistence: StoreSubscriptionPersistence,
     private val storePersistence: StorePersistence,
-//    private val productPersistence: ProductPersistence
+    private val productPersistence: ProductPersistence
 ) : StoreSubscriptionService {
     // 임시 상품 정보 (할인율 10%, 원가 10,000원, 할인가 9,000원)
     private val tempProductInfo = object {
@@ -43,10 +44,7 @@ class StoreSubscriptionServiceImpl(
             subscription = resultSubscription,
             storeName = store.name.value,
             mainImageUrl = store.imageUrl,
-            status = store.status,
-            discountRate = tempProductInfo.discountRate,
-            originalPrice = tempProductInfo.originalPrice,
-            discountedPrice = tempProductInfo.discountedPrice
+            status = store.status
         )
     }
 
