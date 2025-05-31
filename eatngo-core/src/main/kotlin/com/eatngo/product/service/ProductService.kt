@@ -28,7 +28,6 @@ class ProductService(
     private val fileStorageService: FileStorageService,
     private val inventoryService: InventoryService,
     private val storePersistence: StorePersistence,
-    private val storeTotalInventoryTypeDecider: StoreTotalInventoryTypeDecider
 ) {
     @Transactional
     fun createProduct(
@@ -139,7 +138,11 @@ class ProductService(
         val savedProduct = productPersistence.save(product)
 
         val store: Store = storePersistence.findById(product.storeId).orThrow { StoreNotFound(product.storeId) }
-        val changedInventory: InventoryDto = inventoryService.toggleInventory(productCurrentStockDto, store.id)
+        val changedInventory: InventoryDto = inventoryService.toggleInventory(
+            productCurrentStockDto,
+            store.id,
+            findTotalInitialStocks(store.id)
+        )
 
         return ProductAfterStockDto.create(savedProduct, changedInventory)
     }
