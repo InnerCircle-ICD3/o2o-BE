@@ -1,5 +1,6 @@
 package com.eatngo.store.dto
 
+import com.eatngo.common.constant.StoreEnum
 import java.time.LocalTime
 
 /**
@@ -56,7 +57,7 @@ data class StoreDetailResponse(
     val ratingAverage: Double,
     val ratingCount: Int,
     val foodCategory: List<String>?,
-    val storeCategory: List<String>?,
+    val storeCategory: List<StoreEnum.StoreCategory>,
 ) {
     companion object {
         fun from(storeDto: StoreDto): StoreDetailResponse {
@@ -94,7 +95,7 @@ data class StoreDetailResponse(
                 ratingAverage = storeDto.reviewInfo.ratingAverage,
                 ratingCount = storeDto.reviewInfo.ratingCount,
                 foodCategory = storeDto.storeCategoryInfo.foodCategory,
-                storeCategory = storeDto.storeCategoryInfo.storeCategory!!,
+                storeCategory = storeDto.storeCategoryInfo.storeCategory,
             )
         }
     }
