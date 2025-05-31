@@ -56,7 +56,7 @@ data class StoreDto(
                     BusinessHourDto(it.dayOfWeek, it.openTime, it.closeTime)
                 } ?: emptyList(),
                 storeCategoryInfo = StoreCategoryInfoDto(
-                    storeCategory = store.storeCategoryInfo.storeCategory.map { it.value },
+                    storeCategory = store.storeCategoryInfo.storeCategory.map { it.value.name },
                     foodCategory = store.storeCategoryInfo.foodCategory?.map { it.value }
                 ),
                 status = store.status,

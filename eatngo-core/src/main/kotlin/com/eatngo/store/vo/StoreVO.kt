@@ -92,15 +92,14 @@ value class PickUpInfoVO(val value: Triple<StoreEnum.PickupDay, LocalTime, Local
 }
 
 @JvmInline
-value class StoreCategoryVO(val value: String) {
-    init {
-        require(value.isNotBlank()) { "매장 카테고리는 비어있을 수 없습니다" }
-        require(value.length in 1..10) { "매장 카테고리는 1~10자 사이여야 합니다" }
+value class StoreCategoryVO(val value: StoreEnum.StoreCategory) {
+    companion object {
+        fun from(category: String): StoreCategoryVO =
+            StoreCategoryVO(StoreEnum.StoreCategory.fromString(category)
+                ?: throw IllegalArgumentException("존재하지 않는 카테고리입니다: $category"))
     }
 
-    companion object {
-        fun from(category: String): StoreCategoryVO = StoreCategoryVO(category)
-    }
+    override fun toString(): String = value.category //한글명
 }
 
 @JvmInline

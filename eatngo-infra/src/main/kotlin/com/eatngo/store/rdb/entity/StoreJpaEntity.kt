@@ -57,7 +57,7 @@ class StoreJpaEntity(
 
     @ElementCollection
     @CollectionTable(name = "store_categories", joinColumns = [JoinColumn(name = "store_id")])
-    val storeCategories: MutableList<String> = mutableListOf(),
+    val storeCategories: MutableList<StoreEnum.StoreCategory> = mutableListOf(),
 
     @ElementCollection
     @CollectionTable(name = "store_food_categories", joinColumns = [JoinColumn(name = "store_id")])
@@ -133,7 +133,7 @@ class StoreJpaEntity(
                 imageUrl = imageUrl?.let { ImageUrlVO.from(it) },
                 businessHours = businessHours.map { BusinessHourJpaEntity.toVO(it) },
                 storeCategoryInfo = StoreCategoryInfo(
-                    storeCategory = storeCategories.map { StoreCategoryVO.from(it) },
+                    storeCategory = storeCategories.map { StoreCategoryVO(it) },
                     foodCategory = foodCategories.map { FoodCategoryVO.from(it) }
                 ),
                 status = status,
