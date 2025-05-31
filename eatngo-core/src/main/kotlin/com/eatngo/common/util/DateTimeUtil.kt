@@ -7,7 +7,10 @@ object DateTimeUtil {
     /**
      * LocalDateTime을 HH:mm 형식의 문자열로 변환합니다.
      */
-    fun formatTimeToString(time: LocalDateTime): String = time.toLocalTime().toString().substring(0, 5)
+    fun formatTimeToString(time: LocalDateTime): String {
+        val localtime = time.toLocalTime()
+        return String.format("%02d:%02d", localtime.hour, localtime.minute)
+    }
 
     /**
      * HH:mm 형식의 문자열을 LocalTime으로 변환합니다.
