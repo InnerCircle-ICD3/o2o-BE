@@ -82,7 +82,10 @@ jobs:
             cpu,
             memory,
             executionRoleArn,
-            containerDefinitions: (.containerDefinitions | map(.image = $IMAGE)),
+            containerDefinitions: (.containerDefinitions | map(
+                .image = $IMAGE
+              )
+            )
           }' task-def-raw.json > task-def-store-owner.json
 
           aws ecs register-task-definition \
@@ -106,4 +109,4 @@ jobs:
             --service eatngo-store-owner-api-service \
             --task-definition eatngo-store-owner-api:${{ env.STORE_OWNER_REVISION }} \
             --force-new-deployment \
-            --region $AWS_REGION
+            --region $AWS_REGION 
