@@ -6,4 +6,5 @@ interface InventoryPersistence {
     fun save(inventory: Inventory): Inventory
     fun findTopByProductIdOrderByVersionDesc(productId: Long): Inventory?
     fun deleteByProductId(productId: Long)
+    fun updateStock(productId: Long, stockQuantity: Int): Int
 }

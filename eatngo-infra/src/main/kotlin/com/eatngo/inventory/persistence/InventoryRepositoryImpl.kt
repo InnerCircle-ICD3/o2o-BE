@@ -17,9 +17,15 @@ class InventoryRepositoryImpl(
 
     override fun findTopByProductIdOrderByVersionDesc(productId: Long): Inventory? {
         return jpaInventoryRepository.findTopByProductIdOrderByVersionDesc(productId)
+            .map(InventoryMapper::toDomain)
+            .orElse(null)
     }
 
     override fun deleteByProductId(productId: Long) {
         jpaInventoryRepository.deleteByProductId(productId)
+    }
+
+    override fun updateStock(productId: Long, stockQuantity: Int): Int {
+        return jpaInventoryRepository.updateStock(productId, stockQuantity)
     }
 }

@@ -39,11 +39,11 @@ data class Inventory(
 
     private fun decreaseStock(amount: Int): Inventory {
         validateStock(amount)
-        return Inventory(this.id, this.quantity, this.quantity - amount, this.productId)
+        return Inventory(this.id, this.quantity, this.stock - amount, this.productId)
     }
 
     private fun validateStock(amount: Int) {
-        require(this.stock - amount < 0) { "재고는 음수가 될 수 없습니다." }
+        require(this.stock - amount >= 0) { "재고는 음수가 될 수 없습니다." }
     }
 
     companion object {

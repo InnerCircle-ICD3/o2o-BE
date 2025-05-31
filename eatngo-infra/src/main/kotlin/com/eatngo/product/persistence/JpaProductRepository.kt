@@ -10,17 +10,4 @@ import java.util.*
 interface JpaProductRepository : JpaRepository<ProductEntity, Long> {
     fun findAllByStoreId(storeId: Long): List<ProductEntity>
     fun findByIdAndStoreId(productId: Long, storeId: Long): Optional<ProductEntity>
-
-    @Modifying(clearAutomatically = true, flushAutomatically = true)
-    @Query(
-        """
-        UPDATE ProductEntity p
-           SET p.inventory.stock = :stock
-         WHERE p.id = :productId
-        """
-    )
-    fun updateStock(
-        @Param("productId") productId: Long,
-        @Param("stock") stock: Int
-    ): Int
 }

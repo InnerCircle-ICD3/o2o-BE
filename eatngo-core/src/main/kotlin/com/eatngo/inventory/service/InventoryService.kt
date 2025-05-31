@@ -39,7 +39,7 @@ class InventoryService(
         inventoryPersistence.deleteByProductId(productId)
     }
 
-    @CacheEvict("inventory", key = "#productCurrentStockDto.id")
+    @CachePut("inventory", key = "#productCurrentStockDto.id")
     fun toggleInventory(productCurrentStockDto: ProductCurrentStockDto): InventoryDto {
         val inventory: Inventory = inventoryPersistence.findTopByProductIdOrderByVersionDesc(productCurrentStockDto.id)
             .orThrow { InventoryNotFound(productCurrentStockDto.id) }

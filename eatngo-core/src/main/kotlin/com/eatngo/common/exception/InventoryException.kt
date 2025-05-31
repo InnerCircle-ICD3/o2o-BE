@@ -9,8 +9,8 @@ open class InventoryException(
 ) : RuntimeException(message) {
 
     class InventoryNotFound(productId: Long) : InventoryException(
-        BusinessErrorCode.PRODUCT_NOT_FOUND,
-        "${BusinessErrorCode.PRODUCT_NOT_FOUND.message} (ID: $productId)",
+        BusinessErrorCode.INVENTORY_NOT_FOUND,
+        "${BusinessErrorCode.INVENTORY_NOT_FOUND.message} (ID: $productId)",
         mapOf("productId" to productId)
     )
 

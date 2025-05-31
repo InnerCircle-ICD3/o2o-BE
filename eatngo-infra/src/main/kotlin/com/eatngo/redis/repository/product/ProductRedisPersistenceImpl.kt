@@ -1,4 +1,4 @@
-package com.eatngo.product.persistence
+package com.eatngo.redis.repository.product
 
 import com.eatngo.common.exception.StockException.StockEmpty
 import com.eatngo.common.exception.StockException.StockNotFound
@@ -90,8 +90,8 @@ class ProductRedisPersistenceImpl(
         val result = redisTemplate.execute(script, listOf(pKey(productId)), quantity.toString())
             ?: -2L
         when (result) {
-            -1L -> throw StockNotFound(productId)
-            -2L -> throw StockEmpty(productId)
+            -1L -> throw StockEmpty(productId)
+            -2L -> throw StockNotFound(productId)
         }
         return result.toInt()
     }
