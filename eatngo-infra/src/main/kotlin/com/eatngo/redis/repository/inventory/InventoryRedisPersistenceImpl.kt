@@ -1,9 +1,15 @@
 package com.eatngo.redis.repository.inventory
 
+import com.eatngo.common.exception.InventoryException.InventoryNotFound
 import com.eatngo.common.exception.StockException.StockEmpty
 import com.eatngo.common.exception.StockException.StockNotFound
+import com.eatngo.extension.orThrow
+import com.eatngo.inventory.domain.Inventory
 import com.eatngo.inventory.dto.InventoryDto
 import com.eatngo.inventory.infra.InventoryCachePersistence
+import com.eatngo.inventory.infra.InventoryPersistence
+import org.springframework.cache.annotation.CacheEvict
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.data.redis.core.script.DefaultRedisScript
 import org.springframework.stereotype.Repository
@@ -11,6 +17,7 @@ import org.springframework.stereotype.Repository
 @Repository
 class InventoryRedisPersistenceImpl(
     private val redisTemplate: RedisTemplate<String, String>,
+    private val inventoryPersistence: InventoryPersistence
 ) : InventoryCachePersistence {
 
     companion object {
@@ -24,8 +31,17 @@ class InventoryRedisPersistenceImpl(
             redis.call('HINCRBY', KEYS[1], 'stock', -dec)
             return cur - dec
         """
+
+        private const val LUA_INC_STOCK = """
+            local cur = redis.call('HGET', KEYS[1], 'stock')
+            if (not cur) then return -2 end
+            local inc = tonumber(ARGV[1])
+            redis.call('HINCRBY', KEYS[1], 'stock', inc)
+            return tonumber(cur) + inc
+        """
     }
 
+    @CacheEvict("inventory", key = "#productId")
     override fun decreaseStock(productId: Long, stockQuantityToDecrease: Int): Int {
         val script = DefaultRedisScript(LUA_DEC_STOCK, Long::class.java)
         val result = redisTemplate.execute(script, listOf(pKey(productId)), stockQuantityToDecrease.toString())
@@ -37,28 +53,25 @@ class InventoryRedisPersistenceImpl(
         return result.toInt()
     }
 
+    @Cacheable("inventory", key = "#productId")
     override fun findByProductId(productId: Long): InventoryDto? {
-        val key = pKey(productId)
-
-        val quantityValue = redisTemplate.opsForHash<String, String>()
-            .get(key, "quantity") ?: return null
-        val stockValue = redisTemplate.opsForHash<String, String>()
-            .get(key, "stock") ?: return null
+        val inventory: Inventory = inventoryPersistence.findTopByProductIdOrderByVersionDesc(productId)
+            .orThrow { InventoryNotFound(productId) }
 
         return InventoryDto(
-            quantity = quantityValue.toInt(),
-            stock = stockValue.toInt()
+            quantity = inventory.quantity,
+            stock = inventory.stock
         )
     }
 
+    @CacheEvict("inventory", key = "#productId")
     override fun rollbackStock(productId: Long, stockQuantityToIncrease: Int): Int {
-        val key = pKey(productId)
-
-        val existingStockValue = redisTemplate.opsForHash<String, String>()
-            .get(key, "stock") ?: StockNotFound(productId)
-        val increasedStockValue = redisTemplate.opsForHash<String, String>()
-            .increment(key, "stock", stockQuantityToIncrease.toLong()) ?: StockNotFound(productId)
-
-        return (increasedStockValue as Long).toInt()
+        val script = DefaultRedisScript(LUA_INC_STOCK, Long::class.java)
+        val result = redisTemplate.execute(script, listOf(pKey(productId)), stockQuantityToIncrease.toString())
+            ?: -2L
+        when (result) {
+            -2L -> throw StockNotFound(productId)
+        }
+        return result.toInt()
     }
 }
