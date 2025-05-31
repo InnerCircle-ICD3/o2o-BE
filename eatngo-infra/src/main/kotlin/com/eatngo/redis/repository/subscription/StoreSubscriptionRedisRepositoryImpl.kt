@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit
  */
 @Repository
 class StoreSubscriptionRedisRepositoryImpl(
-    private val redisTemplate: RedisTemplate<Any, Any>,
+    private val redisTemplate: RedisTemplate<String, String>,
     private val objectMapper: ObjectMapper
 ): StoreSubscriptionRedisRepository {
     companion object {
@@ -36,7 +36,7 @@ class StoreSubscriptionRedisRepositoryImpl(
      */
     override fun getStoreSubscriptionCount(storeId: Long): Int? {
         val key = STORE_SUBSCRIPTION_COUNT_KEY.format(storeId)
-        val value = redisTemplate.opsForValue().get(key) as? String
+        val value = redisTemplate.opsForValue().get(key)
         return value?.toIntOrNull()
     }
 
@@ -56,12 +56,13 @@ class StoreSubscriptionRedisRepositoryImpl(
         return redisTemplate.opsForValue().increment(key, -1) ?: 0L
     }
 
+
     /**
      * 고객 구독 목록 캐싱
      */
     override fun setCustomerSubscriptionList(customerId: Long, storeIds: List<Long>) {
         val key = CUSTOMER_SUBSCRIPTION_LIST_KEY.format(customerId)
-        val value = objectMapper.writeValueToJson(storeIds)
+        val value = objectMapper.writeValueAsString(storeIds)
         redisTemplate.opsForValue().set(key, value)
         redisTemplate.expire(key, CACHE_TTL_SECONDS.toLong(), TimeUnit.SECONDS)
     }
@@ -71,7 +72,7 @@ class StoreSubscriptionRedisRepositoryImpl(
      */
     override fun getCustomerSubscriptionList(customerId: Long): List<Long>? {
         val key = CUSTOMER_SUBSCRIPTION_LIST_KEY.format(customerId)
-        val value = redisTemplate.opsForValue().get(key) as? String
+        val value = redisTemplate.opsForValue().get(key)
         return value?.let {
             try {
                 objectMapper.readValue(it, Array<Long>::class.java).toList()

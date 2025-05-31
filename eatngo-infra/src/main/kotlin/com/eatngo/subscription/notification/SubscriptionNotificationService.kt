@@ -6,6 +6,7 @@ import com.eatngo.subscription.event.SubscriptionCreatedEvent
 import com.eatngo.subscription.event.SubscriptionResumedEvent
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.context.event.EventListener
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.stereotype.Service
@@ -21,7 +22,7 @@ import java.util.concurrent.TimeUnit
  */
 @Service
 class SubscriptionNotificationService(
-    private val redisTemplate: RedisTemplate<Any, Any>,
+    private val redisTemplate: RedisTemplate<String, String>,
     private val objectMapper: ObjectMapper
 ) {
     private val logger = LoggerFactory.getLogger(this::class.java)
