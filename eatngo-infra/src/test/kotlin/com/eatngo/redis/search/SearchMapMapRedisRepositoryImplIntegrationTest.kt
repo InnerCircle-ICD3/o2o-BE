@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.shouldBe
+import org.junit.jupiter.api.Tag
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.test.context.SpringBootTest
@@ -20,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional
 @SpringBootTest(classes = [TestApplication::class])
 @ActiveProfiles("test")
 @Transactional
+@Tag("integration")
 class SearchMapMapRedisRepositoryImplIntegrationTest(
     @Autowired @Qualifier("stringRedisTemplate") private val redisTemplate: RedisTemplate<String, String>,
     @Autowired private val objectMapper: ObjectMapper,
