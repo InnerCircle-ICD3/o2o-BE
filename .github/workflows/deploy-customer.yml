@@ -95,7 +95,7 @@ jobs:
                 | .environment += [
                     { name: "SPRING_PROFILES_ACTIVE", value: $PROFILE },
                     { name: "AWS_ACCESS_KEY", value: $ACCESS_KEY },
-                    { name: "AWS_SECRET_KEY", value: $SECRET_KEY },
+                    { name: "AWS_SECRET_KEY", value: $SECRET_KEY }
                   ]
               )
             )
