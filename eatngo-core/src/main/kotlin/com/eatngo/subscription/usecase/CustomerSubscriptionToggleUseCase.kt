@@ -1,12 +1,8 @@
 package com.eatngo.subscription.usecase
 
-import com.eatngo.common.exception.StoreException
-import com.eatngo.store.service.StoreService
-import com.eatngo.subscription.domain.StoreSubscription
 import com.eatngo.subscription.dto.StoreSubscriptionDto
-import com.eatngo.subscription.event.SubscriptionCanceledEvent
-import com.eatngo.subscription.event.SubscriptionCreatedEvent
-import com.eatngo.subscription.event.SubscriptionResumedEvent
+import com.eatngo.subscription.event.SubscriptionEvent
+import com.eatngo.subscription.event.SubscriptionEventStatus
 import com.eatngo.subscription.service.StoreSubscriptionService
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
@@ -31,25 +27,26 @@ class CustomerSubscriptionToggleUseCase(
 
         // 구독 상태에 따라 이벤트 발행
         when {
-            // 구독이 활성화된 경우 (생성 또는 복구)
+            // 구독이 활성화된 경우 (생성)
             dto.deletedAt == null && dto.createdAt == dto.updatedAt -> {
-                // 최초 생성
                 eventPublisher.publishEvent(
-                    SubscriptionCreatedEvent(
+                    SubscriptionEvent(
                         subscriptionId = dto.id,
                         customerId = dto.userId,
                         storeId = dto.storeId,
+                        status = SubscriptionEventStatus.CREATED,
                         timestamp = dto.createdAt
                     )
                 )
             }
+            // 구독이 활성화된 경우 (재구독)
             dto.deletedAt == null && dto.createdAt != dto.updatedAt -> {
-                // 재구독
                 eventPublisher.publishEvent(
-                    SubscriptionResumedEvent(
+                    SubscriptionEvent(
                         subscriptionId = dto.id,
                         customerId = dto.userId,
                         storeId = dto.storeId,
+                        status = SubscriptionEventStatus.RESUMED,
                         timestamp = dto.updatedAt
                     )
                 )
@@ -57,10 +54,11 @@ class CustomerSubscriptionToggleUseCase(
             // 구독이 비활성화(취소/soft delete)된 경우
             dto.deletedAt != null -> {
                 eventPublisher.publishEvent(
-                    SubscriptionCanceledEvent(
+                    SubscriptionEvent(
                         subscriptionId = dto.id,
                         customerId = dto.userId,
                         storeId = dto.storeId,
+                        status = SubscriptionEventStatus.CANCELED,
                         timestamp = dto.updatedAt
                     )
                 )
