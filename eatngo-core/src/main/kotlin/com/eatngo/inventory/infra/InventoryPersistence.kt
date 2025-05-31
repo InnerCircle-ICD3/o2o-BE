@@ -7,4 +7,6 @@ interface InventoryPersistence {
     fun findTopByProductIdOrderByVersionDesc(productId: Long): Inventory?
     fun deleteByProductId(productId: Long)
     fun updateStock(productId: Long, stockQuantity: Int): Int
+    fun findAllByProductIdIn(productIds: List<Long>): List<Inventory>
+    fun saveAll(inventories: List<Inventory>)
 }
