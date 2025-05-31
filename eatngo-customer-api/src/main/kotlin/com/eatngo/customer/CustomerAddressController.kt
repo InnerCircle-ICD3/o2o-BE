@@ -36,7 +36,7 @@ class CustomerAddressController(
                 CustomerAddress(
                     addressId = 0L,
                     customerId = address.customerId,
-                    point = address.point,
+                    coordinate = address.coordinate,
                     fullAddress = address.fullAddress,
                     customerAddressType = address.customerAddressType,
                     addressTypeDesc = address.addressTypeDesc,

@@ -1,30 +1,35 @@
 package com.eatngo.mongo.entity.search
 
-import com.eatngo.common.type.Point
-import com.eatngo.search.constant.StoreEnum
+import com.eatngo.common.constant.StoreEnum
+import com.eatngo.common.exception.SearchException
+import com.eatngo.extension.orThrow
+import com.eatngo.search.domain.Coordinate
 import com.eatngo.search.domain.SearchStore
-import com.eatngo.search.dto.BusinessHoursDto
+import com.eatngo.search.domain.SearchStoreStatus
+import com.eatngo.search.domain.TimeRange
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.geo.GeoJsonPoint
 import org.springframework.data.mongodb.core.index.GeoSpatialIndexed
 import org.springframework.data.mongodb.core.mapping.Document
-import java.time.LocalDate
+import org.springframework.data.mongodb.core.mapping.Field
+import java.time.DayOfWeek
 import java.time.LocalDateTime
-import java.time.LocalTime
 
 @Document(collection = "SearchStore")
 class SearchStoreEntity(
     @Id
-    var storeId: Long = 0L,
-    var storeName: String = "",
-    var storeImage: String = "", // 매장 이미지 S3 URL
-    var category: List<StoreEnum.StoreCategory> = emptyList(),
-    var open: Boolean = true, // 매장 오픈 여부
-    var openTime: LocalDateTime = LocalDateTime.of(LocalDate.now(), LocalTime.of(9, 0)), // 매장 오픈 시간
-    var closeTime: LocalDateTime = LocalDateTime.of(LocalDate.now(), LocalTime.of(22, 0)), // 매장 마감 시간
-    var roadAddress: String = "",
+    var storeId: Long,
+    var storeName: String,
+    var storeImage: String, // 매장 이미지 S3 URL
+    var storeCategory: List<String>,
+    var foodCategory: List<String>, // 대표 판매 음식 종류
+    var roadNameAddress: String,
     @GeoSpatialIndexed
-    var location: GeoJsonPoint = GeoJsonPoint(0.0, 0.0),
+    var coordinate: GeoJsonPoint,
+    var status: Int, // 매장 오픈 여부
+    @Field("businessHours")
+    var businessHours: Map<DayOfWeek, TimeRange>,
+    var pickupHour: TimeRange, // 매장 픽업 가능 시간
     var updatedAt: LocalDateTime = LocalDateTime.now(), // 마지막 업데이트 시간
     var createdAt: LocalDateTime = LocalDateTime.now(), // 생성 시간
 ) {
@@ -33,48 +38,30 @@ class SearchStoreEntity(
             storeId = storeId,
             storeName = storeName,
             storeImage = storeImage,
-            category = category,
-            open = open,
-            businessHours =
-                BusinessHoursDto(
-                    openTime = openTime,
-                    closeTime = closeTime,
+            storeCategory =
+                storeCategory.map {
+                    StoreEnum.StoreCategory.valueOf(it).orThrow {
+                        SearchException.SearchCategoryNotFound(it)
+                    }
+                },
+            foodCategory = foodCategory,
+            roadNameAddress = roadNameAddress,
+            coordinate =
+                Coordinate.from(
+                    latitude = coordinate.coordinates[1],
+                    longitude = coordinate.coordinates[0],
                 ),
-            roadAddress = roadAddress,
-            location = toPoint(location),
+            status = SearchStoreStatus.from(status),
+            businessHours = businessHours,
+            pickupHour = pickupHour,
             updatedAt = updatedAt,
             createdAt = createdAt,
         )
 
     companion object {
-        fun from(searchStore: SearchStore): SearchStoreEntity =
-            SearchStoreEntity(
-                storeId = searchStore.storeId,
-                storeName = searchStore.storeName,
-                storeImage = searchStore.storeImage,
-                category = searchStore.category,
-                roadAddress = searchStore.roadAddress,
-                open = searchStore.open,
-                openTime = searchStore.businessHours.openTime,
-                closeTime = searchStore.businessHours.closeTime,
-                location =
-                    toGeoJsonPoint(
-                        searchStore.location.lat,
-                        searchStore.location.lng,
-                    ),
-                updatedAt = searchStore.updatedAt,
-                createdAt = searchStore.createdAt,
-            )
-
         fun toGeoJsonPoint(
-            lat: Double,
-            lng: Double,
-        ): GeoJsonPoint = GeoJsonPoint(lng, lat)
-
-        fun toPoint(geoJsonPoint: GeoJsonPoint): Point =
-            Point(
-                lat = geoJsonPoint.coordinates[1],
-                lng = geoJsonPoint.coordinates[0],
-            )
+            latitude: Double,
+            longitude: Double,
+        ): GeoJsonPoint = GeoJsonPoint(longitude, latitude)
     }
 }

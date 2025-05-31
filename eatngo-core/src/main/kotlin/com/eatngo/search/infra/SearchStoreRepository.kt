@@ -1,25 +1,34 @@
 package com.eatngo.search.infra
 
 import com.eatngo.search.domain.SearchStore
+import com.eatngo.search.dto.AutoCompleteStoreNameDto
 import com.eatngo.search.dto.Box
 import com.eatngo.search.dto.SearchFilter
+import com.eatngo.search.dto.SearchStoreWithDistance
 
 interface SearchStoreRepository {
-    fun findBox(
-        box: Box,
-    ): List<SearchStore>
+    fun findBox(box: Box): List<SearchStore>
+
+    fun listStore(
+        longitude: Double,
+        latitude: Double,
+        maxDistance: Double,
+        searchFilter: SearchFilter,
+        page: Int = 0,
+        size: Int = 20,
+    ): List<SearchStoreWithDistance>
 
     fun searchStore(
-        lng: Double,
-        lat: Double,
+        longitude: Double,
+        latitude: Double,
         maxDistance: Double,
-        searchFilter: SearchFilter? = null,
+        searchText: String,
         page: Int = 0,
         size: Int = 20,
     ): List<SearchStore>
 
-    fun searchStoreRecommend(
+    fun autocompleteStoreName(
         keyword: String,
-        size: Int = 10
-    ): List<String>
+        size: Int = 5,
+    ): List<AutoCompleteStoreNameDto>
 }

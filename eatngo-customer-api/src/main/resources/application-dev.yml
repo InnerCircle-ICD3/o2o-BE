@@ -4,7 +4,7 @@ server:
 spring:
   config:
     import:
-      - classpath:auth-common-application.yml
+      - classpath:auth-application.yml
       - aws-parameterstore:/eatngo/
   cloud:
     aws:
