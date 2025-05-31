@@ -15,11 +15,13 @@ import io.kotest.matchers.longs.shouldBeGreaterThan
 import io.kotest.matchers.shouldBe
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
+import org.junit.jupiter.api.Tag
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.server.LocalServerPort
 import org.springframework.context.annotation.Import
 
 
+@Tag("integration")
 @Import(TestConfiguration::class, CustomerTestHelper::class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class CustomerAddressControllerTest(
