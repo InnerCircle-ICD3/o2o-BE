@@ -52,13 +52,12 @@ subprojects {
 
     tasks.withType<Test> {
         useJUnitPlatform()
+        systemProperty("kotest.tags.exclude", "integration")
     }
 }
 
 tasks.test {
-    useJUnitPlatform {
-        excludeTags("integration")
-    }
+    useJUnitPlatform()
 }
 
 kotlin {
