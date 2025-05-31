@@ -14,6 +14,14 @@ import org.hibernate.annotations.Filter
 
 @Filter(name = DELETED_FILTER)
 @Entity
+@Table(
+    uniqueConstraints = [
+        UniqueConstraint(
+            name = "uk_customer_address",
+            columnNames = ["customer_id", "road_name_address", "lot_number_address"]
+        )
+    ]
+)
 data class CustomerAddressJpaEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

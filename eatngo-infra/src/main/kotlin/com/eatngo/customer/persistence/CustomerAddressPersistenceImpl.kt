@@ -8,6 +8,7 @@ import com.eatngo.customer.infra.CustomerAddressPersistence
 import com.eatngo.customer.rdb.entity.CustomerAddressJpaEntity
 import com.eatngo.customer.rdb.entity.CustomerJpaEntity
 import com.eatngo.customer.rdb.repository.CustomerAddressRdbRepository
+import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 
@@ -17,15 +18,22 @@ class CustomerAddressPersistenceImpl(
     private val customerAddressRdbRepository: CustomerAddressRdbRepository,
 ) : CustomerAddressPersistence {
     override fun save(customer: Customer, customerAddress: CustomerAddress): CustomerAddress {
-        val customerAddressJpaEntity = customerAddressRdbRepository.save(
-            CustomerAddressJpaEntity.of(
-                customer = CustomerJpaEntity.from(customer),
-                customerAddress = customerAddress
+        try {
+            val customerAddressJpaEntity = customerAddressRdbRepository.save(
+                CustomerAddressJpaEntity.of(
+                    customer = CustomerJpaEntity.from(customer),
+                    customerAddress = customerAddress
+                )
             )
-        )
-        return customerAddressRdbRepository.findById(customerAddressJpaEntity.id)
-            .orElseThrow { CustomerAddressException.CustomerAddressNotFound(customerAddressJpaEntity.id) }
-            .let { CustomerAddressJpaEntity.toCustomerAddress(it) }
+            return customerAddressRdbRepository.findById(customerAddressJpaEntity.id)
+                .orElseThrow { CustomerAddressException.CustomerAddressNotFound(customerAddressJpaEntity.id) }
+                .let { CustomerAddressJpaEntity.toCustomerAddress(it) }
+        } catch (ViolationException: DataIntegrityViolationException) {
+            throw CustomerAddressException.CustomerAddressAlreadyExists(
+                customer.id, customerAddress.address.roadNameAddress,
+                customerAddress.address.lotNumberAddress
+            )
+        }
     }
 
     @SoftDeletedFilter

@@ -20,8 +20,6 @@ enum class BusinessErrorCode(
     // 고객 주소 관련 오류
     CUSTOMER_ADDRESS_NOT_FOUND("CA001", "고객 주소를 찾을 수 없습니다."),
     CUSTOMER_ADDRESS_ALREADY_EXISTS("CA002", "이미 등록된 고객 주소입니다."),
-    CUSTOMER_ADDRESS_CREATION_FAILED("CA003", "고객 주소 등록에 실패했습니다."),
-    CUSTOMER_ADDRESS_DELETION_FAILED("CA004", "고객 주소 삭제에 실패했습니다."),
 
     // 주문 관련 오류
     ORDER_NOT_FOUND("O001", "주문을 찾을 수 없습니다."),
