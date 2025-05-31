@@ -41,7 +41,8 @@ class SearchService(
         page: Int = 0,
         size: Int = 20,
     ): SearchStoreResultDto {
-        val listStore: List<SearchStoreWithDistance> =
+        // TODO: 목데이터 삭제 이후 var -> val
+        var listStore: List<SearchStoreWithDistance> =
             searchStoreRepository
                 .listStore(
                     longitude = storeFilterDto.viewCoordinate.longitude,
@@ -51,6 +52,19 @@ class SearchService(
                     page = page,
                     size = size,
                 ).orThrow { SearchException.SearchStoreListFailed(storeFilterDto.viewCoordinate, storeFilterDto.filter) }
+
+        // TODO: 삭제 예정(테스트 기간 Mock 데이터)
+        if (listStore.isEmpty()) {
+            // Mock 데이터 생성
+            listStore =
+                SearchStore.getMockSearchStoreList().map { searchStore ->
+                    SearchStoreWithDistance(
+                        store = searchStore,
+                        distance = 0.1, // Mock 데이터이므로 임의 거리 설정
+                    )
+                }
+        }
+
         return SearchStoreResultDto.from(
             searchStoreList = listStore,
         )
@@ -70,7 +84,8 @@ class SearchService(
         page: Int,
         size: Int,
     ): SearchStoreResultDto {
-        val searchStoreList: List<SearchStore> =
+        // TODO: 목데이터 삭제 이후 var -> val
+        var searchStoreList: List<SearchStore> =
             searchStoreRepository
                 .searchStore(
                     longitude = storeSearchFilterDto.viewCoordinate.longitude,
@@ -80,6 +95,13 @@ class SearchService(
                     page = page,
                     size = size,
                 ).orThrow { SearchException.SearchStoreSearchFailed(storeSearchFilterDto.viewCoordinate, storeSearchFilterDto.searchText) }
+
+        // TODO: 삭제 예정(테스트 기간 Mock 데이터)
+        if (searchStoreList.isEmpty()) {
+            // Mock 데이터 생성
+            searchStoreList = SearchStore.getMockSearchStoreList()
+        }
+
         return SearchStoreResultDto.from(
             userCoordinate = storeSearchFilterDto.viewCoordinate,
             searchStoreList = searchStoreList,
@@ -105,10 +127,16 @@ class SearchService(
 
         // 검색 결과가 없으면 MongoDB에서 검색하여 가져온 뒤 캐싱한다
         if (seachStoreMapList.isEmpty()) {
-            val searchStoreList: List<SearchStore> =
+            // TODO: 목데이터 삭제 이후 var -> val
+            var searchStoreList: List<SearchStore> =
                 searchStoreRepository.findBox(box).orThrow {
                     SearchException.SearchStoreMapFailed(userCoordinate)
                 }
+            // TODO: 삭제 예정(테스트 기간 Mock 데이터)
+            if (searchStoreList.isEmpty()) {
+                // Mock 데이터 생성
+                searchStoreList = SearchStore.getMockSearchStoreList()
+            }
 
             // Redis에 저장
             searchMapRedisRepository

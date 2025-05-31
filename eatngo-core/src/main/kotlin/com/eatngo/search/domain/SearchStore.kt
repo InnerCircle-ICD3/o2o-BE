@@ -23,4 +23,58 @@ class SearchStore(
     val pickupHour: TimeRange, // 매장 픽업 가능 시간
     val updatedAt: LocalDateTime, // 마지막 업데이트 시간
     val createdAt: LocalDateTime, // 생성 시간
-)
+) {
+    companion object {
+        /**
+         * 임시 Mock 데이터 생성용 생성자
+         * TODO: 삭제 예정
+         */
+        fun getMockSearchStoreList(): List<SearchStore> =
+            listOf(
+                SearchStore(
+                    storeId = 1L,
+                    storeName = "Mock Store 빵집",
+                    coordinate = Coordinate.from(37.001010, 127.001010),
+                    storeCategory = listOf(StoreEnum.StoreCategory.BREAD),
+                    foodCategory = listOf("호밀빵", "케이크"),
+                    roadNameAddress = "서울시 강남구 테헤란로 123",
+                    storeImage = "https://example.com/store-image.jpg",
+                    status = SearchStoreStatus.OPEN,
+                    businessHours =
+                        mapOf(
+                            DayOfWeek.MONDAY to TimeRange("08:00", "20:00"),
+                            DayOfWeek.TUESDAY to TimeRange("08:00", "20:00"),
+                            DayOfWeek.WEDNESDAY to TimeRange("08:00", "20:00"),
+                            DayOfWeek.THURSDAY to TimeRange("08:00", "20:00"),
+                            DayOfWeek.FRIDAY to TimeRange("08:00", "20:00"),
+                            DayOfWeek.SATURDAY to TimeRange("11:00", "14:00"),
+                            DayOfWeek.SUNDAY to TimeRange("10:00", "14:00"),
+                        ),
+                    pickupHour = TimeRange("08:00", "20:00"),
+                    updatedAt = LocalDateTime.now(),
+                    createdAt = LocalDateTime.now(),
+                ),
+                SearchStore(
+                    storeId = 2L,
+                    storeName = "Mock Store 디저트",
+                    coordinate = Coordinate.from(37.001000, 127.001000),
+                    storeCategory = listOf(StoreEnum.StoreCategory.DESSERT),
+                    foodCategory = listOf("호밀빵", "케이크"),
+                    roadNameAddress = "서울시 강남구 테헤란로 123",
+                    storeImage = "https://example.com/store-image.jpg",
+                    status = SearchStoreStatus.OPEN,
+                    businessHours =
+                        mapOf(
+                            DayOfWeek.MONDAY to TimeRange("08:00", "21:00"),
+                            DayOfWeek.TUESDAY to TimeRange("10:00", "21:00"),
+                            DayOfWeek.THURSDAY to TimeRange("10:00", "23:00"),
+                            DayOfWeek.FRIDAY to TimeRange("08:00", "23:00"),
+                            DayOfWeek.SATURDAY to TimeRange("11:00", "14:00"),
+                        ),
+                    pickupHour = TimeRange("21:00", "23:00"),
+                    updatedAt = LocalDateTime.now(),
+                    createdAt = LocalDateTime.now(),
+                ),
+            )
+    }
+}
