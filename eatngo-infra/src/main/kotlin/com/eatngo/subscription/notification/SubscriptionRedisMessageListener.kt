@@ -55,7 +55,7 @@ class SubscriptionRedisMessageListener(
             logger.info("구독 알림 수신: {}, 채널: {}", payload.type, pattern)
             
             // 해당 사용자 및 점주에게 SSE 알림 전송
-            // 별도의 처리 로직이 필요하면 여기에 추가
+            //TODO: 추가 로직 구현?
         } catch (e: Exception) {
             logger.error("구독 알림 처리 오류: {}", e.message)
         }

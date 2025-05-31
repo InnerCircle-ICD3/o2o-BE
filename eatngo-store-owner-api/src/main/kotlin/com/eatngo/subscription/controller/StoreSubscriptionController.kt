@@ -23,14 +23,4 @@ class StoreOwnerSubscriptionController(
          val response = storeOwnerSubscriptionQueryUseCase.getSubscriptionsByStoreId(storeId, storeOwnerId)
          return ApiResponse.success(response.map { SubscriptionResponseForStoreOwner.fromStoreSubscriptionDto(it) })
     }
-    
-    @Operation(summary = "매장 구독자 수 조회", description = "점주가 운영중인 매장의 구독자 수를 조회합니다.")
-    @GetMapping("/stores/{storeId}/count")
-    fun getStoreSubscriptionCount(
-        @PathVariable storeId: Long, 
-        @StoreOwnerId storeOwnerId: Long
-    ): ApiResponse<Int> {
-         val count = storeOwnerSubscriptionQueryUseCase.getSubscriptionCountByStoreId(storeId, storeOwnerId)
-         return ApiResponse.success(count)
-    }
 }

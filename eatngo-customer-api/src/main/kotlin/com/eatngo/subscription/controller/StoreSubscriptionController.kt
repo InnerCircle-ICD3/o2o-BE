@@ -35,14 +35,4 @@ class CustomerStoreSubscriptionController(
          val subscriptions = customerSubscriptionQueryUseCase.getSubscriptionsByCustomerId(customerId)
          return ApiResponse.success(subscriptions.map { StoreSubscriptionResponse.from(it) })
     }
-    
-    @Operation(summary = "구독 상세 조회", description = "특정 구독 정보를 상세 조회합니다.")
-    @GetMapping("/{subscriptionId}")
-    fun getSubscription(
-        @PathVariable subscriptionId: Long,
-        @CustomerId customerId: Long
-    ): ApiResponse<StoreSubscriptionResponse> {
-         val subscription = customerSubscriptionQueryUseCase.getSubscriptionById(subscriptionId, customerId)
-         return ApiResponse.success(StoreSubscriptionResponse.from(subscription))
-    }
 }

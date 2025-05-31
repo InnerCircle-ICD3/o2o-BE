@@ -1,4 +1,4 @@
-package com.eatngo.store.service.Impl
+package com.eatngo.store.service.impl
 
 import com.eatngo.common.constant.StoreEnum
 import com.eatngo.common.exception.StoreException

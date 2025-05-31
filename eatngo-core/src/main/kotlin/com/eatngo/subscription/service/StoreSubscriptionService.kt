@@ -9,7 +9,7 @@ interface StoreSubscriptionService {
     /**
      * 상점 구독 생성/취소
      */
-    fun toggleSubscription(storeId: Long): StoreSubscriptionDto
+    fun toggleSubscription(storeId: Long, customerId: Long): StoreSubscriptionDto
 
     /**
      * ID로 상점 구독 조회
@@ -19,7 +19,7 @@ interface StoreSubscriptionService {
     /**
      * 사용자 ID로 상점 구독 목록 조회
      */
-    fun getMySubscriptions(): List<StoreSubscriptionDto>
+    fun getMySubscriptions(customerId: Long): List<StoreSubscriptionDto>
 
     /**
      * 매장 ID로 상점 구독 목록 조회

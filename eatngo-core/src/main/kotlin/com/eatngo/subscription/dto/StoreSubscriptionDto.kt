@@ -10,7 +10,6 @@ import java.time.LocalDateTime
 data class StoreSubscriptionDto(
     val id: Long,
     val userId: Long,
-    val userName: String? = null,
     val storeId: Long,
     val storeName: String,            // 매장명
     val mainImageUrl: String?,        // 매장 대표 이미지
@@ -33,7 +32,6 @@ data class StoreSubscriptionDto(
          */
         fun from(
             subscription: StoreSubscription,
-            userName: String,
             storeName: String,
             mainImageUrl: String?,
             status: StoreEnum.StoreStatus,
@@ -44,7 +42,6 @@ data class StoreSubscriptionDto(
             return StoreSubscriptionDto(
                 id = subscription.id,
                 userId = subscription.userId,
-                userName = userName,
                 storeId = subscription.storeId,
                 storeName = storeName,
                 mainImageUrl = mainImageUrl,
