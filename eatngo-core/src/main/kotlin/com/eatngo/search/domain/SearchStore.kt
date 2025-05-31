@@ -20,6 +20,7 @@ class SearchStore(
     val coordinate: Coordinate, // 매장 위치(위도, 경도)
     val status: SearchStoreStatus, // 매장 오픈 여부
     val businessHours: Map<DayOfWeek, TimeRange>, // 매장 영업 시간
+    val pickUpDay: StoreEnum.PickupDay, //픽업가능 요일
     val pickupHour: TimeRange, // 매장 픽업 가능 시간
     val updatedAt: LocalDateTime, // 마지막 업데이트 시간
     val createdAt: LocalDateTime, // 생성 시간
@@ -50,6 +51,7 @@ class SearchStore(
                             DayOfWeek.SATURDAY to TimeRange("11:00", "14:00"),
                             DayOfWeek.SUNDAY to TimeRange("10:00", "14:00"),
                         ),
+                    pickUpDay = StoreEnum.PickupDay.TODAY,
                     pickupHour = TimeRange("08:00", "20:00"),
                     updatedAt = LocalDateTime.now(),
                     createdAt = LocalDateTime.now(),
@@ -71,6 +73,7 @@ class SearchStore(
                             DayOfWeek.FRIDAY to TimeRange("08:00", "23:00"),
                             DayOfWeek.SATURDAY to TimeRange("11:00", "14:00"),
                         ),
+                    pickUpDay = StoreEnum.PickupDay.TODAY,
                     pickupHour = TimeRange("21:00", "23:00"),
                     updatedAt = LocalDateTime.now(),
                     createdAt = LocalDateTime.now(),

@@ -64,7 +64,7 @@ data class StoreDto(
                     foodCategory = store.storeCategoryInfo.foodCategory?.map { it.value }
                 ),
                 status = store.status,
-                pickUpDay = store.pickUpDay.pickupDay.name,
+                pickUpDay = store.pickUpDay.pickUpDay.name,
                 todayPickupStartTime = todayHour?.openTime,
                 todayPickupEndTime = todayHour?.closeTime,
                 reviewInfo = ReviewInfoDto(

@@ -11,7 +11,6 @@ import com.eatngo.store.vo.*
 import com.fasterxml.jackson.annotation.JsonInclude
 import jakarta.persistence.*
 import org.hibernate.annotations.Filter
-import java.time.LocalTime
 
 @Entity
 @Filter(name = DELETED_FILTER)
@@ -68,13 +67,7 @@ class StoreJpaEntity(
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    val pickupDay: StoreEnum.PickupDay,
-
-    @Column(nullable = false)
-    val pickupStartTime: LocalTime,
-
-    @Column(nullable = false)
-    val pickupEndTime: LocalTime
+    val pickUpDay: StoreEnum.PickupDay
 ) : BaseJpaEntity() {
     companion object {
         fun from(store: Store): StoreJpaEntity {
@@ -100,9 +93,7 @@ class StoreJpaEntity(
                 storeCategories = store.storeCategoryInfo.storeCategory.map { it.value }.toMutableList(),
                 foodCategories = store.storeCategoryInfo.foodCategory?.map { it.value }?.toMutableList() ?: mutableListOf(),
                 status = store.status,
-                pickupDay = store.pickUpDay.pickupDay,
-                pickupStartTime = store.pickUpDay.pickupStartTime,
-                pickupEndTime = store.pickUpDay.pickupEndTime
+                pickUpDay = store.pickUpDay.pickUpDay
             )
 
             store.businessHours?.forEach {
@@ -137,7 +128,7 @@ class StoreJpaEntity(
                     foodCategory = foodCategories.map { FoodCategoryVO.from(it) }
                 ),
                 status = status,
-                pickUpDay = PickUpDayVO.from(pickupDay, pickupStartTime, pickupEndTime),
+                pickUpDay = PickUpDayVO.from(pickUpDay),
                 createdAt = createdAt,
                 updatedAt = updatedAt,
                 deletedAt = deletedAt
