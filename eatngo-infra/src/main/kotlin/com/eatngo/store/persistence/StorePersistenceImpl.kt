@@ -1,5 +1,6 @@
 package com.eatngo.store.persistence
 
+import com.eatngo.aop.SoftDeletedFilter
 import com.eatngo.extension.mapOrNull
 import com.eatngo.store.domain.Store
 import com.eatngo.store.infra.StorePersistence
@@ -14,16 +15,19 @@ import org.springframework.stereotype.Component
 class StorePersistenceImpl(
     private val storeRdbRepository: StoreRdbRepository
 ) : StorePersistence {
-    
+
+    @SoftDeletedFilter
     override fun findById(id: Long): Store? =
         storeRdbRepository
             .findById(id)
             .mapOrNull(StoreJpaEntity::toStore)
 
+    @SoftDeletedFilter
     override fun findAllByIds(storeIds: List<Long>): List<Store> =
         storeRdbRepository.findAllByIds(storeIds)
             .map { StoreJpaEntity.toStore(it) }
 
+    @SoftDeletedFilter
     override fun findByOwnerId(storeOwnerId: Long): List<Store> =
         storeRdbRepository.findByStoreOwnerId(storeOwnerId)
             .map { StoreJpaEntity.toStore(it) }

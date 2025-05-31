@@ -31,7 +31,7 @@ class StoreController(
     private val storeQueryUseCase: StoreQueryUseCase
 ) {
     @Operation(summary = "상점 상세 조회", description = "점주가 운영중인 자신의 상점 상세 정보를 조회합니다.")
-    @GetMapping @SoftDeletedFilter
+    @GetMapping
     fun getStoresByOwnerId(@StoreOwnerId storeOwnerId: Long): ApiResponse<List<StoreDetailResponse>> {
         val storeDtos = storeQueryUseCase.getStoresByStoreOwnerId(storeOwnerId)
         val responses = storeDtos.map { StoreDetailResponse.fromStoreDto(it) }

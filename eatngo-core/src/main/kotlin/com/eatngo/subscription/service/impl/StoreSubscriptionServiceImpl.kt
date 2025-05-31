@@ -79,7 +79,7 @@ class StoreSubscriptionServiceImpl(
         val stores = storePersistence.findAllByIds(storeIds).associateBy { it.id }
 
         return subscriptions.map { subscription ->
-            val store = stores[subscription.storeId] ?: throw StoreException.StoreNotFound(subscription.storeId)
+            val store = stores[subscription.storeId].orThrow {StoreException.StoreNotFound(subscription.storeId)}
             StoreSubscriptionDto.from(
                 subscription = subscription,
                 storeName = store.name.value,
