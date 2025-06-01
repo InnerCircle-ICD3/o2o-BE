@@ -17,8 +17,8 @@ class OrderCreateUseCase(
     fun create(orderDto: OrderCreateDto): OrderDto {
         val order = orderService.createOrder(orderDto)
 
-        OrderEvent.from(order, order.customerId)
-            ?.let { eventPublisher.publishEvent(it) }
+//        OrderEvent.from(order, order.customerId)
+//            ?.let { eventPublisher.publishEvent(it) }
 
         return OrderDto.from(order)
     }
