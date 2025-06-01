@@ -6,6 +6,10 @@ spring:
     import:
       - classpath:auth-application.yml
       - aws-parameterstore:/eatngo/
+  cloud:
+    aws:
+      credentials:
+        use-default-aws-credentials-chain: true
   application:
     name: eatngo-customer-api
   datasource:
