@@ -16,19 +16,19 @@ class ProductPersistenceImpl(
     }
 
     override fun findById(productId: Long): Product? {
-        return productRepository.findById(productId).map {
-            ProductMapper.toDomain(it)
-        }.orElse(null)
+        return productRepository.findById(productId)
+            .map(ProductMapper::toDomain)
+            .orElse(null)
     }
 
     override fun findAllByStoreId(storeId: Long): List<Product> {
         return productRepository.findAllByStoreId(storeId)
-            .map { ProductMapper.toDomain(it) }
+            .map(ProductMapper::toDomain)
     }
 
     override fun findByIdAndStoreId(productId: Long, storeId: Long): Product? {
-        return productRepository.findByIdAndStoreId(productId, storeId).map {
-            ProductMapper.toDomain(it)
-        }.orElse(null)
+        return productRepository.findByIdAndStoreId(productId, storeId)
+            .map(ProductMapper::toDomain)
+            .orElse(null)
     }
 }

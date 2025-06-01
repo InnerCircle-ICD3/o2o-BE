@@ -17,6 +17,10 @@ enum class BusinessErrorCode(
     // 고객 관련 오류
     CUSTOMER_NOT_FOUND("C001", "고객을 찾을 수 없습니다."),
 
+    // 고객 주소 관련 오류
+    CUSTOMER_ADDRESS_NOT_FOUND("CA001", "고객 주소를 찾을 수 없습니다."),
+    CUSTOMER_ADDRESS_ALREADY_EXISTS("CA002", "이미 등록된 고객 주소입니다."),
+
     // 주문 관련 오류
     ORDER_NOT_FOUND("O001", "주문을 찾을 수 없습니다."),
     ORDER_ALREADY_COMPLETED("O002", "이미 완료된 주문입니다."),
@@ -34,6 +38,7 @@ enum class BusinessErrorCode(
     PAYMENT_FAILED("P001", "결제에 실패했습니다."),
     PAYMENT_ALREADY_PROCESSED("P002", "이미 처리된 결제입니다."),
     PAYMENT_AMOUNT_MISMATCH("P003", "결제 금액이 일치하지 않습니다."),
+
 
     // 매장 관련 오류
     STORE_NOT_FOUND("S001", "매장을 찾을 수 없습니다."),
@@ -83,4 +88,9 @@ enum class BusinessErrorCode(
     SEARCH_STORE_MAP_CACHE_FAILED("H006", "지도 정보 캐싱에 실패했습니다."),
     SEARCH_SUGGESTION_FAILED("H007", "추천 검색어 조회에 실패했습니다."),
     SEARCH_CATEGORY_NOT_FOUND("H008", "존재하지 않는 카테고리 입니다."),
+    // 재고 관련 오류
+    STOCK_NOT_FOUND("ST001", "상품의 재고를 찾을 수 없습니다."),
+    STOCK_EMPTY("ST002", "상품의 재고가 없습니다."),
+    INVENTORY_NOT_FOUND("I001", "상품 재고를 찾을 수 없습니다.")
+
 }

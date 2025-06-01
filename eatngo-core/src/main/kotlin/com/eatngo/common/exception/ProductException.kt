@@ -12,21 +12,21 @@ open class ProductException(
 ) : RuntimeException(message) {
 
     // 상품 관련 예외
-    class ProductNotFound(menuId: String) : ProductException(
+    class ProductNotFound(productId: Long) : ProductException(
         BusinessErrorCode.PRODUCT_NOT_FOUND,
-        "${BusinessErrorCode.PRODUCT_NOT_FOUND.message} (ID: $menuId)",
-        mapOf("menuId" to menuId)
+        "${BusinessErrorCode.PRODUCT_NOT_FOUND.message} (ID: $productId)",
+        mapOf("productId" to productId)
     )
 
-    class ProductNotAvailable(menuId: String) : ProductException(
+    class ProductNotAvailable(productId: Long) : ProductException(
         BusinessErrorCode.PRODUCT_NOT_AVAILABLE,
-        "${BusinessErrorCode.PRODUCT_NOT_AVAILABLE.message} (ID: $menuId)",
-        mapOf("menuId" to menuId)
+        "${BusinessErrorCode.PRODUCT_NOT_AVAILABLE.message} (ID: $productId)",
+        mapOf("productId" to productId)
     )
 
-    class ProductSoldOut(menuId: String) : ProductException(
+    class ProductSoldOut(productId: Long) : ProductException(
         BusinessErrorCode.PRODUCT_SOLD_OUT,
-        "${BusinessErrorCode.PRODUCT_SOLD_OUT.message} (ID: $menuId)",
-        mapOf("menuId" to menuId)
+        "${BusinessErrorCode.PRODUCT_SOLD_OUT.message} (ID: $productId)",
+        mapOf("productId" to productId)
     )
 }

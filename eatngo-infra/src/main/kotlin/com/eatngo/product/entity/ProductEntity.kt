@@ -1,21 +1,22 @@
 package com.eatngo.product.entity
 
+import com.eatngo.common.BaseJpaEntity
+import com.eatngo.constants.DELETED_FILTER
 import com.eatngo.product.domain.ProductStatus
 import jakarta.persistence.*
-import org.hibernate.annotations.CreationTimestamp
-import org.hibernate.annotations.SoftDelete
+import org.hibernate.annotations.Filter
 import org.hibernate.annotations.SoftDeleteType
-import org.hibernate.annotations.UpdateTimestamp
-import java.time.LocalDateTime
+import org.springframework.data.redis.core.RedisHash
 
+@Filter(name = DELETED_FILTER)
 @Entity
 @Table(name = "products")
-@SoftDelete
+@RedisHash(value = "product", timeToLive = 600)
 // TODO 이후 DType 추가 필요!
 data class ProductEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    var id: Long? = null,
+    var id: Long = 0L,
 
     @Column(nullable = false)
     var name: String,
@@ -24,16 +25,13 @@ data class ProductEntity(
     var description: String,
 
     @Embedded
-    var inventory: InventoryEmbeddable,
-
-    @Embedded
     var price: ProductPriceEmbeddable,
 
     @Column(columnDefinition = "TEXT")
     var imageUrl: String?,
 
     @Column(nullable = false)
-    var storeId: Long,
+    val storeId: Long,
 
     @ElementCollection
     @CollectionTable(name = "product_entity_food_types", joinColumns = [JoinColumn(name = "product_entity_id")])
@@ -50,13 +48,5 @@ data class ProductEntity(
 
     @Enumerated(EnumType.STRING)
     var deleteStatus: SoftDeleteType,
-
-    @CreationTimestamp
-    @Column(nullable = false, updatable = false)
-    var createdAt: LocalDateTime = LocalDateTime.now(),
-
-    @UpdateTimestamp
-    @Column(nullable = false)
-    var updatedAt: LocalDateTime? = LocalDateTime.now()
-) {
+) : BaseJpaEntity() {
 }

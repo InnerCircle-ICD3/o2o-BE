@@ -1,5 +1,7 @@
 package com.eatngo.product
 
+import com.eatngo.common.response.ApiResponse
+import com.eatngo.inventory.dto.InventoryDto
 import com.eatngo.product.domain.StockActionType
 import com.eatngo.product.domain.StockActionType.DECREASE
 import com.eatngo.product.domain.StockActionType.INCREASE
@@ -8,7 +10,6 @@ import com.eatngo.product.service.ProductService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
-import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
 @Tag(name = "상품", description = "상품 관련 API")
@@ -21,13 +22,13 @@ class ProductController(
     fun createProduct(
         @PathVariable("store-id") storeId: Long,
         @RequestBody createProductRequestDto: CreateProductRequestDto
-    ): ResponseEntity<CreateProductResponseDto> {
+    ): ApiResponse<CreateProductResponseDto> {
         val productDto: ProductDto = productService.createProduct(
             ProductDto(
                 name = createProductRequestDto.name,
                 description = createProductRequestDto.description,
                 size = createProductRequestDto.size,
-                inventory = ProductInventoryDto(createProductRequestDto.quantity),
+                inventory = InventoryDto(createProductRequestDto.quantity),
                 price = ProductPriceDto(createProductRequestDto.originalPrice),
                 imageUrl = createProductRequestDto.image,
                 storeId = storeId,
@@ -35,7 +36,7 @@ class ProductController(
             )
         )
 
-        return ResponseEntity.ok(CreateProductResponseDto.from(productDto))
+        return ApiResponse.success(CreateProductResponseDto.from(productDto))
     }
 
     @GetMapping("/stores/{store-id}/products/{product-id}")
@@ -43,7 +44,7 @@ class ProductController(
     fun getProductDetails(
         @PathVariable("store-id") storeId: Long,
         @PathVariable("product-id") productId: Long
-    ): ResponseEntity<GetProductDetailsResponseDto> = ResponseEntity.ok(
+    ): ApiResponse<GetProductDetailsResponseDto> = ApiResponse.success(
         GetProductDetailsResponseDto.from(
             productService.getProductDetails(storeId, productId)
         )
@@ -53,7 +54,7 @@ class ProductController(
     @Operation(summary = "상품 목록 조회", description = "상품 목록 조회")
     fun getAllProducts(
         @PathVariable("store-id") storeId: Long
-    ): ResponseEntity<List<GetProductDetailsResponseDto>> = ResponseEntity.ok(
+    ): ApiResponse<List<GetProductDetailsResponseDto>> = ApiResponse.success(
         productService.findAllProducts(storeId)
             .map { GetProductDetailsResponseDto.from(it) }
     )
@@ -63,7 +64,7 @@ class ProductController(
     fun deleteProduct(
         @PathVariable("store-id") storeId: Long,
         @PathVariable("product-id") productId: Long,
-    ): ResponseEntity<Unit> = ResponseEntity.ok(
+    ): ApiResponse<Unit> = ApiResponse.success(
         productService.deleteProduct(storeId, productId)
     )
 
@@ -72,12 +73,12 @@ class ProductController(
     fun toggleStock(
         @PathVariable("store-id") storeId: Long,
         @Valid @RequestBody request: ToggleStockRequestDto
-    ): ResponseEntity<ToggleStockResponseDto> {
+    ): ApiResponse<ToggleStockResponseDto> {
         if (StockActionType.fromValue(request.action) !in listOf(INCREASE, DECREASE)) {
             throw IllegalArgumentException("잘못된 action type 입니다. ${request.action}")
         }
 
-        return ResponseEntity.ok(
+        return ApiResponse.success(
             ToggleStockResponseDto.from(
                 productService.toggleStock(
                     ProductCurrentStockDto(
@@ -96,14 +97,14 @@ class ProductController(
         @PathVariable("store-id") storeId: Long,
         @PathVariable("product-id") productId: Long,
         @Valid @RequestBody updateProductRequestDto: UpdateProductRequestDto
-    ): ResponseEntity<UpdateProductResponseDto> {
+    ): ApiResponse<UpdateProductResponseDto> {
         val productDto = productService.modifyProduct(
             ProductDto(
                 id = productId,
                 name = updateProductRequestDto.name,
                 description = updateProductRequestDto.description,
                 size = updateProductRequestDto.size,
-                inventory = ProductInventoryDto(
+                inventory = InventoryDto(
                     updateProductRequestDto.inventory.quantity,
                     updateProductRequestDto.inventory.stock
                 ),
@@ -118,7 +119,7 @@ class ProductController(
             )
         )
 
-        return ResponseEntity.ok(UpdateProductResponseDto.from(productDto))
+        return ApiResponse.success(UpdateProductResponseDto.from(productDto))
     }
 
 }

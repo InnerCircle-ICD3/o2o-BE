@@ -1,6 +1,6 @@
 package com.eatngo.product.dto
 
-import com.eatngo.product.domain.Inventory
+import com.eatngo.inventory.dto.InventoryDto
 import com.eatngo.product.domain.Product
 import com.eatngo.product.domain.ProductPrice
 import java.time.LocalDateTime
@@ -10,7 +10,7 @@ data class ProductDto(
     val name: String,
     val description: String,
     val size: String,
-    val inventory: ProductInventoryDto,
+    val inventory: InventoryDto,
     val price: ProductPriceDto,
     var imageUrl: String? = null,
     val storeId: Long,
@@ -23,6 +23,7 @@ data class ProductDto(
         fun from(
             product: Product,
             imageUrl: String?,
+            inventoryDto: InventoryDto,
         ): ProductDto =
             ProductDto(
                 id = product.id,
@@ -30,29 +31,15 @@ data class ProductDto(
                 description = product.description,
                 // when 이 아닌 추상메소드로 로직 수정
                 size = product.getSize().value,
-                inventory = ProductInventoryDto.from(product.inventory),
+                inventory = inventoryDto,
                 price = ProductPriceDto.from(product.price),
                 imageUrl = imageUrl,
-                storeId = product.storeId!!,
+                storeId = product.storeId,
                 foodTypes = product.foodTypes.foods.map { it.name },
                 status = product.status.name,
                 createdAt = product.createdAt,
                 updatedAt = product.updatedAt,
             )
-    }
-}
-
-data class ProductInventoryDto(
-    val quantity: Int,
-    val stock: Int = quantity,
-) {
-    companion object {
-        fun from(inventory: Inventory): ProductInventoryDto {
-            return ProductInventoryDto(
-                quantity = inventory.quantity,
-                stock = inventory.stock,
-            )
-        }
     }
 }
 

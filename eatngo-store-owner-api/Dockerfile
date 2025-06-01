@@ -1,6 +1,8 @@
 # Dockerfile.eatngo-store-owner-api
 FROM eclipse-temurin:21-jdk-jammy
 
+RUN apt-get update && apt-get install -y ca-certificates && update-ca-certificates
+
 WORKDIR /app
 
 # JAR 파일만 복사 (로컬에서 미리 build되어 있어야 함)
