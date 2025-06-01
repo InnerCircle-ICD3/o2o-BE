@@ -1,7 +1,9 @@
 package com.eatngo.order.persistence
 
+import com.eatngo.common.exception.OrderException
 import com.eatngo.common.response.Cursor
 import com.eatngo.extension.mapOrNull
+import com.eatngo.extension.orThrow
 import com.eatngo.order.domain.Order
 import com.eatngo.order.dto.OrderQueryParamDto
 import com.eatngo.order.infra.OrderPersistence
@@ -45,5 +47,15 @@ class OrderPersistenceImpl(
                 .map(OrderJpaEntity::toOrder),
             cursoredOrderJpaEntities.lastOrNull()?.id
         )
+    }
+
+    override fun update(order: Order): Order {
+        val orderJpaEntity = orderRdbRepository.findById(order.id)
+            .orElseThrow()
+            .orThrow { OrderException.OrderNotFound(order.id) }
+
+        orderJpaEntity.update(order)
+
+        return OrderJpaEntity.toOrder(orderRdbRepository.save(orderJpaEntity))
     }
 }
