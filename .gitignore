@@ -176,6 +176,8 @@ gradle-app.setting
 
 ### Custom
 task-def-customer.json
+task-def-customer-fargate.json
 task-def-store-owner.json
+task-def-store-owner-fargate.json
 
 # End of https://www.toptal.com/developers/gitignore/api/kotlin,macos,intellij+iml,gradle
