@@ -6,11 +6,6 @@ spring:
     import:
       - classpath:auth-application.yml
       - aws-parameterstore:/eatngo/
-  cloud:
-    aws:
-      credentials:
-        access-key: ${AWS_ACCESS_KEY}
-        secret-key: ${AWS_SECRET_KEY}
   application:
     name: eatngo-customer-api
   datasource:
