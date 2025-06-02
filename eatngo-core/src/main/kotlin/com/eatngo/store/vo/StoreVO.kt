@@ -45,17 +45,6 @@ value class ContactNumberVO(val value: String) {
 }
 
 @JvmInline
-value class ImageUrlVO(val value: String) {
-    init {
-        require(value.matches(Regex("^https?://.*"))) { "올바른 URL 형식이 아닙니다" }
-    }
-
-    companion object {
-        fun from(url: String): ImageUrlVO = ImageUrlVO(url)
-    }
-}
-
-@JvmInline
 value class BusinessHourVO(val value: Triple<DayOfWeek, LocalTime, LocalTime>) {
     init {
         require(value.second.isBefore(value.third)) { "영업 종료 시간은 시작 시간보다 이후여야 합니다" }
@@ -75,32 +64,31 @@ value class BusinessHourVO(val value: Triple<DayOfWeek, LocalTime, LocalTime>) {
 }
 
 @JvmInline
-value class PickUpInfoVO(val value: Triple<StoreEnum.PickupDay, LocalTime, LocalTime>) {
-    init {
-        requireNotNull(value.first) { "pickupDay는 null일 수 없습니다." }
-        require(value.second.isBefore(value.third)) { "픽업 종료 시간은 시작 시간보다 이후여야 합니다" }
-    }
-
-    val pickupDay: StoreEnum.PickupDay get() = value.first
-    val pickupStartTime: LocalTime get() = value.second
-    val pickupEndTime: LocalTime get() = value.third
-
+value class PickUpDayVO(val pickUpDay: StoreEnum.PickupDay) {
     companion object {
-        fun from(pickupDay: StoreEnum.PickupDay, pickupStartTime: LocalTime, pickupEndTime: LocalTime): PickUpInfoVO =
-            PickUpInfoVO(Triple(pickupDay, pickupStartTime, pickupEndTime))
+        fun from(day: String?): PickUpDayVO {
+            require(!day.isNullOrBlank()) { "pickUpDay는 null이거나 빈 값일 수 없습니다." }
+            val upperDay = day.uppercase()
+            val matched = StoreEnum.PickupDay.entries.find { it.name == upperDay }
+            require(matched != null) {
+                "pickUpDay는 ${StoreEnum.PickupDay.entries.joinToString(", ")} 중 하나여야 합니다. (입력값: $day)"
+            }
+            return PickUpDayVO(matched)
+        }
+
+        fun from(pickUpDay: StoreEnum.PickupDay): PickUpDayVO = PickUpDayVO(pickUpDay)
     }
 }
 
 @JvmInline
-value class StoreCategoryVO(val value: String) {
-    init {
-        require(value.isNotBlank()) { "매장 카테고리는 비어있을 수 없습니다" }
-        require(value.length in 1..10) { "매장 카테고리는 1~10자 사이여야 합니다" }
+value class StoreCategoryVO(val value: StoreEnum.StoreCategory) {
+    companion object {
+        fun from(category: String): StoreCategoryVO =
+            StoreCategoryVO(StoreEnum.StoreCategory.fromString(category)
+                ?: throw IllegalArgumentException("존재하지 않는 카테고리입니다: $category"))
     }
 
-    companion object {
-        fun from(category: String): StoreCategoryVO = StoreCategoryVO(category)
-    }
+    override fun toString(): String = value.category //한글명
 }
 
 @JvmInline

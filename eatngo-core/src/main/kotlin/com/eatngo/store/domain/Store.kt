@@ -22,11 +22,11 @@ class Store(
     var address: Address,               // 매장 주소
     val businessNumber: BusinessNumberVO, // 사업자등록 번호
     var contactNumber: ContactNumberVO?,  // 매장 or 점주 전화번호
-    var imageUrl: ImageUrlVO?,            // 대표 이미지 url(카드뷰에 보이는 이미지)
-    var businessHours: List<BusinessHourVO>?, // 영업시간(픽업시간과는 다름, 단순 정보제공용 및 확장성 고려해 추가)
+    var imageUrl: String?,            // 대표 이미지 url(카드뷰에 보이는 이미지)
+    var businessHours: List<BusinessHourVO>?, // 매장의 픽업시간
     var storeCategoryInfo: StoreCategoryInfo, // 매장의 카테고리 정보들
     var status: StoreEnum.StoreStatus = StoreEnum.StoreStatus.PENDING, // 매장 상태(기본: 승인대기중)
-    var pickUpInfo: PickUpInfoVO,         // 픽업과 관련된 정보(픽업시간 from to, 오늘/내일 픽업)
+    var pickUpDay: PickUpDayVO,         // 오늘/내일 픽업
     val createdAt: LocalDateTime,       // 생성일
     var updatedAt: LocalDateTime,       // 수정일
     var deletedAt: LocalDateTime? = null, // 삭제일(softDel용, 삭제 시간이 존재하면 softDel)
@@ -53,7 +53,7 @@ class Store(
                 ),
                 businessNumber = BusinessNumberVO.from(dto.businessNumber),
                 contactNumber = dto.contactNumber?.let { ContactNumberVO.from(it) },
-                imageUrl = dto.imageUrl?.let { ImageUrlVO.from(it) },
+                imageUrl = dto.imageUrl,
                 businessHours = BusinessHourVO.fromList(dto.businessHours),
                 storeCategoryInfo = StoreCategoryInfo(
                     storeCategory = dto.storeCategoryInfo.storeCategory?.map { StoreCategoryVO.from(it) }
@@ -61,11 +61,7 @@ class Store(
                     foodCategory = dto.storeCategoryInfo.foodCategory?.map { FoodCategoryVO.from(it) }
                 ),
                 status = dto.status,
-                pickUpInfo = PickUpInfoVO.from(
-                    dto.pickUpInfo.pickupDay!!,
-                    dto.pickUpInfo.pickupStartTime!!,
-                    dto.pickUpInfo.pickupEndTime!!
-                ),
+                pickUpDay = PickUpDayVO.from(dto.pickUpDay),
                 createdAt = dto.createdAt,
                 updatedAt = dto.updatedAt,
                 deletedAt = null
@@ -96,7 +92,7 @@ class Store(
                 ),
                 businessNumber = BusinessNumberVO.from(request.businessNumber),
                 contactNumber = request.contactNumber?.let { ContactNumberVO.from(it) },
-                imageUrl = request.imageUrl?.let { ImageUrlVO.from(it) },
+                imageUrl = request.imageUrl,
                 businessHours = request.businessHours?.map {
                     BusinessHourVO.from(it.dayOfWeek, it.openTime, it.closeTime)
                 } ?: emptyList(),
@@ -106,11 +102,7 @@ class Store(
                     foodCategory = request.storeCategoryInfo.foodCategory?.map { FoodCategoryVO.from(it) }
                 ),
                 status = StoreEnum.StoreStatus.PENDING,
-                pickUpInfo = PickUpInfoVO.from(
-                    request.pickUpInfo.pickupDay!!,
-                    request.pickUpInfo.pickupStartTime!!,
-                    request.pickUpInfo.pickupEndTime!!
-                ),
+                pickUpDay = PickUpDayVO.from(request.pickUpDay),
                 createdAt = LocalDateTime.now(),
                 updatedAt = LocalDateTime.now(),
                 deletedAt = null
@@ -150,7 +142,7 @@ class Store(
             )
         }
         request.contactNumber?.let { this.contactNumber = ContactNumberVO.from(it) }
-        request.mainImageUrl?.let { this.imageUrl = ImageUrlVO.from(it) }
+        request.mainImageUrl?.let { this.imageUrl = it }
         request.businessHours?.let {
             this.businessHours = it.map { hour ->
                 BusinessHourVO.from(hour.dayOfWeek, hour.openTime, hour.closeTime)
@@ -162,13 +154,7 @@ class Store(
                 foodCategory = info.foodCategory?.map { FoodCategoryVO.from(it) }
             )
         }
-        request.pickUpInfo?.let { info ->
-            this.pickUpInfo = PickUpInfoVO.from(
-                info.pickupDay!!,
-                info.pickupStartTime!!,
-                info.pickupEndTime!!
-            )
-        }
+        request.pickUpDay?.let { this.pickUpDay = PickUpDayVO.from(it) }
         this.updatedAt = LocalDateTime.now()
     }
 
@@ -195,8 +181,11 @@ class Store(
      */
     fun isPickupTime(): Boolean {
         val currentTime = LocalDateTime.now().toLocalTime()
-        val startWindow = pickUpInfo.pickupStartTime.minusMinutes(1)
-        val endWindow = pickUpInfo.pickupStartTime.plusMinutes(1)
+        val today = LocalDateTime.now().dayOfWeek
+        val todayHour = businessHours?.find { it.dayOfWeek == today } ?: return false
+
+        val startWindow = todayHour.openTime.minusMinutes(1)
+        val endWindow = todayHour.openTime.plusMinutes(1)
         return currentTime.isAfter(startWindow) && currentTime.isBefore(endWindow)
     }
 
@@ -206,13 +195,19 @@ class Store(
      */
     fun updateStoreStatus(hasStock: Boolean) {
         val now = LocalDateTime.now()
-        val isAfterMidnight = pickUpInfo.pickupEndTime.isBefore(pickUpInfo.pickupStartTime)
+        val today = now.dayOfWeek
+        val todayHour = businessHours?.find { it.dayOfWeek == today }
 
-        val isInPickupTime = if (isAfterMidnight) {
-            now.toLocalTime() >= pickUpInfo.pickupStartTime || now.toLocalTime() <= pickUpInfo.pickupEndTime
-        } else {
-            now.toLocalTime() >= pickUpInfo.pickupStartTime && now.toLocalTime() <= pickUpInfo.pickupEndTime
-        }
+        val isInPickupTime = todayHour?.let {
+            val open = it.openTime
+            val close = it.closeTime
+            // 자정 넘김(야간영업)
+            if (close.isBefore(open)) {
+                now.toLocalTime() >= open || now.toLocalTime() <= close
+            } else {
+                now.toLocalTime() >= open && now.toLocalTime() <= close
+            }
+        } ?: false
 
         status = when {
             !hasStock -> StoreEnum.StoreStatus.CLOSED
@@ -221,22 +216,6 @@ class Store(
         }
 
         this.updatedAt = now
-    }
-
-    /**
-     * 픽업 정보만 업데이트
-     */
-    fun updatePickupInfo(
-        pickupDay: StoreEnum.PickupDay?,
-        startTime: LocalTime?,
-        endTime: LocalTime?
-    ) {
-        this.pickUpInfo = PickUpInfoVO.from(
-            pickupDay!!,
-            startTime!!,
-            endTime!!
-        )
-        updatedAt = LocalDateTime.now()
     }
 }
 

@@ -65,6 +65,12 @@ enum class BusinessErrorCode(
     // 매장 권한 관련 오류
     STORE_OWNER_FORBIDDEN("S013", "해당 매장에 대한 권한이 없습니다."),
 
+    // 매장 구독 권한 관련 오류
+    SUBSCRIPTION_FORBIDDEN("S014", "해당 구독 정보에 대한 권한이 없습니다."),
+    // 매장 구독 상태 관련 오류
+    SUBSCRIPTION_ALREADY_ACTIVE("S015", "이미 활성화된 구독입니다."),
+    SUBSCRIPTION_ALREADY_CANCELED("S016", "이미 취소된 구독입니다."),
+
     // 메뉴 관련 오류
     PRODUCT_NOT_FOUND("M001", "메뉴를 찾을 수 없습니다."),
     PRODUCT_NOT_AVAILABLE("M002", "현재 제공하지 않는 메뉴입니다."),

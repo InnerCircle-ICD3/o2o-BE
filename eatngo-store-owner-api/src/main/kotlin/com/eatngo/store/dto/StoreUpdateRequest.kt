@@ -26,12 +26,10 @@ data class StoreUpdateRequest(
     val longitude: Double? = null,
 
     // 운영 정보
-    val pickupStartTime: String? = null,
-    val pickupEndTime: String? = null,
+    val businessHours: List<BusinessHourDto>? = null,
     val pickupDay: String? = null,
 
     // 부가 정보
-    val businessHours: List<Map<String, Any>>? = null,
     val contact: String? = null,
     val description: String? = null,
     val mainImageUrl: String? = null,
@@ -58,14 +56,6 @@ data class StoreUpdateRequest(
             )
         } else null
 
-        val pickUpInfoDto = if (pickupStartTime != null && pickupEndTime != null && pickupDay != null) {
-            PickUpInfoDto(
-                pickupStartTime = this.pickupStartTime.let { LocalTime.parse(it) },
-                pickupEndTime = this.pickupEndTime.let { LocalTime.parse(it) },
-                pickupDay = StoreEnum.PickupDay.valueOf(this.pickupDay.uppercase())
-            )
-        } else null
-
         // 카테고리 정보가 있는 경우에만 StoreCategoryInfoDto 생성
         val storeCategoryInfoDto = if (storeCategory != null || foodCategory != null) {
             StoreCategoryInfoDto(
@@ -78,17 +68,17 @@ data class StoreUpdateRequest(
             storeOwnerId = storeOwnerId,
             name = name,
             address = addressDto,
-            businessHours = this.businessHours?.map { map ->
+            businessHours = this.businessHours?.map { hour ->
                 BusinessHourDto(
-                    dayOfWeek = DayOfWeek.valueOf((map["dayOfWeek"] as String).uppercase()),
-                    openTime = LocalTime.parse(map["openTime"] as String),
-                    closeTime = LocalTime.parse(map["closeTime"] as String)
+                    dayOfWeek = hour.dayOfWeek,
+                    openTime = hour.openTime,
+                    closeTime = hour.closeTime,
                 )
             },
+            pickUpDay = pickupDay,
             contactNumber = contact,
             description = description,
             mainImageUrl = mainImageUrl,
-            pickUpInfo = pickUpInfoDto,
             storeCategoryInfo = storeCategoryInfoDto
         )
     }
