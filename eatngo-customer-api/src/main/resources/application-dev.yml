@@ -14,19 +14,18 @@ spring:
   application:
     name: eatngo-customer-api
   datasource:
-    # H2 메모리 DB를 PostgreSQL 모드로 실행
-    url: jdbc:h2:mem:eatngo;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DATABASE_TO_LOWER=TRUE
-    username: sa
-    password: sa
-    driverClassName: org.h2.Driver
+    url: ${PG_URL}
+    username: eatngo_user
+    password: ${PG_PASSWORD}
+    driver-class-name: org.postgresql.Driver
   jpa:
     open-in-view: false
-    # Hibernate가 PostgreSQL 방언을 사용하도록 설정
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
+    show-sql: true
     properties:
       hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
         highlight_sql: true
   h2:
