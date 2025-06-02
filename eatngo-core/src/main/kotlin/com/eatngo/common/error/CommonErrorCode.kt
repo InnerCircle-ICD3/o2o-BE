@@ -16,5 +16,8 @@ enum class CommonErrorCode(
     DUPLICATE_ENTITY("C006", "엔티티가 이미 존재합니다."),
 
     // Validation
-    VALIDATION_FAILED("V001", "유효성 검증에 실패했습니다.");
+    VALIDATION_FAILED("V001", "유효성 검증에 실패했습니다."),
+
+    // Image
+    IMAGE_URL_RESOLVE_FAILED("I001","이미지 URL 변환에 실패했습니다.");
 }
