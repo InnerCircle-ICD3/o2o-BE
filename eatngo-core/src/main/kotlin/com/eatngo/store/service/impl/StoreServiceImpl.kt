@@ -1,6 +1,7 @@
 package com.eatngo.store.service.impl
 
 import com.eatngo.common.constant.StoreEnum
+import com.eatngo.common.exception.FileException
 import com.eatngo.common.exception.StoreException
 import com.eatngo.extension.orThrow
 import com.eatngo.file.FileStorageService
@@ -23,7 +24,8 @@ class StoreServiceImpl(
     override fun createStore(request: StoreCreateDto): Store {
         val store = Store.create(request)
         store.apply {
-            imageUrl = request.imageUrl?.let { fileStorageService.resolveImageUrl(it) }
+            imageUrl = request.imageUrl?.let { fileStorageService.resolveImageUrl(it)
+                .orThrow { FileException.ImageUrlResolveFailed(request.imageUrl) } }
         }
         return storePersistence.save(store)
     }
@@ -33,7 +35,9 @@ class StoreServiceImpl(
         existingStore.requireOwner(request.storeOwnerId)
         existingStore.update(request)
         if (request.mainImageUrl != null) {
-            existingStore.imageUrl = fileStorageService.resolveImageUrl(request.mainImageUrl)
+            existingStore.imageUrl =
+                fileStorageService.resolveImageUrl(request.mainImageUrl)
+                    .orThrow { FileException.ImageUrlResolveFailed(request.mainImageUrl) }
         }
         return storePersistence.save(existingStore)
     }
