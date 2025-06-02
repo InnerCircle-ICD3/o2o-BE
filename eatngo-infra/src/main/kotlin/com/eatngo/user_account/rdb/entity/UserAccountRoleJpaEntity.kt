@@ -8,6 +8,7 @@ import org.hibernate.annotations.Filter
 
 @Filter(name = DELETED_FILTER)
 @Entity
+@Table(name = "user_account_role")
 class UserAccountRoleJpaEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
