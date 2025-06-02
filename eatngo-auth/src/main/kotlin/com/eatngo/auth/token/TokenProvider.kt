@@ -16,13 +16,12 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.oauth2.jwt.JwtException
 import org.springframework.stereotype.Component
+import java.time.Duration
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 import java.util.*
 import javax.crypto.SecretKey
 
-const val REFRESH_TOKEN_TTL: Long = 1000L * 60 * 60  // 14 days in milliseconds
-const val COOKIE_MAX_AGE: Long = 60 * 60 * 24 * 14 // 14 days
 fun refreshKey(loginUser: LoginUser) = "refreshToken:${loginUser.getCurrentRole()}:${loginUser.userAccountId}"
 
 @Component
@@ -64,7 +63,7 @@ class TokenProvider(
             .signWith(key)
             .compact()
 
-        stringRedisTemplate.opsForValue().set(refreshKey(loginUser), refreshToken, REFRESH_TOKEN_TTL) // 14 days in seconds
+        stringRedisTemplate.opsForValue().set(refreshKey(loginUser), refreshToken, Duration.ofDays(14)) // 14 days in seconds
         return refreshToken
     }
 
@@ -127,10 +126,10 @@ class TokenProvider(
     }
 
     fun deleteRefreshToken(accessToken: String) =
-        (getAuthentication(accessToken).principal as? LoginUser
+        (getAuthenticationIgnoreExpired(accessToken).principal as? LoginUser
             ?: throw IllegalArgumentException("Invalid access token"))
             .run {
-                stringRedisTemplate.unlink(refreshKey(this))
+                stringRedisTemplate.delete(refreshKey(this))
             }
 
     fun getRefreshToken(accessToken: String): String? {
@@ -144,12 +143,12 @@ class TokenProvider(
 
     fun createHttpOnlyCookie(name: String, value: String): ResponseCookie {
         return ResponseCookie
-            .fromClientResponse(name, value)
+            .from(name, value)
             .httpOnly(true)
             .secure(true)
             .path("/")
             .sameSite("None")
-            .maxAge(COOKIE_MAX_AGE)
+            .maxAge(Duration.ofDays(14))
             .build()
     }
 }
