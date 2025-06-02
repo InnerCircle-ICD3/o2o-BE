@@ -22,11 +22,6 @@ interface StoreSubscriptionPersistence {
     fun findByStoreId(storeId: Long): List<StoreSubscription>
 
     /**
-     * 사용자 ID와 상점 ID로 상점 구독 조회
-     */
-    fun findByUserIdAndStoreId(userId: Long, storeId: Long): StoreSubscription?
-
-    /**
      * 사용자 ID와 상점 ID로 상점 구독 조회 - deleted 된 것도 전부 조회
      */
     fun findAllByUserIdAndStoreId(userId: Long, storeId: Long): StoreSubscription?
