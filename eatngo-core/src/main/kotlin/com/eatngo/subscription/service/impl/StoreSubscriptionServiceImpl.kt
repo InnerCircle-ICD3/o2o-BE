@@ -1,5 +1,6 @@
 package com.eatngo.subscription.service.impl
 
+import com.eatngo.common.constant.StoreEnum
 import com.eatngo.common.exception.StoreException
 import com.eatngo.extension.orThrow
 import com.eatngo.product.infra.ProductPersistence
@@ -27,25 +28,28 @@ class StoreSubscriptionServiceImpl(
         val discountedPrice = 9000
     }
 
-    override fun toggleSubscription(storeId: Long, customerId: Long): StoreSubscriptionDto {
+    override fun toggleSubscription(storeId: Long, customerId: Long): Pair<StoreSubscriptionDto, StoreEnum.SubscriptionStatus> {
         val store = storePersistence.findById(storeId).orThrow { StoreException.StoreNotFound(storeId) }
 
         val subscription = storeSubscriptionPersistence.findAllByUserIdAndStoreId(customerId, storeId)
-        val resultSubscription = if (subscription == null) {
+        val (resultSubscription, operationType) = if (subscription == null) {
             // 신규 구독 (INSERT)
-            storeSubscriptionPersistence.save(StoreSubscription.create(customerId, storeId))
+            val created = storeSubscriptionPersistence.save(StoreSubscription.create(customerId, storeId))
+            created to StoreEnum.SubscriptionStatus.CREATED
         } else {
             // 기존 row가 있으면 (UPDATE)
-            subscription.toggleOrRestore()
-            storeSubscriptionPersistence.save(subscription)
+            val operationType = subscription.toggleOrRestore()
+            val updated = storeSubscriptionPersistence.save(subscription)
+            updated to operationType
         }
 
-        return StoreSubscriptionDto.from(
+        val dto = StoreSubscriptionDto.from(
             subscription = resultSubscription,
             storeName = store.name.value,
             mainImageUrl = store.imageUrl,
             status = store.status
         )
+        return dto to operationType
     }
 
     override fun getSubscriptionById(id: Long): StoreSubscriptionDto {
@@ -82,8 +86,9 @@ class StoreSubscriptionServiceImpl(
         }
     }
 
-    override fun getSubscriptionsByStoreId(storeId: Long): List<StoreSubscriptionDto> {
+    override fun getSubscriptionsByStoreId(storeId: Long, storeOwnerId: Long): List<StoreSubscriptionDto> {
         val store = storePersistence.findById(storeId).orThrow { StoreException.StoreNotFound(storeId) }
+        store.requireOwner(storeOwnerId)
 
         return storeSubscriptionPersistence.findByStoreId(storeId)
             .map { subscription ->

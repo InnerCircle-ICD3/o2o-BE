@@ -13,7 +13,7 @@ data class StoreSubscriptionDto(
     val storeId: Long,
     val storeName: String,            // 매장명
     val mainImageUrl: String?,        // 매장 대표 이미지
-    val status: StoreEnum.StoreStatus,               // 매장 상태 (OPEN, CLOSED 등)
+    val status: StoreEnum.StoreStatus,        // 매장 상태 (OPEN, CLOSED 등)
     val discountRate: Double? = null,         // 할인율 (10% → 0.1)
     val originalPrice: Int? = null,           // 원가
     val discountedPrice: Int? = null,         // 할인된 가격

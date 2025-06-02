@@ -22,6 +22,6 @@ class StoreOwnerSubscriptionQueryUseCase(
      */
     @Transactional(readOnly = true)
     fun getSubscriptionsByStoreId(storeId: Long, storeOwnerId: Long): List<StoreSubscriptionDto> {
-        return storeSubscriptionService.getSubscriptionsByStoreId(storeId)
+        return storeSubscriptionService.getSubscriptionsByStoreId(storeId, storeOwnerId)
     }
 } 

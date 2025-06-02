@@ -1,5 +1,6 @@
 package com.eatngo.subscription.service
 
+import com.eatngo.common.constant.StoreEnum
 import com.eatngo.subscription.dto.StoreSubscriptionDto
 
 /**
@@ -9,7 +10,7 @@ interface StoreSubscriptionService {
     /**
      * 상점 구독 생성/취소
      */
-    fun toggleSubscription(storeId: Long, customerId: Long): StoreSubscriptionDto
+    fun toggleSubscription(storeId: Long, customerId: Long): Pair<StoreSubscriptionDto, StoreEnum.SubscriptionStatus>
 
     /**
      * ID로 상점 구독 조회
@@ -24,5 +25,5 @@ interface StoreSubscriptionService {
     /**
      * 매장 ID로 상점 구독 목록 조회
      */
-    fun getSubscriptionsByStoreId(storeId: Long): List<StoreSubscriptionDto>
+    fun getSubscriptionsByStoreId(storeId: Long, storeOwnerId: Long): List<StoreSubscriptionDto>
 }

@@ -1,5 +1,6 @@
 package com.eatngo.subscription.domain
 
+import com.eatngo.common.constant.StoreEnum
 import com.eatngo.common.exception.StoreException
 import java.time.LocalDateTime
 
@@ -49,15 +50,15 @@ class StoreSubscription(
 
     /**
      * 구독 토글/재구독 통합 메서드
-     * @return 토글 후 활성화 여부 (true: 활성, false: 비활성)
+     * @return 토글 후 상태
      */
-    fun toggleOrRestore(): Boolean {
+    fun toggleOrRestore(): StoreEnum.SubscriptionStatus {
         return if (isActive()) {
             softDelete()
-            false
+            StoreEnum.SubscriptionStatus.CANCELED
         } else {
             restore()
-            true
+            StoreEnum.SubscriptionStatus.RESUMED
         }
     }
 
