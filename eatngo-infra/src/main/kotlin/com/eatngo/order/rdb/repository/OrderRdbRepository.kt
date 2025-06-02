@@ -16,9 +16,9 @@ interface OrderRdbRepository : JpaRepository<OrderJpaEntity, Long> {
         """
       SELECT o
       FROM OrderJpaEntity o
-      JOIN OrderItemJpaEntity oi
+      JOIN OrderItemJpaEntity oi ON o.id = oi.order.id
       WHERE 1=1
-        AND (o.status = :status)
+        AND (:status IS NULL OR o.status = :status)
         AND (:customerId IS NULL OR o.customerId = :customerId)
         AND (:storeId IS NULL OR o.storeId = :storeId)
         AND (:lastId IS NULL OR o.id < :lastId)

@@ -39,7 +39,7 @@ class OrderService(
     }
 
     fun update(order: Order): Order {
-        return orderPersistence.save(order)
+        return orderPersistence.update(order)
     }
 
     fun findAllByQueryParam(queryParam: OrderQueryParamDto): Cursor<Order> =
