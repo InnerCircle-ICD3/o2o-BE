@@ -1,0 +1,70 @@
+server:
+  port: 8081
+
+spring:
+  config:
+    import:
+      - classpath:auth-application.yml
+      - aws-parameterstore:/eatngo/
+  cloud:
+    aws:
+      credentials:
+        access-key: ${AWS_ACCESS_KEY}
+        secret-key: ${AWS_SECRET_KEY}
+  application:
+    name: eatngo-store-owner-api
+  datasource:
+    url: ${PG_URL}
+    username: eatngo_user
+    password: ${PG_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        highlight_sql: true
+  h2:
+    console:
+      enabled: true
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password: eatngolocal
+      repositories:
+        enabled: false
+
+cloud:
+  aws:
+    region:
+      static: us-east-1
+    s3:
+      bucket: eatgoeatgo
+
+datastore:
+  mongodb:
+    uri: ${MONGO_URI}
+    database: eatngo
+    username: eatngo-dev
+    password: ${MONGO_PW}
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /api-docs
+
+swagger:
+  title: "EatNGo 점주 API"
+  description: "EatNGo 서비스의 점주용 API 문서"
+  version: "v1.0.0"
+
+logging:
+  level:
+    org.hibernate.SQL: debug
+    org.hibernate.orm.jdbc.bind: trace
