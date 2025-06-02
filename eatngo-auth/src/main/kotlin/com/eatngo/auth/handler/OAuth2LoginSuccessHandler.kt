@@ -2,10 +2,10 @@ package com.eatngo.auth.handler
 
 import com.eatngo.auth.constants.AuthenticationConstants.ACCESS_TOKEN
 import com.eatngo.auth.constants.AuthenticationConstants.PRINCIPAL_KEY
+import com.eatngo.auth.constants.AuthenticationConstants.SET_COOKIE_HEADER
 import com.eatngo.auth.token.TokenProvider
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
-import org.springframework.http.ResponseCookie
 import org.springframework.security.core.Authentication
 import org.springframework.security.oauth2.core.user.OAuth2User
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component
 @Component
 class OAuth2LoginSuccessHandler(
     private val tokenProvider: TokenProvider,
-    private val postProcessor: OAuth2SuccessPostProcessor
+    private val postProcessor: OAuth2SuccessPostProcessor,
 ) : AuthenticationSuccessHandler {
 
     override fun onAuthenticationSuccess(
@@ -28,10 +28,10 @@ class OAuth2LoginSuccessHandler(
 
         val loginUser = postProcessor.postProcess(userId)
         val accessToken = tokenProvider.createAccessToken(loginUser)
+        tokenProvider.createRefreshToken(loginUser)
 
-        val responseCookie = createHttpOnlyCookie(ACCESS_TOKEN, accessToken)
-        response.addHeader("Set-Cookie", responseCookie.toString())
-        // TODO redis refresh token 추가하기
+        val responseCookie = tokenProvider.createHttpOnlyCookie(ACCESS_TOKEN, accessToken)
+        response.addHeader(SET_COOKIE_HEADER, responseCookie.toString())
         response.contentType = "application/json"
 
         val kakaoAccount = attributes["kakao_account"] as? Map<*, *> ?: emptyMap<Any, Any>()
@@ -45,14 +45,4 @@ class OAuth2LoginSuccessHandler(
         }
     }
 
-    private fun createHttpOnlyCookie(name: String, value: String): ResponseCookie {
-        return ResponseCookie
-            .fromClientResponse(name, value)
-            .httpOnly(true)
-            .secure(true)
-            .path("/")
-            .sameSite("None")
-            .maxAge(60 * 60 * 24 * 14) // 14 days
-            .build()
-    }
 }

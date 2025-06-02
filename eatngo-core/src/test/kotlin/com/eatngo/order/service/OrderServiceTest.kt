@@ -40,6 +40,10 @@ class MockOrderPersistenceImpl : OrderPersistence {
     override fun findAllByQueryParameter(queryParam: OrderQueryParamDto): Cursor<Order> {
         throw NotImplementedError()
     }
+
+    override fun update(order: Order): Order {
+        throw NotImplementedError()
+    }
 }
 
 class OrderServiceTest : BehaviorSpec({
