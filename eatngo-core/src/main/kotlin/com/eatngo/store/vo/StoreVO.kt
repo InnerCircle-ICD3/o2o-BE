@@ -68,7 +68,12 @@ value class PickUpDayVO(val pickUpDay: StoreEnum.PickupDay) {
     companion object {
         fun from(day: String?): PickUpDayVO {
             require(!day.isNullOrBlank()) { "pickUpDay는 null이거나 빈 값일 수 없습니다." }
-            return PickUpDayVO(StoreEnum.PickupDay.valueOf(day.uppercase()))
+            val upperDay = day.uppercase()
+            val matched = StoreEnum.PickupDay.entries.find { it.name == upperDay }
+            require(matched != null) {
+                "pickUpDay는 ${StoreEnum.PickupDay.entries.joinToString(", ")} 중 하나여야 합니다. (입력값: $day)"
+            }
+            return PickUpDayVO(matched)
         }
 
         fun from(pickUpDay: StoreEnum.PickupDay): PickUpDayVO = PickUpDayVO(pickUpDay)
