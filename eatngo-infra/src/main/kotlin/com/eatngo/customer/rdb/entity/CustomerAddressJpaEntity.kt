@@ -39,6 +39,8 @@ data class CustomerAddressJpaEntity(
     val region2DepthName: String?,
     val region3DepthName: String?,
     val coordinate: CoordinateVO,
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     val customerAddressType: CustomerAddressType,
     val description: String?,
 ) : BaseJpaEntity() {
