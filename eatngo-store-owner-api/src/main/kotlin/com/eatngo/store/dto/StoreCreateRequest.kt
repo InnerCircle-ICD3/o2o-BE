@@ -28,7 +28,7 @@ data class StoreCreateRequest(
 
     // 운영 정보
     val pickupDay: String? = null,
-    val businessHours: List<Map<String, Any>>? = null,
+    val businessHours: List<BusinessHourDto>? = null,
 
     // 부가 정보
     val contact: String? = null,
@@ -55,11 +55,11 @@ data class StoreCreateRequest(
                 )
             ),
             businessNumber = this.businessNumber,
-            businessHours = this.businessHours?.map { map ->
+            businessHours = this.businessHours?.map { hour ->
                 BusinessHourDto(
-                    dayOfWeek = DayOfWeek.valueOf((map["dayOfWeek"] as String).uppercase()),
-                    openTime = LocalTime.parse(map["openTime"] as String),
-                    closeTime = LocalTime.parse(map["closeTime"] as String)
+                    dayOfWeek = hour.dayOfWeek,
+                    openTime = hour.openTime,
+                    closeTime = hour.closeTime,
                 )
             },
             contactNumber = this.contact,
