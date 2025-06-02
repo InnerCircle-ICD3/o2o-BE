@@ -16,6 +16,7 @@ import org.hibernate.annotations.Filter
 @Filter(name = DELETED_FILTER)
 @Entity
 @Table(
+    name = "customer_addresses",
     uniqueConstraints = [
         UniqueConstraint(
             name = "uk_customer_address",
