@@ -9,7 +9,8 @@ import java.time.LocalDateTime
 
 @Filter(name = DELETED_FILTER)
 @Entity
-class UserAccountOauth2TermJpaEntity(
+@Table(name = "user_account_oauth2_term")
+class UserAccountOAuth2TermJpaEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
@@ -26,7 +27,7 @@ class UserAccountOauth2TermJpaEntity(
         fun of(
             userAccountOauth2Term: UserAccountOauth2Term,
             accountOAuth2JpaEntity: UserAccountOAuth2JpaEntity,
-        ) = UserAccountOauth2TermJpaEntity(
+        ) = UserAccountOAuth2TermJpaEntity(
             userAccountOAuth2 = accountOAuth2JpaEntity,
             tag = userAccountOauth2Term.tag,
             agreedAt = userAccountOauth2Term.agreedAt,
