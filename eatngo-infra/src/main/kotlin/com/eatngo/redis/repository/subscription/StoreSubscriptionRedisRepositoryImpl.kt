@@ -19,7 +19,7 @@ class StoreSubscriptionRedisRepositoryImpl(
         private const val STORE_SUBSCRIPTION_COUNT_KEY = "store:%d:subscription:count"
         private const val CUSTOMER_SUBSCRIPTION_LIST_KEY = "customer:%d:subscriptions"
         private const val STORE_SUBSCRIPTION_LIST_KEY = "store:%d:subscribers"
-        private const val CACHE_TTL_SECONDS = 60 * 30 // 30분
+        private const val CACHE_TTL_SECONDS = 60 * 30 // 30분?? TODO: 보통 몇 분으로 설정하는지..?
     }
 
     /**
@@ -45,7 +45,9 @@ class StoreSubscriptionRedisRepositoryImpl(
      */
     override fun incrementStoreSubscriptionCount(storeId: Long): Long {
         val key = STORE_SUBSCRIPTION_COUNT_KEY.format(storeId)
-        return redisTemplate.opsForValue().increment(key, 1) ?: 1L
+        val result = redisTemplate.opsForValue().increment(key, 1) ?: 1L
+        redisTemplate.expire(key, CACHE_TTL_SECONDS.toLong(), TimeUnit.SECONDS)
+        return result
     }
 
     /**
@@ -53,9 +55,10 @@ class StoreSubscriptionRedisRepositoryImpl(
      */
     override fun decrementStoreSubscriptionCount(storeId: Long): Long {
         val key = STORE_SUBSCRIPTION_COUNT_KEY.format(storeId)
-        return redisTemplate.opsForValue().increment(key, -1) ?: 0L
+        val result = redisTemplate.opsForValue().increment(key, -1) ?: 0L
+        redisTemplate.expire(key, CACHE_TTL_SECONDS.toLong(), TimeUnit.SECONDS)
+        return result
     }
-
 
     /**
      * 고객 구독 목록 캐싱
