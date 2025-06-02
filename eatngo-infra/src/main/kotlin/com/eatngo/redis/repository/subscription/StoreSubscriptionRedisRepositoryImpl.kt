@@ -77,7 +77,7 @@ class StoreSubscriptionRedisRepositoryImpl(
             try {
                 objectMapper.readValue(it, Array<Long>::class.java).toList()
             } catch (e: Exception) {
-                null
+                null //TODO: logging 처리
             }
         }
     }

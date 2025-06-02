@@ -142,7 +142,7 @@ class Store(
             )
         }
         request.contactNumber?.let { this.contactNumber = ContactNumberVO.from(it) }
-        request.mainImageUrl
+        request.mainImageUrl?.let { this.imageUrl = it }
         request.businessHours?.let {
             this.businessHours = it.map { hour ->
                 BusinessHourVO.from(hour.dayOfWeek, hour.openTime, hour.closeTime)
