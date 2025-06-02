@@ -33,7 +33,8 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
     // Redis
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
-
+    // PostgreSQL
+    implementation("org.postgresql:postgresql:42.7.3") // PG 17 호환
     // h2
     runtimeOnly("com.h2database:h2")
 }
