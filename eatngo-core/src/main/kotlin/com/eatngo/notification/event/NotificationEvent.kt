@@ -14,11 +14,11 @@ data class OrderItemMessage(
 
 data class NotificationEvent<T: NotificationMessage>(
     val storeId: Long,
-    val eventType: PushEventType,
+    val eventType: NotificationEventType,
     val message: T
 )
 
-enum class PushEventType(
+enum class NotificationEventType(
     val eventName: String,
     val messageClass: Class<out NotificationMessage>
 ) {

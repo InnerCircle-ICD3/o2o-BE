@@ -1,7 +1,7 @@
 package com.eatngo.notification
 
 import com.eatngo.notification.event.NotificationEvent
-import com.eatngo.notification.event.PushEventType
+import com.eatngo.notification.event.NotificationEventType
 import com.eatngo.notification.service.NotificationSseService
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.data.redis.connection.Message
@@ -19,7 +19,7 @@ class NotificationListener(
         val root = objectMapper.readTree(rawJson)
         val eventNameStr = root.get("eventName").asText()
 
-        val eventType = PushEventType.entries
+        val eventType = NotificationEventType.entries
             .find { it.eventName == eventNameStr }
             ?: throw IllegalArgumentException("Unknown event type: $eventNameStr")
 
