@@ -38,6 +38,9 @@ TODO: store category, food category 인덱스 analyzer 개선
       },
       "coordinate": {
         "type": "geo"
+      },
+      "status": {
+        "type": "int"
       }
     }
   }
