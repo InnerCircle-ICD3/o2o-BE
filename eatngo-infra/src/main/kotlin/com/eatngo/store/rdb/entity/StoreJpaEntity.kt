@@ -38,9 +38,14 @@ class StoreJpaEntity(
     @Column(columnDefinition = "TEXT")
     val description: String?,
 
-    @Column(columnDefinition = "jsonb", nullable = false)
-    @Convert(converter = AddressJsonConverter::class)
-    val address: AddressJson,
+//    @JdbcTypeCode(SqlTypes.JSON)
+//    @Column(columnDefinition = "jsonb", nullable = false)
+//    @Convert(converter = AddressJsonConverter::class)
+//    val address: AddressJson,
+
+    @OneToOne(fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
+    @JoinColumn(name = "address_id", nullable = false)
+    val address: AddressJpaEntity,
 
     @Column(name = "business_number", length = 10, nullable = false)
     val businessNumber: String,
@@ -80,7 +85,7 @@ class StoreJpaEntity(
                 storeOwnerId = store.storeOwnerId,
                 name = store.name.value,
                 description = store.description?.value,
-                address = AddressJson(
+                address = AddressJpaEntity(
                     roadNameAddress = store.address.roadNameAddress.value,
                     lotNumberAddress = store.address.lotNumberAddress.value,
                     buildingName = store.address.buildingName,

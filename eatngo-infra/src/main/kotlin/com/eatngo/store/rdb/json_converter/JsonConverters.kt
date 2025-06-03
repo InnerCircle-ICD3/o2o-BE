@@ -6,9 +6,6 @@ import com.fasterxml.jackson.core.type.TypeReference
 import jakarta.persistence.Converter
 
 @Converter(autoApply = false)
-class AddressJsonConverter : JsonAttributeConverter<AddressJson>(AddressJson::class.java)
-
-@Converter(autoApply = false)
 class BusinessHoursJsonConverter : JsonListAttributeConverter<List<BusinessHourJson>>(object : TypeReference<List<BusinessHourJson>>() {})
 
 @Converter(autoApply = false)

@@ -8,12 +8,28 @@ import org.springframework.data.jpa.repository.Query
 import java.util.*
 
 interface StoreRdbRepository : JpaRepository<StoreJpaEntity, Long> {
-
+    @Query(
+        """
+    select s from StoreJpaEntity s
+    join fetch s.address
+    where s.id = :id
+    """)
     override fun findById(id: Long): Optional<StoreJpaEntity>
 
-    fun findAllByIdIn(ids: List<Long>): List<StoreJpaEntity>
+    @Query(
+        """
+    select s from StoreJpaEntity s
+    join fetch s.address
+    where s.storeOwnerId = :storeOwnerId
+    """)
+    fun findByStoreOwnerIdWithAddress(storeOwnerId: Long): List<StoreJpaEntity>
 
-    fun findByStoreOwnerId(storeOwnerId: Long): List<StoreJpaEntity>
+    @Query("""
+    select s from StoreJpaEntity s
+    join fetch s.address
+    where s.id in :ids
+    """)
+    fun findAllByIdIn(ids: List<Long>): List<StoreJpaEntity>
 
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query(
