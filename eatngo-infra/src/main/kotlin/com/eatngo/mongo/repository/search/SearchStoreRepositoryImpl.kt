@@ -111,7 +111,7 @@ class SearchStoreRepositoryImpl(
             mongoTemplate
                 .aggregate(
                     pipeline,
-                    "searchStore",
+                    "SearchStore",
                     SearchStoreEntity::class.java,
                 ).mappedResults
 
@@ -146,7 +146,7 @@ class SearchStoreRepositoryImpl(
             mongoTemplate
                 .aggregate(
                     pipeline,
-                    "searchStore",
+                    "SearchStore",
                     SearchStoreEntity::class.java,
                 ).mappedResults
 
@@ -158,11 +158,15 @@ class SearchStoreRepositoryImpl(
         }
     }
 
+    /**
+     * status 정렬순을 보장하기 위해 status를 지정하여 검색
+     */
     fun makeSearchQuery(
         longitude: Double,
         latitude: Double,
         maxDistanceKm: Double,
         searchText: String,
+        status: Int = 1, // 기본적으로 OPEN 상태의 매장을 우선 검색
     ): AggregationOperation {
         val maxDistance = maxDistanceKm * 1000 // km 단위를 meter로 변환
 
@@ -171,20 +175,26 @@ class SearchStoreRepositoryImpl(
                 Document(
                     "text",
                     Document("query", searchText)
-                        .append("path", listOf("storeName", "roadNameAddress", "foodCategory")),
+                        .append("path", listOf("storeName", "roadNameAddress", "foodCategory"))
+                        .append("score", Document("boost", Document("value", 1.0))),
+                ),
+                Document(
+                    "equals",
+                    Document("path", "status")
+                        .append("value", status),
                 ),
             )
         val filter =
             listOf( // 거리 필터 (maxDistance)
                 Document(
-                    "range",
+                    "near",
                     Document("path", "coordinate")
-                        .append("lte", maxDistance)
+                        .append("pivot", maxDistance)
                         .append(
                             "origin",
                             Document("type", "Point")
                                 .append("coordinates", listOf(longitude, latitude)),
-                        ).append("unit", "meter"),
+                        ),
                 ),
             )
 
