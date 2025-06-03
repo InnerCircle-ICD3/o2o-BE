@@ -41,6 +41,10 @@ jobs:
 
       - name: Gradle Build (bootJar)
         run: ./gradlew :eatngo-store-owner-api:bootJar
+        env:
+          SPRING_PROFILES_ACTIVE: dev
+          AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -75,15 +79,27 @@ jobs:
 
           jq \
           --arg IMAGE "$IMAGE_URI" \
+          --arg PROFILE "dev" \
+          --arg ACCESS_KEY "${{ secrets.AWS_ACCESS_KEY_ID }}" \
+          --arg SECRET_KEY "${{ secrets.AWS_SECRET_ACCESS_KEY }}" \
           '{
             family,
             networkMode,
             requiresCompatibilities,
             cpu,
             memory,
+            taskRoleArn,
             executionRoleArn,
-            containerDefinitions: (.containerDefinitions | map(
+            containerDefinitions: (
+              .containerDefinitions | map(
                 .image = $IMAGE
+                | .environment += [
+                    { name: "SPRING_PROFILES_ACTIVE", value: $PROFILE },
+                    { name: "AWS_ACCESS_KEY", value: $ACCESS_KEY },
+                    { name: "AWS_SECRET_KEY", value: $SECRET_KEY },
+                    { name: "AWS_ACCESS_KEY_ID", value: $ACCESS_KEY },
+                    { name: "AWS_SECRET_ACCESS_KEY", value: $SECRET_KEY }
+                  ]
               )
             )
           }' task-def-raw.json > task-def-store-owner.json

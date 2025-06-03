@@ -1,6 +1,8 @@
 package com.eatngo.file.dto
 
 import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.NotEmpty
+import jakarta.validation.constraints.Size
 
 data class UploadRequestDto(
 
@@ -14,4 +16,10 @@ data class UploadRequestDto(
     // ex. "product", "profile", "store"
     @field:NotBlank(message = "저장 경로는 필수입니다.")
     val folderPath: String
+)
+
+data class UploadBatchRequestDto(
+    @field:NotEmpty(message = "파일 목록은 비어있을 수 없습니다.")
+    @field:Size(max = 3, message = "한 번에 최대 3개 파일까지 업로드 가능합니다.")
+    val files: List<UploadRequestDto>
 )

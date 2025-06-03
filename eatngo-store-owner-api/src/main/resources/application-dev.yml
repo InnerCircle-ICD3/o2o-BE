@@ -33,18 +33,18 @@ spring:
       enabled: true
   data:
     redis:
-      host: localhost
+      host: ${REDIS_HOST}
       port: 6379
-      password: eatngolocal
+      password: ${REDIS_PASSWORD}
       repositories:
         enabled: false
 
 cloud:
   aws:
     region:
-      static: us-east-1
+      static: ap-northeast-2
     s3:
-      bucket: eatgoeatgo
+      bucket: eatngo-app
 
 datastore:
   mongodb:
