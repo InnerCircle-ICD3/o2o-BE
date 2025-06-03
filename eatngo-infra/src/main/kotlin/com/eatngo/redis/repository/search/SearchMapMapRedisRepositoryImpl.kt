@@ -37,7 +37,7 @@ class SearchMapMapRedisRepositoryImpl(
         val ops = redisTemplate.opsForHash<String, String>()
         values.forEach { storeMap ->
             val json = objectMapper.writeValueToJson(storeMap)
-            ops.put(key, storeMap.storeID.toString(), json)
+            ops.put(key, storeMap.storeId.toString(), json)
         }
     }
 
