@@ -57,7 +57,7 @@ class SearchService(
         if (listStore.isEmpty()) {
             // Mock 데이터 생성
             listStore =
-                SearchStore.getMockSearchStoreList().map { searchStore ->
+                SearchStore.getMockSearchStoreList(size).map { searchStore ->
                     SearchStoreWithDistance(
                         store = searchStore,
                         distance = 0.1, // Mock 데이터이므로 임의 거리 설정
@@ -99,7 +99,7 @@ class SearchService(
         // TODO: 삭제 예정(테스트 기간 Mock 데이터)
         if (searchStoreList.isEmpty()) {
             // Mock 데이터 생성
-            searchStoreList = SearchStore.getMockSearchStoreList()
+            searchStoreList = SearchStore.getMockSearchStoreList(size)
         }
 
         return SearchStoreResultDto.from(
