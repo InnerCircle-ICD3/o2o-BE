@@ -29,7 +29,6 @@ class SearchStoreEntity(
     var status: Int, // 매장 오픈 여부
     @Field("businessHours")
     var businessHours: Map<DayOfWeek, TimeRange>,
-    var pickUpDay: String,
     var updatedAt: LocalDateTime = LocalDateTime.now(), // 마지막 업데이트 시간
     var createdAt: LocalDateTime = LocalDateTime.now(), // 생성 시간
 ) {
@@ -53,13 +52,6 @@ class SearchStoreEntity(
                 ),
             status = SearchStoreStatus.from(status),
             businessHours = businessHours,
-            pickUpDay = StoreEnum.PickupDay.valueOf(pickUpDay),
-            pickupHour =
-                TimeRange(
-                    "00:00",
-                    "23:59",
-                ),
-            // TODO: 오늘 날짜 BusinessHours에 맞게 변경 필요
             updatedAt = updatedAt,
             createdAt = createdAt,
         )

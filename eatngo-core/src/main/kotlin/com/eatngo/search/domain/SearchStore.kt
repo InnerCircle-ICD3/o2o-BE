@@ -20,8 +20,6 @@ class SearchStore(
     val coordinate: Coordinate, // 매장 위치(위도, 경도)
     val status: SearchStoreStatus, // 매장 오픈 여부
     val businessHours: Map<DayOfWeek, TimeRange>, // 매장 영업 시간
-    val pickUpDay: StoreEnum.PickupDay, // 픽업가능 요일
-    val pickupHour: TimeRange, // 매장 픽업 가능 시간
     val updatedAt: LocalDateTime, // 마지막 업데이트 시간
     val createdAt: LocalDateTime, // 생성 시간
 )
