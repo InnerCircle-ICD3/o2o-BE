@@ -28,13 +28,13 @@ class SearchController(
     )
     @GetMapping("/api/v1/store/list")
     fun listStore(
-        @Parameter(description = "중심 좌표의 위도 (latitude)", example = "37.566500")
+        @Parameter(description = "중심 좌표의 위도 (latitude)", example = "37.497900")
         @RequestParam latitude: Double,
-        @Parameter(description = "중심 좌표의 경도 (latitude)", example = "126.978011")
+        @Parameter(description = "중심 좌표의 경도 (latitude)", example = "127.027600")
         @RequestParam longitude: Double,
-        @Parameter(description = "필터링할 매장 카테고리", example = "BREAD")
+        @Parameter(description = "필터링할 매장 카테고리")
         @RequestParam storeCategory: StoreEnum.StoreCategory?,
-        @Parameter(description = "HH:mm 형식의 시간 ", example = "12:30")
+        @Parameter(description = "HH:mm 형식의 시간 ")
         @RequestParam time: String?, // TODO: VO로 정의하여 검증 로직 추가
         @Parameter(description = "픽업 가능 매장만 조회 여부 (null, false시 모든 상태 조회)", example = "true")
         @RequestParam onlyReservable: Boolean = false,
@@ -61,11 +61,11 @@ class SearchController(
     @Operation(summary = "가게 검색 API", description = "매장 텍스트 검색 API")
     @GetMapping("/api/v1/search/store")
     fun searchStoreKeyword(
-        @Parameter(description = "중심 좌표의 위도 (latitude)", example = "37.566500")
+        @Parameter(description = "중심 좌표의 위도 (latitude)", example = "37.497900")
         @RequestParam latitude: Double,
-        @Parameter(description = "중심 좌표의 경도 (latitude)", example = "126.978011")
+        @Parameter(description = "중심 좌표의 경도 (latitude)", example = "127.027600")
         @RequestParam longitude: Double,
-        @Parameter(description = "검색어", example = "치킨")
+        @Parameter(description = "검색어", example = "쿠키")
         @RequestParam searchText: String,
         // TODO : 우선 BE, FE 모두 page+size로 구현 => 추후 개선
         @Parameter(description = "페이지 번호", example = "0")
