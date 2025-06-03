@@ -88,6 +88,7 @@ jobs:
             requiresCompatibilities,
             cpu,
             memory,
+            taskRoleArn,
             executionRoleArn,
             containerDefinitions: (
               .containerDefinitions | map(
