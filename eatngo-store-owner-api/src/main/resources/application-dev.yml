@@ -42,9 +42,9 @@ spring:
 cloud:
   aws:
     region:
-      static: us-east-1
+      static: ap-northeast-2
     s3:
-      bucket: eatgoeatgo
+      bucket: eatngo-app
 
 datastore:
   mongodb:
