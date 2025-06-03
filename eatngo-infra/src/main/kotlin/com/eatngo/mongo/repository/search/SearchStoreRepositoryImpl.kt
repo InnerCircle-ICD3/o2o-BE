@@ -219,7 +219,7 @@ class SearchStoreRepositoryImpl(
                                     Document(
                                         "text",
                                         Document("query", searchText)
-                                            .append("path", listOf("storeName", "foodCategory")),
+                                            .append("path", listOf("storeName", "foodCategory", "foodType")),
                                     ),
                                 ),
                             ).append(
