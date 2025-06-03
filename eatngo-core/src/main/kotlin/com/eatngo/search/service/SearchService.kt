@@ -37,7 +37,7 @@ class SearchService(
     fun listStore(
         storeFilterDto: StoreFilterDto,
         // TODO: 검색반경 프론트와 논의 필요
-        searchDistance: Double = 0.2, // 200m
+        searchDistance: Double = 2.0, // 2km
         page: Int = 0,
         size: Int = 20,
     ): SearchStoreResultDto {
@@ -67,7 +67,7 @@ class SearchService(
     fun searchStore(
         storeSearchFilterDto: StoreSearchFilterDto,
         // TODO: 검색반경 프론트와 논의 필요
-        searchDistance: Double = 0.2, // 200m
+        searchDistance: Double = 2.0, // 2km
         page: Int,
         size: Int,
     ): SearchStoreResultDto {
