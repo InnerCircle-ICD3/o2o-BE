@@ -21,7 +21,8 @@ class StoreTotalInventoryTypeDecider(
         private const val IN_STOCK_THRESHOLD = 5
     }
 
-    @Cacheable("storeProducts", key = "#storeId")
+    // TODO 캐시 어떻게 할지 고민 필요
+//    @Cacheable("storeProducts", key = "#storeId")
     fun decideInventoryType(storeId: Long, initialStock: Int): InventoryChangedType {
         val allProducts: List<Product> = productPersistence.findAllByStoreId(storeId)
 

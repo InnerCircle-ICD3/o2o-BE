@@ -30,6 +30,10 @@ class ProductService(
     private val storePersistence: StorePersistence,
 ) {
 
+//    @Caching(
+//        put = [CachePut("product", key = "#result.id")],
+//        evict = [CacheEvict("storeProducts", key = "#productDto.storeId")]
+//    )
     @Transactional
     fun createProduct(
         productDto: ProductDto,
@@ -87,7 +91,6 @@ class ProductService(
     }
 
     @Cacheable("product", key = "#productId")
-    @Transactional
     fun getProductDetails(
         storeId: Long,
         productId: Long
