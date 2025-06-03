@@ -28,4 +28,15 @@ class InventoryRepositoryImpl(
     override fun updateStock(productId: Long, stockQuantity: Int): Int {
         return jpaInventoryRepository.updateStock(productId, stockQuantity)
     }
+
+    override fun findAllByProductIdIn(productIds: List<Long>): List<Inventory> {
+        return jpaInventoryRepository.findAllByProductIdIn(productIds)
+            .map(InventoryMapper.Companion::toDomain)
+    }
+
+    override fun saveAll(inventories: List<Inventory>) {
+        jpaInventoryRepository.saveAll(
+            inventories.map(InventoryMapper.Companion::toEntity)
+        )
+    }
 }

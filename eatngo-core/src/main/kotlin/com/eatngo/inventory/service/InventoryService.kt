@@ -7,6 +7,7 @@ import com.eatngo.inventory.dto.InventoryDto
 import com.eatngo.inventory.infra.InventoryPersistence
 import com.eatngo.product.dto.ProductCurrentStockDto
 import com.eatngo.product.dto.ProductDto
+import com.eatngo.product.service.StoreTotalInventoryTypeDecider
 import org.springframework.cache.annotation.CacheEvict
 import org.springframework.cache.annotation.CachePut
 import org.springframework.cache.annotation.Cacheable
@@ -17,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional
 class InventoryService(
     private val inventoryPersistence: InventoryPersistence,
+    private val storeTotalInventoryTypeDecider: StoreTotalInventoryTypeDecider
 ) {
 
     @CachePut("inventory", key = "#productDto.id")
@@ -40,16 +42,26 @@ class InventoryService(
     }
 
     @CachePut("inventory", key = "#productCurrentStockDto.id")
-    fun toggleInventory(productCurrentStockDto: ProductCurrentStockDto): InventoryDto {
+    fun toggleInventory(
+        productCurrentStockDto: ProductCurrentStockDto,
+        storeId: Long,
+        initialStock: Int
+    ): InventoryDto {
         val inventory: Inventory = inventoryPersistence.findTopByProductIdOrderByVersionDesc(productCurrentStockDto.id)
             .orThrow { InventoryNotFound(productCurrentStockDto.id) }
         val changedInventory = inventory.changeStock(productCurrentStockDto.action, productCurrentStockDto.amount)
         val savedInventory: Inventory = inventoryPersistence.save(changedInventory)
+
+        storeTotalInventoryTypeDecider.decideInventoryType(
+            storeId = storeId,
+            initialStock = initialStock,
+        )
+
         return InventoryDto(savedInventory.quantity)
     }
 
     @CachePut("inventory", key = "#productDto.id")
-    fun modifyInventory(productDto: ProductDto): InventoryDto {
+    fun modifyInventory(productDto: ProductDto, initialStock: Int): InventoryDto {
         val inventory: Inventory = inventoryPersistence.findTopByProductIdOrderByVersionDesc(productDto.id!!)
             .orThrow { InventoryNotFound(productDto.id!!) }
 
@@ -59,6 +71,12 @@ class InventoryService(
         )
 
         val savedInventory: Inventory = inventoryPersistence.save(changedInventory)
+
+        storeTotalInventoryTypeDecider.decideInventoryType(
+            storeId = productDto.storeId,
+            initialStock = initialStock
+        )
+
         return InventoryDto(savedInventory.quantity)
     }
 

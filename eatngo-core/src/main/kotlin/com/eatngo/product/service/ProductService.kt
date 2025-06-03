@@ -27,8 +27,13 @@ class ProductService(
     private val productPersistence: ProductPersistence,
     private val fileStorageService: FileStorageService,
     private val inventoryService: InventoryService,
-    private val storePersistence: StorePersistence
+    private val storePersistence: StorePersistence,
 ) {
+
+//    @Caching(
+//        put = [CachePut("product", key = "#result.id")],
+//        evict = [CacheEvict("storeProducts", key = "#productDto.storeId")]
+//    )
     @Transactional
     fun createProduct(
         productDto: ProductDto,
@@ -86,7 +91,6 @@ class ProductService(
     }
 
     @Cacheable("product", key = "#productId")
-    @Transactional
     fun getProductDetails(
         storeId: Long,
         productId: Long
@@ -137,7 +141,12 @@ class ProductService(
             .orThrow { ProductNotFound(productCurrentStockDto.id) }
         val savedProduct = productPersistence.save(product)
 
-        val changedInventory: InventoryDto = inventoryService.toggleInventory(productCurrentStockDto)
+        val store: Store = storePersistence.findById(product.storeId).orThrow { StoreNotFound(product.storeId) }
+        val changedInventory: InventoryDto = inventoryService.toggleInventory(
+            productCurrentStockDto,
+            store.id,
+            findTotalInitialStocks(store.id)
+        )
 
         return ProductAfterStockDto.create(savedProduct, changedInventory)
     }
@@ -164,12 +173,21 @@ class ProductService(
         )
 
         val savedProduct: Product = productPersistence.save(product)
-        val changedInventory: InventoryDto = inventoryService.modifyInventory(productDto)
+        val changedInventory: InventoryDto =
+            inventoryService.modifyInventory(productDto, findTotalInitialStocks(product.storeId))
 
         return ProductDto.from(
             savedProduct,
             savedProduct.imageUrl?.let(fileStorageService::resolveImageUrl),
             changedInventory
         )
+    }
+
+    fun findTotalInitialStocks(storeId: Long): Int {
+        return productPersistence.findAllByStoreId(storeId)
+            .map { product ->
+                inventoryService.getInventoryDetails(product.id)
+            }
+            .sumOf { i -> i.stock }
     }
 }

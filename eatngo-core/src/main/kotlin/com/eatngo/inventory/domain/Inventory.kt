@@ -22,7 +22,7 @@ data class Inventory(
     }
 
     fun changeInventory(
-        quantity: Int,
+        quantity: Int = this.quantity,
         stock: Int,
     ): Inventory {
         return Inventory(
