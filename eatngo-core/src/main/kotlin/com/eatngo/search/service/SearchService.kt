@@ -41,8 +41,7 @@ class SearchService(
         page: Int = 0,
         size: Int = 20,
     ): SearchStoreResultDto {
-        // TODO: 목데이터 삭제 이후 var -> val
-        var listStore: List<SearchStoreWithDistance> =
+        val listStore: List<SearchStoreWithDistance> =
             searchStoreRepository
                 .listStore(
                     longitude = storeFilterDto.viewCoordinate.longitude,
@@ -52,18 +51,6 @@ class SearchService(
                     page = page,
                     size = size,
                 ).orThrow { SearchException.SearchStoreListFailed(storeFilterDto.viewCoordinate, storeFilterDto.filter) }
-
-        // TODO: 삭제 예정(테스트 기간 Mock 데이터)
-        if (listStore.isEmpty()) {
-            // Mock 데이터 생성
-            listStore =
-                SearchStore.getMockSearchStoreList(size).map { searchStore ->
-                    SearchStoreWithDistance(
-                        store = searchStore,
-                        distance = 0.1, // Mock 데이터이므로 임의 거리 설정
-                    )
-                }
-        }
 
         return SearchStoreResultDto.from(
             searchStoreList = listStore,
@@ -84,8 +71,7 @@ class SearchService(
         page: Int,
         size: Int,
     ): SearchStoreResultDto {
-        // TODO: 목데이터 삭제 이후 var -> val
-        var searchStoreList: List<SearchStore> =
+        val searchStoreList: List<SearchStore> =
             searchStoreRepository
                 .searchStore(
                     longitude = storeSearchFilterDto.viewCoordinate.longitude,
@@ -95,12 +81,6 @@ class SearchService(
                     page = page,
                     size = size,
                 ).orThrow { SearchException.SearchStoreSearchFailed(storeSearchFilterDto.viewCoordinate, storeSearchFilterDto.searchText) }
-
-        // TODO: 삭제 예정(테스트 기간 Mock 데이터)
-        if (searchStoreList.isEmpty()) {
-            // Mock 데이터 생성
-            searchStoreList = SearchStore.getMockSearchStoreList(size)
-        }
 
         return SearchStoreResultDto.from(
             userCoordinate = storeSearchFilterDto.viewCoordinate,
