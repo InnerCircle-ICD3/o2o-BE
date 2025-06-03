@@ -9,7 +9,7 @@ import com.eatngo.store.domain.Store
  */
 interface StorePersistence {
     /**
-     * ID로 매장 조회
+     * ID로 매장 조회(주소포함)
      */
     fun findById(id: Long): Store?
 
@@ -19,7 +19,7 @@ interface StorePersistence {
     fun findAllByIds(storeIds: List<Long>): List<Store>
 
     /**
-     * 점주 ID로 매장 목록 조회
+     * 점주 ID로 매장 목록 조회(주소포함)
      */
     fun findByOwnerId(storeOwnerId: Long): List<Store>
 

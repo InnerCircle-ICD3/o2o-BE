@@ -29,7 +29,7 @@ class StorePersistenceImpl(
 
     @SoftDeletedFilter
     override fun findByOwnerId(storeOwnerId: Long): List<Store> =
-        storeRdbRepository.findByStoreOwnerId(storeOwnerId)
+        storeRdbRepository.findByStoreOwnerIdWithAddress(storeOwnerId)
             .map { StoreJpaEntity.toStore(it) }
 
     override fun save(store: Store): Store =

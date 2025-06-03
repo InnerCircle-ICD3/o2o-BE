@@ -23,6 +23,7 @@ class StoreServiceImpl(
 
     override fun createStore(request: StoreCreateDto): Store {
         val store = Store.create(request)
+
         store.apply {
             imageUrl = request.imageUrl?.let { fileStorageService.resolveImageUrl(it)
                 .orThrow { FileException.ImageUrlResolveFailed(request.imageUrl) } }
