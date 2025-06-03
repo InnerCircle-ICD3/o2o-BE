@@ -28,11 +28,6 @@ interface StoreService {
     fun updateStoreStatus(id: Long, newStatus: String, storeOwnerId: Long): Store
 
     /**
-     * 상점 픽업 정보 변경
-     */
-    fun updateStorePickupInfo(id: Long, request: PickUpInfoDto, storeOwnerId: Long): Store
-
-    /**
      * 상점 삭제 (Soft Delete)
      */
     fun deleteStore(id: Long, storeOwnerId: Long): Boolean

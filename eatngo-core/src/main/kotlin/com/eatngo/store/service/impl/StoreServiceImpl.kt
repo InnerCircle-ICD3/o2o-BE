@@ -1,10 +1,11 @@
-package com.eatngo.store.serviceImpl
+package com.eatngo.store.service.impl
 
 import com.eatngo.common.constant.StoreEnum
+import com.eatngo.common.exception.FileException
 import com.eatngo.common.exception.StoreException
 import com.eatngo.extension.orThrow
+import com.eatngo.file.FileStorageService
 import com.eatngo.store.domain.Store
-import com.eatngo.store.dto.PickUpInfoDto
 import com.eatngo.store.dto.StoreCreateDto
 import com.eatngo.store.dto.StoreUpdateDto
 import com.eatngo.store.infra.StorePersistence
@@ -17,10 +18,15 @@ import org.springframework.stereotype.Service
 @Service
 class StoreServiceImpl(
     private val storePersistence: StorePersistence,
+    private val fileStorageService: FileStorageService
 ) : StoreService {
 
     override fun createStore(request: StoreCreateDto): Store {
         val store = Store.create(request)
+        store.apply {
+            imageUrl = request.imageUrl?.let { fileStorageService.resolveImageUrl(it)
+                .orThrow { FileException.ImageUrlResolveFailed(request.imageUrl) } }
+        }
         return storePersistence.save(store)
     }
 
@@ -28,6 +34,11 @@ class StoreServiceImpl(
         val existingStore = storePersistence.findById(id).orThrow { StoreException.StoreNotFound(id) }
         existingStore.requireOwner(request.storeOwnerId)
         existingStore.update(request)
+        if (request.mainImageUrl != null) {
+            existingStore.imageUrl =
+                fileStorageService.resolveImageUrl(request.mainImageUrl)
+                    .orThrow { FileException.ImageUrlResolveFailed(request.mainImageUrl) }
+        }
         return storePersistence.save(existingStore)
     }
 
@@ -53,19 +64,6 @@ class StoreServiceImpl(
             StoreEnum.StoreStatus.PENDING -> existingStore.toPending()
         }
 
-        return storePersistence.save(existingStore)
-    }
-
-    //TODO: UI 따라 삭제 가능성 있는 로직 -> 픽업 정보를 따로 변경하는 화면이 있지 않은 이상 매정 정보에서 같이 변경할거라 삭제가능성 있음
-    override fun updateStorePickupInfo(id: Long, request: PickUpInfoDto, storeOwnerId: Long): Store {
-        val existingStore = storePersistence.findById(id).orThrow { StoreException.StoreNotFound(id) }
-        existingStore.requireOwner(storeOwnerId)
-
-        existingStore.updatePickupInfo(
-            request.pickupDay,
-            request.pickupStartTime,
-            request.pickupEndTime
-        )
         return storePersistence.save(existingStore)
     }
 

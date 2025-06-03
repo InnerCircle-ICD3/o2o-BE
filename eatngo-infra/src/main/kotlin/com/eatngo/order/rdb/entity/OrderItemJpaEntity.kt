@@ -9,6 +9,7 @@ import org.hibernate.annotations.Filter
 
 @Entity
 @Filter(name = DELETED_FILTER)
+@Table(name = "orderItem")
 class OrderItemJpaEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

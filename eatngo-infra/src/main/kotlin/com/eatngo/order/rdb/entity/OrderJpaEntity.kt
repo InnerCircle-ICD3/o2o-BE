@@ -9,6 +9,7 @@ import jakarta.persistence.*
 import org.hibernate.annotations.Filter
 
 @Filter(name = DELETED_FILTER)
+@Table(name = "orders")
 @Entity
 class OrderJpaEntity(
     @Id
@@ -21,8 +22,12 @@ class OrderJpaEntity(
     val customerId: Long,
     val storeId: Long,
     @Enumerated(EnumType.STRING)
-    val status: Status
+    var status: Status
 ) : BaseJpaEntity() {
+
+    fun update(order: Order) {
+        status = order.status
+    }
 
     companion object {
         fun from(order: Order): OrderJpaEntity {

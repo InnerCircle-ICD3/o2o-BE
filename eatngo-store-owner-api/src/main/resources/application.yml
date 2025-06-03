@@ -3,15 +3,11 @@ server:
 
 spring:
   config:
-    import: classpath:auth-application.yml
+    import:
+      - classpath:auth-application.yml
+      - classpath:infra-application.yml
   application:
     name: eatngo-store-owner-api
-  datasource:
-    # H2 메모리 DB를 PostgreSQL 모드로 실행
-    url: jdbc:h2:mem:eatngo;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DATABASE_TO_LOWER=TRUE
-    username: sa
-    password: sa
-    driverClassName: org.h2.Driver
   jpa:
     open-in-view: false
     # Hibernate가 PostgreSQL 방언을 사용하도록 설정
@@ -22,9 +18,6 @@ spring:
       hibernate:
         format_sql: true
         highlight_sql: true
-  h2:
-    console:
-      enabled: true
   data:
     redis:
       host: localhost

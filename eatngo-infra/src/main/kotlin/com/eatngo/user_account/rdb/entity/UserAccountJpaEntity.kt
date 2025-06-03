@@ -10,6 +10,7 @@ import org.hibernate.annotations.Filter
 
 @Filter(name = DELETED_FILTER)
 @Entity
+@Table(name = "user_account")
 class UserAccountJpaEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

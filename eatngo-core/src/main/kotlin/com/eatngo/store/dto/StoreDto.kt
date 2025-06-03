@@ -23,7 +23,9 @@ data class StoreDto(
     val businessHours: List<BusinessHourDto> = emptyList(),
     val storeCategoryInfo: StoreCategoryInfoDto,
     val status: StoreEnum.StoreStatus,
-    val pickUpInfo: PickUpInfoDto,
+    val pickUpDay: String,
+    val todayPickupStartTime: LocalTime?,
+    val todayPickupEndTime: LocalTime?,
     val reviewInfo: ReviewInfoDto,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime,
@@ -31,6 +33,8 @@ data class StoreDto(
 ) {
     companion object {
         fun from(store: Store): StoreDto {
+            val today = java.time.LocalDate.now().dayOfWeek
+            val todayHour = store.businessHours?.find { it.dayOfWeek == today }
             return StoreDto(
                 storeId = store.id,
                 storeOwnerId = store.storeOwnerId,
@@ -51,20 +55,18 @@ data class StoreDto(
                 ),
                 businessNumber = store.businessNumber.value,
                 contactNumber = store.contactNumber?.value,
-                imageUrl = store.imageUrl?.value,
+                imageUrl = store.imageUrl,
                 businessHours = store.businessHours?.map {
                     BusinessHourDto(it.dayOfWeek, it.openTime, it.closeTime)
                 } ?: emptyList(),
                 storeCategoryInfo = StoreCategoryInfoDto(
-                    storeCategory = store.storeCategoryInfo.storeCategory.map { it.value },
+                    storeCategory = store.storeCategoryInfo.storeCategory.map { it.value.name },
                     foodCategory = store.storeCategoryInfo.foodCategory?.map { it.value }
                 ),
                 status = store.status,
-                pickUpInfo = PickUpInfoDto(
-                    pickupStartTime = store.pickUpInfo.pickupStartTime,
-                    pickupEndTime = store.pickUpInfo.pickupEndTime,
-                    pickupDay = store.pickUpInfo.pickupDay
-                ),
+                pickUpDay = store.pickUpDay.pickUpDay.name,
+                todayPickupStartTime = todayHour?.openTime,
+                todayPickupEndTime = todayHour?.closeTime,
                 reviewInfo = ReviewInfoDto(
                     //TODO: 리뷰는 dto에만 포함, 추후 기능 개발되면 서비스에서 값 가져와야 함
                     ratingAverage = 0.0,
@@ -107,15 +109,6 @@ data class BusinessHourDto(
 data class CoordinateDto(
     val latitude: Double? = 0.0,
     val longitude: Double? = 0.0
-)
-
-/**
- * 픽업과 관련된 정보 DTO
- */
-data class PickUpInfoDto(
-    val pickupStartTime: LocalTime?,
-    val pickupEndTime: LocalTime?,
-    val pickupDay: StoreEnum.PickupDay?,
 )
 
 /**

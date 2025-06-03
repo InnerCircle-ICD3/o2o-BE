@@ -55,6 +55,15 @@ object StoreEnum {
     }
 
     /**
+     * 구독 유형
+     */
+    enum class SubscriptionStatus {
+        CREATED,
+        RESUMED,
+        CANCELED
+    }
+
+    /**
      * 매장 카테고리
      */
     enum class StoreCategory(

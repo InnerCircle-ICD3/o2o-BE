@@ -1,6 +1,8 @@
 package com.eatngo.auth.filter
 
 import com.eatngo.auth.constants.AuthenticationConstants.ACCESS_TOKEN
+import com.eatngo.auth.constants.AuthenticationConstants.SET_COOKIE_HEADER
+import com.eatngo.auth.dto.LoginUser
 import com.eatngo.auth.token.TokenProvider
 import io.jsonwebtoken.ExpiredJwtException
 import jakarta.servlet.FilterChain
@@ -27,7 +29,7 @@ class JwtAuthenticationFilter(
                 val authentication = tokenProvider.getAuthentication(accessToken)
                 SecurityContextHolder.getContext().authentication = authentication
             } catch (e: ExpiredJwtException) {
-                // TODO redis refresh token 검사해서 access token 재발급하는 로직 추가하기
+                handleRefreshToken(response, accessToken)
             } catch (e: Exception) {
                 logger.debug("Invalid token: ${e.message}")
                 SecurityContextHolder.clearContext()
@@ -35,5 +37,29 @@ class JwtAuthenticationFilter(
         }
 
         filterChain.doFilter(request, response)
+    }
+
+    private fun handleRefreshToken(response: HttpServletResponse, expiredAccessToken: String) {
+        val refreshToken = tokenProvider.getRefreshToken(expiredAccessToken)
+        if (refreshToken.isNullOrBlank()) {
+            logger.debug("No refresh token found for expired access token.")
+            return
+        }
+
+        try {
+            val loginUser = tokenProvider.getAuthentication(refreshToken).principal as LoginUser
+            val newAccessToken = tokenProvider.createAccessToken(loginUser)
+
+            val responseCookie = tokenProvider.createHttpOnlyCookie(ACCESS_TOKEN, newAccessToken)
+            response.addHeader(SET_COOKIE_HEADER, responseCookie.toString())
+
+            val newAuth = tokenProvider.getAuthentication(newAccessToken)
+            SecurityContextHolder.getContext().authentication = newAuth
+
+            logger.debug("Access token refreshed successfully.")
+        } catch (e: Exception) {
+            logger.warn("Failed to authenticate with refresh token: ${e.message}")
+            SecurityContextHolder.clearContext()
+        }
     }
 }

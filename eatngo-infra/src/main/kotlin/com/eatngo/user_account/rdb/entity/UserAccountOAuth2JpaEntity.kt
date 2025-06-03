@@ -13,6 +13,7 @@ import java.time.LocalDateTime
 
 @Filter(name = DELETED_FILTER)
 @Entity
+@Table(name = "user_account_oauth2")
 class UserAccountOAuth2JpaEntity(
 
     @Id
@@ -47,7 +48,7 @@ class UserAccountOAuth2JpaEntity(
 
     @OneToMany(mappedBy = "userAccountOAuth2", fetch = FetchType.LAZY, cascade = [CascadeType.PERSIST])
     @Filter(name = DELETED_FILTER)
-    val terms: MutableList<UserAccountOauth2TermJpaEntity> = mutableListOf(),
+    val terms: MutableList<UserAccountOAuth2TermJpaEntity> = mutableListOf(),
 ) : BaseJpaEntity() {
     companion object {
         fun of(
@@ -66,7 +67,7 @@ class UserAccountOAuth2JpaEntity(
         ).also {
             userAccountOauth2.terms.forEach { term ->
                 // addLast
-                it.terms.add(UserAccountOauth2TermJpaEntity.of(term, it))
+                it.terms.add(UserAccountOAuth2TermJpaEntity.of(term, it))
             }
         }
 

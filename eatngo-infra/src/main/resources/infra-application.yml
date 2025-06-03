@@ -1,0 +1,7 @@
+spring:
+  datasource:
+    # H2 메모리 DB를 PostgreSQL 모드로 실행
+    url: jdbc:postgresql://localhost:5432/eatngo
+    username: eatngo_user
+    password: eatngolocal
+    driver-class-name: org.postgresql.Driver

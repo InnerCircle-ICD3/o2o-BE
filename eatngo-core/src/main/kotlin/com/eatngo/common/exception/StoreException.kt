@@ -75,4 +75,24 @@ open class StoreException(
         "${BusinessErrorCode.SUBSCRIPTION_UPDATE_FAILED.message}: $subscriptionId",
         mapOf("subscriptionId" to subscriptionId)
     )
+
+    // 추가: 구독 권한 관련 예외
+    class SubscriptionForbidden(customerId: Long, subscriptionId: Long) : StoreException(
+        BusinessErrorCode.SUBSCRIPTION_FORBIDDEN,
+        "고객 ID: $customerId 는 구독 ID: $subscriptionId 에 대한 ${BusinessErrorCode.SUBSCRIPTION_FORBIDDEN.message}",
+        mapOf("customerId" to customerId, "subscriptionId" to subscriptionId)
+    )
+
+    // 추가: 구독 상태 관련 예외
+    class SubscriptionAlreadyActive(subscriptionId: Long) : StoreException(
+        BusinessErrorCode.SUBSCRIPTION_ALREADY_ACTIVE,
+        "${BusinessErrorCode.SUBSCRIPTION_ALREADY_ACTIVE.message}: $subscriptionId",
+        mapOf("subscriptionId" to subscriptionId)
+    )
+
+    class SubscriptionAlreadyCanceled(subscriptionId: Long) : StoreException(
+        BusinessErrorCode.SUBSCRIPTION_ALREADY_CANCELED,
+        "${BusinessErrorCode.SUBSCRIPTION_ALREADY_CANCELED.message}: $subscriptionId",
+        mapOf("subscriptionId" to subscriptionId)
+    )
 }

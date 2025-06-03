@@ -1,15 +1,12 @@
 package com.eatngo.store.controller
 
-import com.eatngo.aop.SoftDeletedFilter
 import com.eatngo.auth.annotaion.StoreOwnerId
 import com.eatngo.common.response.ApiResponse
 import com.eatngo.store.dto.StoreCreateRequest
 import com.eatngo.store.dto.StoreDetailResponse
 import com.eatngo.store.dto.StoreCUDResponse
-import com.eatngo.store.dto.StorePickUpInfoRequest
 import com.eatngo.store.dto.StoreStatusUpdateRequest
 import com.eatngo.store.dto.StoreUpdateRequest
-import com.eatngo.store.service.StoreService
 import com.eatngo.store.usecase.StoreOwnerStatusChangeUseCase
 import com.eatngo.store.usecase.StoreOwnerStoreCreatedUseCase
 import com.eatngo.store.usecase.StoreOwnerStoreDeletedUseCase
@@ -31,7 +28,7 @@ class StoreController(
     private val storeQueryUseCase: StoreQueryUseCase
 ) {
     @Operation(summary = "상점 상세 조회", description = "점주가 운영중인 자신의 상점 상세 정보를 조회합니다.")
-    @GetMapping @SoftDeletedFilter
+    @GetMapping
     fun getStoresByOwnerId(@StoreOwnerId storeOwnerId: Long): ApiResponse<List<StoreDetailResponse>> {
         val storeDtos = storeQueryUseCase.getStoresByStoreOwnerId(storeOwnerId)
         val responses = storeDtos.map { StoreDetailResponse.fromStoreDto(it) }
@@ -59,14 +56,6 @@ class StoreController(
         return ApiResponse.success(StoreCUDResponse(storeId = storeDto.storeId, actionTime = storeDto.updatedAt))
     }
 
-    //TODO: 픽업관련 정보는 매장 정보 변경 시 한번에 변경할 가능성이 높아서(Update와 통일될 가능성) 주석처리, UI 확정 후 삭제 및 수정
-//    @Operation(summary = "상점 픽업 정보 변경", description = "점주가 상점의 픽업 관련 정보를 변경합니다.")
-//    @PatchMapping("/{storeId}/pickup-info")
-//    fun updateStorePickupInfo(@PathVariable storeId: Long, @RequestBody request: StorePickUpInfoRequest, @StoreOwnerId storeOwnerId: Long): ApiResponse<StoreCUDResponse> {
-//         val response = storeService.updateStorePickupInfo(storeId, StorePickUpInfoRequest.from(request), storeOwnerId)
-//         return ApiResponse.success(StoreCUDResponse(storeId = response.storeId, actionTime = LocalDateTime.now()))
-//    }
-    
     @Operation(summary = "상점 삭제", description = "점주가 등록된 상점을 삭제합니다.")
     @DeleteMapping("/{storeId}")
     fun deleteStore(@PathVariable storeId: Long, @StoreOwnerId storeOwnerId: Long): ApiResponse<StoreCUDResponse> {

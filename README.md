@@ -77,7 +77,7 @@
 
 ### 매장(Store) 관련 용어
 
-|      변수명       |  한글명   | 설명            |
+|         변수명         |   한글명   | 설명                                |
 |:-------------------:|:-------:|:----------------------------------|
 |        `id`         |  매장 ID  | 매장의 고유 ID                         |
 |   `storeOwnerId`    |  점주 ID  | 해당 매장을 소유한 점주계정 ID (매장:계정 1:1)    |
@@ -89,8 +89,8 @@
 |     `imageUrl`      | 대표 이미지  | 매장의 대표 이미지 URL (카드뷰에 표시)          |
 |   `businessHours`   |  영업시간   | 매장의 영업시간 정보                       |
 |      `status`       |  매장 상태  | 매장의 운영 상태 (PENDING, OPEN, CLOSED) |
-|    `pickUpInfo`     |  픽업 정보  | 픽업 관련 정보                          |
-| `storeCategoryInfo` | 매장 카테고리 | 매장의 카테고리 정보                      |
+|     `pickUpDay`     |  픽업날짜   | 픽업하는 날(TODAY. TOMORROW)           |
+| `storeCategoryInfo` | 매장 카테고리 | 매장의 카테고리 정보                       |
 
 ### 주소(Address) 관련 용어
 
@@ -162,11 +162,9 @@
 - `openTime`: `LocalTime` - 오픈 시간 (HH:mm 형식)
 - `closeTime`: `LocalTime` - 종료 시간 (HH:mm 형식, openTime보다 이후여야 함)
 
-#### `PickUpInfoVO`
+#### `PickUpDayVO`
 
 - `pickupDay`: `StoreEnum.PickupDay` - 픽업 가능 요일 (TODAY, TOMORROW)
-- `pickupStartTime`: `LocalTime` - 픽업 시작 시간 (HH:mm 형식)
-- `pickupEndTime`: `LocalTime` - 픽업 종료 시간 (HH:mm 형식, startTime보다 이후여야 함)
 
 #### `ReviewInfoVO`
 

@@ -2,16 +2,14 @@ package com.eatngo.store.rdb.entity
 
 import com.eatngo.common.BaseJpaEntity
 import com.eatngo.common.constant.StoreEnum
-import com.eatngo.common.converter.JsonAttributeConverter
 import com.eatngo.common.type.Address
 import com.eatngo.common.type.CoordinateVO
 import com.eatngo.constants.DELETED_FILTER
 import com.eatngo.store.domain.*
+import com.eatngo.store.rdb.json_converter.*
 import com.eatngo.store.vo.*
-import com.fasterxml.jackson.annotation.JsonInclude
 import jakarta.persistence.*
 import org.hibernate.annotations.Filter
-import java.time.LocalTime
 
 @Entity
 @Filter(name = DELETED_FILTER)
@@ -51,30 +49,30 @@ class StoreJpaEntity(
     @Column(columnDefinition = "TEXT")
     val imageUrl: String?,
 
-    @OneToMany(mappedBy = "store", fetch = FetchType.LAZY, cascade = [CascadeType.ALL])
-    @Filter(name = DELETED_FILTER)
-    val businessHours: MutableList<BusinessHourJpaEntity> = mutableListOf(),
+    // TODO: 나중에 진짜 db 환경에서는 컬럼 Jsonb로 변경 필요
+//    @Column(columnDefinition = "jsonb", nullable = false)
+    @Column(columnDefinition = "TEXT", nullable = false)
+    @Convert(converter = BusinessHoursJsonConverter::class)
+    val businessHours: BusinessHoursJson,
 
-    @ElementCollection
-    @CollectionTable(name = "store_categories", joinColumns = [JoinColumn(name = "store_id")])
-    val storeCategories: MutableList<String> = mutableListOf(),
+    // TODO: 나중에 진짜 db 환경에서는 컬럼 Jsonb로 변경 필요
+//    @Column(columnDefinition = "jsonb", nullable = false)
+    @Column(columnDefinition = "TEXT", nullable = false)
+    @Convert(converter = StoreCategoryJsonConverter::class)
+    val storeCategory: StoreCategoryJson,
 
-    @ElementCollection
-    @CollectionTable(name = "store_food_categories", joinColumns = [JoinColumn(name = "store_id")])
-    val foodCategories: MutableList<String> = mutableListOf(),
+    // TODO: 나중에 진짜 db 환경에서는 컬럼 Jsonb로 변경 필요
+//    @Column(columnDefinition = "jsonb", nullable = false)
+    @Column(columnDefinition = "TEXT", nullable = false)
+    @Convert(converter = FoodCategoryJsonConverter::class)
+    val foodCategory: FoodCategoryJson,
 
     @Enumerated(EnumType.STRING)
     val status: StoreEnum.StoreStatus,
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    val pickupDay: StoreEnum.PickupDay,
-
-    @Column(nullable = false)
-    val pickupStartTime: LocalTime,
-
-    @Column(nullable = false)
-    val pickupEndTime: LocalTime
+    val pickUpDay: StoreEnum.PickupDay
 ) : BaseJpaEntity() {
     companion object {
         fun from(store: Store): StoreJpaEntity {
@@ -96,18 +94,21 @@ class StoreJpaEntity(
                 ),
                 businessNumber = store.businessNumber.value,
                 contactNumber = store.contactNumber?.value,
-                imageUrl = store.imageUrl?.value,
-                storeCategories = store.storeCategoryInfo.storeCategory.map { it.value }.toMutableList(),
-                foodCategories = store.storeCategoryInfo.foodCategory?.map { it.value }?.toMutableList() ?: mutableListOf(),
+                imageUrl = store.imageUrl,
+                businessHours = BusinessHoursJson(
+                    hours = store.businessHours?.map {
+                        BusinessHourJson(
+                            dayOfWeek = it.dayOfWeek.name,
+                            openTime = it.openTime.toString(),
+                            closeTime = it.closeTime.toString()
+                        )
+                    } ?: emptyList()
+                ),
+                storeCategory = StoreCategoryJson(store.storeCategoryInfo.storeCategory.map { it.value }),
+                foodCategory = FoodCategoryJson(store.storeCategoryInfo.foodCategory?.map { it.value } ?: emptyList()),
                 status = store.status,
-                pickupDay = store.pickUpInfo.pickupDay,
-                pickupStartTime = store.pickUpInfo.pickupStartTime,
-                pickupEndTime = store.pickUpInfo.pickupEndTime
+                pickUpDay = store.pickUpDay.pickUpDay
             )
-
-            store.businessHours?.forEach {
-                storeJpaEntity.businessHours.add(BusinessHourJpaEntity.of(it, storeJpaEntity))
-            }
 
             return storeJpaEntity
         }
@@ -130,14 +131,20 @@ class StoreJpaEntity(
                 ),
                 businessNumber = BusinessNumberVO.from(businessNumber),
                 contactNumber = contactNumber?.let { ContactNumberVO.from(it) },
-                imageUrl = imageUrl?.let { ImageUrlVO.from(it) },
-                businessHours = businessHours.map { BusinessHourJpaEntity.toVO(it) },
+                imageUrl = imageUrl,
+                businessHours = businessHours.hours.map {
+                    BusinessHourVO.from(
+                        dayOfWeek = java.time.DayOfWeek.valueOf(it.dayOfWeek),
+                        openTime = java.time.LocalTime.parse(it.openTime),
+                        closeTime = java.time.LocalTime.parse(it.closeTime)
+                    )
+                },
                 storeCategoryInfo = StoreCategoryInfo(
-                    storeCategory = storeCategories.map { StoreCategoryVO.from(it) },
-                    foodCategory = foodCategories.map { FoodCategoryVO.from(it) }
+                    storeCategory = storeCategory.value.map { StoreCategoryVO(it) },
+                    foodCategory = foodCategory.value.map { FoodCategoryVO.from(it) }
                 ),
                 status = status,
-                pickUpInfo = PickUpInfoVO.from(pickupDay, pickupStartTime, pickupEndTime),
+                pickUpDay = PickUpDayVO.from(pickUpDay),
                 createdAt = createdAt,
                 updatedAt = updatedAt,
                 deletedAt = deletedAt
@@ -145,19 +152,3 @@ class StoreJpaEntity(
         }
     }
 }
-
-@JsonInclude(JsonInclude.Include.NON_NULL)
-data class AddressJson(
-    val roadNameAddress: String,
-    val lotNumberAddress: String,
-    val buildingName: String? = null,
-    val zipCode: String,
-    val region1DepthName: String? = null,
-    val region2DepthName: String? = null,
-    val region3DepthName: String? = null,
-    val latitude: Double,
-    val longitude: Double
-)
-
-@Converter(autoApply = false)
-class AddressJsonConverter : JsonAttributeConverter<AddressJson>(AddressJson::class.java)
