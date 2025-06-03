@@ -7,7 +7,6 @@ import com.eatngo.common.util.DistanceCalculator
 import com.eatngo.search.domain.SearchStore
 import com.eatngo.store.dto.BusinessHourDto
 import com.eatngo.store.vo.BusinessHourVO
-import com.eatngo.store.vo.PickUpDayVO
 import java.time.LocalTime
 
 data class SearchStoreResultDto(
@@ -49,15 +48,16 @@ data class SearchStoreDto(
     val foodCategory: List<String>, // 음식 종류
     val distanceKm: Double, // 검색하는 유저와 매장 간의 거리(km)
     val status: StoreEnum.StoreStatus, // 매장 오픈 여부
-    val stock: Int, // 재고 수량
     val roadNameAddress: String, // 매장 주소(도로명 주소)
     val coordinate: CoordinateVO, // 매장 위치(위도, 경도)
     val businessHours: List<BusinessHourVO>, // 매장 영업 시간
-    val pickUpDay: PickUpDayVO,
-    val pickupHour: PickupHour, // 매장 픽업 가능 시간
+    val pickUpDay: String,
+    val todayPickupStartTime: LocalTime?, // 오늘 픽업 시작 시간
+    val todayPickupEndTime: LocalTime?, // 오늘 픽업 종료 시간
     // TODO: 리뷰, 찜 기능
-    val reviewCount: Int? = 0, // 리뷰 수
-    val reviewScore: Double? = 5.0, // 리뷰 평점
+    val stock: Int, // 재고 수량
+    val ratingAverage: Double, // 리뷰 평점
+    val ratingCount: Int, // 리뷰 수
     val isFavorite: Boolean? = false, // 찜 여부
 ) {
     companion object {
@@ -86,19 +86,14 @@ data class SearchStoreDto(
                         },
                     ),
                 // TODO: 픽업 가능 요일 선택 MongoDB 에도 추가
-                pickUpDay = PickUpDayVO.from(searchStore.pickUpDay.name),
-                pickupHour =
-                    PickupHour(
-                        startTime = DateTimeUtil.parseHHmmToLocalTime(searchStore.pickupHour.openTime),
-                        endTime = DateTimeUtil.parseHHmmToLocalTime(searchStore.pickupHour.closeTime),
-                    ),
+                pickUpDay = searchStore.pickUpDay.name,
+                todayPickupStartTime = DateTimeUtil.parseHHmmToLocalTime(searchStore.pickupHour.openTime),
+                todayPickupEndTime = DateTimeUtil.parseHHmmToLocalTime(searchStore.pickupHour.closeTime),
                 // TODO: 재고 수량은 Redis에서 가져와야 함(상품)
                 stock = 0,
+                // TODO: 리뷰 관련 기능 구현 (Redis에서 가져오기?)
+                ratingAverage = 3.0,
+                ratingCount = 3,
             )
     }
 }
-
-data class PickupHour(
-    val startTime: LocalTime,
-    val endTime: LocalTime
-)

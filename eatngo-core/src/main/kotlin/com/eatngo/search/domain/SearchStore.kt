@@ -30,16 +30,16 @@ class SearchStore(
          * 임시 Mock 데이터 생성용 생성자
          * TODO: 삭제 예정
          */
-        fun getMockSearchStoreList(): List<SearchStore> =
-            listOf(
+        fun getMockSearchStoreList(size: Int): List<SearchStore> =
+            (1..size).map { idx ->
                 SearchStore(
-                    storeId = 1L,
-                    storeName = "Mock Store 빵집",
-                    coordinate = Coordinate.from(37.001010, 127.001010),
-                    storeCategory = listOf(StoreEnum.StoreCategory.BREAD),
+                    storeId = idx.toLong(),
+                    storeName = "Mock Store $idx",
+                    coordinate = Coordinate.from(37.001000 + idx * 0.00001, 127.001000 + idx * 0.00001),
+                    storeCategory = listOf(enumValues<StoreEnum.StoreCategory>().random()),
                     foodCategory = listOf("호밀빵", "케이크"),
                     roadNameAddress = "서울시 강남구 테헤란로 123",
-                    storeImage = "https://example.com/store-image.jpg",
+                    storeImage = "https://eatngo-app.s3.ap-northeast-2.amazonaws.com/store/pu.png",
                     status = SearchStoreStatus.OPEN,
                     businessHours =
                         mapOf(
@@ -55,29 +55,7 @@ class SearchStore(
                     pickupHour = TimeRange("08:00", "20:00"),
                     updatedAt = LocalDateTime.now(),
                     createdAt = LocalDateTime.now(),
-                ),
-                SearchStore(
-                    storeId = 2L,
-                    storeName = "Mock Store 디저트",
-                    coordinate = Coordinate.from(37.001000, 127.001000),
-                    storeCategory = listOf(StoreEnum.StoreCategory.DESSERT),
-                    foodCategory = listOf("호밀빵", "케이크"),
-                    roadNameAddress = "서울시 강남구 테헤란로 123",
-                    storeImage = "https://example.com/store-image.jpg",
-                    status = SearchStoreStatus.OPEN,
-                    businessHours =
-                        mapOf(
-                            DayOfWeek.MONDAY to TimeRange("08:00", "21:00"),
-                            DayOfWeek.TUESDAY to TimeRange("10:00", "21:00"),
-                            DayOfWeek.THURSDAY to TimeRange("10:00", "23:00"),
-                            DayOfWeek.FRIDAY to TimeRange("08:00", "23:00"),
-                            DayOfWeek.SATURDAY to TimeRange("11:00", "14:00"),
-                        ),
-                    pickUpDay = StoreEnum.PickupDay.TODAY,
-                    pickupHour = TimeRange("21:00", "23:00"),
-                    updatedAt = LocalDateTime.now(),
-                    createdAt = LocalDateTime.now(),
-                ),
-            )
+                )
+            }
     }
 }
