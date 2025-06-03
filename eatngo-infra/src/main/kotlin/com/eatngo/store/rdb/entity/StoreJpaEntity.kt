@@ -5,7 +5,8 @@ import com.eatngo.common.constant.StoreEnum
 import com.eatngo.common.type.Address
 import com.eatngo.common.type.CoordinateVO
 import com.eatngo.constants.DELETED_FILTER
-import com.eatngo.store.domain.*
+import com.eatngo.store.domain.Store
+import com.eatngo.store.domain.StoreCategoryInfo
 import com.eatngo.store.rdb.json_converter.*
 import com.eatngo.store.vo.*
 import jakarta.persistence.*
@@ -35,8 +36,7 @@ class StoreJpaEntity(
     @Column(columnDefinition = "TEXT")
     val description: String?,
 
-//    @Column(columnDefinition = "jsonb", nullable = false) TODO: 나중에 진짜 db 환경에서는 컬럼 Jsonb로 변경 필요
-    @Column(columnDefinition = "TEXT", nullable = false)
+    @Column(columnDefinition = "jsonb", nullable = false)
     @Convert(converter = AddressJsonConverter::class)
     val address: AddressJson,
 
@@ -49,21 +49,15 @@ class StoreJpaEntity(
     @Column(columnDefinition = "TEXT")
     val imageUrl: String?,
 
-    // TODO: 나중에 진짜 db 환경에서는 컬럼 Jsonb로 변경 필요
-//    @Column(columnDefinition = "jsonb", nullable = false)
-    @Column(columnDefinition = "TEXT", nullable = false)
+    @Column(columnDefinition = "jsonb", nullable = false)
     @Convert(converter = BusinessHoursJsonConverter::class)
     val businessHours: BusinessHoursJson,
 
-    // TODO: 나중에 진짜 db 환경에서는 컬럼 Jsonb로 변경 필요
-//    @Column(columnDefinition = "jsonb", nullable = false)
-    @Column(columnDefinition = "TEXT", nullable = false)
+    @Column(columnDefinition = "jsonb", nullable = false)
     @Convert(converter = StoreCategoryJsonConverter::class)
     val storeCategory: StoreCategoryJson,
 
-    // TODO: 나중에 진짜 db 환경에서는 컬럼 Jsonb로 변경 필요
-//    @Column(columnDefinition = "jsonb", nullable = false)
-    @Column(columnDefinition = "TEXT", nullable = false)
+    @Column(columnDefinition = "jsonb", nullable = false)
     @Convert(converter = FoodCategoryJsonConverter::class)
     val foodCategory: FoodCategoryJson,
 
