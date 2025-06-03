@@ -1,5 +1,6 @@
 package com.eatngo.file
 
+import com.eatngo.file.dto.UploadBatchRequestDto
 import com.eatngo.file.dto.UploadRequestDto
 import com.eatngo.file.dto.UploadResponseDto
 import jakarta.validation.Valid
@@ -23,4 +24,18 @@ class FileUploadController(
                 uploadRequestDto.folderPath
             )
         )
+
+    @PostMapping("/presigned-urls")
+    fun getPresignedUrls(@Valid @RequestBody uploadBatchRequestDto: UploadBatchRequestDto): List<UploadResponseDto> {
+        return uploadBatchRequestDto.files.map { file ->
+            UploadResponseDto.from(
+                fileUploadService.generatePreSignedUploadUrl(
+                    file.fileName,
+                    file.contentType,
+                    file.folderPath
+                )
+            )
+        }
+    }
 }
+
