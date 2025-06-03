@@ -11,6 +11,8 @@ import com.eatngo.store.rdb.json_converter.*
 import com.eatngo.store.vo.*
 import jakarta.persistence.*
 import org.hibernate.annotations.Filter
+import org.hibernate.annotations.JdbcTypeCode
+import org.hibernate.type.SqlTypes
 
 @Entity
 @Filter(name = DELETED_FILTER)
@@ -49,14 +51,17 @@ class StoreJpaEntity(
     @Column(columnDefinition = "TEXT")
     val imageUrl: String?,
 
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb", nullable = false)
     @Convert(converter = BusinessHoursJsonConverter::class)
-    val businessHours: BusinessHoursJson,
+    val businessHours: List<BusinessHourJson>,
 
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb", nullable = false)
     @Convert(converter = StoreCategoryJsonConverter::class)
     val storeCategory: StoreCategoryJson,
 
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb", nullable = false)
     @Convert(converter = FoodCategoryJsonConverter::class)
     val foodCategory: FoodCategoryJson,
@@ -89,15 +94,13 @@ class StoreJpaEntity(
                 businessNumber = store.businessNumber.value,
                 contactNumber = store.contactNumber?.value,
                 imageUrl = store.imageUrl,
-                businessHours = BusinessHoursJson(
-                    hours = store.businessHours?.map {
-                        BusinessHourJson(
-                            dayOfWeek = it.dayOfWeek.name,
-                            openTime = it.openTime.toString(),
-                            closeTime = it.closeTime.toString()
-                        )
-                    } ?: emptyList()
-                ),
+                businessHours = store.businessHours?.map {
+                    BusinessHourJson(
+                        dayOfWeek = it.dayOfWeek.name,
+                        openTime = it.openTime.toString(),
+                        closeTime = it.closeTime.toString()
+                    )
+                } ?: emptyList(),
                 storeCategory = StoreCategoryJson(store.storeCategoryInfo.storeCategory.map { it.value }),
                 foodCategory = FoodCategoryJson(store.storeCategoryInfo.foodCategory?.map { it.value } ?: emptyList()),
                 status = store.status,
@@ -126,7 +129,7 @@ class StoreJpaEntity(
                 businessNumber = BusinessNumberVO.from(businessNumber),
                 contactNumber = contactNumber?.let { ContactNumberVO.from(it) },
                 imageUrl = imageUrl,
-                businessHours = businessHours.hours.map {
+                businessHours = businessHours.map {
                     BusinessHourVO.from(
                         dayOfWeek = java.time.DayOfWeek.valueOf(it.dayOfWeek),
                         openTime = java.time.LocalTime.parse(it.openTime),

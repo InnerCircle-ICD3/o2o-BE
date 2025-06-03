@@ -18,14 +18,9 @@ data class AddressJson(
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 data class BusinessHourJson(
-    val dayOfWeek: String,    // "MONDAY", "TUESDAY" 등
-    val openTime: String,     // "08:30" 형식
+    val dayOfWeek: String,
+    val openTime: String,
     val closeTime: String
-)
-
-@JsonInclude(JsonInclude.Include.NON_NULL)
-data class BusinessHoursJson(
-    val hours: List<BusinessHourJson> = emptyList()
 )
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
