@@ -49,7 +49,7 @@ data class SearchStoreDto(
     val distanceKm: Double, // 검색하는 유저와 매장 간의 거리(km)
     val status: StoreEnum.StoreStatus, // 매장 오픈 여부
     val roadNameAddress: String, // 매장 주소(도로명 주소)
-    val coordinate: CoordinateVO, // 매장 위치(위도, 경도)
+    val coordinate: CoordinateResultDto, // 매장 위치(위도, 경도)
     val businessHours: List<BusinessHourVO>, // 매장 영업 시간
     val pickUpDay: String,
     val todayPickupStartTime: LocalTime?, // 오늘 픽업 시작 시간
@@ -72,7 +72,7 @@ data class SearchStoreDto(
                 storeCategory = searchStore.storeCategory,
                 foodCategory = searchStore.foodCategory,
                 roadNameAddress = searchStore.roadNameAddress,
-                coordinate = searchStore.coordinate.toVO(),
+                coordinate = searchStore.coordinate.toDto(),
                 distanceKm = distanceKm,
                 status = searchStore.status.toStoreStatus(),
                 businessHours =
