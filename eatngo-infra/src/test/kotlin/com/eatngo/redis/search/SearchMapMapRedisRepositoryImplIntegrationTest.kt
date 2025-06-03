@@ -2,6 +2,7 @@ package com.eatngo.redis.repository.search
 
 import com.eatngo.TestApplication
 import com.eatngo.common.type.CoordinateVO
+import com.eatngo.search.dto.CoordinateResultDto
 import com.eatngo.search.dto.SearchStoreMap
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.kotest.core.annotation.Tags
@@ -35,8 +36,8 @@ class SearchMapMapRedisRepositoryImplIntegrationTest(
 
             val storeMaps =
                 listOf(
-                    SearchStoreMap(storeID = 1L, storeName = "Store A", CoordinateVO.from(latitude = 37.000000, longitude = 127.000000)),
-                    SearchStoreMap(storeID = 2L, storeName = "Store B", CoordinateVO.from(latitude = 37.000001, longitude = 127.000001)),
+                    SearchStoreMap(storeID = 1L, storeName = "Store A", CoordinateResultDto(latitude = 37.000000, longitude = 127.000000)),
+                    SearchStoreMap(storeID = 2L, storeName = "Store B", CoordinateResultDto(latitude = 37.000001, longitude = 127.000001)),
                 )
 
             this.`when`("Redis에 저장하고 다시 조회하면") {
