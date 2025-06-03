@@ -69,45 +69,7 @@ class SearchStoreRepositoryImpl(
                 .spherical(true)
 
         // 서브쿼리 생성
-        val query = Query()
-        // 선택 : 카테고리 필터링
-        searchFilter.storeCategory?.let {
-            query.addCriteria(
-                Criteria.where("storeCategory").`is`(it),
-            )
-        }
-
-        // 선택 : 픽업 가능 시간 필터링
-        val now = LocalDateTime.now()
-        val currentDayOfWeek = now.dayOfWeek
-        val currentTime = now.toLocalTime()
-        searchFilter.time?.let {
-            query.addCriteria(
-                Criteria
-                    .where("pickupHour.openTime")
-                    .lte(currentTime)
-                    .and("pickupHour.closeTime")
-                    .gt(currentTime),
-            )
-        }
-
-        // 선택 : 예약 가능 상태 필터링 -> TODO 로직 확인 필요...(매장 오픈 시간과 상태로 예약 가능 상태 필터링)
-        searchFilter.onlyReservable.let {
-            val openTimeField = "businessHours.$currentDayOfWeek.openTime"
-            val closeTimeField = "businessHours.$currentDayOfWeek.closeTime"
-            query.addCriteria(
-                Criteria
-                    .where(openTimeField)
-                    .lte(currentTime)
-                    .and(closeTimeField)
-                    .gt(currentTime),
-            )
-
-            query.addCriteria(
-                Criteria.where("status").`is`(SearchStoreStatus.OPEN.code),
-            )
-        }
-
+        val query = makeFilterQuery(searchFilter)
         // Criteria가 있으면 NearQuery에 붙여주기
         nearQuery.query(query)
 
@@ -204,6 +166,28 @@ class SearchStoreRepositoryImpl(
     ): AggregationOperation {
         val maxDistance = maxDistanceKm * 1000 // km 단위를 meter로 변환
 
+        val must =
+            listOf(
+                Document(
+                    "text",
+                    Document("query", searchText)
+                        .append("path", listOf("storeName", "roadNameAddress", "foodCategory")),
+                ),
+            )
+        val filter =
+            listOf( // 거리 필터 (maxDistance)
+                Document(
+                    "range",
+                    Document("path", "coordinate")
+                        .append("lte", maxDistance)
+                        .append(
+                            "origin",
+                            Document("type", "Point")
+                                .append("coordinates", listOf(longitude, latitude)),
+                        ).append("unit", "meter"),
+                ),
+            )
+
         val searchQuery =
             Document(
                 "\$search",
@@ -214,29 +198,10 @@ class SearchStoreRepositoryImpl(
                         Document()
                             .append(
                                 "must",
-                                listOf(
-                                    // 텍스트 검색 → 관련성 기반 정렬
-                                    Document(
-                                        "text",
-                                        Document("query", searchText)
-                                            .append("path", listOf("storeName", "foodCategory", "foodType")),
-                                    ),
-                                ),
+                                must,
                             ).append(
                                 "filter",
-                                listOf(
-                                    // 거리 필터 (maxDistance)
-                                    Document(
-                                        "range",
-                                        Document("path", "coordinate")
-                                            .append("lte", maxDistance)
-                                            .append(
-                                                "origin",
-                                                Document("type", "Point")
-                                                    .append("coordinates", listOf(longitude, latitude)),
-                                            ).append("unit", "meter"),
-                                    ),
-                                ),
+                                filter,
                             ),
                     ),
             )
@@ -259,4 +224,40 @@ class SearchStoreRepositoryImpl(
                     ),
             )
         }
+
+    fun makeFilterQuery(searchFilter: SearchFilter): Query {
+        val query = Query()
+        // 선택 : 카테고리 필터링
+        searchFilter.storeCategory?.let {
+            query.addCriteria(
+                Criteria.where("storeCategory").`is`(it),
+            )
+        }
+
+        searchFilter.time?.let {
+            // 선택 : 픽업 가능 시간 필터링
+            val now = LocalDateTime.now()
+            val currentDayOfWeek = now.dayOfWeek
+            val currentTime = now.toLocalTime()
+
+            val openTimeField = "businessHours.$currentDayOfWeek.openTime"
+            val closeTimeField = "businessHours.$currentDayOfWeek.closeTime"
+            query.addCriteria(
+                Criteria
+                    .where(openTimeField)
+                    .lte(currentTime)
+                    .and(closeTimeField)
+                    .gt(currentTime),
+            )
+        }
+
+        // 선택 : 예약 가능 상태 필터링 -> TODO 로직 확인 필요...(오픈 할 때 마다 예약 가능 상태 변경할건지)
+        searchFilter.onlyReservable.let {
+            query.addCriteria(
+                Criteria.where("status").`is`(SearchStoreStatus.OPEN.code),
+            )
+        }
+
+        return query
+    }
 }
