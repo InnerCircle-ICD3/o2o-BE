@@ -33,9 +33,9 @@ spring:
       enabled: true
   data:
     redis:
-      host: localhost
+      host: ${REDIS_HOST}
       port: 6379
-      password: eatngolocal
+      password: ${REDIS_PASSWORD}
 
 cloud:
   aws:
