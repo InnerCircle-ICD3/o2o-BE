@@ -40,7 +40,7 @@ TODO: store category, food category 인덱스 analyzer 개선
         "type": "geo"
       },
       "status": {
-        "type": "int"
+        "type": "number"
       }
     }
   }
