@@ -121,34 +121,50 @@ class SearchService(
                 latitude = userCoordinate.latitude,
             )
 
-        // TODO: 목데이터 삭제 이후 주석 해제
         // Redis에서 box 검색 결과를 가져온다. -> 위경도 기중 0.005 단위로 박스 매핑
-//        val redisKey = searchMapRedisRepository.getKey(box.topLeft)
-//        val seachStoreMapList: List<SearchStoreMap> = searchMapRedisRepository.findByKey(redisKey)
-//
-//        // 검색 결과가 없으면 MongoDB에서 검색하여 가져온 뒤 캐싱한다
-//        if (seachStoreMapList.isEmpty()) {
-//            val searchStoreList: List<SearchStore> =
-//                searchStoreRepository.findBox(box).orThrow {
-//                    SearchException.SearchStoreMapFailed(userCoordinate)
-//                }
-//            // Redis에 저장
-//            searchMapRedisRepository
-//                .save(
-//                    key = redisKey,
-//                    value =
-//                        searchStoreList.map {
-//                            SearchStoreMap.from(it)
-//                        },
-//                ).orThrow {
-//                    SearchException.SearchStoreMapCacheFailed(redisKey)
-//                }
-//        }
+        val redisKey =
+            searchMapRedisRepository.getKey(box.topLeft)
+        val seachStoreMapList: List<SearchStoreMap> = searchMapRedisRepository.findByKey(redisKey)
 
         return SearchStoreMapResultDto.from(
             box = box,
-            searchStoreMapList = SearchStoreMap.getMockSearchStoreMapList(),
+            searchStoreMapList = seachStoreMapList,
         )
+    }
+
+    fun searchStoreMapRefresh(userCoordinate: CoordinateVO): SearchStoreMapResultDto {
+        // center 값을 기준으로 해당하는 box 좌표를 구한다.
+        val box: Box =
+            getBox(
+                longitude = userCoordinate.longitude,
+                latitude = userCoordinate.latitude,
+            )
+
+        // Redis에서 box 검색 결과를 가져온다. -> 위경도 기중 0.005 단위로 박스 매핑
+        val redisKey =
+            searchMapRedisRepository.getKey(box.topLeft)
+        val seachStoreMapList: List<SearchStoreMap> = searchMapRedisRepository.findByKey(redisKey)
+
+        // 검색 결과가 없으면 MongoDB에서 검색하여 가져온 뒤 캐싱한다
+        if (seachStoreMapList.isEmpty()) {
+            val searchStoreList: List<SearchStore> =
+                searchStoreRepository.findBox(box).orThrow {
+                    SearchException.SearchStoreMapFailed(userCoordinate)
+                }
+            // Redis에 저장
+            searchMapRedisRepository
+                .save(
+                    key = redisKey,
+                    value =
+                        searchStoreList.map {
+                            SearchStoreMap.from(it)
+                        },
+                ).orThrow {
+                    SearchException.SearchStoreMapCacheFailed(redisKey)
+                }
+        }
+
+        return searchStoreMap(userCoordinate)
     }
 
     /**

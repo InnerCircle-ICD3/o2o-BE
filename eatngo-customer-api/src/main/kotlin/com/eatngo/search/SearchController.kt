@@ -116,4 +116,27 @@ class SearchController(
         ResponseEntity.ok(
             searchService.searchSuggestions(keyword),
         )
+
+    /**
+     * 지도 검색 리프레시 API
+     * 이 API는 지도에서 매장 포인트를 새로고침하여 최신 정보를 제공합니다.
+     * @param latitude 중심 좌표의 위도
+     * @param longitude 중심 좌표의 경도
+     */
+    @Operation(summary = "지도 검색 리프레시 API", description = "지도에서 매장 포인트를 새로고침하여 최신 정보를 제공합니다. TODO : 사용 할 지 논의 필요(우선 만들어둠)")
+    @GetMapping("/api/v1/search/store/map/refresh")
+    fun searchStoreMapRefresh(
+        @Parameter(description = "중심 좌표의 위도 (latitude)", example = "37.566500")
+        @RequestParam latitude: Double,
+        @Parameter(description = "중심 좌표의 경도 (latitude)", example = "126.978011")
+        @RequestParam longitude: Double,
+    ): ResponseEntity<SearchStoreMapResultDto> =
+        ResponseEntity.ok(
+            searchService.searchStoreMapRefresh(
+                CoordinateVO.from(
+                    latitude = latitude,
+                    longitude = longitude,
+                ),
+            ),
+        )
 }
