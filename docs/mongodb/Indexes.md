@@ -38,15 +38,6 @@ TODO: store category, food category 인덱스 analyzer 개선
       },
       "coordinate": {
         "type": "geo"
-      },
-      "open": {
-        "type": "boolean"
-      },
-      "openTime": {
-        "type": "date"
-      },
-      "closeTime": {
-        "type": "date"
       }
     }
   }
