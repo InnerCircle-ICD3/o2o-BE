@@ -4,7 +4,7 @@
 ## SearchStore
 ### MongoDB 인덱스
 ```js
-db.SearchStore.createIndex({ location: "2dsphere" })
+db.SearchStore.createIndex({ coordinate: "2dsphere" })
 ```
 ### Atlas Search 인덱스
 TODO: store category, food category 인덱스 analyzer 개선
