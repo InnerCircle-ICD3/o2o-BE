@@ -4,7 +4,6 @@ import com.eatngo.file.dto.UploadBatchRequestDto
 import com.eatngo.file.dto.UploadRequestDto
 import com.eatngo.file.dto.UploadResponseDto
 import jakarta.validation.Valid
-import org.springframework.web.bind.annotation.CrossOrigin
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -27,8 +26,7 @@ class FileUploadController(
         )
 
     @PostMapping("/presigned-urls")
-    @CrossOrigin(origins = ["http://localhost:8081"])
-    fun getPresignedUrls(@RequestBody uploadBatchRequestDto: UploadBatchRequestDto): List<UploadResponseDto> {
+    fun getPresignedUrls(@Valid @RequestBody uploadBatchRequestDto: UploadBatchRequestDto): List<UploadResponseDto> {
         return uploadBatchRequestDto.files.map { file ->
             UploadResponseDto.from(
                 fileUploadService.generatePreSignedUploadUrl(
