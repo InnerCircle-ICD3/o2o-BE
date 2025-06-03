@@ -13,7 +13,7 @@ spring:
     # Hibernate가 PostgreSQL 방언을 사용하도록 설정
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     properties:
       hibernate:
         format_sql: true
