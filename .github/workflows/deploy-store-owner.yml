@@ -102,7 +102,7 @@ jobs:
                   ]
               )
             )
-          }' task-def-raw.json > task-def-customer.json
+          }' task-def-raw.json > task-def-store-owner.json
 
           aws ecs register-task-definition \
             --cli-input-json file://task-def-store-owner.json \
