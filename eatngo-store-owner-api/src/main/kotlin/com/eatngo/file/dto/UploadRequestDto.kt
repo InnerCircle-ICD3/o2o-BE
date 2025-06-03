@@ -15,3 +15,7 @@ data class UploadRequestDto(
     @field:NotBlank(message = "저장 경로는 필수입니다.")
     val folderPath: String
 )
+
+data class UploadBatchRequestDto(
+    val files: List<UploadRequestDto>
+)
