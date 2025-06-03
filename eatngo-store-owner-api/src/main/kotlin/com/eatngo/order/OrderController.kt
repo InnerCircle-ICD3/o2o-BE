@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*
 @RestController
 class OrderController(
     private val orderStatusChangedUseCase: StoreOrderStatusChangedUseCase,
-    private val storeReadOrderUseCase: StoreReadOrderUseCase
+    private val storeReadOrderUseCase: StoreReadOrderUseCase,
 ) {
     @PostMapping("/api/v1/orders/{orderId}/cancel")
     @Operation(summary = "주문 취소", description = "주문 취소")
@@ -41,10 +41,12 @@ class OrderController(
         @StoreOwnerId storeOwnerId: Long,
         @ModelAttribute cursoredStoreOrderQueryParamDto: CursoredStoreOrderQueryParamDto
     ) =
-        storeReadOrderUseCase.findAllByQueryParameter(
-            CursoredStoreOrderQueryParamDto.toOrderQueryParamDto(
-                storeOwnerId,
-                cursoredStoreOrderQueryParamDto
+        ResponseEntity.ok(
+            storeReadOrderUseCase.findAllByQueryParameter(
+                CursoredStoreOrderQueryParamDto.toOrderQueryParamDto(
+                    storeOwnerId,
+                    cursoredStoreOrderQueryParamDto
+                )
             )
         )
 }
