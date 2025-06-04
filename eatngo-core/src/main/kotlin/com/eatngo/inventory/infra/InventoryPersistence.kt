@@ -9,4 +9,5 @@ interface InventoryPersistence {
     fun updateStock(productId: Long, stockQuantity: Int): Int
     fun findAllByProductIdIn(productIds: List<Long>): List<Inventory>
     fun saveAll(inventories: List<Inventory>)
+//    fun updateInventory(quantity: Int, stock: Int, productId: Long)
 }

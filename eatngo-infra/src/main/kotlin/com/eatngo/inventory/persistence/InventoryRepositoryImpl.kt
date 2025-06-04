@@ -39,4 +39,8 @@ class InventoryRepositoryImpl(
             inventories.map(InventoryMapper.Companion::toEntity)
         )
     }
+
+//    override fun updateInventory(quantity: Int, stock: Int, productId: Long) {
+//        jpaInventoryRepository.updateInventory(quantity, stock, productId)
+//    }
 }

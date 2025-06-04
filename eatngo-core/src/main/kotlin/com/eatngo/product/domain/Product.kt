@@ -65,6 +65,7 @@ sealed class Product {
 
         override fun remove() {
             this.deletedStatus = DeletedStatus.DELETED
+            this.status = ProductStatus.INACTIVE
         }
     }
 
@@ -104,6 +105,7 @@ sealed class Product {
 
         override fun remove() {
             this.deletedStatus = DeletedStatus.DELETED
+            this.status = ProductStatus.INACTIVE
         }
     }
 
@@ -143,6 +145,7 @@ sealed class Product {
 
         override fun remove() {
             this.deletedStatus = DeletedStatus.DELETED
+            this.status = ProductStatus.INACTIVE
         }
     }
 }

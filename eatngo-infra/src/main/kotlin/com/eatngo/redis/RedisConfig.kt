@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator
+import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import org.springframework.cache.CacheManager
 import org.springframework.cache.annotation.EnableCaching
 import org.springframework.context.annotation.Bean
@@ -63,22 +64,24 @@ class RedisConfig(
 
     @Bean
     fun cacheManager(factory: RedisConnectionFactory): CacheManager {
-        val redisMapper = objectMapper.copy().apply {
+        val dtoMapper = objectMapper.copy().apply {
+            registerKotlinModule()
             activateDefaultTyping(
                 LaissezFaireSubTypeValidator.instance,
-                ObjectMapper.DefaultTyping.NON_FINAL,
+                ObjectMapper.DefaultTyping.EVERYTHING,
                 JsonTypeInfo.As.PROPERTY
             )
             configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
         }
-        val jacksonSerializer = GenericJackson2JsonRedisSerializer(redisMapper)
+
+        val productSerializer = GenericJackson2JsonRedisSerializer(dtoMapper)
 
         val config = RedisCacheConfiguration.defaultCacheConfig()
             .serializeKeysWith(
-                RedisSerializationContext.SerializationPair.fromSerializer(stringSerializer)
+                RedisSerializationContext.SerializationPair.fromSerializer(StringRedisSerializer())
             )
             .serializeValuesWith(
-                RedisSerializationContext.SerializationPair.fromSerializer(jacksonSerializer)
+                RedisSerializationContext.SerializationPair.fromSerializer(productSerializer)
             )
             .entryTtl(Duration.ofMinutes(60))
             .disableCachingNullValues()
@@ -88,5 +91,6 @@ class RedisConfig(
             .transactionAware()
             .build()
     }
+
 
 }

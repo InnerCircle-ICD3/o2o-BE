@@ -15,6 +15,10 @@ import com.eatngo.product.dto.ProductDto
 import com.eatngo.product.infra.ProductPersistence
 import com.eatngo.store.domain.Store
 import com.eatngo.store.infra.StorePersistence
+import org.springframework.cache.annotation.CacheEvict
+import org.springframework.cache.annotation.CachePut
+import org.springframework.cache.annotation.Cacheable
+import org.springframework.cache.annotation.Caching
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -26,10 +30,10 @@ class ProductService(
     private val storePersistence: StorePersistence,
 ) {
 
-    //    @Caching(
-//        put = [CachePut("product", key = "#result.id")],
-//        evict = [CacheEvict("storeProducts", key = "#productDto.storeId")]
-//    )
+    @Caching(
+        put = [CachePut("product", key = "#result.id")],
+        evict = [CacheEvict("storeProducts", key = "#productDto.storeId")]
+    )
     @Transactional
     fun createProduct(
         productDto: ProductDto,
@@ -85,7 +89,7 @@ class ProductService(
         )
     }
 
-    //    @Cacheable("product", key = "#productId")
+    @Cacheable("product", key = "#productId")
     @Transactional
     fun getProductDetails(
         storeId: Long,
@@ -103,7 +107,7 @@ class ProductService(
         )
     }
 
-    //    @Cacheable("storeProducts", key = "#storeId")
+    @Cacheable("storeProducts", key = "#storeId")
     @Transactional
     fun findAllProducts(storeId: Long): List<ProductDto> {
         return productPersistence.findAllActivatedProductByStoreId(storeId)
@@ -116,21 +120,22 @@ class ProductService(
             }
     }
 
-    //    @Caching(
-//        evict = [
-//            CacheEvict("product", key = "#productId"),
-//            CacheEvict("inventory", key = "#productId"),
-//            CacheEvict("storeProducts", key = "#storeId")],
-//    )
+    @Caching(
+        evict = [
+            CacheEvict("product", key = "#productId"),
+            CacheEvict("inventory", key = "#productId"),
+            CacheEvict("storeProducts", key = "#storeId")],
+    )
     @Transactional
     fun deleteProduct(storeId: Long, productId: Long) {
-        val product: Product = productPersistence.findActivatedProductById(productId).orThrow { ProductNotFound(productId) }
+        val product: Product =
+            productPersistence.findActivatedProductById(productId).orThrow { ProductNotFound(productId) }
         product.remove()
         productPersistence.save(product)
         inventoryService.deleteInventory(product.id)
     }
 
-    //    @CacheEvict("product", key = "#productCurrentStockDto.id")
+    @CacheEvict("product", key = "#productCurrentStockDto.id")
     @Transactional
     fun toggleStock(productCurrentStockDto: ProductCurrentStockDto): ProductAfterStockDto {
         val product: Product = productPersistence.findActivatedProductById(productCurrentStockDto.id)
@@ -147,14 +152,15 @@ class ProductService(
         return ProductAfterStockDto.create(savedProduct, changedInventory)
     }
 
-    //    @Caching(
-//        put = [CachePut("product", key = "#productDto.id")],
-//        evict = [CacheEvict("storeProducts", key = "#productDto.storeId")]
-//    )
+    @Caching(
+        put = [CachePut("product", key = "#productDto.id")],
+        evict = [CacheEvict("storeProducts", key = "#productDto.storeId")]
+    )
     @Transactional
     fun modifyProduct(productDto: ProductDto): ProductDto {
-        val product: Product = productPersistence.findActivatedProductByIdAndStoreId(productDto.id!!, productDto.storeId)
-            .orThrow { ProductNotFound(productDto.id!!) }
+        val product: Product =
+            productPersistence.findActivatedProductByIdAndStoreId(productDto.id!!, productDto.storeId)
+                .orThrow { ProductNotFound(productDto.id!!) }
 
         product.modify(
             name = productDto.name,
@@ -169,8 +175,9 @@ class ProductService(
         )
 
         val savedProduct: Product = productPersistence.save(product)
+        val initialStock = findTotalInitialStocks(product.storeId)
         val changedInventory: InventoryDto =
-            inventoryService.modifyInventory(productDto, findTotalInitialStocks(product.storeId))
+            inventoryService.modifyInventory(productDto, initialStock)
 
         return ProductDto.from(
             savedProduct,
