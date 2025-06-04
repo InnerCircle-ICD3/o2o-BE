@@ -13,10 +13,18 @@ class ReviewUseCase(
     private val orderService: OrderService,
     private val customerService: CustomerService,
 ) {
-
     fun createReview(dto: CreateReviewDto): ReviewDto {
         val customer = customerService.getCustomerById(dto.customerId)
         val order = orderService.getById(dto.orderId)
-        return ReviewDto.from(order.createReview(dto = dto, customer = customer))
+
+        check(!reviewService.existsReviewByOrderId(order.id)) { "이미 해당 주문에 리뷰가 작성되어 있습니다." }
+
+        return ReviewDto.from(
+            reviewService.createReview(
+                dto = dto,
+                order = order,
+                customer = customer
+            )
+        )
     }
 }

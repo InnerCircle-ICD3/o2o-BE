@@ -42,10 +42,12 @@ class Order(
         require(customerId == customer.id) { "주문한 손님만이 리뷰를 작성할 수 있습니다." }
         require(status.equals(Status.DONE)) { "완료된 주문에만 리뷰를 작성할 수 있습니다." }
 
-        return Review(
+        return Review.create(
             content = dto.content,
             score = Score(dto.score),
-            images = Images(dto.images)
+            images = Images(dto.images),
+            orderId = id,
+            customerId = customer.id
         )
     }
 
