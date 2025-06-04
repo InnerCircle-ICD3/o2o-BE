@@ -11,6 +11,7 @@ class InventoryMapper {
                 id = inventory.id,
                 quantity = inventory.quantity,
                 stock = inventory.stock,
+                version = inventory.version,
                 productId = inventory.productId
             )
         }
@@ -20,7 +21,8 @@ class InventoryMapper {
                 id = inventoryEntity.id,
                 quantity = inventoryEntity.quantity,
                 stock = inventoryEntity.stock,
-                productId = inventoryEntity.productId
+                productId = inventoryEntity.productId,
+                version = inventoryEntity.version,
             )
         }
     }

@@ -6,8 +6,9 @@ import com.eatngo.product.domain.StockActionType.INCREASE
 
 data class Inventory(
     val id: Long = 0L,
-    val quantity: Int, // 점주가 지정한 상품의 수량
-    val stock: Int, // 현재 재고량
+    var quantity: Int, // 점주가 지정한 상품의 수량
+    var stock: Int, // 현재 재고량
+    val version: Long = 0L,
     val productId: Long,
 ) {
     fun changeStock(
@@ -33,13 +34,21 @@ data class Inventory(
         )
     }
 
+    fun modify(
+        quantity: Int = this.quantity,
+        stock: Int,
+    ) {
+        this.quantity = quantity
+        this.stock = stock
+    }
+
     private fun increaseStock(amount: Int): Inventory {
-        return Inventory(this.id, this.quantity, this.stock + amount, this.productId)
+        return Inventory(this.id, this.quantity, this.stock + amount, this.version, this.productId)
     }
 
     private fun decreaseStock(amount: Int): Inventory {
         validateStock(amount)
-        return Inventory(this.id, this.quantity, this.stock - amount, this.productId)
+        return Inventory(this.id, this.quantity, this.stock - amount, this.version, this.productId)
     }
 
     private fun validateStock(amount: Int) {

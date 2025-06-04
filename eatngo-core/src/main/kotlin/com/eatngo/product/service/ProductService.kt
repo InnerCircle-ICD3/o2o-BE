@@ -30,10 +30,10 @@ class ProductService(
     private val storePersistence: StorePersistence,
 ) {
 
-//    @Caching(
-//        put = [CachePut("product", key = "#result.id")],
-//        evict = [CacheEvict("storeProducts", key = "#productDto.storeId")]
-//    )
+    @Caching(
+        put = [CachePut("product", key = "#result.id")],
+        evict = [CacheEvict("storeProducts", key = "#productDto.storeId")]
+    )
     @Transactional
     fun createProduct(
         productDto: ProductDto,
@@ -79,7 +79,6 @@ class ProductService(
         }
 
         val savedProduct: Product = productPersistence.save(product)
-        // id가 비어있어서 에러가 발생함. JPA에서 만들어준 Id로 대체
         productDto.id = savedProduct.id
         val savedInventory: InventoryDto = inventoryService.createInventory(productDto)
 
@@ -91,11 +90,12 @@ class ProductService(
     }
 
     @Cacheable("product", key = "#productId")
+    @Transactional
     fun getProductDetails(
         storeId: Long,
         productId: Long
     ): ProductDto {
-        val product: Product = productPersistence.findByIdAndStoreId(productId, storeId)
+        val product: Product = productPersistence.findActivatedProductByIdAndStoreId(productId, storeId)
             .orThrow { ProductNotFound(productId) }
 
         val inventoryDetails: InventoryDto = inventoryService.getInventoryDetails(productId)
@@ -110,7 +110,7 @@ class ProductService(
     @Cacheable("storeProducts", key = "#storeId")
     @Transactional
     fun findAllProducts(storeId: Long): List<ProductDto> {
-        return productPersistence.findAllByStoreId(storeId)
+        return productPersistence.findAllActivatedProductByStoreId(storeId)
             .map {
                 ProductDto.from(
                     it,
@@ -128,7 +128,8 @@ class ProductService(
     )
     @Transactional
     fun deleteProduct(storeId: Long, productId: Long) {
-        val product: Product = productPersistence.findById(productId).orThrow { ProductNotFound(productId) }
+        val product: Product =
+            productPersistence.findActivatedProductById(productId).orThrow { ProductNotFound(productId) }
         product.remove()
         productPersistence.save(product)
         inventoryService.deleteInventory(product.id)
@@ -137,7 +138,7 @@ class ProductService(
     @CacheEvict("product", key = "#productCurrentStockDto.id")
     @Transactional
     fun toggleStock(productCurrentStockDto: ProductCurrentStockDto): ProductAfterStockDto {
-        val product: Product = productPersistence.findById(productCurrentStockDto.id)
+        val product: Product = productPersistence.findActivatedProductById(productCurrentStockDto.id)
             .orThrow { ProductNotFound(productCurrentStockDto.id) }
         val savedProduct = productPersistence.save(product)
 
@@ -157,8 +158,9 @@ class ProductService(
     )
     @Transactional
     fun modifyProduct(productDto: ProductDto): ProductDto {
-        val product: Product = productPersistence.findByIdAndStoreId(productDto.id!!, productDto.storeId)
-            .orThrow { ProductNotFound(productDto.id!!) }
+        val product: Product =
+            productPersistence.findActivatedProductByIdAndStoreId(productDto.id!!, productDto.storeId)
+                .orThrow { ProductNotFound(productDto.id!!) }
 
         product.modify(
             name = productDto.name,
@@ -173,8 +175,9 @@ class ProductService(
         )
 
         val savedProduct: Product = productPersistence.save(product)
+        val initialStock = findTotalInitialStocks(product.storeId)
         val changedInventory: InventoryDto =
-            inventoryService.modifyInventory(productDto, findTotalInitialStocks(product.storeId))
+            inventoryService.modifyInventory(productDto, initialStock)
 
         return ProductDto.from(
             savedProduct,
@@ -184,7 +187,7 @@ class ProductService(
     }
 
     fun findTotalInitialStocks(storeId: Long): Int {
-        return productPersistence.findAllByStoreId(storeId)
+        return productPersistence.findAllActivatedProductByStoreId(storeId)
             .map { product ->
                 inventoryService.getInventoryDetails(product.id)
             }

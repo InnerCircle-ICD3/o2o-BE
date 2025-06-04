@@ -39,4 +39,5 @@ class InventoryRepositoryImpl(
             inventories.map(InventoryMapper.Companion::toEntity)
         )
     }
+
 }

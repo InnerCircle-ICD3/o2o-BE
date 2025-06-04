@@ -47,7 +47,7 @@ class ProductEventListener(
     }
 
     private fun publishInventoryChangeIfNeeded(orderItem: OrderItem) {
-        val storeId = productPersistence.findById(orderItem.productId)
+        val storeId = productPersistence.findActivatedProductById(orderItem.productId)
             .orThrow { ProductNotFound(orderItem.productId) }
             .storeId
         val initialStock = productService.findTotalInitialStocks(storeId)

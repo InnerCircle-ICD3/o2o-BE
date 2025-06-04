@@ -5,7 +5,6 @@ import com.eatngo.product.domain.Product.*
 import com.eatngo.product.entity.ProductEntity
 import com.eatngo.product.entity.ProductPriceEmbeddable
 import com.eatngo.product.entity.ProductType.*
-import org.hibernate.annotations.SoftDeleteType
 
 class ProductMapper {
 
@@ -32,7 +31,7 @@ class ProductMapper {
                 foodTypes = product.foodTypes.foods.map { it.name },
                 status = product.status,
                 productType = productType,
-                deleteStatus = SoftDeleteType.valueOf(product.deletedStatus.value)
+                deleteStatus = DeletedStatus.valueOf(product.deletedStatus.value)
             )
         }
 
