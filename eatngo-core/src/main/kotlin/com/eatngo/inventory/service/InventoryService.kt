@@ -8,27 +8,24 @@ import com.eatngo.inventory.infra.InventoryPersistence
 import com.eatngo.product.dto.ProductCurrentStockDto
 import com.eatngo.product.dto.ProductDto
 import com.eatngo.product.service.StoreTotalInventoryTypeDecider
-import org.springframework.cache.annotation.CacheEvict
-import org.springframework.cache.annotation.CachePut
-import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
-@Transactional
 class InventoryService(
     private val inventoryPersistence: InventoryPersistence,
     private val storeTotalInventoryTypeDecider: StoreTotalInventoryTypeDecider
 ) {
 
-    @CachePut("inventory", key = "#productDto.id")
+//    @CachePut("inventory", key = "#productDto.id")
+    @Transactional
     fun createInventory(productDto: ProductDto): InventoryDto {
         val inventory = Inventory.create(productDto.inventory.quantity, productDto.id!!)
         val savedInventory: Inventory = inventoryPersistence.save(inventory)
         return InventoryDto(savedInventory.quantity)
     }
 
-    @Cacheable("inventory", key = "#productId")
+//    @Cacheable("inventory", key = "#productId")
     fun getInventoryDetails(productId: Long): InventoryDto {
         val inventory: Inventory =
             inventoryPersistence.findTopByProductIdOrderByVersionDesc(productId)
@@ -36,12 +33,14 @@ class InventoryService(
         return InventoryDto(inventory.quantity)
     }
 
-    @CacheEvict("inventory", key = "#productId")
+//    @CacheEvict("inventory", key = "#productId")
+    @Transactional
     fun deleteInventory(productId: Long) {
         inventoryPersistence.deleteByProductId(productId)
     }
 
-    @CachePut("inventory", key = "#productCurrentStockDto.id")
+//    @CachePut("inventory", key = "#productCurrentStockDto.id")
+    @Transactional
     fun toggleInventory(
         productCurrentStockDto: ProductCurrentStockDto,
         storeId: Long,
@@ -57,10 +56,11 @@ class InventoryService(
             initialStock = initialStock,
         )
 
-        return InventoryDto(savedInventory.quantity)
+        return InventoryDto(savedInventory.quantity, savedInventory.stock)
     }
 
-    @CachePut("inventory", key = "#productDto.id")
+//    @CachePut("inventory", key = "#productDto.id")
+    @Transactional
     fun modifyInventory(productDto: ProductDto, initialStock: Int): InventoryDto {
         val inventory: Inventory = inventoryPersistence.findTopByProductIdOrderByVersionDesc(productDto.id!!)
             .orThrow { InventoryNotFound(productDto.id!!) }

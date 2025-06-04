@@ -1,5 +1,9 @@
 package com.eatngo.redis
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo
+import com.fasterxml.jackson.databind.DeserializationFeature
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator
 import org.springframework.cache.CacheManager
 import org.springframework.cache.annotation.EnableCaching
 import org.springframework.context.annotation.Bean
@@ -25,6 +29,7 @@ import java.time.Duration
 @EnableCaching
 class RedisConfig(
     private val env: Environment,
+    private val objectMapper: ObjectMapper
 ) {
     val stringSerializer: StringRedisSerializer = StringRedisSerializer()
 
@@ -58,21 +63,30 @@ class RedisConfig(
 
     @Bean
     fun cacheManager(factory: RedisConnectionFactory): CacheManager {
+        val redisMapper = objectMapper.copy().apply {
+            activateDefaultTyping(
+                LaissezFaireSubTypeValidator.instance,
+                ObjectMapper.DefaultTyping.NON_FINAL,
+                JsonTypeInfo.As.PROPERTY
+            )
+            configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+        }
+        val jacksonSerializer = GenericJackson2JsonRedisSerializer(redisMapper)
+
         val config = RedisCacheConfiguration.defaultCacheConfig()
             .serializeKeysWith(
-                RedisSerializationContext.SerializationPair.fromSerializer(StringRedisSerializer())
+                RedisSerializationContext.SerializationPair.fromSerializer(stringSerializer)
             )
             .serializeValuesWith(
-                RedisSerializationContext.SerializationPair.fromSerializer(
-                    GenericJackson2JsonRedisSerializer()
-                )
+                RedisSerializationContext.SerializationPair.fromSerializer(jacksonSerializer)
             )
             .entryTtl(Duration.ofMinutes(60))
             .disableCachingNullValues()
 
         return RedisCacheManager.builder(factory)
             .cacheDefaults(config)
-            .transactionAware() // transaction commit 이후 redis AOP 작동
+            .transactionAware()
             .build()
     }
+
 }

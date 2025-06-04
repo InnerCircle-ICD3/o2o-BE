@@ -1,5 +1,6 @@
 package com.eatngo.product.persistence
 
+import com.eatngo.product.domain.DeletedStatus
 import com.eatngo.product.domain.Product
 import com.eatngo.product.infra.ProductPersistence
 import com.eatngo.product.mapper.ProductMapper
@@ -15,19 +16,19 @@ class ProductPersistenceImpl(
         return ProductMapper.toDomain(savedEntity)
     }
 
-    override fun findById(productId: Long): Product? {
-        return productRepository.findById(productId)
+    override fun findActivatedProductById(productId: Long): Product? {
+        return productRepository.findByIdAndDeleteStatus(productId, DeletedStatus.ACTIVE)
             .map(ProductMapper::toDomain)
             .orElse(null)
     }
 
-    override fun findAllByStoreId(storeId: Long): List<Product> {
-        return productRepository.findAllByStoreId(storeId)
+    override fun findAllActivatedProductByStoreId(storeId: Long): List<Product> {
+        return productRepository.findAllByStoreIdAndDeleteStatus(storeId, DeletedStatus.ACTIVE)
             .map(ProductMapper::toDomain)
     }
 
-    override fun findByIdAndStoreId(productId: Long, storeId: Long): Product? {
-        return productRepository.findByIdAndStoreId(productId, storeId)
+    override fun findActivatedProductByIdAndStoreId(productId: Long, storeId: Long): Product? {
+        return productRepository.findByIdAndStoreIdAndDeleteStatus(productId, storeId, DeletedStatus.ACTIVE)
             .map(ProductMapper::toDomain)
             .orElse(null)
     }

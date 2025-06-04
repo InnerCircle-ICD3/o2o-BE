@@ -23,7 +23,7 @@ data class UpdateProductRequestDto(
 
     @field:Schema(
         description = "잇고백 상품 세부 정보들",
-        examples = ["단팥빵", "소금빵", "팥빵"],
+        example = "단팥빵 ,소금빵, 팥빵"
     )
     val foodType: List<String>,
 

@@ -18,8 +18,8 @@ data class CreateProductRequestDto(
 
     @field:NotBlank(message = "상품 사이즈는 필수입니다")
     @field:Schema(
-        description = "상품 사이즈",
-        examples = ["L(large)", "M(medium)", "S(small)"],
+        description = "상품 사이즈(large, medium, small)",
+        examples = ["L", "M", "S"],
     )
     val size: String,
 
@@ -38,7 +38,7 @@ data class CreateProductRequestDto(
     @field:NotEmpty(message = "음식 유형은 최소 하나 이상 선택해야 합니다")
     @field:Schema(
         description = "잇고백 상품 세부 정보들",
-        examples = ["단팥빵", "소금빵", "팥빵"],
+        example = "단팥빵 ,소금빵, 팥빵"
     )
     val foodType: List<String>
 )

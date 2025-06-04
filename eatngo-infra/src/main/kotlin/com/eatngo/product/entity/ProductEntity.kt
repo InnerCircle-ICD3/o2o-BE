@@ -2,10 +2,10 @@ package com.eatngo.product.entity
 
 import com.eatngo.common.BaseJpaEntity
 import com.eatngo.constants.DELETED_FILTER
+import com.eatngo.product.domain.DeletedStatus
 import com.eatngo.product.domain.ProductStatus
 import jakarta.persistence.*
 import org.hibernate.annotations.Filter
-import org.hibernate.annotations.SoftDeleteType
 import org.springframework.data.redis.core.RedisHash
 
 @Filter(name = DELETED_FILTER)
@@ -47,6 +47,6 @@ data class ProductEntity(
     var productType: ProductType,
 
     @Enumerated(EnumType.STRING)
-    var deleteStatus: SoftDeleteType,
+    var deleteStatus: DeletedStatus,
 ) : BaseJpaEntity() {
 }

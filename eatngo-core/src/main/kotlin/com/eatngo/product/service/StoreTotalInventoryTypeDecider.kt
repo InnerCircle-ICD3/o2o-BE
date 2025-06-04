@@ -7,7 +7,6 @@ import com.eatngo.inventory.event.InventoryChangedType.*
 import com.eatngo.inventory.infra.InventoryPersistence
 import com.eatngo.product.domain.Product
 import com.eatngo.product.infra.ProductPersistence
-import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
 
 @Service
@@ -24,7 +23,7 @@ class StoreTotalInventoryTypeDecider(
     // TODO 캐시 어떻게 할지 고민 필요
 //    @Cacheable("storeProducts", key = "#storeId")
     fun decideInventoryType(storeId: Long, initialStock: Int): InventoryChangedType {
-        val allProducts: List<Product> = productPersistence.findAllByStoreId(storeId)
+        val allProducts: List<Product> = productPersistence.findAllActivatedProductByStoreId(storeId)
 
         val totalStockQuantity = allProducts.asSequence()
             .map { product ->
