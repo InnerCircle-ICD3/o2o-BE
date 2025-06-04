@@ -70,11 +70,14 @@ object StoreEnum {
         val category: String,
     ) {
         BREAD("빵"),
+        BAKERY("베이커리"),
+        COFFEE("커피전문점"),
         DESSERT("디저트"),
         KOREAN("한식"),
         FRUIT("과일"),
         PIZZA("피자"),
         SALAD("샐러드"),
+        RICECAKE("떡")
         ;
 
         companion object {
