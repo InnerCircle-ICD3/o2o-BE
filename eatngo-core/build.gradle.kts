@@ -5,7 +5,9 @@ plugins {
 
 dependencies {
     // Spring Boot 기본 의존성
+
     implementation("org.springframework:spring-context")  // REST API 지원
+    implementation("org.springframework.boot:spring-boot-starter-web") // SSE Emitter 지원
     implementation("org.jetbrains.kotlin:kotlin-reflect")              // Kotlin 리플렉션 지원
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin") // Kotlin JSON 직렬화/역직렬화
     implementation("org.springframework.boot:spring-boot-starter-data-jpa") // Transactional 사용
