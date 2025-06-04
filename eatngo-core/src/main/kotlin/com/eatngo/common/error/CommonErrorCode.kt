@@ -16,8 +16,8 @@ enum class CommonErrorCode(
     DUPLICATE_ENTITY("CEC006", "엔티티가 이미 존재합니다."),
 
     // Validation
-    VALIDATION_FAILED("CEC001", "유효성 검증에 실패했습니다."),
+    VALIDATION_FAILED("CEC007", "유효성 검증에 실패했습니다."),
 
     // Image
-    IMAGE_URL_RESOLVE_FAILED("CEC001","이미지 URL 변환에 실패했습니다.");
+    IMAGE_URL_RESOLVE_FAILED("CEC008","이미지 URL 변환에 실패했습니다.");
 }
