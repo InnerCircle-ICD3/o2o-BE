@@ -2,20 +2,25 @@ package com.eatngo.product
 
 import com.eatngo.common.response.ApiResponse
 import com.eatngo.inventory.dto.InventoryDto
+import com.eatngo.order.domain.Order
+import com.eatngo.order.event.OrderEvent
 import com.eatngo.product.domain.StockActionType
 import com.eatngo.product.domain.StockActionType.DECREASE
 import com.eatngo.product.domain.StockActionType.INCREASE
 import com.eatngo.product.dto.*
+import com.eatngo.product.event.ProductEventListener
 import com.eatngo.product.service.ProductService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import org.springframework.web.bind.annotation.*
+import java.lang.foreign.ValueLayout
 
 @Tag(name = "상품", description = "상품 관련 API")
 @RestController
 class ProductController(
     private val productService: ProductService,
+    private val productEventListener: ProductEventListener,
 ) {
     @PostMapping("/stores/{store-id}/products")
     @Operation(summary = "상품 생성", description = "상품 생성")
