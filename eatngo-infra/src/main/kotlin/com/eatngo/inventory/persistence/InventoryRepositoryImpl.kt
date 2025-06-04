@@ -40,7 +40,4 @@ class InventoryRepositoryImpl(
         )
     }
 
-//    override fun updateInventory(quantity: Int, stock: Int, productId: Long) {
-//        jpaInventoryRepository.updateInventory(quantity, stock, productId)
-//    }
 }
