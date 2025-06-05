@@ -81,25 +81,25 @@ data class BusinessHourDoc(
 @Schema(description = "주소 정보 예시")
 data class AddressDoc(
     @Schema(description = "도로명 주소", example = "서울특별시 강남구 테헤란로 427")
-    val roadNameAddress: String? = "서울특별시 강남구 테헤란로 427",
+    val roadNameAddress: String?,
 
     @Schema(description = "지번 주소", example = "서울특별시 강남구 삼성동 143-48")
-    val lotNumberAddress: String? = "서울특별시 강남구 삼성동 143-48",
+    val lotNumberAddress: String?,
 
     @Schema(description = "건물명", example = "위워크타워")
-    val buildingName: String? = "위워크타워",
+    val buildingName: String?,
 
     @Schema(description = "우편번호", example = "06159")
-    val zipCode: String? = "06159",
+    val zipCode: String?,
 
     @Schema(description = "지역 1단계명", example = "서울특별시")
-    val region1DepthName: String? = "서울특별시",
+    val region1DepthName: String?,
 
     @Schema(description = "지역 2단계명", example = "강남구")
-    val region2DepthName: String? = "강남구",
+    val region2DepthName: String?,
 
     @Schema(description = "지역 3단계명", example = "삼성동")
-    val region3DepthName: String? = "삼성동",
+    val region3DepthName: String?,
 
     @Schema(description = "좌표 정보")
     val coordinate: CoordinateDoc
