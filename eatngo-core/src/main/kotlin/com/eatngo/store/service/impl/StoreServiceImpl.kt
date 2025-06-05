@@ -2,7 +2,7 @@ package com.eatngo.store.service.impl
 
 import com.eatngo.common.constant.StoreEnum
 import com.eatngo.common.exception.FileException
-import com.eatngo.common.exception.StoreException
+import com.eatngo.common.exception.store.StoreException
 import com.eatngo.extension.orThrow
 import com.eatngo.file.FileStorageService
 import com.eatngo.store.domain.Store

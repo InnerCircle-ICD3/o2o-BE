@@ -1,8 +1,6 @@
 package com.eatngo.store.dto
 
-import com.eatngo.common.constant.StoreEnum
-import java.time.DayOfWeek
-import java.time.LocalTime
+import com.eatngo.store.docs.request.StoreCreateRequestDocs
 
 /**
  * 매장 생성 요청용 dto
@@ -10,33 +8,33 @@ import java.time.LocalTime
 
 data class StoreCreateRequest(
     // 기본 정보
-    val name: String,
-    val businessNumber: String,
+   override val name: String,
+   override val businessNumber: String,
 
     // 주소 정보 (Flat 구조)
-    val roadNameAddress: String? = null,
-    val lotNumberAddress: String? = null,
-    val buildingName: String? = null,
-    val zipCode: String? = null,
-    val region1DepthName: String? = null,
-    val region2DepthName: String? = null,
-    val region3DepthName: String? = null,
+   override val roadNameAddress: String? = null,
+   override val lotNumberAddress: String? = null,
+   override val buildingName: String? = null,
+   override val zipCode: String? = null,
+   override val region1DepthName: String? = null,
+   override val region2DepthName: String? = null,
+   override val region3DepthName: String? = null,
 
     // 위치 정보
-    val latitude: Double? = null,
-    val longitude: Double? = null,
+   override val latitude: Double? = null,
+   override val longitude: Double? = null,
 
     // 운영 정보
-    val pickupDay: String? = null,
-    val businessHours: List<BusinessHourDto>? = null,
+   override val pickupDay: String? = null,
+   override val businessHours: List<BusinessHourDto>? = null,
 
     // 부가 정보
-    val contact: String? = null,
-    val description: String? = null,
-    val mainImageUrl: String? = null,
-    val storeCategory: List<String>? = null,
-    val foodCategory: List<String>?  = null,
-) {
+   override val contact: String? = null,
+   override val description: String? = null,
+   override val mainImageUrl: String? = null,
+   override val storeCategory: List<String>? = null,
+   override val foodCategory: List<String>?  = null,
+): StoreCreateRequestDocs {
     fun toStoreCreateDto(storeOwnerId: Long): StoreCreateDto {
         return StoreCreateDto(
             storeOwnerId = storeOwnerId,

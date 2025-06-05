@@ -1,7 +1,7 @@
 package com.eatngo.customer.persistence
 
 import com.eatngo.aop.SoftDeletedFilter
-import com.eatngo.common.exception.CustomerAddressException
+import com.eatngo.common.exception.user.CustomerAddressException
 import com.eatngo.customer.domain.Customer
 import com.eatngo.customer.domain.CustomerAddress
 import com.eatngo.customer.infra.CustomerAddressPersistence

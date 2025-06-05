@@ -1,7 +1,7 @@
 package com.eatngo.store.domain
 
 import com.eatngo.common.constant.StoreEnum
-import com.eatngo.common.exception.StoreException
+import com.eatngo.common.exception.store.StoreException
 import com.eatngo.common.type.Address
 import com.eatngo.common.type.CoordinateVO
 import com.eatngo.store.dto.StoreCreateDto

@@ -1,6 +1,6 @@
 package com.eatngo.product.event
 
-import com.eatngo.common.exception.ProductException.ProductNotFound
+import com.eatngo.common.exception.product.ProductException.ProductNotFound
 import com.eatngo.extension.orThrow
 import com.eatngo.inventory.event.InventoryChangedEvent
 import com.eatngo.inventory.event.InventoryChangedType.ADEQUATE_STOCK

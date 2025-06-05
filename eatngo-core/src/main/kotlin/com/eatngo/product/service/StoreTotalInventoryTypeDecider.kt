@@ -1,6 +1,6 @@
 package com.eatngo.product.service
 
-import com.eatngo.common.exception.InventoryException.InventoryNotFound
+import com.eatngo.common.exception.product.InventoryException.InventoryNotFound
 import com.eatngo.extension.orThrow
 import com.eatngo.inventory.event.InventoryChangedType
 import com.eatngo.inventory.event.InventoryChangedType.*

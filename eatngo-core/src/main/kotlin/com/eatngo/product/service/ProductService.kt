@@ -1,7 +1,7 @@
 package com.eatngo.product.service
 
-import com.eatngo.common.exception.ProductException.ProductNotFound
-import com.eatngo.common.exception.StoreException.StoreNotFound
+import com.eatngo.common.exception.product.ProductException.ProductNotFound
+import com.eatngo.common.exception.store.StoreException.StoreNotFound
 import com.eatngo.extension.orThrow
 import com.eatngo.file.FileStorageService
 import com.eatngo.inventory.dto.InventoryDto

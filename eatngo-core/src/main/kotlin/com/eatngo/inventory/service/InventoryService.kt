@@ -1,6 +1,6 @@
 package com.eatngo.inventory.service
 
-import com.eatngo.common.exception.InventoryException.InventoryNotFound
+import com.eatngo.common.exception.product.InventoryException.InventoryNotFound
 import com.eatngo.extension.orThrow
 import com.eatngo.inventory.domain.Inventory
 import com.eatngo.inventory.dto.InventoryDto

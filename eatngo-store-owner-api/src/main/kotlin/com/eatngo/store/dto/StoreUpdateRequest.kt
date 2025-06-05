@@ -1,41 +1,39 @@
 package com.eatngo.store.dto
 
-import com.eatngo.common.constant.StoreEnum
-import java.time.DayOfWeek
-import java.time.LocalTime
+import com.eatngo.store.docs.request.StoreStatusUpdateRequestDocs
+import com.eatngo.store.docs.request.StoreUpdateRequestDocs
 
 /**
  * 매장 수정 요청용 dto
  */
 
 data class StoreUpdateRequest(
-    val name: String? = null,
-    val businessNumber: String? = null,
+    override val name: String? = null,
 
     // 주소 정보 (flat)
-    val roadNameAddress: String? = null,
-    val lotNumberAddress: String? = null,
-    val buildingName: String? = null,
-    val zipCode: String? = null,
-    val region1DepthName: String? = null,
-    val region2DepthName: String? = null,
-    val region3DepthName: String? = null,
+    override val roadNameAddress: String? = null,
+    override val lotNumberAddress: String? = null,
+    override val buildingName: String? = null,
+    override val zipCode: String? = null,
+    override val region1DepthName: String? = null,
+    override val region2DepthName: String? = null,
+    override val region3DepthName: String? = null,
 
     // 위치 정보
-    val latitude: Double? = null,
-    val longitude: Double? = null,
+    override val latitude: Double? = null,
+    override val longitude: Double? = null,
 
     // 운영 정보
-    val businessHours: List<BusinessHourDto>? = null,
-    val pickupDay: String? = null,
+    override val businessHours: List<BusinessHourDto>? = null,
+    override val pickupDay: String? = null,
 
     // 부가 정보
-    val contact: String? = null,
-    val description: String? = null,
-    val mainImageUrl: String? = null,
-    val storeCategory: List<String>? = null,
-    val foodCategory: List<String>? = null
-) {
+    override val contact: String? = null,
+    override val description: String? = null,
+    override val mainImageUrl: String? = null,
+    override val storeCategory: List<String>? = null,
+    override val foodCategory: List<String>? = null
+) : StoreUpdateRequestDocs {
     fun toStoreUpdateDto(storeOwnerId: Long): StoreUpdateDto {
         val addressDto = if (
             roadNameAddress != null && zipCode != null &&
@@ -84,4 +82,4 @@ data class StoreUpdateRequest(
     }
 }
 
-data class StoreStatusUpdateRequest(val status: String)
+data class StoreStatusUpdateRequest(override val status: String) : StoreStatusUpdateRequestDocs

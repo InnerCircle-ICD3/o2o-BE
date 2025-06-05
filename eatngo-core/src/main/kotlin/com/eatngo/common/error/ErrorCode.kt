@@ -10,4 +10,7 @@ interface ErrorCode {
 
     /** 에러 메시지 */
     val message: String
+
+    /** http status */
+    val httpStatus: Int?
 }

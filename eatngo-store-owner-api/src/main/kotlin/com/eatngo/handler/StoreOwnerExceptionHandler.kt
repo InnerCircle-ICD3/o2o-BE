@@ -1,10 +1,12 @@
 package com.eatngo.handler
 
 import com.eatngo.common.error.CommonErrorCode
-import com.eatngo.common.exception.OrderException
-import com.eatngo.common.exception.StoreException
+import com.eatngo.common.exception.BusinessException
+import com.eatngo.common.exception.order.OrderException
+import com.eatngo.common.exception.store.StoreException
 import com.eatngo.common.response.ApiResponse
 import jakarta.servlet.http.HttpServletRequest
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.slf4j.event.Level
 import org.springframework.http.HttpStatus
@@ -21,84 +23,44 @@ class StoreOwnerExceptionHandler {
         private val log = LoggerFactory.getLogger(this::class.java)
     }
 
-    // 점주 관련 예외 처리
-    @ExceptionHandler(StoreException::class)
-    fun handleStoreException(e: StoreException, request: HttpServletRequest): ResponseEntity<ApiResponse<Nothing>> {
-        // context 정보 구성
-        val context = buildLogContext(request, e.data)
-
-        // HTTP 상태 결정
-        val (httpStatus, logLevel) = when (e) {
-            is StoreException.StoreNotFound -> HttpStatus.NOT_FOUND to Level.WARN
-            is StoreException.StoreClosed,
-            is StoreException.StoreNotAvailable -> HttpStatus.CONFLICT to Level.WARN
-            else -> HttpStatus.BAD_REQUEST to Level.ERROR
-        }
-
-        // 로그 메시지 기록
-        logError(e, logLevel, e.message, context)
-
+    @ExceptionHandler(BusinessException::class)
+    fun handleBusinessException(
+        e: BusinessException,
+        request: HttpServletRequest
+    ): ResponseEntity<ApiResponse<Nothing>> {
+        val context = request.toLogContext(e.data)
+        e.logError(log, e.logLevel, e.message, context)
+        val status = e.errorCode.httpStatus ?: 400
         return ResponseEntity
-            .status(httpStatus)
+            .status(status)
             .body(ApiResponse.error(e.errorCode.code, e.message))
     }
 
-
-    @ExceptionHandler(OrderException::class)
-    fun handleOrderException(e: OrderException, request: HttpServletRequest): ResponseEntity<ApiResponse<Nothing>> {
-        // context 정보 구성
-        val context = buildLogContext(request, e.data)
-
-        // HTTP 상태 결정
-        val (httpStatus, logLevel) = when (e) {
-            is OrderException.OrderNotFound -> HttpStatus.NOT_FOUND to Level.WARN
-            is OrderException.OrderAlreadyCompleted -> HttpStatus.CONFLICT to Level.WARN
-            else -> HttpStatus.BAD_REQUEST to Level.ERROR
-        }
-
-        // 로그 메시지 기록
-        logError(e, logLevel, e.message, context)
-
-        return ResponseEntity
-            .status(httpStatus)
-            .body(ApiResponse.error(e.errorCode.code, e.message))
-    }
-
+    /** Spring의 @Valid, @Validated 사용 시 처리용 */
     @ExceptionHandler(MethodArgumentNotValidException::class)
     fun handleValidationException(
         e: MethodArgumentNotValidException,
         request: HttpServletRequest
     ): ResponseEntity<ApiResponse<Nothing>> {
-        // 필드 에러 정보 추출
         val fieldErrors = e.bindingResult.fieldErrors.associate { error ->
             error.field to (error.defaultMessage ?: "유효하지 않은 값")
         }
-
-        // 컨텍스트 정보 구성
-        val context = buildLogContext(request).plus("fields" to fieldErrors)
-
-        // 첫 번째 에러 메시지 가져오기
+        val context = request.toLogContext().plus("fields" to fieldErrors)
         val firstErrorMessage = fieldErrors.values.firstOrNull() ?: "유효하지 않은 요청"
-
-        // 로그 기록
-        logError(e, Level.WARN, "유효성 검증 실패: $fieldErrors", context)
-
+        e.logError(log, Level.WARN, "유효성 검증 실패: $fieldErrors", context)
         return ResponseEntity
             .status(HttpStatus.BAD_REQUEST)
             .body(ApiResponse.error(CommonErrorCode.INVALID_INPUT.code, firstErrorMessage))
     }
 
+    /** 예상하지 못한 런타임 오류 처리용*/
     @ExceptionHandler(RuntimeException::class)
     fun handleRuntimeException(
         e: RuntimeException,
         request: HttpServletRequest
     ): ResponseEntity<ApiResponse<Nothing>> {
-        // 컨텍스트 정보 구성
-        val context = buildLogContext(request)
-
-        // 로그 기록
-        logError(e, Level.ERROR, "예상치 못한 오류 발생: ${e.message}", context)
-
+        val context = request.toLogContext()
+        e.logError(log, Level.ERROR, "예상치 못한 오류 발생: ${e.message}", context)
         return ResponseEntity
             .status(HttpStatus.INTERNAL_SERVER_ERROR)
             .body(
@@ -110,25 +72,40 @@ class StoreOwnerExceptionHandler {
     }
 
     // --------------------- Helper Methods ---------------------
-    private fun buildLogContext(
-        request: HttpServletRequest,
-        data: Map<String, Any>? = null
-    ): Map<String, Any> {
+    /**
+     * HttpServletRequest에서 주요 요청 정보를 추출해 로그 컨텍스트 맵으로 변환합니다.
+     * @param data 추가로 합치고 싶은 데이터(선택)
+     * @return 로그용 컨텍스트 맵 (path, method, userAgent, timestamp 등 포함)
+     */
+    fun HttpServletRequest.toLogContext(data: Map<String, Any>? = null): Map<String, Any> {
         return mutableMapOf<String, Any>(
-            "path" to request.requestURI,
-            "method" to request.method,
-            "userAgent" to (request.getHeader("User-Agent") ?: "Unknown"),
+            "path" to this.requestURI,
+            "method" to this.method,
+            "userAgent" to (this.getHeader("User-Agent") ?: "Unknown"),
             "timestamp" to LocalDateTime.now().toString()
         ).apply {
             data?.let { putAll(it) }
         }
     }
 
-    private fun logError(e: Exception, level: Level, message: String?, context: Map<String, Any>) {
+    /**
+     * Exception을 로거와 함께 지정한 레벨/메시지/컨텍스트로 로깅합니다.
+     * @param logger 사용할 Logger 인스턴스
+     * @param level 로그 레벨
+     * @param message 로그 메시지(선택)
+     * @param context 로그 컨텍스트(선택)
+     */
+    fun Exception.logError(
+        logger: Logger,
+        level: Level,
+        message: String? = null,
+        context: Map<String, Any> = emptyMap()
+    ) {
+        val logMsg = "[$level] $message | Context: $context"
         when (level) {
-            Level.ERROR -> log.error("[$level] $message | Context: $context", e)
-            Level.WARN -> log.warn("[$level] $message | Context: $context")
-            else -> log.info("[$level] $message | Context: $context")
+            Level.ERROR -> logger.error(logMsg, this)
+            Level.WARN -> logger.warn(logMsg)
+            else -> logger.info(logMsg)
         }
     }
 }

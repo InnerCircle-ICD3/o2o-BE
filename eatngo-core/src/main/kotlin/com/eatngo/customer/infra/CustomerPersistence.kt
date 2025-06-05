@@ -1,6 +1,6 @@
 package com.eatngo.customer.infra
 
-import com.eatngo.common.exception.CustomerException
+import com.eatngo.common.exception.user.CustomerException
 import com.eatngo.customer.domain.Customer
 
 interface CustomerPersistence {
