@@ -1,23 +1,25 @@
 package com.eatngo.common.exception
 
 import com.eatngo.common.error.BusinessErrorCode
+import org.slf4j.event.Level
 
 open class StockException(
-    val errorCode: BusinessErrorCode,
+    override val errorCode: BusinessErrorCode,
     override val message: String = errorCode.message,
-    val data: Map<String, Any>? = null
-) : RuntimeException(message) {
+    override val data: Map<String, Any>? = null,
+    override val logLevel: Level = Level.WARN,
+) : BusinessException(errorCode, message, data, logLevel) {
 
     class StockNotFound(productId: Long) : StockException(
-        BusinessErrorCode.STOCK_NOT_FOUND,
-        "${BusinessErrorCode.STOCK_NOT_FOUND.message} (ID: $productId)",
-        mapOf("productId" to productId)
+        errorCode =BusinessErrorCode.STOCK_NOT_FOUND,
+        message =  "${BusinessErrorCode.STOCK_NOT_FOUND.message} (ID: $productId)",
+        data =     mapOf("productId" to productId)
     )
 
     class StockEmpty(productId: Long) : StockException(
-        BusinessErrorCode.STOCK_EMPTY,
-        "${BusinessErrorCode.STOCK_EMPTY.message} (ID: $productId)",
-        mapOf("productId" to productId)
+        errorCode =BusinessErrorCode.STOCK_EMPTY,
+        message =  "${BusinessErrorCode.STOCK_EMPTY.message} (ID: $productId)",
+        data =     mapOf("productId" to productId)
     )
 
 }

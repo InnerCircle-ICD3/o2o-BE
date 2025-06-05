@@ -3,17 +3,20 @@ package com.eatngo.common.exception
 import com.eatngo.common.error.BusinessErrorCode
 import com.eatngo.store.vo.LotNumberAddressVO
 import com.eatngo.store.vo.RoadNameAddressVO
+import org.slf4j.event.Level
+
 
 open class CustomerAddressException(
-    val errorCode: BusinessErrorCode,
+    override val errorCode: BusinessErrorCode,
     override val message: String = errorCode.message,
-    val data: Map<String, Any>? = null,
-) : RuntimeException(message) {
+    override val data: Map<String, Any>? = null,
+    override val logLevel: Level = Level.WARN,
+) : BusinessException(errorCode, message, data, logLevel) {
 
     class CustomerAddressNotFound(customerAddressId: Long) : CustomerAddressException(
-        BusinessErrorCode.CUSTOMER_ADDRESS_NOT_FOUND,
-        "${BusinessErrorCode.CUSTOMER_ADDRESS_NOT_FOUND.message} (ID: $customerAddressId)",
-        mapOf("customerAddressId" to customerAddressId)
+        errorCode = BusinessErrorCode.CUSTOMER_ADDRESS_NOT_FOUND,
+        message = "${BusinessErrorCode.CUSTOMER_ADDRESS_NOT_FOUND.message} (ID: $customerAddressId)",
+        data = mapOf("customerAddressId" to customerAddressId)
     )
 
     class CustomerAddressAlreadyExists(id: Long, roadNameAddressVO: RoadNameAddressVO, lotNumberAddress: LotNumberAddressVO) :

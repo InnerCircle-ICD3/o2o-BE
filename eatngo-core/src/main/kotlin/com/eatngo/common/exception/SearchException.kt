@@ -3,77 +3,80 @@ package com.eatngo.common.exception
 import com.eatngo.common.error.BusinessErrorCode
 import com.eatngo.common.type.CoordinateVO
 import com.eatngo.search.dto.SearchFilter
+import org.slf4j.event.Level
 
 /**
  * 검색 관련 예외
  */
 open class SearchException(
-    val errorCode: BusinessErrorCode,
+    override val errorCode: BusinessErrorCode,
     override val message: String = errorCode.message,
-    val data: Map<String, Any>? = null,
-) : RuntimeException(message) {
+    override val data: Map<String, Any>? = null,
+    override val logLevel: Level = Level.WARN,
+) : BusinessException(errorCode, message, data, logLevel) {
+
     class SearchInvalidCoordinate(
         latitude: Double,
         longitude: Double,
     ) : SearchException(
-            BusinessErrorCode.SEARCH_INVALID_COORDINATE,
-            "${BusinessErrorCode.SEARCH_INVALID_COORDINATE.message} (latitude: $latitude, longitude: $longitude)",
-            mapOf("latitude" to latitude, "longitude" to longitude),
-        )
+        errorCode = BusinessErrorCode.SEARCH_INVALID_COORDINATE,
+        message = "${BusinessErrorCode.SEARCH_INVALID_COORDINATE.message} (latitude: $latitude, longitude: $longitude)",
+        data = mapOf("latitude" to latitude, "longitude" to longitude),
+    )
 
     class SearchInvalidFilter :
         SearchException(
-            BusinessErrorCode.SEARCH_INVALID_FILTER,
-            "${BusinessErrorCode.SEARCH_INVALID_FILTER.message} ",
+            errorCode = BusinessErrorCode.SEARCH_INVALID_FILTER,
+            message = "${BusinessErrorCode.SEARCH_INVALID_FILTER.message} ",
         )
 
     class SearchStoreListFailed(
         coordinate: CoordinateVO,
         searchFilter: SearchFilter,
     ) : SearchException(
-            BusinessErrorCode.SEARCH_STORE_LIST_FAILED,
-            "${BusinessErrorCode.SEARCH_STORE_LIST_FAILED.message} (coordinate: $coordinate, searchFilter: $searchFilter)",
-            mapOf("coordinate" to coordinate, "searchFilter" to searchFilter),
-        )
+        errorCode = BusinessErrorCode.SEARCH_STORE_LIST_FAILED,
+        message = "${BusinessErrorCode.SEARCH_STORE_LIST_FAILED.message} (coordinate: $coordinate, searchFilter: $searchFilter)",
+        data = mapOf("coordinate" to coordinate, "searchFilter" to searchFilter),
+    )
 
     class SearchStoreSearchFailed(
         coordinate: CoordinateVO,
         searchText: String,
     ) : SearchException(
-            BusinessErrorCode.SEARCH_STORE_SEARCH_FAILED,
-            "${BusinessErrorCode.SEARCH_STORE_SEARCH_FAILED.message} (coordinate: $coordinate, searchText: $searchText)",
-            mapOf("coordinate" to coordinate, "searchText" to searchText),
-        )
+        errorCode = BusinessErrorCode.SEARCH_STORE_SEARCH_FAILED,
+        message = "${BusinessErrorCode.SEARCH_STORE_SEARCH_FAILED.message} (coordinate: $coordinate, searchText: $searchText)",
+        data = mapOf("coordinate" to coordinate, "searchText" to searchText),
+    )
 
     class SearchStoreMapFailed(
         coordinate: CoordinateVO,
     ) : SearchException(
-            BusinessErrorCode.SEARCH_STORE_MAP_FAILED,
-            "${BusinessErrorCode.SEARCH_STORE_MAP_FAILED.message} (coordinate: $coordinate)",
-            mapOf("coordinate" to coordinate),
-        )
+        errorCode = BusinessErrorCode.SEARCH_STORE_MAP_FAILED,
+        message = "${BusinessErrorCode.SEARCH_STORE_MAP_FAILED.message} (coordinate: $coordinate)",
+        data = mapOf("coordinate" to coordinate),
+    )
 
     class SearchStoreMapCacheFailed(
         key: String,
     ) : SearchException(
-            BusinessErrorCode.SEARCH_STORE_MAP_CACHE_FAILED,
-            "${BusinessErrorCode.SEARCH_STORE_MAP_CACHE_FAILED.message} (key: $key)",
-            mapOf("key" to key),
-        )
+        errorCode = BusinessErrorCode.SEARCH_STORE_MAP_CACHE_FAILED,
+        message = "${BusinessErrorCode.SEARCH_STORE_MAP_CACHE_FAILED.message} (key: $key)",
+        data = mapOf("key" to key),
+    )
 
     class SearchSuggestionFailed(
         keyword: String,
     ) : SearchException(
-            BusinessErrorCode.SEARCH_SUGGESTION_FAILED,
-            "${BusinessErrorCode.SEARCH_SUGGESTION_FAILED.message} (keyword: $keyword)",
-            mapOf("keyword" to keyword),
-        )
+        errorCode = BusinessErrorCode.SEARCH_SUGGESTION_FAILED,
+        message = "${BusinessErrorCode.SEARCH_SUGGESTION_FAILED.message} (keyword: $keyword)",
+        data = mapOf("keyword" to keyword),
+    )
 
     class SearchCategoryNotFound(
         category: String,
     ) : SearchException(
-            BusinessErrorCode.SEARCH_CATEGORY_NOT_FOUND,
-            "${BusinessErrorCode.SEARCH_CATEGORY_NOT_FOUND.message} (category: $category)",
-            mapOf("category" to category),
-        )
+        errorCode = BusinessErrorCode.SEARCH_CATEGORY_NOT_FOUND,
+        message = "${BusinessErrorCode.SEARCH_CATEGORY_NOT_FOUND.message} (category: $category)",
+        data = mapOf("category" to category),
+    )
 }

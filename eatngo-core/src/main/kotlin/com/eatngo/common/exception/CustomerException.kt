@@ -1,17 +1,19 @@
 package com.eatngo.common.exception
 
 import com.eatngo.common.error.BusinessErrorCode
+import org.slf4j.event.Level
 
 open class CustomerException(
-    val errorCode: BusinessErrorCode,
+    override val errorCode: BusinessErrorCode,
     override val message: String = errorCode.message,
-    val data: Map<String, Any>? = null,
-) : RuntimeException(message) {
+    override val data: Map<String, Any>? = null,
+    override val logLevel: Level = Level.WARN,
+) : BusinessException(errorCode, message, data, logLevel) {
 
     class CustomerNotFound(customerId: Long) : CustomerException(
-        BusinessErrorCode.CUSTOMER_NOT_FOUND,
-        "${BusinessErrorCode.CUSTOMER_NOT_FOUND.message} (ID: $customerId)",
-        mapOf("customerId" to customerId)
+        errorCode =BusinessErrorCode.CUSTOMER_NOT_FOUND,
+        message = "${BusinessErrorCode.CUSTOMER_NOT_FOUND.message} (ID: $customerId)",
+        data = mapOf("customerId" to customerId)
     )
 
 }

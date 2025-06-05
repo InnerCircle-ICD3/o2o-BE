@@ -3,7 +3,7 @@ package com.eatngo.common.response
 
 sealed class ApiResponse<T> {
     abstract val success: Boolean
-    
+
     data class Success<T>(
         override val success: Boolean = true,
         val data: T
