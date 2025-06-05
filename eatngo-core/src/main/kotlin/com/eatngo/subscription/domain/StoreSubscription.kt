@@ -2,6 +2,7 @@ package com.eatngo.subscription.domain
 
 import com.eatngo.common.constant.StoreEnum
 import com.eatngo.common.exception.store.StoreException
+import com.eatngo.common.exception.subscription.SubscriptionException
 import java.time.LocalDateTime
 
 /**
@@ -37,13 +38,13 @@ class StoreSubscription(
     fun isActive(): Boolean = deletedAt == null
 
     fun restore() {
-        if (isActive()) throw StoreException.SubscriptionAlreadyActive(id)
+        if (isActive()) throw SubscriptionException.SubscriptionAlreadyActive(id)
         deletedAt = null
         updatedAt = LocalDateTime.now()
     }
 
     fun softDelete() {
-        if (!isActive()) throw StoreException.SubscriptionAlreadyCanceled(id)
+        if (!isActive()) throw SubscriptionException.SubscriptionAlreadyCanceled(id)
         deletedAt = LocalDateTime.now()
         updatedAt = LocalDateTime.now()
     }
@@ -69,7 +70,7 @@ class StoreSubscription(
      */
     fun validateOwnership(customerId: Long) {
         if (userId != customerId) {
-            throw StoreException.SubscriptionForbidden(customerId, id)
+            throw SubscriptionException.SubscriptionForbidden(customerId, id)
         }
     }
 }

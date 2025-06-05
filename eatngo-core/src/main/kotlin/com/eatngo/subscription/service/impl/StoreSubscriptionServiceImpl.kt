@@ -2,6 +2,7 @@ package com.eatngo.subscription.service.impl
 
 import com.eatngo.common.constant.StoreEnum
 import com.eatngo.common.exception.store.StoreException
+import com.eatngo.common.exception.subscription.SubscriptionException
 import com.eatngo.extension.orThrow
 import com.eatngo.product.infra.ProductPersistence
 import com.eatngo.store.infra.StorePersistence
@@ -10,7 +11,6 @@ import com.eatngo.subscription.dto.StoreSubscriptionDto
 import com.eatngo.subscription.infra.StoreSubscriptionPersistence
 import com.eatngo.subscription.service.StoreSubscriptionService
 import org.springframework.stereotype.Service
-import java.time.LocalDateTime
 
 /**
  * 상점 구독 서비스 구현체
@@ -53,7 +53,7 @@ class StoreSubscriptionServiceImpl(
     }
 
     override fun getSubscriptionById(id: Long): StoreSubscriptionDto {
-        val subscription = storeSubscriptionPersistence.findById(id).orThrow { StoreException.SubscriptionNotFound(id) }
+        val subscription = storeSubscriptionPersistence.findById(id).orThrow { SubscriptionException.SubscriptionNotFound(id) }
         val store = storePersistence.findById(subscription.storeId).orThrow { StoreException.StoreNotFound(subscription.storeId) }
 
         return StoreSubscriptionDto.from(
