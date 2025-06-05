@@ -22,13 +22,13 @@ class UserAccountJpaEntity(
     @Column(nullable = true, length = 255)
     val nickname: String?,
 
-    @OneToMany(mappedBy = "userAccount", fetch = FetchType.LAZY, cascade = [CascadeType.PERSIST])
+    @OneToMany(mappedBy = "userAccount", fetch = FetchType.LAZY, cascade = [CascadeType.PERSIST, CascadeType.MERGE])
     @Filter(name = DELETED_FILTER)
-    val oAuth2: MutableList<UserAccountOAuth2JpaEntity> = mutableListOf(),
+    val oAuth2: MutableSet<UserAccountOAuth2JpaEntity> = mutableSetOf(),
 
-    @OneToMany(mappedBy = "account", fetch = FetchType.LAZY, cascade = [CascadeType.PERSIST])
+    @OneToMany(mappedBy = "account", fetch = FetchType.LAZY, cascade = [CascadeType.PERSIST, CascadeType.MERGE])
     @Filter(name = DELETED_FILTER)
-    val roles: MutableList<UserAccountRoleJpaEntity> = mutableListOf(),
+    val roles: MutableSet<UserAccountRoleJpaEntity> = mutableSetOf(),
 ) : BaseJpaEntity() {
 
     companion object {

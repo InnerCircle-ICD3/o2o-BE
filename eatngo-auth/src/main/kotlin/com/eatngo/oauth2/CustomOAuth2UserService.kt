@@ -6,15 +6,19 @@ import com.eatngo.user_account.infra.UserAccountPersistence
 import com.eatngo.user_account.oauth2.constants.Oauth2Provider
 import com.eatngo.user_account.oauth2.constants.Role
 import com.eatngo.user_account.oauth2.constants.Role.*
+import com.eatngo.user_account.oauth2.domain.UserAccountOAuth2
 import com.eatngo.user_account.oauth2.dto.KakaoOAuth2
 import com.eatngo.user_account.oauth2.dto.OAuth2
+import com.eatngo.user_account.vo.EmailAddress
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService
+import org.springframework.security.oauth2.core.OAuth2AccessToken
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User
 import org.springframework.security.oauth2.core.user.OAuth2User
 import org.springframework.stereotype.Service
+import java.time.ZoneId
 
 @Service
 class CustomOAuth2UserService(
@@ -25,11 +29,24 @@ class CustomOAuth2UserService(
         val oAuth2User = delegate.loadUser(userRequest)
 
         val provider = Oauth2Provider.valueOfIgnoreCase(userRequest.clientRegistration.registrationId)
-        val oAuth2: OAuth2 = handleOauth2Attributes(provider, oAuth2User)
+        val token = userRequest.accessToken
+        val oAuth2: OAuth2 = handleOauth2Attributes(provider, oAuth2User, token)
 
-        val userAccount = userAccountPersistence.findByOauth(oAuth2.id.toString(), provider)
-            ?: userAccountPersistence.save(UserAccount.create(oAuth2))
-        // TODO term fetch api 추가하기
+        val userKey = oAuth2.id.toString()
+        val userAccount = (userAccountPersistence.findByOauth(userKey, provider)
+            ?: oAuth2.email
+                ?.let { userAccountPersistence.findByEmail(EmailAddress(it)) }
+                ?.also {
+                    it.addOauth2(
+                        UserAccountOAuth2.of(
+                            account = it,
+                            oAuth2 = oAuth2
+                        )
+                    )
+                })
+            ?: UserAccount.create(oAuth2)
+        userAccountPersistence.save(userAccount)
+
 
         val roles = handleRoles(userAccount)
             .map { SimpleGrantedAuthority(it.toString()) }
@@ -57,9 +74,15 @@ class CustomOAuth2UserService(
 
     private fun handleOauth2Attributes(
         provider: Oauth2Provider,
-        oAuth2User: OAuth2User
+        oAuth2User: OAuth2User,
+        token: OAuth2AccessToken
     ) = when (provider) {
-        Oauth2Provider.KAKAO -> KakaoOAuth2(oAuth2User.attributes, provider)
+        Oauth2Provider.KAKAO -> KakaoOAuth2(
+            oAuth2User.attributes, provider, token.tokenValue,
+            token.expiresAt.atZone(ZoneId.systemDefault()).toLocalDateTime(),
+            token.scopes.joinToString(",")
+        )
+
         else -> throw IllegalArgumentException("Unsupported provider: $provider")
     }
 }

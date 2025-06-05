@@ -17,6 +17,7 @@ import io.restassured.http.ContentType
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.server.LocalServerPort
 import org.springframework.context.annotation.Import
+import java.time.LocalDateTime
 
 @Import(TestConfiguration::class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -87,7 +88,10 @@ class StoreOwnerControllerTest(
                         "profile" to mapOf("nickname" to "홍길동")
                     )
                 ),
-                Oauth2Provider.KAKAO
+                Oauth2Provider.KAKAO,
+                "token",
+                LocalDateTime.now().plusHours(1),
+                "profile,email"
             )
         )
 

@@ -25,5 +25,6 @@ interface UserAccountRdbRepository : JpaRepository<UserAccountJpaEntity, Long> {
     """
     )
     fun findByOAuth2Key(userKey: String, provider: Oauth2Provider): UserAccountJpaEntity?
+    fun findByEmail(email: String): UserAccountJpaEntity?
 
 }

@@ -7,6 +7,7 @@ import com.eatngo.user_account.infra.UserAccountPersistence
 import com.eatngo.user_account.oauth2.constants.Oauth2Provider
 import com.eatngo.user_account.rdb.entity.UserAccountJpaEntity
 import com.eatngo.user_account.rdb.repository.UserAccountRdbRepository
+import com.eatngo.user_account.vo.EmailAddress
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 
@@ -40,6 +41,12 @@ class UserAccountPersistenceImpl(
     override fun findByOauth(userKey: String, provider: Oauth2Provider) =
         userAccountRdbRepository.findByOAuth2Key(userKey, provider)
             ?.let { UserAccountJpaEntity.toUserAccount(it) }
+
+    @SoftDeletedFilter
+    override fun findByEmail(emailAddress: EmailAddress): UserAccount? {
+        return userAccountRdbRepository.findByEmail(emailAddress.value)
+            ?.let { UserAccountJpaEntity.toUserAccount(it) }
+    }
 }
 
 

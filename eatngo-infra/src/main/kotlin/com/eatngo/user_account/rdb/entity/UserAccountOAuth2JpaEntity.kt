@@ -13,7 +13,12 @@ import java.time.LocalDateTime
 
 @Filter(name = DELETED_FILTER)
 @Entity
-@Table(name = "user_account_oauth2")
+@Table(
+    name = "user_account_oauth2",
+    uniqueConstraints = [
+        UniqueConstraint(name = "uk_user_account_oauth2_user_key_provider", columnNames = ["user_key", "provider"])
+    ]
+)
 class UserAccountOAuth2JpaEntity(
 
     @Id
@@ -98,6 +103,7 @@ class UserAccountOAuth2JpaEntity(
             userAccount
         }
     }
+
 
     override fun delete() {
         super.delete()

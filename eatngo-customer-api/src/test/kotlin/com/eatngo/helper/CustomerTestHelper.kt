@@ -26,7 +26,11 @@ class CustomerTestHelper(
                         "profile" to mapOf("nickname" to "홍길동")
                     )
                 ),
-                Oauth2Provider.KAKAO
+                Oauth2Provider.KAKAO,
+                "token",
+                expiresAt = java.time.LocalDateTime.now().plusDays(1),
+                scopes = "profile,email"
+
             )
         )
 
