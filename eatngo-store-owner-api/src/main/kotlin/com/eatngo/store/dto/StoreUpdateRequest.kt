@@ -1,6 +1,7 @@
 package com.eatngo.store.dto
 
 import com.eatngo.common.constant.StoreEnum
+import com.eatngo.store.docs.StoreStatusUpdateRequestDocs
 import java.time.DayOfWeek
 import java.time.LocalTime
 
@@ -84,4 +85,4 @@ data class StoreUpdateRequest(
     }
 }
 
-data class StoreStatusUpdateRequest(val status: String)
+data class StoreStatusUpdateRequest(override val status: String) : StoreStatusUpdateRequestDocs

@@ -1,4 +1,4 @@
-package com.eatngo.store.docs
+package com.eatngo.subscription.docs
 
 import com.eatngo.auth.annotaion.StoreOwnerId
 import com.eatngo.common.response.ApiResponse

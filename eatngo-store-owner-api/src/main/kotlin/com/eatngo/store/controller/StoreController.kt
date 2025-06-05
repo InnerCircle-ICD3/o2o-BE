@@ -26,7 +26,6 @@ class StoreController(
 ) : StoreOwnerDocs {
 
     @GetMapping
-    @Operation(summary = "상점 상세 조회", description = "점주가 운영중인 자신의 상점 상세 정보를 조회합니다.")
     override fun getStoresByOwnerId(@StoreOwnerId storeOwnerId: Long): ApiResponse<List<StoreDetailResponse>> {
         val storeDtos = storeQueryUseCase.getStoresByStoreOwnerId(storeOwnerId)
         val responses = storeDtos.map { StoreDetailResponse.fromStoreDto(it) }
@@ -34,14 +33,12 @@ class StoreController(
     }
 
     @PostMapping
-    @Operation(summary = "상점 등록", description = "점주가 상점을 등록합니다.")
     override fun createStore(@RequestBody request: StoreCreateRequest, @StoreOwnerId storeOwnerId: Long): ApiResponse<StoreCUDResponse> {
         val storeDto = storeOwnerStoreCreatedUseCase.create(request.toStoreCreateDto(storeOwnerId))
         return ApiResponse.success(StoreCUDResponse(storeId = storeDto.storeId, actionTime = storeDto.createdAt))
     }
     
     @PutMapping("/{storeId}")
-    @Operation(summary = "상점 수정", description = "점주가 상점 정보를 수정합니다.")
     override fun updateStore(
         @PathVariable storeId: Long,
         @RequestBody request: StoreUpdateRequest,
@@ -52,7 +49,6 @@ class StoreController(
     }
     
     @PatchMapping("/{storeId}/status")
-    @Operation(summary = "상점 상태 변경", description = "점주가 상점의 영업 상태를 변경합니다.")
     override fun updateStoreOnlyStatus(
         @PathVariable storeId: Long,
         @RequestBody request: StoreStatusUpdateRequest,
@@ -63,7 +59,6 @@ class StoreController(
     }
 
     @DeleteMapping("/{storeId}")
-    @Operation(summary = "상점 삭제", description = "점주가 등록된 상점을 삭제합니다.")
     override fun deleteStore(@PathVariable storeId: Long, @StoreOwnerId storeOwnerId: Long): ApiResponse<StoreCUDResponse> {
         val response = storeOwnerStoreDeletedUseCase.delete(storeId, storeOwnerId)
         return ApiResponse.success(StoreCUDResponse(storeId = response, actionTime = LocalDateTime.now()))

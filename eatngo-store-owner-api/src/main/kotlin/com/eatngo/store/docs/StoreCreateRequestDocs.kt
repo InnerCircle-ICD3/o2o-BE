@@ -1,14 +1,7 @@
 package com.eatngo.store.docs
 
-import com.eatngo.auth.annotaion.StoreOwnerId
-import com.eatngo.common.response.ApiResponse
 import com.eatngo.store.dto.BusinessHourDto
-import com.eatngo.store.dto.StoreCUDResponse
-import com.eatngo.store.dto.StoreCreateRequest
-import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Schema
-import io.swagger.v3.oas.annotations.tags.Tag
-import org.springframework.web.bind.annotation.RequestBody
 
 interface StoreCreateRequestDocs {
 

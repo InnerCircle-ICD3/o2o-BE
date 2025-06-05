@@ -75,14 +75,3 @@ interface StoreOwnerDocs {
         @StoreOwnerId storeOwnerId: Long
     ): ApiResponse<StoreCUDResponse>
 }
-
-@Schema(description = "매장 상태 변경 요청")
-data class StoreStatusUpdateRequestDocs(
-    @field:Schema(
-        description = "변경할 매장 상태",
-        example = "OPEN",
-        allowableValues = ["OPEN", "CLOSED", "PENDING"],
-        required = true
-    )
-    val status: String
-) 

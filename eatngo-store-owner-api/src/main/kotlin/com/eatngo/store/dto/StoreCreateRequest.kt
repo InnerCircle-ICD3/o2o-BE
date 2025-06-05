@@ -1,10 +1,6 @@
 package com.eatngo.store.dto
 
-import com.eatngo.common.constant.StoreEnum
 import com.eatngo.store.docs.StoreCreateRequestDocs
-import io.swagger.v3.oas.annotations.media.Schema
-import java.time.DayOfWeek
-import java.time.LocalTime
 
 /**
  * 매장 생성 요청용 dto

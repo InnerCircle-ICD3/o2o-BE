@@ -1,13 +1,12 @@
-package com.eatngo.store.docs
+package com.eatngo.subscription.docs
 
-import com.eatngo.auth.annotaion.CustomerId
+import com.eatngo.auth.annotation.CustomerId
 import com.eatngo.common.response.ApiResponse
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RequestBody
 
 @Tag(name = "매장 구독", description = "매장 구독 관련 API")
 interface StoreSubscriptionDocs {
