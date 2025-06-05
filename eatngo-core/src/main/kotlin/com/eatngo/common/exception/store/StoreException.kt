@@ -34,7 +34,7 @@ open class StoreException(
 
     class StoreNotFoundByStoreOwner(storeOwnerId: Long) : StoreException(
         errorCode = BusinessErrorCode.STORE_NOT_FOUND,
-        message = "StoreOwnerId: $storeOwnerId) 의 ${BusinessErrorCode.STORE_NOT_FOUND.message}",
+        message = "StoreOwnerId: $storeOwnerId 의 ${BusinessErrorCode.STORE_NOT_FOUND.message}",
         data = mapOf("storeOwnerId" to storeOwnerId)
     )
 

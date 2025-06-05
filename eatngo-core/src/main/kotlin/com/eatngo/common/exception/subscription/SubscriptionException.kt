@@ -5,7 +5,7 @@ import com.eatngo.common.exception.BusinessException
 import org.slf4j.event.Level
 
 /**
- * 매장(점주) 관련 예외
+ * 구독 관련 예외
  */
 open class SubscriptionException(
     override val errorCode: BusinessErrorCode,
