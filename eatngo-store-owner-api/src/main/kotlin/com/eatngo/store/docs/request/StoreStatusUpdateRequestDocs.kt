@@ -1,4 +1,4 @@
-package com.eatngo.store.docs
+package com.eatngo.store.docs.request
 
 import io.swagger.v3.oas.annotations.media.Schema
 

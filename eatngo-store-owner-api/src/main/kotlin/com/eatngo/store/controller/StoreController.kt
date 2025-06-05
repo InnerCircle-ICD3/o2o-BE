@@ -2,28 +2,25 @@ package com.eatngo.store.controller
 
 import com.eatngo.auth.annotaion.StoreOwnerId
 import com.eatngo.common.response.ApiResponse
-import com.eatngo.store.docs.StoreOwnerDocs
+import com.eatngo.store.docs.controller.StoreOwnerControllerDocs
 import com.eatngo.store.dto.*
 import com.eatngo.store.usecase.StoreOwnerStatusChangeUseCase
 import com.eatngo.store.usecase.StoreOwnerStoreCreatedUseCase
 import com.eatngo.store.usecase.StoreOwnerStoreDeletedUseCase
 import com.eatngo.store.usecase.StoreOwnerStoreUpdatedUseCase
 import com.eatngo.store.usecase.StoreQueryUseCase
-import io.swagger.v3.oas.annotations.Operation
-import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.web.bind.annotation.*
 import java.time.LocalDateTime
 
 @RestController
 @RequestMapping("/api/v1/stores")
-@Tag(name = "상점 API", description = "상점 관련 API")
 class StoreController(
     private val storeOwnerStoreCreatedUseCase: StoreOwnerStoreCreatedUseCase,
     private val storeOwnerStoreUpdatedUseCase: StoreOwnerStoreUpdatedUseCase,
     private val storeOwnerStatusChangeUseCase: StoreOwnerStatusChangeUseCase,
     private val storeOwnerStoreDeletedUseCase: StoreOwnerStoreDeletedUseCase,
     private val storeQueryUseCase: StoreQueryUseCase
-) : StoreOwnerDocs {
+) : StoreOwnerControllerDocs {
 
     @GetMapping
     override fun getStoresByOwnerId(@StoreOwnerId storeOwnerId: Long): ApiResponse<List<StoreDetailResponse>> {
