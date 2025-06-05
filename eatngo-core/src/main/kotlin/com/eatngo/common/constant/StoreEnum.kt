@@ -2,15 +2,6 @@ package com.eatngo.common.constant
 
 object StoreEnum {
     /**
-     * 주소 타입
-     */
-    enum class AddressType {
-        ROAD, // 도로명 주소
-        ADMIN, // 행정동
-        LEGAL, // 법정동
-    }
-
-    /**
      * 매장 상태
      */
     enum class StoreStatus {
@@ -71,7 +62,7 @@ object StoreEnum {
     ) {
         BREAD("빵"),
         BAKERY("베이커리"),
-        COFFEE("커피전문점"),
+        CAFE("카페"),
         DESSERT("디저트"),
         KOREAN("한식"),
         FRUIT("과일"),
