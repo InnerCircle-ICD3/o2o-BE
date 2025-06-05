@@ -9,15 +9,15 @@ enum class CommonErrorCode(
     override val message: String,
 ) : ErrorCode {
     // Common
-    INVALID_INPUT("C001", "입력값이 올바르지 않습니다."),
-    ENTITY_NOT_FOUND("C003", "요청한 엔티티를 찾을 수 없습니다."),
-    INTERNAL_SERVER_ERROR("C004", "서버 내부 오류가 발생했습니다."),
-    INVALID_TYPE_VALUE("C005", "잘못된 타입의 값이 입력되었습니다."),
-    DUPLICATE_ENTITY("C006", "엔티티가 이미 존재합니다."),
+    INVALID_INPUT("CEC001", "입력값이 올바르지 않습니다."),
+    ENTITY_NOT_FOUND("CEC003", "요청한 엔티티를 찾을 수 없습니다."),
+    INTERNAL_SERVER_ERROR("CEC004", "서버 내부 오류가 발생했습니다."),
+    INVALID_TYPE_VALUE("CEC005", "잘못된 타입의 값이 입력되었습니다."),
+    DUPLICATE_ENTITY("CEC006", "엔티티가 이미 존재합니다."),
 
     // Validation
-    VALIDATION_FAILED("V001", "유효성 검증에 실패했습니다."),
+    VALIDATION_FAILED("CEC007", "유효성 검증에 실패했습니다."),
 
     // Image
-    IMAGE_URL_RESOLVE_FAILED("I001","이미지 URL 변환에 실패했습니다.");
+    IMAGE_URL_RESOLVE_FAILED("CEC008","이미지 URL 변환에 실패했습니다.");
 }
