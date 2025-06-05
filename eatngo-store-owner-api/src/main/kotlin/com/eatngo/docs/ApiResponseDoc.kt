@@ -2,12 +2,12 @@ package com.eatngo.docs
 
 import io.swagger.v3.oas.annotations.media.Schema
 
-@Schema(description = "API 성공 응답 예시")
-data class ApiResponseSuccessDoc<T>(
+@Schema(description = "API 성공 응답 예시(추상)")
+abstract class ApiResponseSuccessDoc<T>(
     @Schema(description = "요청 성공 여부", example = "true")
-    val success: Boolean = true,
+    open val success: Boolean = true,
     @Schema(description = "응답 데이터")
-    val data: T
+    open val data: T
 )
 
 @Schema(description = "API 에러 응답 예시")
