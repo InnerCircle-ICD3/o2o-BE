@@ -2,7 +2,7 @@ package com.eatngo.subscription.controller
 
 import com.eatngo.auth.annotation.CustomerId
 import com.eatngo.common.response.ApiResponse
-import com.eatngo.subscription.docs.StoreSubscriptionDocs
+import com.eatngo.subscription.docs.controller.StoreSubscriptionControllerDocs
 import com.eatngo.subscription.dto.StoreSubscriptionResponse
 import com.eatngo.subscription.dto.SubscriptionToggleResponse
 import com.eatngo.subscription.usecase.CustomerSubscriptionQueryUseCase
@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*
 class CustomerStoreSubscriptionController(
     private val customerSubscriptionToggleUseCase: CustomerSubscriptionToggleUseCase,
     private val customerSubscriptionQueryUseCase: CustomerSubscriptionQueryUseCase
-) : StoreSubscriptionDocs {
+) : StoreSubscriptionControllerDocs {
     @PostMapping("/{storeId}")
     override fun toggleSubscription(
         @PathVariable storeId: Long,

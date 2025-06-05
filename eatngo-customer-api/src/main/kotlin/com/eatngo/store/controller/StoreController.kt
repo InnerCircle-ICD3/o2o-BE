@@ -1,7 +1,7 @@
 package com.eatngo.store.controller
 
 import com.eatngo.common.response.ApiResponse
-import com.eatngo.store.docs.StoreCustomerDocs
+import com.eatngo.store.docs.StoreCustomerControllerDocs
 import com.eatngo.store.dto.StoreDetailResponse
 import com.eatngo.store.usecase.StoreQueryUseCase
 import org.springframework.web.bind.annotation.*
@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*
 
 class StoreController(
     private val storeQueryUseCase: StoreQueryUseCase
-) : StoreCustomerDocs {
+) : StoreCustomerControllerDocs {
     @GetMapping("/{storeId}")
     override fun getStoreById(@PathVariable storeId: Long): ApiResponse<StoreDetailResponse> {
         val storeDto = storeQueryUseCase.getStoreById(storeId)

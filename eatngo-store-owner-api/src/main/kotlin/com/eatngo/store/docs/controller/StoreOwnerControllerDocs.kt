@@ -3,7 +3,6 @@ package com.eatngo.store.docs.controller
 import com.eatngo.auth.annotaion.StoreOwnerId
 import com.eatngo.common.response.ApiResponse
 import com.eatngo.docs.ApiResponseErrorDoc
-import com.eatngo.docs.ApiResponseSuccessDoc
 import com.eatngo.store.docs.response.StoreCUDApiResponseDoc
 import com.eatngo.store.docs.response.StoreDetailApiResponseDoc
 import com.eatngo.store.dto.StoreCUDResponse
