@@ -1,6 +1,7 @@
 package com.eatngo.user_account.oauth2.dto
 
 import com.eatngo.user_account.oauth2.constants.Oauth2Provider
+import java.time.LocalDateTime
 
 interface OAuth2 {
 
@@ -10,4 +11,7 @@ interface OAuth2 {
     val terms: List<OauthTerm>
     val principal: String
     val nickname: String?
+    val token: String
+    val expiresAt: LocalDateTime
+    val scopes: String
 }
