@@ -1,17 +1,16 @@
-package com.eatngo.store.docs
+package com.eatngo.store.docs.controller
 
-import com.eatngo.common.response.ApiResponse
 import com.eatngo.docs.ApiResponseErrorDoc
 import com.eatngo.store.docs.response.StoreDetailApiResponseDoc
-import com.eatngo.store.dto.*
+import com.eatngo.store.dto.StoreDetailResponse
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
-import io.swagger.v3.oas.annotations.responses.ApiResponse as SwaggerApiResponse
+import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.PathVariable
 
 @Tag(name = "매장 API", description = "매장 관련 API")
 interface StoreCustomerControllerDocs {
@@ -22,12 +21,12 @@ interface StoreCustomerControllerDocs {
     )
     @ApiResponses(
         value = [
-            SwaggerApiResponse(
+            ApiResponse(
                 responseCode = "200",
                 description = "매장 조회 성공",
                 content = [Content(schema = Schema(implementation = StoreDetailApiResponseDoc::class))]
             ),
-            SwaggerApiResponse(
+            ApiResponse(
                 responseCode = "400",
                 description = "잘못된 요청(400~500 에러 포함)",
                 content = [Content(schema = Schema(implementation = ApiResponseErrorDoc::class))]
@@ -37,5 +36,5 @@ interface StoreCustomerControllerDocs {
     fun getStoreById(
         @Parameter(description = "조회할 매장 ID", required = true)
         @PathVariable storeId: Long
-    ): ApiResponse<StoreDetailResponse>
+    ): com.eatngo.common.response.ApiResponse<StoreDetailResponse>
 }

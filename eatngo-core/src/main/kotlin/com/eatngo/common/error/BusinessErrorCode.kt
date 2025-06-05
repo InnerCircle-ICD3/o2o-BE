@@ -88,11 +88,11 @@ enum class BusinessErrorCode(
     SEARCH_STORE_MAP_FAILED("H005", "매장 지도 조회에 실패했습니다.", 500),
     SEARCH_STORE_MAP_CACHE_FAILED("H006", "지도 정보 캐싱에 실패했습니다.", 500),
     SEARCH_SUGGESTION_FAILED("H007", "추천 검색어 조회에 실패했습니다.", 500),
-    SEARCH_CATEGORY_NOT_FOUND("H008", "존재하지 않는 카테고리 입니다.", 404),
+    SEARCH_CATEGORY_NOT_FOUND("H008", "존재하지 않는 카테고리 입니다.", 400),
 
     // 재고 관련 오류
-    STOCK_NOT_FOUND("ST001", "상품의 재고를 찾을 수 없습니다.", 404),
+    STOCK_NOT_FOUND("ST001", "상품의 재고를 찾을 수 없습니다.", 400),
     STOCK_EMPTY("ST002", "상품의 재고가 없습니다.", 409),
-    INVENTORY_NOT_FOUND("I001", "상품 재고를 찾을 수 없습니다.", 404)
+    INVENTORY_NOT_FOUND("I001", "상품 재고를 찾을 수 없습니다.", 400)
 
 }

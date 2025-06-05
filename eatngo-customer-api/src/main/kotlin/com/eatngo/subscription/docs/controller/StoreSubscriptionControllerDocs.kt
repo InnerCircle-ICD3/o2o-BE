@@ -36,7 +36,7 @@ interface StoreSubscriptionControllerDocs {
             ),
             SwaggerApiResponse(
                 responseCode = "400",
-                description = "잘못된 요청",
+                description = "잘못된 요청(400~500 에러 포함)",
                 content = [Content(schema = Schema(implementation = ApiResponseErrorDoc::class))]
             )
         ]
@@ -62,7 +62,7 @@ interface StoreSubscriptionControllerDocs {
             ),
             SwaggerApiResponse(
                 responseCode = "400",
-                description = "잘못된 요청",
+                description = "잘못된 요청(400~500 에러 포함)",
                 content = [Content(schema = Schema(implementation = ApiResponseErrorDoc::class))]
             )
         ]

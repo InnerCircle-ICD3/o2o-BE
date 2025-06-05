@@ -78,14 +78,6 @@ data class BusinessHourDoc(
     val closeTime: String
 )
 
-@Schema(description = "좌표 정보 예시")
-data class CoordinateDoc(
-    @Schema(description = "경도", example = "127.0276368")
-    val longitude: Double = 127.0276368,
-    @Schema(description = "위도", example = "37.497942")
-    val latitude: Double = 37.497942
-)
-
 @Schema(description = "주소 정보 예시")
 data class AddressDoc(
     @Schema(description = "도로명 주소", example = "서울특별시 강남구 테헤란로 427")
@@ -110,5 +102,13 @@ data class AddressDoc(
     val region3DepthName: String? = "삼성동",
 
     @Schema(description = "좌표 정보")
-    val coordinate: CoordinateDoc = CoordinateDoc()
+    val coordinate: CoordinateDoc
+)
+
+@Schema(description = "좌표 정보 예시")
+data class CoordinateDoc(
+    @Schema(description = "경도", example = "127.0276368")
+    val longitude: Double,
+    @Schema(description = "위도", example = "37.497942")
+    val latitude: Double
 )
