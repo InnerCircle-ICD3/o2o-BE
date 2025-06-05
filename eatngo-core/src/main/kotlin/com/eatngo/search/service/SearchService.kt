@@ -6,7 +6,6 @@ import com.eatngo.extension.orThrow
 import com.eatngo.search.domain.SearchStore
 import com.eatngo.search.dto.AutoCompleteStoreNameDto
 import com.eatngo.search.dto.Box
-import com.eatngo.search.dto.CoordinateResultDto
 import com.eatngo.search.dto.SearchStoreMap
 import com.eatngo.search.dto.SearchStoreMapResultDto
 import com.eatngo.search.dto.SearchStoreResultDto
@@ -105,23 +104,7 @@ class SearchService(
         // Redis에서 box 검색 결과를 가져온다. -> 위경도 기중 0.005 단위로 박스 매핑
         val redisKey =
             searchMapRedisRepository.getKey(box.topLeft)
-        // TODO : 실제 구현 이후 MOCK 삭제
-        var searchStoreMapList: List<SearchStoreMap> = searchMapRedisRepository.findByKey(redisKey)
-        if (searchStoreMapList.isEmpty()) {
-            searchStoreMapList =
-                listOf(
-                    SearchStoreMap(
-                        storeId = 1L,
-                        storeName = "테스트 매장",
-                        coordinate = CoordinateResultDto.from(126.978011, 37.566500),
-                    ),
-                    SearchStoreMap(
-                        storeId = 2L,
-                        storeName = "테스트 매장2",
-                        coordinate = CoordinateResultDto.from(126.970011, 37.566500),
-                    ),
-                )
-        }
+        val searchStoreMapList: List<SearchStoreMap> = searchMapRedisRepository.findByKey(redisKey)
 
         return SearchStoreMapResultDto.from(
             box = box,
