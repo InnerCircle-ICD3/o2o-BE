@@ -262,7 +262,7 @@ class SearchStoreRepositoryImpl(
         }
 
         // 선택 : 예약 가능 상태 필터링 -> TODO 로직 확인 필요...(오픈 할 때 마다 예약 가능 상태 변경할건지)
-        searchFilter.onlyReservable.let {
+        if (searchFilter.onlyReservable) {
             query.addCriteria(
                 Criteria.where("status").`is`(SearchStoreStatus.OPEN.code),
             )
