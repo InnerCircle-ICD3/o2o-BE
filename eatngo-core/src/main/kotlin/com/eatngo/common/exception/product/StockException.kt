@@ -1,6 +1,7 @@
-package com.eatngo.common.exception
+package com.eatngo.common.exception.product
 
 import com.eatngo.common.error.BusinessErrorCode
+import com.eatngo.common.exception.BusinessException
 import org.slf4j.event.Level
 
 open class StockException(

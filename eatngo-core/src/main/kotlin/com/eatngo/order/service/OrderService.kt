@@ -1,6 +1,6 @@
 package com.eatngo.order.service
 
-import com.eatngo.common.exception.OrderException
+import com.eatngo.common.exception.order.OrderException
 import com.eatngo.common.response.Cursor
 import com.eatngo.extension.orThrow
 import com.eatngo.order.domain.Order

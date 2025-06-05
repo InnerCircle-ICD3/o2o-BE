@@ -1,7 +1,7 @@
 package com.eatngo.subscription.service.impl
 
 import com.eatngo.common.constant.StoreEnum
-import com.eatngo.common.exception.StoreException
+import com.eatngo.common.exception.store.StoreException
 import com.eatngo.extension.orThrow
 import com.eatngo.product.infra.ProductPersistence
 import com.eatngo.store.infra.StorePersistence

@@ -1,7 +1,7 @@
 package com.eatngo.mongo.entity.search
 
 import com.eatngo.common.constant.StoreEnum
-import com.eatngo.common.exception.SearchException
+import com.eatngo.common.exception.search.SearchException
 import com.eatngo.extension.orThrow
 import com.eatngo.search.domain.Coordinate
 import com.eatngo.search.domain.SearchStore

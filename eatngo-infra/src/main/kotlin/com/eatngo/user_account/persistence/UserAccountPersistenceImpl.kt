@@ -1,7 +1,7 @@
 package com.eatngo.user_account.persistence
 
 import com.eatngo.aop.SoftDeletedFilter
-import com.eatngo.common.exception.UserAccountException
+import com.eatngo.common.exception.user.UserAccountException
 import com.eatngo.user_account.domain.UserAccount
 import com.eatngo.user_account.infra.UserAccountPersistence
 import com.eatngo.user_account.oauth2.constants.Oauth2Provider

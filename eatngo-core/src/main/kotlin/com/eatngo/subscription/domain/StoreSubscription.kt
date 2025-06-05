@@ -1,7 +1,7 @@
 package com.eatngo.subscription.domain
 
 import com.eatngo.common.constant.StoreEnum
-import com.eatngo.common.exception.StoreException
+import com.eatngo.common.exception.store.StoreException
 import java.time.LocalDateTime
 
 /**

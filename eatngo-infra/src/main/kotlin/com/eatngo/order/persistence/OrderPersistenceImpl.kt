@@ -1,6 +1,6 @@
 package com.eatngo.order.persistence
 
-import com.eatngo.common.exception.OrderException
+import com.eatngo.common.exception.order.OrderException
 import com.eatngo.common.response.Cursor
 import com.eatngo.extension.mapOrNull
 import com.eatngo.extension.orThrow

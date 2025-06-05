@@ -1,6 +1,7 @@
-package com.eatngo.common.exception
+package com.eatngo.common.exception.search
 
 import com.eatngo.common.error.BusinessErrorCode
+import com.eatngo.common.exception.BusinessException
 import com.eatngo.common.type.CoordinateVO
 import com.eatngo.search.dto.SearchFilter
 import org.slf4j.event.Level

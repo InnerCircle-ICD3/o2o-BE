@@ -1,6 +1,6 @@
 package com.eatngo.subscription.usecase
 
-import com.eatngo.common.exception.StoreException
+import com.eatngo.common.exception.store.StoreException
 import com.eatngo.store.infra.StorePersistence
 import com.eatngo.store.service.StoreService
 import com.eatngo.subscription.dto.StoreSubscriptionDto

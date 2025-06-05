@@ -1,6 +1,6 @@
 package com.eatngo.store.dto
 
-import com.eatngo.store.docs.StoreCreateRequestDocs
+import com.eatngo.store.docs.request.StoreCreateRequestDocs
 
 /**
  * 매장 생성 요청용 dto

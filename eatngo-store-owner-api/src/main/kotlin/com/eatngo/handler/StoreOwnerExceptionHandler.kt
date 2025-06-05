@@ -2,8 +2,8 @@ package com.eatngo.handler
 
 import com.eatngo.common.error.CommonErrorCode
 import com.eatngo.common.exception.BusinessException
-import com.eatngo.common.exception.OrderException
-import com.eatngo.common.exception.StoreException
+import com.eatngo.common.exception.order.OrderException
+import com.eatngo.common.exception.store.StoreException
 import com.eatngo.common.response.ApiResponse
 import jakarta.servlet.http.HttpServletRequest
 import org.slf4j.Logger

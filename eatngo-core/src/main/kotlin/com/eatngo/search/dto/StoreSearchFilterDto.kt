@@ -1,6 +1,6 @@
 package com.eatngo.search.dto
 
-import com.eatngo.common.exception.SearchException
+import com.eatngo.common.exception.search.SearchException
 import com.eatngo.common.type.CoordinateVO
 import com.eatngo.extension.orThrow
 

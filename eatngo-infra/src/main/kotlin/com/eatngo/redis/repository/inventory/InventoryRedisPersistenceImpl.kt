@@ -1,7 +1,7 @@
 package com.eatngo.redis.repository.inventory
 
-import com.eatngo.common.exception.StockException.StockEmpty
-import com.eatngo.common.exception.StockException.StockNotFound
+import com.eatngo.common.exception.product.StockException.StockEmpty
+import com.eatngo.common.exception.product.StockException.StockNotFound
 import com.eatngo.inventory.dto.InventoryDto
 import com.eatngo.inventory.infra.InventoryCachePersistence
 import org.springframework.data.redis.core.RedisTemplate

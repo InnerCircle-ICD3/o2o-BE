@@ -1,6 +1,6 @@
 package com.eatngo.customer.service
 
-import com.eatngo.common.exception.CustomerException
+import com.eatngo.common.exception.user.CustomerException
 import com.eatngo.customer.dto.AddressCreateDto
 import com.eatngo.customer.dto.CustomerAddressDto
 import com.eatngo.customer.infra.CustomerAddressPersistence

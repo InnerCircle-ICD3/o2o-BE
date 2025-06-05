@@ -1,6 +1,6 @@
 package com.eatngo.store_owner.service
 
-import com.eatngo.common.exception.StoreException
+import com.eatngo.common.exception.store.StoreException
 import com.eatngo.store_owner.domain.StoreOwner
 import com.eatngo.store_owner.dto.StoreOwnerUpdateDto
 import com.eatngo.store_owner.infra.StoreOwnerPersistence

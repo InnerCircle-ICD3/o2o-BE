@@ -1,6 +1,7 @@
-package com.eatngo.common.exception
+package com.eatngo.common.exception.user
 
 import com.eatngo.common.error.BusinessErrorCode
+import com.eatngo.common.exception.BusinessException
 import com.eatngo.store.vo.LotNumberAddressVO
 import com.eatngo.store.vo.RoadNameAddressVO
 import org.slf4j.event.Level
