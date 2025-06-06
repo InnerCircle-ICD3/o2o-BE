@@ -10,6 +10,10 @@ import com.eatngo.inventory.infra.InventoryPersistence
 import com.eatngo.product.dto.ProductCurrentStockDto
 import com.eatngo.product.dto.ProductDto
 import com.eatngo.product.service.StoreTotalInventoryTypeDecider
+import com.eatngo.inventory.event.InventoryEventPublisher
+import com.eatngo.inventory.event.InventoryChangedEvent
+import com.eatngo.inventory.event.InventoryChangedType
+import com.eatngo.inventory.event.InventoryChangedType.*
 import org.springframework.cache.annotation.CacheEvict
 import org.springframework.cache.annotation.CachePut
 import org.springframework.cache.annotation.Cacheable
@@ -20,7 +24,8 @@ import org.springframework.transaction.annotation.Transactional
 class InventoryService(
     private val inventoryPersistence: InventoryPersistence,
     private val storeTotalInventoryTypeDecider: StoreTotalInventoryTypeDecider,
-    private val inventorySyncPublisher: InventorySyncPublisher
+    private val inventorySyncPublisher: InventorySyncPublisher,
+    private val inventoryEventPublisher: InventoryEventPublisher
 ) {
 
     @CachePut("inventory", key = "#productDto.id")
@@ -57,7 +62,7 @@ class InventoryService(
         val changedInventory = inventory.changeStock(productCurrentStockDto.action, productCurrentStockDto.amount)
         val savedInventory: Inventory = inventoryPersistence.save(changedInventory)
 
-        storeTotalInventoryTypeDecider.decideInventoryType(
+        val eventType = storeTotalInventoryTypeDecider.decideInventoryType(
             storeId = storeId,
             initialStock = initialStock,
         )
@@ -68,6 +73,15 @@ class InventoryService(
                 syncedStock = savedInventory.stock
             )
         )
+
+        if (shouldPublishStoreStatusChangeEvent(eventType, initialStock)) {
+            inventoryEventPublisher.publishInventoryChangedEvent(
+                InventoryChangedEvent(
+                    productId = savedInventory.productId,
+                    inventoryChangedType = eventType
+                )
+            )
+        }
 
         return InventoryDto(savedInventory.quantity, savedInventory.stock)
     }
@@ -85,7 +99,7 @@ class InventoryService(
 
         val savedInventory = inventoryPersistence.save(inventory)
 
-        storeTotalInventoryTypeDecider.decideInventoryType(
+        val eventType = storeTotalInventoryTypeDecider.decideInventoryType(
             storeId = productDto.storeId,
             initialStock = initialStock
         )
@@ -97,7 +111,27 @@ class InventoryService(
             )
         )
 
+        if (shouldPublishStoreStatusChangeEvent(eventType, initialStock)) {
+            inventoryEventPublisher.publishInventoryChangedEvent(
+                InventoryChangedEvent(
+                    productId = savedInventory.productId,
+                    inventoryChangedType = eventType
+                )
+            )
+        }
+
         return InventoryDto(savedInventory.quantity, savedInventory.stock)
+    }
+
+    private fun shouldPublishStoreStatusChangeEvent(
+        eventType: InventoryChangedType, 
+        initialStock: Int
+    ): Boolean {
+        return when (eventType) {
+            OUT_OF_STOCK -> true
+            RESTOCKED -> initialStock == 0
+            else -> false
+        }
     }
 
 }
