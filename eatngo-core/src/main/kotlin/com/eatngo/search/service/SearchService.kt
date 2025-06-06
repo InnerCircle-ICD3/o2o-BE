@@ -113,38 +113,28 @@ class SearchService(
     }
 
     fun searchStoreMapRefresh(userCoordinate: CoordinateVO): SearchStoreMapResultDto {
-        // center 값을 기준으로 해당하는 box 좌표를 구한다.
+        val searchStoreMapResult: SearchStoreMapResultDto = searchStoreMap(userCoordinate)
+        if (searchStoreMapResult.storeList.isNotEmpty()) {
+            // Redis에 캐싱된 검색 결과가 있으면 그대로 반환
+            return searchStoreMapResult
+        }
+
+        // 검색 결과가 없으면 MongoDB에서 검색하여 가져온 뒤 캐싱한다
         val box: Box =
             getBox(
                 longitude = userCoordinate.longitude,
                 latitude = userCoordinate.latitude,
             )
+        val searchMapList =
+            saveBoxRedis(
+                box = box,
+                userCoordinate = userCoordinate,
+            )
 
-        // Redis에서 box 검색 결과를 가져온다. -> 위경도 기중 0.005 단위로 박스 매핑
-        val redisKey =
-            searchMapRedisRepository.getKey(box.topLeft)
-        val seachStoreMapList: List<SearchStoreMap> = searchMapRedisRepository.findByKey(redisKey)
-
-        // 검색 결과가 없으면 MongoDB에서 검색하여 가져온 뒤 캐싱한다
-        if (seachStoreMapList.isEmpty()) {
-            val searchStoreList: List<SearchStore> =
-                searchStoreRepository.findBox(box).orThrow {
-                    SearchException.SearchStoreMapFailed(userCoordinate)
-                }
-            // Redis에 저장
-            searchMapRedisRepository
-                .save(
-                    key = redisKey,
-                    value =
-                        searchStoreList.map {
-                            SearchStoreMap.from(it)
-                        },
-                ).orThrow {
-                    SearchException.SearchStoreMapCacheFailed(redisKey)
-                }
-        }
-
-        return searchStoreMap(userCoordinate)
+        return SearchStoreMapResultDto.from(
+            box = box,
+            searchStoreMapList = searchMapList,
+        )
     }
 
     /**
@@ -205,5 +195,29 @@ class SearchService(
         val bottomRight = CoordinateVO.from(longitude = rightLng, latitude = bottomLat) // 동쪽 + 남쪽
 
         return Box.from(topLeft, bottomRight)
+    }
+
+    fun saveBoxRedis(
+        box: Box,
+        userCoordinate: CoordinateVO,
+    ): List<SearchStoreMap> {
+        val redisKey =
+            searchMapRedisRepository.getKey(box.topLeft)
+
+        val searchStoreList: List<SearchStore> =
+            searchStoreRepository.findBox(box).orThrow {
+                SearchException.SearchStoreMapFailed(userCoordinate)
+            }
+        val searchStoreMap = searchStoreList.map { SearchStoreMap.from(it) }
+        // Redis에 저장
+        searchMapRedisRepository
+            .save(
+                key = redisKey,
+                value = searchStoreMap,
+            ).orThrow {
+                SearchException.SearchStoreMapCacheFailed(redisKey)
+            }
+
+        return searchStoreMap
     }
 }
