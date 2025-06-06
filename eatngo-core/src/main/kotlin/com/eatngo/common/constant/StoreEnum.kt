@@ -71,7 +71,7 @@ object StoreEnum {
     ) {
         BREAD("빵"),
         BAKERY("베이커리"),
-        COFFEE("커피전문점"),
+        CAFE("카페"),
         DESSERT("디저트"),
         KOREAN("한식"),
         FRUIT("과일"),

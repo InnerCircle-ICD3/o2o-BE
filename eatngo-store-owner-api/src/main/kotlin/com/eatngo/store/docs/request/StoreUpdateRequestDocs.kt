@@ -106,7 +106,7 @@ interface StoreUpdateRequestDocs {
     @get:Schema(
         description = "매장의 대분류 카테고리(리스트로 입력)",
         example = "[\"BREAD\"]",
-        allowableValues = ["BREAD", "BAKERY", "COFFEE", "DESSERT", "KOREAN", "FRUIT", "PIZZA", "SALAD", "RICECAKE"],
+        allowableValues = ["BREAD", "BAKERY", "CAFE", "DESSERT", "KOREAN", "FRUIT", "PIZZA", "SALAD", "RICECAKE"],
     )
     val storeCategory: List<String>?
 
