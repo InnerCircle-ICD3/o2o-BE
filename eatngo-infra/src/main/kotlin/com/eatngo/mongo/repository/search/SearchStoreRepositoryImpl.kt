@@ -30,6 +30,7 @@ class SearchStoreRepositoryImpl(
     private val mongoTemplate: MongoTemplate,
 ) : SearchStoreRepository {
     val searchStoreIndex = "search-store"
+    val autoCompleteIndex = "store-autocomplete"
 
     override fun findBox(box: CoreBox): List<SearchStore> {
         val mongoBox: Shape =
@@ -224,7 +225,7 @@ class SearchStoreRepositoryImpl(
             Document(
                 "\$search",
                 Document()
-                    .append("index", "store-autocomplete-index")
+                    .append("index", autoCompleteIndex)
                     .append(
                         "autocomplete",
                         Document()
