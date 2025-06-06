@@ -195,6 +195,13 @@ class SearchStoreRepositoryImpl(
         bulkOps.execute()
     }
 
+    override fun deleteIds(deleteIds: List<Long>) {
+        if (deleteIds.isEmpty()) return
+
+        val query = Query(Criteria.where("_id").`in`(deleteIds))
+        mongoTemplate.remove(query, SearchStoreEntity::class.java, "SearchStore")
+    }
+
     /**
      * status 정렬순을 보장하기 위해 status를 지정하여 검색
      */

@@ -33,4 +33,6 @@ interface SearchStoreRepository {
     ): List<AutoCompleteStoreNameDto>
 
     fun saveAll(searchStoreList: List<SearchStore>)
+
+    fun deleteIds(deleteIds: List<Long>)
 }
