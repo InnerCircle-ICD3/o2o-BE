@@ -6,15 +6,5 @@ class SearchStoreAutoCompleteDto(
     @Id
     val storeId: Long,
     val storeName: String,
-) {
-    companion object {
-        fun from(
-            storeId: Long,
-            storeName: String,
-        ): SearchStoreAutoCompleteDto =
-            SearchStoreAutoCompleteDto(
-                storeId = storeId,
-                storeName = storeName,
-            )
-    }
-}
+    val score: Double = 0.0,
+)

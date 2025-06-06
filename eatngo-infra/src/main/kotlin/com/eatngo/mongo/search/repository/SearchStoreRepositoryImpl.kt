@@ -10,6 +10,7 @@ import com.eatngo.search.dto.SearchFilter
 import com.eatngo.search.dto.SearchStoreWithDistance
 import com.eatngo.search.infra.SearchStoreRepository
 import org.bson.Document
+import org.springframework.data.domain.Sort
 import org.springframework.data.geo.GeoResults
 import org.springframework.data.geo.Metrics
 import org.springframework.data.geo.Point
@@ -134,11 +135,16 @@ class SearchStoreRepositoryImpl(
         val searchOp = getAutocompleteOperation(keyword)
         val limitOp = Aggregation.limit(size.toLong())
         val projectionOp =
-            Aggregation.project("_id", "storeName") // _id, storeName 필드만 추출
+            Aggregation
+                .project("_id", "storeName") // _id, storeName 필드만 추출
+                .andExpression("metaSearchScore")
+                .`as`("score")
+        val sortOp = Aggregation.sort(Sort.by(Sort.Direction.DESC, "score"))
 
         val pipeline =
             Aggregation.newAggregation(
                 searchOp,
+                sortOp,
                 limitOp,
                 projectionOp,
             )
@@ -152,7 +158,7 @@ class SearchStoreRepositoryImpl(
                 ).mappedResults
 
         return result.map {
-            AutoCompleteStoreNameDto.Companion.from(
+            AutoCompleteStoreNameDto.from(
                 storeId = it.storeId,
                 storeName = it.storeName,
             )
