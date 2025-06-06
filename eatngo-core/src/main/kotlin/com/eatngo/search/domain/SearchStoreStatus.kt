@@ -3,11 +3,11 @@ package com.eatngo.search.domain
 import com.eatngo.common.constant.StoreEnum
 
 enum class SearchStoreStatus(
-    val code: Int, // 상태 코드
+    val code: Int, // 상태 코드 -> 정렬을 위해 OPEN을 1로...
 ) {
-    PENDING(0),
     OPEN(1),
-    CLOSED(2),
+    PENDING(2),
+    CLOSED(3),
     ;
 
     companion object {
@@ -20,9 +20,9 @@ enum class SearchStoreStatus(
 
         fun from(code: Int): SearchStoreStatus =
             when (code) {
-                0 -> PENDING
                 1 -> OPEN
-                2 -> CLOSED
+                2 -> PENDING
+                3 -> CLOSED
                 else -> throw IllegalArgumentException("Invalid status code: $code")
             }
     }
