@@ -85,7 +85,8 @@ class ProductService(
         return ProductDto.from(
             savedProduct,
             savedProduct.imageUrl?.let(fileStorageService::resolveImageUrl),
-            savedInventory
+            savedInventory,
+            store.name.value
         )
     }
 
@@ -95,6 +96,8 @@ class ProductService(
         storeId: Long,
         productId: Long
     ): ProductDto {
+        val store: Store = storePersistence.findById(storeId)
+            .orThrow { StoreNotFound(storeId) }
         val product: Product = productPersistence.findActivatedProductByIdAndStoreId(productId, storeId)
             .orThrow { ProductNotFound(productId) }
 
@@ -103,19 +106,23 @@ class ProductService(
         return ProductDto.from(
             product,
             product.imageUrl?.let(fileStorageService::resolveImageUrl),
-            inventoryDetails
+            inventoryDetails,
+            store.name.value
         )
     }
 
     @Cacheable("storeProducts", key = "#storeId")
     @Transactional
     fun findAllProducts(storeId: Long): List<ProductDto> {
+        val store: Store = storePersistence.findById(storeId)
+            .orThrow { StoreNotFound(storeId) }
         return productPersistence.findAllActivatedProductByStoreId(storeId)
             .map {
                 ProductDto.from(
                     it,
                     it.imageUrl?.let(fileStorageService::resolveImageUrl),
-                    inventoryService.getInventoryDetails(it.id)
+                    inventoryService.getInventoryDetails(it.id),
+                    store.name.value
                 )
             }
     }
@@ -138,18 +145,18 @@ class ProductService(
     @CacheEvict("product", key = "#productCurrentStockDto.id")
     @Transactional
     fun toggleStock(productCurrentStockDto: ProductCurrentStockDto): ProductAfterStockDto {
+        val store: Store = storePersistence.findById(productCurrentStockDto.storeId)
+            .orThrow { StoreNotFound(productCurrentStockDto.storeId) }
         val product: Product = productPersistence.findActivatedProductById(productCurrentStockDto.id)
             .orThrow { ProductNotFound(productCurrentStockDto.id) }
-        val savedProduct = productPersistence.save(product)
 
-        val store: Store = storePersistence.findById(product.storeId).orThrow { StoreNotFound(product.storeId) }
         val changedInventory: InventoryDto = inventoryService.toggleInventory(
             productCurrentStockDto,
             store.id,
             findTotalInitialStocks(store.id)
         )
 
-        return ProductAfterStockDto.create(savedProduct, changedInventory)
+        return ProductAfterStockDto.create(product, changedInventory)
     }
 
     @Caching(
@@ -158,6 +165,8 @@ class ProductService(
     )
     @Transactional
     fun modifyProduct(productDto: ProductDto): ProductDto {
+        val store: Store = storePersistence.findById(productDto.storeId)
+            .orThrow { StoreNotFound(productDto.storeId) }
         val product: Product =
             productPersistence.findActivatedProductByIdAndStoreId(productDto.id!!, productDto.storeId)
                 .orThrow { ProductNotFound(productDto.id!!) }
@@ -182,7 +191,8 @@ class ProductService(
         return ProductDto.from(
             savedProduct,
             savedProduct.imageUrl?.let(fileStorageService::resolveImageUrl),
-            changedInventory
+            changedInventory,
+            store.name.value
         )
     }
 

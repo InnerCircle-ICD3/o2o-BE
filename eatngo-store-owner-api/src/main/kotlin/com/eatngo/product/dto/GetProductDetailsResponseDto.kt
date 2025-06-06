@@ -6,7 +6,9 @@ import java.time.LocalDateTime
 data class GetProductDetailsResponseDto(
     val id: Long?,
     val name: String,
+    val description: String,
     val storeId: Long,
+    val storeName: String,
     val price: GetProductPriceResponseDto,
     val size: String,
     val inventory: GetProductInventoryResponseDto,
@@ -20,7 +22,9 @@ data class GetProductDetailsResponseDto(
             return GetProductDetailsResponseDto(
                 id = productDto.id,
                 name = productDto.name,
+                description = productDto.description,
                 storeId = productDto.storeId,
+                storeName = productDto.name,
                 price = GetProductPriceResponseDto.from(productDto.price),
                 size = productDto.size,
                 inventory = GetProductInventoryResponseDto.from(productDto.inventory),

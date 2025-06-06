@@ -3,9 +3,7 @@ package com.eatngo.inventory.batch
 import com.eatngo.inventory.domain.Inventory
 import com.eatngo.inventory.infra.InventoryPersistence
 import org.slf4j.LoggerFactory
-import org.springframework.data.redis.core.Cursor
 import org.springframework.data.redis.core.RedisTemplate
-import org.springframework.data.redis.core.ScanOptions
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
@@ -19,86 +17,72 @@ class InventorySyncScheduler(
 
     companion object {
         private const val REDIS_KEY_PREFIX = "inventory:"
-        private const val SCAN_COUNT = 1000L
+        private const val CHANGED_SET_KEY = "changedProductIds"
         private const val CHUNK_SIZE = 500
     }
 
-    @Scheduled(cron = "0 0 * * * ?")
+    @Scheduled(cron = "0 0/10 * * * ?")
     @Transactional
     fun syncInventoryFromRedisToRdb() {
-        val productStockMap = fetchRedisProductStocks()
-        if (productStockMap.isEmpty()) {
-            logger.info("동기화할 Redis 재고 데이터가 없습니다.")
+        val changedIds: Set<String>? = redisTemplate.opsForSet().members(CHANGED_SET_KEY)
+        if (changedIds.isNullOrEmpty()) {
+            logger.info("동기화할 변경된 재고 ID가 없습니다.")
             return
         }
 
-        logger.info("동기화 대상 상품 개수: ${productStockMap.size}")
-        updateRdbInChunks(productStockMap)
-        logger.info("Redis → RDB 재고 동기화 작업 완료.")
-    }
+        redisTemplate.delete(CHANGED_SET_KEY)
 
-    private fun fetchRedisProductStocks(): MutableMap<Long, Int> {
-        val scanOptions: ScanOptions = ScanOptions.scanOptions()
-            .match("$REDIS_KEY_PREFIX*")
-            .count(SCAN_COUNT)
-            .build()
-
-        val cursor: Cursor<String> = redisTemplate.scan(scanOptions)
-        val productStockMap = mutableMapOf<Long, Int>()
-
-        cursor.use {
-            it.forEachRemaining { key ->
-                val productId = key.removePrefix(REDIS_KEY_PREFIX).toLongOrNull()
-                if (productId == null) {
-                    logger.warn("Redis 키 '$key' 에서 productId 파싱 실패. 건너뜁니다.")
-                    return@forEachRemaining
+        val productIds = changedIds.mapNotNull { productId ->
+            productId.toLongOrNull().also {
+                if (it == null) {
+                    logger.warn("잘못된 productId 형식: '$productId' (Long 변환 실패)")
                 }
-
-                val stockValue = redisTemplate.opsForHash<String, String>()
-                    .get(key, "stock")
-                val stock = stockValue?.toIntOrNull()
-                if (stock == null) {
-                    logger.warn("Redis 키 '$key' 의 'stock' 필드가 없거나 파싱 실패. 건너뜁니다.")
-                    return@forEachRemaining
-                }
-
-                productStockMap[productId] = stock
             }
         }
-        return productStockMap
-    }
 
-    private fun updateRdbInChunks(productStockMap: MutableMap<Long, Int>) {
-        val productIds = productStockMap.keys.toList()
+        if (productIds.isEmpty()) {
+            logger.info("유효한 productId가 없어 동기화 대상이 없습니다.")
+            return
+        }
+
+        logger.info("동기화 대상 상품 ID 개수: ${productIds.size}")
+
         productIds.chunked(CHUNK_SIZE).forEachIndexed { chunkIndex, idChunk ->
             try {
-                updateRdbWithSingleChunk(idChunk, chunkIndex, productStockMap)
+                updateRdbWithSingleChunk(idChunk, chunkIndex)
             } catch (ex: Exception) {
                 logger.error("chunk #$chunkIndex 처리 중 오류 발생. IDs=$idChunk", ex)
             }
         }
+
+        logger.info("Redis → RDB 재고 동기화 작업 완료.")
     }
 
     private fun updateRdbWithSingleChunk(
         idChunk: List<Long>,
-        chunkIndex: Int,
-        productStockMap: MutableMap<Long, Int>
+        chunkIndex: Int
     ) {
         val inventories: MutableList<Inventory> =
             inventoryPersistence.findAllByProductIdIn(idChunk).toMutableList()
 
         if (inventories.isEmpty()) {
             logger.warn("chunk #$chunkIndex: RDB에서 조회된 엔티티가 없습니다. IDs=$idChunk")
-        } else {
-            inventories.forEach { inventory ->
-                val redisStock = productStockMap[inventory.productId]
-                if (redisStock != null) {
-                    inventory.changeInventory(stock = redisStock)
-                }
-            }
-            inventoryPersistence.saveAll(inventories)
-            logger.info("chunk #$chunkIndex: ${inventories.size}건 재고 업데이트 완료.")
+            return
         }
-    }
 
+        inventories.forEach { inventory ->
+            val redisKey = "$REDIS_KEY_PREFIX${inventory.productId}"
+            val stockValue = redisTemplate.opsForHash<String, String>()
+                .get(redisKey, "stock")
+            val redisStock = stockValue?.toIntOrNull()
+            if (redisStock == null) {
+                logger.warn("chunk #$chunkIndex: Redis 키 '$redisKey' 의 'stock' 필드가 없거나 파싱 실패. 건너뜁니다.")
+                return@forEach
+            }
+            inventory.changeInventory(stock = redisStock)
+        }
+
+        inventoryPersistence.saveAll(inventories)
+        logger.info("chunk #$chunkIndex: ${inventories.size}건 재고 업데이트 완료.")
+    }
 }

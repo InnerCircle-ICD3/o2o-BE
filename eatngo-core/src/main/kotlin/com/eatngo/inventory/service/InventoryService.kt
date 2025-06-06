@@ -4,6 +4,8 @@ import com.eatngo.common.exception.product.InventoryException.InventoryNotFound
 import com.eatngo.extension.orThrow
 import com.eatngo.inventory.domain.Inventory
 import com.eatngo.inventory.dto.InventoryDto
+import com.eatngo.inventory.event.InventorySyncEvent
+import com.eatngo.inventory.event.InventorySyncPublisher
 import com.eatngo.inventory.infra.InventoryPersistence
 import com.eatngo.product.dto.ProductCurrentStockDto
 import com.eatngo.product.dto.ProductDto
@@ -17,7 +19,8 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class InventoryService(
     private val inventoryPersistence: InventoryPersistence,
-    private val storeTotalInventoryTypeDecider: StoreTotalInventoryTypeDecider
+    private val storeTotalInventoryTypeDecider: StoreTotalInventoryTypeDecider,
+    private val inventorySyncPublisher: InventorySyncPublisher
 ) {
 
     @CachePut("inventory", key = "#productDto.id")
@@ -59,6 +62,13 @@ class InventoryService(
             initialStock = initialStock,
         )
 
+        inventorySyncPublisher.publishEvent(
+            InventorySyncEvent(
+                productId = savedInventory.productId,
+                syncedStock = savedInventory.stock
+            )
+        )
+
         return InventoryDto(savedInventory.quantity, savedInventory.stock)
     }
 
@@ -78,6 +88,13 @@ class InventoryService(
         storeTotalInventoryTypeDecider.decideInventoryType(
             storeId = productDto.storeId,
             initialStock = initialStock
+        )
+
+        inventorySyncPublisher.publishEvent(
+            InventorySyncEvent(
+                productId = savedInventory.productId,
+                syncedStock = savedInventory.stock
+            )
         )
 
         return InventoryDto(savedInventory.quantity, savedInventory.stock)
