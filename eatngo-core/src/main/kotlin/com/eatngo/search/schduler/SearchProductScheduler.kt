@@ -1,8 +1,10 @@
 package com.eatngo.search.schduler
 
 import com.eatngo.search.domain.SearchStore
+import com.eatngo.search.dto.Box
 import com.eatngo.search.infra.SearchMapRedisRepository
 import com.eatngo.search.infra.SearchStoreRepository
+import com.eatngo.search.service.SearchService
 import com.eatngo.store.domain.Store
 import com.eatngo.store.infra.StorePersistence
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
@@ -25,6 +27,7 @@ class SearchProductScheduler(
     private val storePersistence: StorePersistence,
     private val searchStoreRepository: SearchStoreRepository,
     private val searchMapRedisRepository: SearchMapRedisRepository,
+    private val searchService: SearchService,
 ) {
     /**
      * 상품 검색 인덱스를 업데이트합니다.
@@ -38,13 +41,34 @@ class SearchProductScheduler(
             return
         }
 
-        // Store 도메인 모델을 검색 인덱스에 맞게 변환
-        val searchStores = stores.map { SearchStore.from(it) }
+        val deleteStoreIds = mutableListOf<Long>()
+        val updateStores = mutableListOf<SearchStore>()
+        val redisBoxMap = mutableMapOf<String, Box>()
+
+        for (store in stores) {
+            // MongoDB 업데이트 정보
+            if (store.deletedAt != null) {
+                deleteStoreIds.add(store.id)
+            } else {
+                updateStores.add(SearchStore.from(store))
+            }
+            // Redis 업데이트 정보
+            val box =
+                searchService.getBox(
+                    latitude = store.address.coordinate.latitude,
+                    longitude = store.address.coordinate.longitude,
+                )
+            val redisKey = searchMapRedisRepository.getKey(box.topLeft)
+            redisBoxMap[redisKey] = box
+        }
 
         // 검색 인덱스 업데이트
-        searchStoreRepository.saveAll(searchStores)
+        searchStoreRepository.saveAll(updateStores)
+        searchStoreRepository.deleteIds(deleteStoreIds)
 
         // 매장 위치 정보 업데이트
-//        searchMapRedisRepository.saveAll()
+        for ((_, box) in redisBoxMap) {
+            searchService.saveBoxRedis(box = box)
+        }
     }
 }
