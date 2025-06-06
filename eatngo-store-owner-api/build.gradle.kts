@@ -40,4 +40,7 @@ dependencies {
     runtimeOnly("com.h2database:h2")
     // redis
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
+
+    testImplementation("org.testcontainers:testcontainers:1.21.1")
+    testImplementation("com.redis:testcontainers-redis:2.2.2")
 }
