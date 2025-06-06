@@ -31,4 +31,6 @@ interface SearchStoreRepository {
         keyword: String,
         size: Int = 5,
     ): List<AutoCompleteStoreNameDto>
+
+    fun saveAll(searchStoreList: List<SearchStore>)
 }

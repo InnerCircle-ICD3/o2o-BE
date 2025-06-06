@@ -13,6 +13,11 @@ object DateTimeUtil {
     }
 
     /**
+     * LocalTime HH:mm 형식의 문자열로 변환합니다.
+     */
+    fun formatLocalTimeToString(time: LocalTime): String = String.format("%02d:%02d", time.hour, time.minute)
+
+    /**
      * HH:mm 형식의 문자열을 LocalTime으로 변환합니다.
      */
     fun parseHHmmToLocalTime(timeString: String): LocalTime {

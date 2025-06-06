@@ -61,5 +61,22 @@ class SearchStoreEntity(
             latitude: Double,
             longitude: Double,
         ): GeoJsonPoint = GeoJsonPoint(longitude, latitude)
+
+        fun from(searchStore: SearchStore): SearchStoreEntity =
+            SearchStoreEntity(
+                storeId = searchStore.storeId,
+                storeName = searchStore.storeName,
+                storeImage = searchStore.storeImage,
+                storeCategory = searchStore.storeCategory.map { it.name },
+                foodCategory = searchStore.foodCategory,
+                roadNameAddress = searchStore.roadNameAddress,
+                coordinate =
+                    toGeoJsonPoint(
+                        latitude = searchStore.coordinate.latitude,
+                        longitude = searchStore.coordinate.longitude,
+                    ),
+                status = searchStore.status.code,
+                businessHours = searchStore.businessHours,
+            )
     }
 }

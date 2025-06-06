@@ -13,6 +13,7 @@ import org.springframework.data.geo.GeoResults
 import org.springframework.data.geo.Metrics
 import org.springframework.data.geo.Point
 import org.springframework.data.geo.Shape
+import org.springframework.data.mongodb.core.BulkOperations
 import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.data.mongodb.core.aggregation.Aggregation
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation
@@ -21,6 +22,7 @@ import org.springframework.data.mongodb.core.geo.GeoJsonPoint
 import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.NearQuery
 import org.springframework.data.mongodb.core.query.Query
+import org.springframework.data.mongodb.core.query.Update
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime
 import com.eatngo.search.dto.Box as CoreBox
@@ -156,6 +158,41 @@ class SearchStoreRepositoryImpl(
                 storeName = it.storeName,
             )
         }
+    }
+
+    override fun saveAll(searchStoreList: List<SearchStore>) {
+        val bulkOps =
+            mongoTemplate
+                .bulkOps(
+                    BulkOperations.BulkMode.UNORDERED,
+                    SearchStoreEntity::class.java,
+                    "SearchStore",
+                )
+
+        searchStoreList.map { searchStore ->
+            val store = SearchStoreEntity.from(searchStore)
+
+            val query = Query(Criteria.where("_id").`is`(store.storeId))
+            val update =
+                Update()
+                    .set("storeName", store.storeName)
+                    .set("storeImage", store.storeImage)
+                    .set("storeCategory", store.storeCategory)
+                    .set("foodCategory", store.foodCategory)
+                    .set("roadNameAddress", store.roadNameAddress)
+                    .set("coordinate", store.coordinate)
+                    .set("status", store.status)
+                    .set("businessHours", store.businessHours)
+                    .set("updatedAt", LocalDateTime.now())
+                    .set("createdAt", store.createdAt)
+
+            bulkOps.upsert(
+                query,
+                update,
+            )
+        }
+
+        bulkOps.execute()
     }
 
     /**
