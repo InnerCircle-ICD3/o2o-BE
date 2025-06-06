@@ -83,6 +83,7 @@ class ProductController(
                 productService.toggleStock(
                     ProductCurrentStockDto(
                         id = request.id,
+                        storeId = storeId,
                         action = request.action,
                         amount = request.amount
                     )
