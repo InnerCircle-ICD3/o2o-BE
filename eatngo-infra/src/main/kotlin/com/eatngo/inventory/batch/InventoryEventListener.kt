@@ -12,7 +12,7 @@ import org.springframework.transaction.event.TransactionalEventListener
 
 @Service
 class InventoryEventListener(
-    private val redisTemplate: ReactiveStringRedisTemplate,
+    private val reactiveStringRedisTemplate: ReactiveStringRedisTemplate,
     private val inventoryScope: CoroutineScope
 ) {
 
@@ -20,7 +20,7 @@ class InventoryEventListener(
     fun onInventoryChangedByOrder(event: InventoryChangedEvent) {
         inventoryScope.launch {
             val changedProductId = event.productId.toString()
-            redisTemplate.opsForSet()
+            reactiveStringRedisTemplate.opsForSet()
                 .add("changedProductIds", changedProductId)
                 .awaitSingle()
         }
@@ -30,7 +30,7 @@ class InventoryEventListener(
     fun onInventoryChangedByStoreOwner(event: InventorySyncEvent) {
         inventoryScope.launch {
             val changedProductId = event.productId.toString()
-            redisTemplate.opsForSet()
+            reactiveStringRedisTemplate.opsForSet()
                 .add("changedProductIds", changedProductId)
                 .awaitSingle()
         }

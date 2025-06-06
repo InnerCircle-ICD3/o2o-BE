@@ -5,10 +5,12 @@ import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.cache.CacheManager
 import org.springframework.cache.annotation.EnableCaching
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.Primary
 import org.springframework.core.env.Environment
 import org.springframework.data.redis.cache.RedisCacheConfiguration
 import org.springframework.data.redis.cache.RedisCacheManager
@@ -36,6 +38,7 @@ class RedisConfig(
 ) {
     val stringSerializer: StringRedisSerializer = StringRedisSerializer()
 
+    @Primary
     @Bean
     fun redisConnectionFactory(): RedisConnectionFactory {
         val host = env.getProperty("spring.data.redis.host") ?: "localhost"
@@ -52,6 +55,22 @@ class RedisConfig(
         redisStandaloneConfiguration.setPassword(password)
 
         return LettuceConnectionFactory(redisStandaloneConfiguration, lettuceClientConfiguration)
+    }
+
+    @Bean
+    fun reactiveRedisConnectionFactory(): ReactiveRedisConnectionFactory {
+        val host = env.getProperty("spring.data.redis.host") ?: "localhost"
+        val port = env.getProperty("spring.data.redis.port")?.toInt() ?: 6379
+        val password = env.getProperty("spring.data.redis.password")
+
+        val lettuceClientConfig = LettuceClientConfiguration.builder()
+            .commandTimeout(Duration.ofSeconds(5))
+            .shutdownTimeout(Duration.ZERO)
+            .build()
+        val standaloneConfig = RedisStandaloneConfiguration(host, port).apply {
+            setPassword(password)
+        }
+        return LettuceConnectionFactory(standaloneConfig, lettuceClientConfig)
     }
 
     @Bean(value = ["redisTemplate"])
@@ -72,7 +91,10 @@ class RedisConfig(
     }
 
     @Bean
-    fun cacheManager(factory: RedisConnectionFactory): CacheManager {
+    fun cacheManager(
+        @Qualifier("redisConnectionFactory")
+        factory: RedisConnectionFactory
+    ): CacheManager {
         val dtoMapper = objectMapper.copy().apply {
             registerKotlinModule()
             activateDefaultTyping(
