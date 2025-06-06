@@ -45,7 +45,9 @@ class ReviewJpaEntity(
                     images = Images(reviewJpaEntity.images),
                     customerId = reviewJpaEntity.customerId,
                     createdAt = reviewJpaEntity.createdAt,
+                    createdBy = reviewJpaEntity.createdBy,
                     updatedAt = reviewJpaEntity.updatedAt,
+                    updatedBy = reviewJpaEntity.updatedBy,
                     deletedAt = reviewJpaEntity.deletedAt
                 )
             }

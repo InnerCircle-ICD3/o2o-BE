@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.Query
 
 interface ReviewRdbRepository : JpaRepository<ReviewJpaEntity, Long> {
     @Query("SELECT r FROM ReviewJpaEntity r WHERE r.orderId = :orderId")
-    fun existsByOrderId(orderId: Long): Boolean
+    fun findByOrderId(orderId: Long): ReviewJpaEntity?
 }

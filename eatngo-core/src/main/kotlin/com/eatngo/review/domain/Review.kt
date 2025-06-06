@@ -10,9 +10,9 @@ class Review(
     val images: Images,
     val customerId: Long,
     val createdAt: LocalDateTime = LocalDateTime.now(),
-    val createdBy: Long = 0,
+    val createdBy: Long? = null,
     val updatedAt: LocalDateTime = LocalDateTime.now(),
-    val updatedBy: Long = 0,
+    val updatedBy: Long? = null,
     val deletedAt: LocalDateTime? = null
 ) {
     companion object {

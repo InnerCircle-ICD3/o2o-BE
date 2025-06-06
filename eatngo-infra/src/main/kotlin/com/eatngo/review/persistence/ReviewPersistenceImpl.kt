@@ -16,5 +16,5 @@ class ReviewPersistenceImpl(
         )
     )
 
-    override fun existsByOrderId(orderId: Long) = reviewRdbRepository.existsByOrderId(orderId)
+    override fun existsByOrderId(orderId: Long) = reviewRdbRepository.findByOrderId(orderId) != null
 }

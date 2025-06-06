@@ -17,7 +17,7 @@ class ReviewUseCase(
         val customer = customerService.getCustomerById(dto.customerId)
         val order = orderService.getById(dto.orderId)
 
-        check(!reviewService.existsReviewByOrderId(order.id)) { "이미 해당 주문에 리뷰가 작성되어 있습니다." }
+        require(!reviewService.existsReviewByOrderId(order.id)) { "이미 해당 주문에 리뷰가 작성되어 있습니다." }
 
         return ReviewDto.from(
             reviewService.createReview(
