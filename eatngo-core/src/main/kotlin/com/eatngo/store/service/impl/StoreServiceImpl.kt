@@ -56,10 +56,10 @@ class StoreServiceImpl(
 
         val updateSuccess = storePersistence.updateStatus(id, newStatus)
         if (!updateSuccess) {
-            throw StoreException.StoreNotFound(id)
+            throw StoreException.StoreStatusUpdateFailed(id, newStatus)
         }
 
-        return storePersistence.findById(id).orThrow { StoreException.StoreNotFound(id) }
+        return existingStore
     }
 
     override fun deleteStore(id: Long, storeOwnerId: Long): Boolean {

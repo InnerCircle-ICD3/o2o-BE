@@ -6,9 +6,6 @@ import com.eatngo.store.domain.Store
 import com.eatngo.store.infra.StorePersistence
 import com.eatngo.store.rdb.entity.StoreJpaEntity
 import com.eatngo.store.rdb.repository.StoreRdbRepository
-import com.eatngo.store.rdb.json_converter.BusinessHourJson
-import com.eatngo.store.rdb.json_converter.StoreCategoryJson
-import com.eatngo.store.rdb.json_converter.FoodCategoryJson
 import org.springframework.stereotype.Component
 
 /**
