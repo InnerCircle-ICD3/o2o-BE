@@ -4,7 +4,6 @@ import com.eatngo.common.constant.StoreEnum
 import com.eatngo.store.event.StoreCUDEvent
 import com.eatngo.store.event.StoreCUDEventType
 import com.eatngo.store.event.StoreStatusChangedEvent
-import org.slf4j.LoggerFactory
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Component
 
@@ -22,14 +21,7 @@ class DirectStoreEventPublisher(
             userId = userId,
             eventType = eventType
         )
-        
-        val eventTypeMsg = when (eventType) {
-            StoreCUDEventType.CREATED -> "생성"
-            StoreCUDEventType.UPDATED -> "정보 업데이트"
-            StoreCUDEventType.DELETED -> "삭제"
-        }
-        
-        log.info("매장 {} 이벤트 발행: storeId={}, userId={}", eventTypeMsg, storeId, userId)
+
         eventPublisher.publishEvent(event)
     }
 
@@ -45,12 +37,7 @@ class DirectStoreEventPublisher(
             previousStatus = previousStatus,
             currentStatus = currentStatus
         )
-        log.info("매장 상태 변경 이벤트 발행: storeId={}, previousStatus={}, currentStatus={}", 
-            storeId, previousStatus, currentStatus)
-        eventPublisher.publishEvent(event)
-    }
 
-    companion object {
-        private val log = LoggerFactory.getLogger(DirectStoreEventPublisher::class.java)
+        eventPublisher.publishEvent(event)
     }
 } 

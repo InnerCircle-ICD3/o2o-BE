@@ -45,24 +45,20 @@ class StoreServiceImpl(
 
     override fun updateStoreStatus(id: Long, newStatus: StoreEnum.StoreStatus, storeOwnerId: Long?): Store {
         val existingStore = storePersistence.findById(id).orThrow { StoreException.StoreNotFound(id) }
-        
         // 점주가 직접 변경하는 경우에만 권한 확인
         storeOwnerId?.let { existingStore.requireOwner(it) }
 
-        // 도메인 상태 전이 로직 사용 (비즈니스 룰 검증)
         when (newStatus) {
             StoreEnum.StoreStatus.OPEN -> existingStore.toOpen()
             StoreEnum.StoreStatus.CLOSED -> existingStore.toClose()
             StoreEnum.StoreStatus.PENDING -> existingStore.toPending()
         }
 
-        // 상태만 DB에 효율적으로 업데이트
         val updateSuccess = storePersistence.updateStatus(id, newStatus)
         if (!updateSuccess) {
             throw StoreException.StoreNotFound(id)
         }
-        
-        // 업데이트된 매장 정보 조회해서 반환
+
         return storePersistence.findById(id).orThrow { StoreException.StoreNotFound(id) }
     }
 

@@ -19,7 +19,7 @@ interface StoreService {
     fun updateStore(id: Long, request: StoreUpdateDto): Store
 
     /**
-     * 상점 상태 변경 (점주)
+     * 상점 상태 변경
      */
     fun updateStoreStatus(id: Long, newStatus: StoreEnum.StoreStatus, storeOwnerId: Long? = null): Store
 
