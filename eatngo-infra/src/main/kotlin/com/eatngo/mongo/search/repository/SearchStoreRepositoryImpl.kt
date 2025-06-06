@@ -1,14 +1,16 @@
-package com.eatngo.mongo.repository.search
+package com.eatngo.mongo.search.repository
 
-import com.eatngo.mongo.entity.search.SearchStoreEntity
+import com.eatngo.mongo.search.dto.SearchStoreAutoCompleteDto
+import com.eatngo.mongo.search.entity.SearchStoreEntity
 import com.eatngo.search.domain.SearchStore
 import com.eatngo.search.domain.SearchStoreStatus
 import com.eatngo.search.dto.AutoCompleteStoreNameDto
+import com.eatngo.search.dto.Box
 import com.eatngo.search.dto.SearchFilter
 import com.eatngo.search.dto.SearchStoreWithDistance
 import com.eatngo.search.infra.SearchStoreRepository
 import org.bson.Document
-import org.springframework.data.geo.Box
+import org.springframework.data.domain.Sort
 import org.springframework.data.geo.GeoResults
 import org.springframework.data.geo.Metrics
 import org.springframework.data.geo.Point
@@ -25,17 +27,17 @@ import org.springframework.data.mongodb.core.query.Query
 import org.springframework.data.mongodb.core.query.Update
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime
-import com.eatngo.search.dto.Box as CoreBox
 
 @Component
 class SearchStoreRepositoryImpl(
     private val mongoTemplate: MongoTemplate,
 ) : SearchStoreRepository {
     val searchStoreIndex = "search-store"
+    val autoCompleteIndex = "store-auto-complete"
 
-    override fun findBox(box: CoreBox): List<SearchStore> {
+    override fun findBox(box: Box): List<SearchStore> {
         val mongoBox: Shape =
-            Box(
+            org.springframework.data.geo.Box(
                 GeoJsonPoint(box.topLeft.longitude, box.topLeft.latitude),
                 GeoJsonPoint(box.bottomRight.longitude, box.bottomRight.latitude),
             )
@@ -135,11 +137,16 @@ class SearchStoreRepositoryImpl(
         val searchOp = getAutocompleteOperation(keyword)
         val limitOp = Aggregation.limit(size.toLong())
         val projectionOp =
-            Aggregation.project("_id", "storeName") // _id, storeName 필드만 추출
+            Aggregation
+                .project("_id", "storeName") // _id, storeName 필드만 추출
+                .andExpression("metaSearchScore")
+                .`as`("score")
+        val sortOp = Aggregation.sort(Sort.by(Sort.Direction.DESC, "score"))
 
         val pipeline =
             Aggregation.newAggregation(
                 searchOp,
+                sortOp,
                 limitOp,
                 projectionOp,
             )
@@ -149,7 +156,7 @@ class SearchStoreRepositoryImpl(
                 .aggregate(
                     pipeline,
                     "SearchStore",
-                    SearchStoreEntity::class.java,
+                    SearchStoreAutoCompleteDto::class.java,
                 ).mappedResults
 
         return result.map {
@@ -268,7 +275,7 @@ class SearchStoreRepositoryImpl(
             Document(
                 "\$search",
                 Document()
-                    .append("index", "store-autocomplete-index")
+                    .append("index", autoCompleteIndex)
                     .append(
                         "autocomplete",
                         Document()
