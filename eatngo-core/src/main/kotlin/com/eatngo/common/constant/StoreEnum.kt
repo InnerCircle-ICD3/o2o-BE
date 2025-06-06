@@ -60,7 +60,7 @@ object StoreEnum {
     enum class SubscriptionStatus {
         CREATED,
         RESUMED,
-        CANCELED
+        CANCELED,
     }
 
     /**
@@ -77,7 +77,8 @@ object StoreEnum {
         FRUIT("과일"),
         PIZZA("피자"),
         SALAD("샐러드"),
-        RICECAKE("떡")
+        RICECAKE("떡"),
+        SANDWICH("샌드위치"),
         ;
 
         companion object {
