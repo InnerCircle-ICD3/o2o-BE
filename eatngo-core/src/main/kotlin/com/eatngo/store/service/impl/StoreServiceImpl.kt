@@ -43,29 +43,27 @@ class StoreServiceImpl(
         return storePersistence.save(existingStore)
     }
 
-    override fun updateStoreStatus(id: Long, hasStock: Boolean): Store {
+    override fun updateStoreStatus(id: Long, newStatus: StoreEnum.StoreStatus, storeOwnerId: Long?): Store {
         val existingStore = storePersistence.findById(id).orThrow { StoreException.StoreNotFound(id) }
-        existingStore.updateStoreStatus(hasStock)
-        return storePersistence.save(existingStore)
-    }
+        
+        // 점주가 직접 변경하는 경우에만 권한 확인
+        storeOwnerId?.let { existingStore.requireOwner(it) }
 
-    override fun updateStoreStatus(id: Long, newStatus: String, storeOwnerId: Long): Store {
-        val existingStore = storePersistence.findById(id).orThrow { StoreException.StoreNotFound(id) }
-        existingStore.requireOwner(storeOwnerId)
-
-        val status = try {
-            StoreEnum.StoreStatus.valueOf(newStatus.trim().uppercase())
-        } catch (e: IllegalArgumentException) {
-            throw StoreException.StoreStatusInvalid(newStatus)
-        }
-
-        when (status) {
+        // 도메인 상태 전이 로직 사용 (비즈니스 룰 검증)
+        when (newStatus) {
             StoreEnum.StoreStatus.OPEN -> existingStore.toOpen()
             StoreEnum.StoreStatus.CLOSED -> existingStore.toClose()
             StoreEnum.StoreStatus.PENDING -> existingStore.toPending()
         }
 
-        return storePersistence.save(existingStore)
+        // 상태만 DB에 효율적으로 업데이트
+        val updateSuccess = storePersistence.updateStatus(id, newStatus)
+        if (!updateSuccess) {
+            throw StoreException.StoreNotFound(id)
+        }
+        
+        // 업데이트된 매장 정보 조회해서 반환
+        return storePersistence.findById(id).orThrow { StoreException.StoreNotFound(id) }
     }
 
     override fun deleteStore(id: Long, storeOwnerId: Long): Boolean {

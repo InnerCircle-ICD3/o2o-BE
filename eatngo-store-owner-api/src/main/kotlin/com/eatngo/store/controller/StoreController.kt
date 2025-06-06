@@ -4,10 +4,8 @@ import com.eatngo.auth.annotaion.StoreOwnerId
 import com.eatngo.common.response.ApiResponse
 import com.eatngo.store.docs.controller.StoreOwnerControllerDocs
 import com.eatngo.store.dto.*
+import com.eatngo.store.usecase.StoreCUDUseCase
 import com.eatngo.store.usecase.StoreOwnerStatusChangeUseCase
-import com.eatngo.store.usecase.StoreOwnerStoreCreatedUseCase
-import com.eatngo.store.usecase.StoreOwnerStoreDeletedUseCase
-import com.eatngo.store.usecase.StoreOwnerStoreUpdatedUseCase
 import com.eatngo.store.usecase.StoreQueryUseCase
 import org.springframework.web.bind.annotation.*
 import java.time.LocalDateTime
@@ -15,10 +13,8 @@ import java.time.LocalDateTime
 @RestController
 @RequestMapping("/api/v1/stores")
 class StoreController(
-    private val storeOwnerStoreCreatedUseCase: StoreOwnerStoreCreatedUseCase,
-    private val storeOwnerStoreUpdatedUseCase: StoreOwnerStoreUpdatedUseCase,
+    private val storeCUDUseCase: StoreCUDUseCase,
     private val storeOwnerStatusChangeUseCase: StoreOwnerStatusChangeUseCase,
-    private val storeOwnerStoreDeletedUseCase: StoreOwnerStoreDeletedUseCase,
     private val storeQueryUseCase: StoreQueryUseCase
 ) : StoreOwnerControllerDocs {
 
@@ -31,7 +27,7 @@ class StoreController(
 
     @PostMapping
     override fun createStore(@RequestBody request: StoreCreateRequest, @StoreOwnerId storeOwnerId: Long): ApiResponse<StoreCUDResponse> {
-        val storeDto = storeOwnerStoreCreatedUseCase.create(request.toStoreCreateDto(storeOwnerId))
+        val storeDto = storeCUDUseCase.createStore(request.toStoreCreateDto(storeOwnerId))
         return ApiResponse.success(StoreCUDResponse(storeId = storeDto.storeId, actionTime = storeDto.createdAt))
     }
     
@@ -41,7 +37,7 @@ class StoreController(
         @RequestBody request: StoreUpdateRequest,
         @StoreOwnerId storeOwnerId: Long
     ): ApiResponse<StoreCUDResponse> {
-        val storeDto = storeOwnerStoreUpdatedUseCase.update(storeId, storeOwnerId, request.toStoreUpdateDto(storeOwnerId))
+        val storeDto = storeCUDUseCase.updateStore(storeId, storeOwnerId, request.toStoreUpdateDto(storeOwnerId))
         return ApiResponse.success(StoreCUDResponse(storeId = storeDto.storeId, actionTime = storeDto.updatedAt))
     }
     
@@ -57,7 +53,7 @@ class StoreController(
 
     @DeleteMapping("/{storeId}")
     override fun deleteStore(@PathVariable storeId: Long, @StoreOwnerId storeOwnerId: Long): ApiResponse<StoreCUDResponse> {
-        val response = storeOwnerStoreDeletedUseCase.delete(storeId, storeOwnerId)
+        val response = storeCUDUseCase.deleteStore(storeId, storeOwnerId)
         return ApiResponse.success(StoreCUDResponse(storeId = response, actionTime = LocalDateTime.now()))
     }
 } 

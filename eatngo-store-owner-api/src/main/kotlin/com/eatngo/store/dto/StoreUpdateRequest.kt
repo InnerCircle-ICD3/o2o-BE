@@ -1,5 +1,6 @@
 package com.eatngo.store.dto
 
+import com.eatngo.common.constant.StoreEnum
 import com.eatngo.store.docs.request.StoreStatusUpdateRequestDocs
 import com.eatngo.store.docs.request.StoreUpdateRequestDocs
 
@@ -82,4 +83,4 @@ data class StoreUpdateRequest(
     }
 }
 
-data class StoreStatusUpdateRequest(override val status: String) : StoreStatusUpdateRequestDocs
+data class StoreStatusUpdateRequest(override val status: StoreEnum.StoreStatus) : StoreStatusUpdateRequestDocs

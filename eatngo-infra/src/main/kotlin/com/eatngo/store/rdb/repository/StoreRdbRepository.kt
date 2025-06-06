@@ -1,5 +1,6 @@
 package com.eatngo.store.rdb.repository
 
+import com.eatngo.common.constant.StoreEnum
 import com.eatngo.store.rdb.entity.StoreJpaEntity
 import org.springframework.data.jpa.repository.EntityGraph
 import org.springframework.data.jpa.repository.JpaRepository
@@ -30,6 +31,16 @@ interface StoreRdbRepository : JpaRepository<StoreJpaEntity, Long> {
     where s.id in :ids
     """)
     fun findAllByIdIn(ids: List<Long>): List<StoreJpaEntity>
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query(
+        """
+        UPDATE StoreJpaEntity s
+        SET s.status = :status, s.updatedAt = CURRENT_TIMESTAMP
+        WHERE s.id = :storeId
+    """
+    )
+    fun updateStatus(storeId: Long, status: StoreEnum.StoreStatus): Int
 
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query(

@@ -7,13 +7,9 @@ object StoreEnum {
     enum class StoreStatus {
         OPEN {
             override fun close(): StoreStatus = CLOSED
-
-            override fun pending(): StoreStatus = PENDING
         },
         CLOSED {
             override fun open(): StoreStatus = OPEN
-
-            override fun pending(): StoreStatus = PENDING
         },
         PENDING {
             override fun open(): StoreStatus = OPEN
