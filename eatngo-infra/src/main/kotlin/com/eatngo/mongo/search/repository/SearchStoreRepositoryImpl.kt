@@ -1,14 +1,14 @@
-package com.eatngo.mongo.repository.search
+package com.eatngo.mongo.search.repository
 
-import com.eatngo.mongo.entity.search.SearchStoreEntity
+import com.eatngo.mongo.search.entity.SearchStoreEntity
 import com.eatngo.search.domain.SearchStore
 import com.eatngo.search.domain.SearchStoreStatus
 import com.eatngo.search.dto.AutoCompleteStoreNameDto
+import com.eatngo.search.dto.Box
 import com.eatngo.search.dto.SearchFilter
 import com.eatngo.search.dto.SearchStoreWithDistance
 import com.eatngo.search.infra.SearchStoreRepository
 import org.bson.Document
-import org.springframework.data.geo.Box
 import org.springframework.data.geo.GeoResults
 import org.springframework.data.geo.Metrics
 import org.springframework.data.geo.Point
@@ -23,18 +23,17 @@ import org.springframework.data.mongodb.core.query.NearQuery
 import org.springframework.data.mongodb.core.query.Query
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime
-import com.eatngo.search.dto.Box as CoreBox
 
 @Component
 class SearchStoreRepositoryImpl(
     private val mongoTemplate: MongoTemplate,
 ) : SearchStoreRepository {
     val searchStoreIndex = "search-store"
-    val autoCompleteIndex = "store-autocomplete"
+    val autoCompleteIndex = "store-auto-complete"
 
-    override fun findBox(box: CoreBox): List<SearchStore> {
+    override fun findBox(box: Box): List<SearchStore> {
         val mongoBox: Shape =
-            Box(
+            org.springframework.data.geo.Box(
                 GeoJsonPoint(box.topLeft.longitude, box.topLeft.latitude),
                 GeoJsonPoint(box.bottomRight.longitude, box.bottomRight.latitude),
             )
@@ -152,7 +151,7 @@ class SearchStoreRepositoryImpl(
                 ).mappedResults
 
         return result.map {
-            AutoCompleteStoreNameDto.from(
+            AutoCompleteStoreNameDto.Companion.from(
                 storeId = it.storeId,
                 storeName = it.storeName,
             )

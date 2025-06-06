@@ -1,4 +1,4 @@
-package com.eatngo.mongo.entity.search
+package com.eatngo.mongo.search.entity
 
 import com.eatngo.common.constant.StoreEnum
 import com.eatngo.common.exception.search.SearchException
@@ -46,11 +46,11 @@ class SearchStoreEntity(
             foodCategory = foodCategory,
             roadNameAddress = roadNameAddress,
             coordinate =
-                Coordinate.from(
+                Coordinate.Companion.from(
                     latitude = coordinate.coordinates[1],
                     longitude = coordinate.coordinates[0],
                 ),
-            status = SearchStoreStatus.from(status),
+            status = SearchStoreStatus.Companion.from(status),
             businessHours = businessHours,
             updatedAt = updatedAt,
             createdAt = createdAt,
