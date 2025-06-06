@@ -7,7 +7,6 @@ import com.eatngo.inventory.event.InventoryChangedType.*
 import com.eatngo.inventory.infra.InventoryPersistence
 import com.eatngo.product.domain.Product
 import com.eatngo.product.infra.ProductPersistence
-import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
 
 @Service
@@ -21,7 +20,6 @@ class StoreTotalInventoryTypeDecider(
         private const val IN_STOCK_THRESHOLD = 5
     }
 
-    @Cacheable("storeProducts", key = "#storeId")
     fun decideInventoryType(storeId: Long, initialStock: Int): InventoryChangedType {
         val allProducts: List<Product> = productPersistence.findAllActivatedProductByStoreId(storeId)
 
