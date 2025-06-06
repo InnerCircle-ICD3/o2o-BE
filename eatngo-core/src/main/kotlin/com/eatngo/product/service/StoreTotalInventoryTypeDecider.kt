@@ -4,8 +4,6 @@ import com.eatngo.common.exception.product.InventoryException.InventoryNotFound
 import com.eatngo.extension.orThrow
 import com.eatngo.inventory.event.InventoryChangedType
 import com.eatngo.inventory.event.InventoryChangedType.*
-import com.eatngo.inventory.event.InventorySyncEvent
-import com.eatngo.inventory.event.InventorySyncPublisher
 import com.eatngo.inventory.infra.InventoryPersistence
 import com.eatngo.product.domain.Product
 import com.eatngo.product.infra.ProductPersistence

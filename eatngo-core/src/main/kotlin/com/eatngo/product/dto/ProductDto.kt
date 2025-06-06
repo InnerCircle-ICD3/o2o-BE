@@ -3,7 +3,6 @@ package com.eatngo.product.dto
 import com.eatngo.inventory.dto.InventoryDto
 import com.eatngo.product.domain.Product
 import com.eatngo.product.domain.ProductPrice
-import com.eatngo.store.vo.StoreNameVO
 import java.time.LocalDateTime
 
 data class ProductDto(
