@@ -76,3 +76,19 @@ atlas tokenizer 설정
     - user_dictionary 없으면 -> "먹", "태", "깡"
 - stopwords: 불용어. 검색에서 제외(조사, 접속사, 추임새 등)
   - `"stopwords": ["그리고", "또한", "은", "는", "이", "가"]`
+
+## 자동 검색 완성어 인덱스 생성
+- autoComplete 인덱스는 Atlas Search에서 제공하는 기능으로, 사용자가 입력하는 검색어에 대한 자동 완성 기능을 제공
+- string 필드에 대해서만 생성 가능하며, 배열 필드에 대해서는 생성할 수 없음
+```json
+{
+  "mappings": {
+    "dynamic": false,
+    "fields": {
+      "storeName": {
+        "type": "autocomplete"
+      }
+    }
+  }
+}
+```
