@@ -5,17 +5,21 @@ import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.cache.CacheManager
 import org.springframework.cache.annotation.EnableCaching
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.Primary
 import org.springframework.core.env.Environment
 import org.springframework.data.redis.cache.RedisCacheConfiguration
 import org.springframework.data.redis.cache.RedisCacheManager
+import org.springframework.data.redis.connection.ReactiveRedisConnectionFactory
 import org.springframework.data.redis.connection.RedisConnectionFactory
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration
 import org.springframework.data.redis.connection.lettuce.LettuceClientConfiguration
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory
+import org.springframework.data.redis.core.ReactiveStringRedisTemplate
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.data.redis.repository.configuration.EnableRedisRepositories
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer
@@ -34,6 +38,7 @@ class RedisConfig(
 ) {
     val stringSerializer: StringRedisSerializer = StringRedisSerializer()
 
+    @Primary
     @Bean
     fun redisConnectionFactory(): RedisConnectionFactory {
         val host = env.getProperty("spring.data.redis.host") ?: "localhost"
@@ -52,6 +57,22 @@ class RedisConfig(
         return LettuceConnectionFactory(redisStandaloneConfiguration, lettuceClientConfiguration)
     }
 
+    @Bean
+    fun reactiveRedisConnectionFactory(): ReactiveRedisConnectionFactory {
+        val host = env.getProperty("spring.data.redis.host") ?: "localhost"
+        val port = env.getProperty("spring.data.redis.port")?.toInt() ?: 6379
+        val password = env.getProperty("spring.data.redis.password")
+
+        val lettuceClientConfig = LettuceClientConfiguration.builder()
+            .commandTimeout(Duration.ofSeconds(5))
+            .shutdownTimeout(Duration.ZERO)
+            .build()
+        val standaloneConfig = RedisStandaloneConfiguration(host, port).apply {
+            setPassword(password)
+        }
+        return LettuceConnectionFactory(standaloneConfig, lettuceClientConfig)
+    }
+
     @Bean(value = ["redisTemplate"])
     fun redisTemplate(redisConnectionFactory: RedisConnectionFactory): RedisTemplate<ByteArray?, ByteArray?> {
         val template = RedisTemplate<ByteArray?, ByteArray?>()
@@ -63,7 +84,17 @@ class RedisConfig(
     }
 
     @Bean
-    fun cacheManager(factory: RedisConnectionFactory): CacheManager {
+    fun reactiveStringRedisTemplate(
+        reactiveFactory: ReactiveRedisConnectionFactory
+    ): ReactiveStringRedisTemplate {
+        return ReactiveStringRedisTemplate(reactiveFactory)
+    }
+
+    @Bean
+    fun cacheManager(
+        @Qualifier("redisConnectionFactory")
+        factory: RedisConnectionFactory
+    ): CacheManager {
         val dtoMapper = objectMapper.copy().apply {
             registerKotlinModule()
             activateDefaultTyping(

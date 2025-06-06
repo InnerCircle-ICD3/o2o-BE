@@ -14,6 +14,7 @@ data class ProductDto(
     val price: ProductPriceDto,
     var imageUrl: String? = null,
     val storeId: Long,
+    val storeName: String? = null,
     val foodTypes: List<String>,
     var status: String? = "ACTIVE",
     var createdAt: LocalDateTime? = null,
@@ -24,6 +25,7 @@ data class ProductDto(
             product: Product,
             imageUrl: String?,
             inventoryDto: InventoryDto,
+            storeName: String?,
         ): ProductDto =
             ProductDto(
                 id = product.id,
@@ -35,6 +37,7 @@ data class ProductDto(
                 price = ProductPriceDto.from(product.price),
                 imageUrl = imageUrl,
                 storeId = product.storeId,
+                storeName = storeName,
                 foodTypes = product.foodTypes.foods.map { it.name },
                 status = product.status.name,
                 createdAt = product.createdAt,

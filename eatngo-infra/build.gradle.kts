@@ -22,6 +22,10 @@ dependencies {
     // AWS S3 의존성
     implementation("software.amazon.awssdk:s3:2.23.15")
 
+    // 코루틴 의존성 추가
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.7.3")
+
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("io.kotest:kotest-property:5.8.1")
     testImplementation("io.kotest.extensions:kotest-extensions-spring:1.1.2")

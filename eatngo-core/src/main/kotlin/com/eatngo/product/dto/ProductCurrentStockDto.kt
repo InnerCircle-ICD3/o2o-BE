@@ -5,6 +5,7 @@ import com.eatngo.product.domain.Product
 
 data class ProductCurrentStockDto(
     val id: Long,
+    val storeId: Long,
     val action: String,
     val amount: Int
 )
