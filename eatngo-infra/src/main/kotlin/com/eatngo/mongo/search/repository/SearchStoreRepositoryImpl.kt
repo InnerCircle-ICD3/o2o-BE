@@ -1,5 +1,6 @@
 package com.eatngo.mongo.search.repository
 
+import com.eatngo.mongo.search.dto.SearchStoreAutoCompleteDto
 import com.eatngo.mongo.search.entity.SearchStoreEntity
 import com.eatngo.search.domain.SearchStore
 import com.eatngo.search.domain.SearchStoreStatus
@@ -147,7 +148,7 @@ class SearchStoreRepositoryImpl(
                 .aggregate(
                     pipeline,
                     "SearchStore",
-                    SearchStoreEntity::class.java,
+                    SearchStoreAutoCompleteDto::class.java,
                 ).mappedResults
 
         return result.map {
