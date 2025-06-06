@@ -4,6 +4,8 @@ import com.eatngo.common.exception.product.InventoryException.InventoryNotFound
 import com.eatngo.extension.orThrow
 import com.eatngo.inventory.event.InventoryChangedType
 import com.eatngo.inventory.event.InventoryChangedType.*
+import com.eatngo.inventory.event.InventorySyncEvent
+import com.eatngo.inventory.event.InventorySyncPublisher
 import com.eatngo.inventory.infra.InventoryPersistence
 import com.eatngo.product.domain.Product
 import com.eatngo.product.infra.ProductPersistence
@@ -13,7 +15,7 @@ import org.springframework.stereotype.Service
 @Service
 class StoreTotalInventoryTypeDecider(
     private val inventoryPersistence: InventoryPersistence,
-    private val productPersistence: ProductPersistence
+    private val productPersistence: ProductPersistence,
 ) {
 
     companion object {
