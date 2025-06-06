@@ -12,10 +12,12 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.core.env.Environment
 import org.springframework.data.redis.cache.RedisCacheConfiguration
 import org.springframework.data.redis.cache.RedisCacheManager
+import org.springframework.data.redis.connection.ReactiveRedisConnectionFactory
 import org.springframework.data.redis.connection.RedisConnectionFactory
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration
 import org.springframework.data.redis.connection.lettuce.LettuceClientConfiguration
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory
+import org.springframework.data.redis.core.ReactiveStringRedisTemplate
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.data.redis.repository.configuration.EnableRedisRepositories
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer
@@ -60,6 +62,13 @@ class RedisConfig(
         template.hashKeySerializer = stringSerializer
         template.valueSerializer = stringSerializer
         return template
+    }
+
+    @Bean
+    fun reactiveStringRedisTemplate(
+        reactiveFactory: ReactiveRedisConnectionFactory
+    ): ReactiveStringRedisTemplate {
+        return ReactiveStringRedisTemplate(reactiveFactory)
     }
 
     @Bean
