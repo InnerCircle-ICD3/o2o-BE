@@ -1,7 +1,7 @@
 package com.eatngo.store.persistence
 
 import com.eatngo.aop.SoftDeletedFilter
-import com.eatngo.extension.mapOrNull
+import com.eatngo.common.constant.StoreEnum
 import com.eatngo.store.domain.Store
 import com.eatngo.store.infra.StorePersistence
 import com.eatngo.store.rdb.entity.StoreJpaEntity
@@ -20,7 +20,8 @@ class StorePersistenceImpl(
     override fun findById(id: Long): Store? =
         storeRdbRepository
             .findById(id)
-            .mapOrNull(StoreJpaEntity::toStore)
+            .map(StoreJpaEntity::toStore)
+            .orElse(null)
 
     @SoftDeletedFilter
     override fun findAllByIds(storeIds: List<Long>): List<Store> =
@@ -38,6 +39,9 @@ class StorePersistenceImpl(
                 StoreJpaEntity.from(store)
             )
         )
+
+    override fun updateStatus(storeId: Long, status: StoreEnum.StoreStatus): Boolean =
+        storeRdbRepository.updateStatus(storeId, status) > 0
 
     override fun deleteById(id: Long): Boolean =
         storeRdbRepository.softDeleteById(id) > 0

@@ -24,9 +24,14 @@ interface StorePersistence {
     fun findByOwnerId(storeOwnerId: Long): List<Store>
 
     /**
-     * 매장 저장
+     * 매장 저장 (전체 정보 업데이트)
      */
     fun save(store: Store): Store
+    
+    /**
+     * 매장 상태만 업데이트 (주소 정보 변경 없이)
+     */
+    fun updateStatus(storeId: Long, status: StoreEnum.StoreStatus): Boolean
 
     /**
     * 매장 삭제 (soft delete)

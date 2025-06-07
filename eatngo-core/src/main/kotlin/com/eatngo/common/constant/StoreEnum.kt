@@ -2,27 +2,14 @@ package com.eatngo.common.constant
 
 object StoreEnum {
     /**
-     * 주소 타입
-     */
-    enum class AddressType {
-        ROAD, // 도로명 주소
-        ADMIN, // 행정동
-        LEGAL, // 법정동
-    }
-
-    /**
      * 매장 상태
      */
     enum class StoreStatus {
         OPEN {
             override fun close(): StoreStatus = CLOSED
-
-            override fun pending(): StoreStatus = PENDING
         },
         CLOSED {
             override fun open(): StoreStatus = OPEN
-
-            override fun pending(): StoreStatus = PENDING
         },
         PENDING {
             override fun open(): StoreStatus = OPEN

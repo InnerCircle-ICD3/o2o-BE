@@ -1,5 +1,6 @@
 package com.eatngo.store.docs.request
 
+import com.eatngo.common.constant.StoreEnum
 import io.swagger.v3.oas.annotations.media.Schema
 
 
@@ -11,5 +12,5 @@ interface StoreStatusUpdateRequestDocs{
         allowableValues = ["OPEN", "CLOSED"],
         required = true
     )
-    val status: String
+    val status: StoreEnum.StoreStatus
 }

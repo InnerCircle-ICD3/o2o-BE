@@ -1,5 +1,6 @@
 package com.eatngo.common.exception.store
 
+import com.eatngo.common.constant.StoreEnum
 import com.eatngo.common.error.BusinessErrorCode
 import com.eatngo.common.exception.BusinessException
 import org.slf4j.event.Level
@@ -48,5 +49,11 @@ open class StoreException(
         errorCode = BusinessErrorCode.STORE_OWNER_FORBIDDEN,
         message = "점주아이디: $storeOwnerId 는 ${BusinessErrorCode.STORE_OWNER_FORBIDDEN.message}",
         data = mapOf("storeOwnerId" to storeOwnerId)
+    )
+
+    class StoreStatusUpdateFailed(storeId: Long, status: StoreEnum.StoreStatus) : StoreException(
+        errorCode = BusinessErrorCode.STORE_UPDATE_FAILED,
+        message = "매장 상태 업데이트 실패: 매장 ID $storeId, 상태 $status",
+        data = mapOf("storeId" to storeId, "status" to status)
     )
 }

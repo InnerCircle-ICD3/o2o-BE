@@ -1,5 +1,6 @@
 package com.eatngo.store.service
 
+import com.eatngo.common.constant.StoreEnum
 import com.eatngo.store.domain.Store
 import com.eatngo.store.dto.*
 
@@ -18,14 +19,9 @@ interface StoreService {
     fun updateStore(id: Long, request: StoreUpdateDto): Store
 
     /**
-     * 상점 상태 변경 (시스템)
+     * 상점 상태 변경
      */
-    fun updateStoreStatus(id: Long, hasStock: Boolean): Store
-
-    /**
-     * 상점 상태 변경 (점주)
-     */
-    fun updateStoreStatus(id: Long, newStatus: String, storeOwnerId: Long): Store
+    fun updateStoreStatus(id: Long, newStatus: StoreEnum.StoreStatus, storeOwnerId: Long? = null): Store
 
     /**
      * 상점 삭제 (Soft Delete)
