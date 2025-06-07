@@ -12,6 +12,7 @@ class WebMvcConfig : WebMvcConfigurer {
             .allowedOriginPatterns(
                 "https://eatngo.org",
                 "https://www.eatngo.org",
+                "https://ceo.eatngo.org",
                 "https://store-owner.eatngo.org",
                 "https://customer.eatngo.org",
                 "http://localhost:3000",
