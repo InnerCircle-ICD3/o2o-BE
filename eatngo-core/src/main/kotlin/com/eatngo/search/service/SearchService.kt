@@ -36,10 +36,9 @@ class SearchService(
      */
     fun listStore(
         storeFilterDto: StoreFilterDto,
-        // TODO: 검색반경 프론트와 논의 필요
-        searchDistance: Double = 2.0, // 2km
-        page: Int = 0,
-        size: Int = 20,
+        searchDistance: Double,
+        page: Int,
+        size: Int,
     ): SearchStoreResultDto {
         val listStore: List<SearchStoreWithDistance> =
             searchStoreRepository
@@ -66,8 +65,7 @@ class SearchService(
      */
     fun searchStore(
         storeSearchFilterDto: StoreSearchFilterDto,
-        // TODO: 검색반경 프론트와 논의 필요
-        searchDistance: Double = 2.0, // 2km
+        searchDistance: Double,
         page: Int,
         size: Int,
     ): SearchStoreResultDto {
