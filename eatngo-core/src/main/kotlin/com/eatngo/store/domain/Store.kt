@@ -20,6 +20,7 @@ class Store(
     var name: StoreNameVO,                // 매장명
     var description: DescriptionVO?,           // 매장 설명
     var address: Address,               // 매장 주소
+    var addressId: Long = 0L,           // 주소 테이블의 ID (JPA 매핑용)
     val businessNumber: BusinessNumberVO, // 사업자등록 번호
     var contactNumber: ContactNumberVO?,  // 매장 or 점주 전화번호
     var imageUrl: String?,            // 대표 이미지 url(카드뷰에 보이는 이미지)
@@ -51,6 +52,7 @@ class Store(
                         dto.address.coordinate.longitude ?: 0.0
                     )
                 ),
+                addressId = 0L,
                 businessNumber = BusinessNumberVO.from(dto.businessNumber),
                 contactNumber = dto.contactNumber?.let { ContactNumberVO.from(it) },
                 imageUrl = dto.imageUrl,
@@ -90,6 +92,7 @@ class Store(
                         request.address.coordinate.longitude ?: 0.0
                     )
                 ),
+                addressId = 0L,
                 businessNumber = BusinessNumberVO.from(request.businessNumber),
                 contactNumber = request.contactNumber?.let { ContactNumberVO.from(it) },
                 imageUrl = request.imageUrl,
