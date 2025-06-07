@@ -14,6 +14,8 @@ class WebMvcConfig : WebMvcConfigurer {
                 "https://www.eatngo.org",
                 "https://store-owner.eatngo.org",
                 "https://customer.eatngo.org",
+                "http://localhost:3000",
+                "http://localhost:3001",
                 "http://localhost:8080",
                 "http://localhost:8081",
             ).allowedMethods("*")
