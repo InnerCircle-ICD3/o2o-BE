@@ -15,6 +15,7 @@ import org.springframework.cache.annotation.CachePut
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDate
 
 @Service
 class InventoryService(
@@ -34,7 +35,7 @@ class InventoryService(
     @Cacheable("inventory", key = "#productId")
     fun getInventoryDetails(productId: Long): InventoryDto {
         val inventory: Inventory =
-            inventoryPersistence.findTopByProductIdOrderByVersionDesc(productId)
+            inventoryPersistence.findTopByProductIdOrderByVersionDesc(productId, LocalDate.now())
                 .orThrow { InventoryNotFound(productId) }
         return InventoryDto(inventory.quantity, inventory.stock)
     }
@@ -52,8 +53,10 @@ class InventoryService(
         storeId: Long,
         initialStock: Int
     ): InventoryDto {
-        val inventory: Inventory = inventoryPersistence.findTopByProductIdOrderByVersionDesc(productCurrentStockDto.id)
-            .orThrow { InventoryNotFound(productCurrentStockDto.id) }
+        val inventory: Inventory = inventoryPersistence.findTopByProductIdOrderByVersionDesc(
+            productCurrentStockDto.id,
+            LocalDate.now()
+        ).orThrow { InventoryNotFound(productCurrentStockDto.id) }
         val changedInventory = inventory.changeStock(productCurrentStockDto.action, productCurrentStockDto.amount)
         val savedInventory: Inventory = inventoryPersistence.save(changedInventory)
 
@@ -76,7 +79,7 @@ class InventoryService(
     @CachePut("inventory", key = "#productDto.id")
     @Transactional
     fun modifyInventory(productDto: ProductDto, initialStock: Int): InventoryDto {
-        val inventory: Inventory = inventoryPersistence.findTopByProductIdOrderByVersionDesc(productDto.id!!)
+        val inventory: Inventory = inventoryPersistence.findTopByProductIdOrderByVersionDesc(productDto.id!!, LocalDate.now())
             .orThrow { InventoryNotFound(productDto.id!!) }
 
         inventory.modify(

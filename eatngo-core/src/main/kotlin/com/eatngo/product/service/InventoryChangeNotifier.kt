@@ -10,6 +10,7 @@ import com.eatngo.inventory.infra.InventoryPersistence
 import com.eatngo.product.domain.Product
 import com.eatngo.product.infra.ProductPersistence
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 
 @Service
 class InventoryChangeNotifier(
@@ -54,7 +55,7 @@ class InventoryChangeNotifier(
 
         val totalStockQuantity = allProducts.asSequence()
             .map { product ->
-                inventoryPersistence.findTopByProductIdOrderByVersionDesc(product.id)
+                inventoryPersistence.findTopByProductIdOrderByVersionDesc(product.id, LocalDate.now())
                     .orThrow { InventoryNotFound(product.id) }
                     .stock
             }

@@ -7,6 +7,7 @@ import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDate
 
 @Component
 class InventorySyncScheduler(
@@ -63,7 +64,7 @@ class InventorySyncScheduler(
         chunkIndex: Int
     ) {
         val inventories: MutableList<Inventory> =
-            inventoryPersistence.findAllByProductIdIn(idChunk).toMutableList()
+            inventoryPersistence.findAllByProductIdIn(idChunk, LocalDate.now()).toMutableList()
 
         if (inventories.isEmpty()) {
             logger.warn("chunk #$chunkIndex: RDB에서 조회된 엔티티가 없습니다. IDs=$idChunk")
