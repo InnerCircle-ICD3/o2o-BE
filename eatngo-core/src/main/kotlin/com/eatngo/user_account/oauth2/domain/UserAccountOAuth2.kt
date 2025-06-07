@@ -38,6 +38,9 @@ class UserAccountOAuth2(
                 nickname = oAuth2.nickname,
                 provider = oAuth2.provider,
                 userKey = oAuth2.principal,
+                accessToken = oAuth2.token,
+                expireAt = oAuth2.expiresAt,
+                scopes = oAuth2.scopes
             )
             val newTerms = oAuth2.terms.map {
                 UserAccountOauth2Term.of(
