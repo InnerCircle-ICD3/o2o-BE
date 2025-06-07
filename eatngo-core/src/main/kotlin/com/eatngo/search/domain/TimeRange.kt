@@ -1,6 +1,6 @@
 package com.eatngo.search.domain
 
-import com.eatngo.common.util.DateTimeUtil
+import com.eatngo.common.util.toHHmmString
 import java.time.LocalTime
 
 data class TimeRange(
@@ -11,11 +11,6 @@ data class TimeRange(
         fun from(
             openTime: LocalTime,
             closeTime: LocalTime,
-        ): TimeRange {
-            val formattedOpenTime = DateTimeUtil.formatLocalTimeToString(openTime)
-            val formattedCloseTime = DateTimeUtil.formatLocalTimeToString(closeTime)
-
-            return TimeRange(openTime = formattedOpenTime, closeTime = formattedCloseTime)
-        }
+        ): TimeRange = TimeRange(openTime = openTime.toHHmmString(), closeTime = closeTime.toHHmmString())
     }
 }

@@ -1,22 +1,8 @@
 package com.eatngo.common.util
 
-import java.time.LocalDateTime
 import java.time.LocalTime
 
 object DateTimeUtil {
-    /**
-     * LocalDateTime을 HH:mm 형식의 문자열로 변환합니다.
-     */
-    fun formatTimeToString(time: LocalDateTime): String {
-        val localtime = time.toLocalTime()
-        return String.format("%02d:%02d", localtime.hour, localtime.minute)
-    }
-
-    /**
-     * LocalTime HH:mm 형식의 문자열로 변환합니다.
-     */
-    fun formatLocalTimeToString(time: LocalTime): String = String.format("%02d:%02d", time.hour, time.minute)
-
     /**
      * HH:mm 형식의 문자열을 LocalTime으로 변환합니다.
      */
@@ -33,3 +19,8 @@ object DateTimeUtil {
         return LocalTime.of(hour, minute)
     }
 }
+
+/**
+ * LocalTime을 HH:mm 형식의 문자열로 변환하는 확장함수
+ */
+fun LocalTime.toHHmmString(): String = String.format("%02d:%02d", this.hour, this.minute)
