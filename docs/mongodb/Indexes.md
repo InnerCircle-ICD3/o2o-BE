@@ -4,41 +4,49 @@
 ## SearchStore
 ### MongoDB 인덱스
 ```js
-db.SearchStore.createIndex({ location: "2dsphere" })
+db.SearchStore.createIndex({ coordinate: "2dsphere" })
 ```
 ### Atlas Search 인덱스
 TODO: store category, food category 인덱스 analyzer 개선
 - ex) "치킨 떡볶이" 검색 시 어느 범위까지 허용할지(food category에 "치킨"과 "떡볶이"가 모두 포함된 경우일지, 아니면 둘 중 하나라도 포함된 경우 보여줄지)
 - custom analyzer를 사용하여 "치킨"과 "떡볶이"를 모두 포함하는 경우에만 검색되도록 설정
+
+0603
+- +) 검색어와 관련된 필드만 Atlas Search 인덱스에 포함시킨 뒤, 나머지 필터링 조건은 MongoDB 쿼리로 처리($addFields)
+- 도입 후 고민할 점 : foodCategory, foodType, storeCategory 필드에 대한 검색어 분석기(analyzer) 설정
+  - ex) "치킨 떡볶이" 검색 시 "치킨"과 "떡볶이" 모두 포함하는 경우에만 검색되도록 설정
 ```json
 {
   "mappings": {
-    "dynamic": false, // true로 설정하면 동적으로 필드가 추가됨 -> false로 설정하면 명시한 필드에만 인덱싱을 적용
+    "dynamic": false,
     "fields": {
       "storeName": {
         "type": "string",
         "analyzer": "lucene.nori"
       },
-      "category": {
+      "storeCategory": {
         "type": "string",
         "analyzer": "lucene.keyword"
       },
-      "open": {
-        "type": "boolean"
+      "foodCategory": {
+        "type": "string",
+        "analyzer": "lucene.keyword"
       },
-      "openTime": {
-        "type": "date"
+      "foodType": {
+        "type": "string",
+        "analyzer": "lucene.keyword"
       },
-      "closeTime": {
-        "type": "date"
-      },
-      "location": {
+      "coordinate": {
         "type": "geo"
+      },
+      "status": {
+        "type": "number"
       }
     }
   }
 }
 ```
+- dynamic을 true로 설정하면 동적으로 필드가 추가됨 -> false로 설정하면 명시한 필드에만 인덱싱을 적용
 
 #### nori vs standard Analyzer 비교
 |       항목        | standard 분석기      | nori 분석기 (한국어 전용)                   |
@@ -68,3 +76,19 @@ atlas tokenizer 설정
     - user_dictionary 없으면 -> "먹", "태", "깡"
 - stopwords: 불용어. 검색에서 제외(조사, 접속사, 추임새 등)
   - `"stopwords": ["그리고", "또한", "은", "는", "이", "가"]`
+
+## 자동 검색 완성어 인덱스 생성
+- autoComplete 인덱스는 Atlas Search에서 제공하는 기능으로, 사용자가 입력하는 검색어에 대한 자동 완성 기능을 제공
+- string 필드에 대해서만 생성 가능하며, 배열 필드에 대해서는 생성할 수 없음
+```json
+{
+  "mappings": {
+    "dynamic": false,
+    "fields": {
+      "storeName": {
+        "type": "autocomplete"
+      }
+    }
+  }
+}
+```
