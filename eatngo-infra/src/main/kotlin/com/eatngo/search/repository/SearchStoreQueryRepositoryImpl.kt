@@ -2,13 +2,19 @@ package com.eatngo.search.repository
 
 import com.eatngo.search.dto.SearchStoreFoodTypeDto
 import com.eatngo.search.dto.SearchStoreRdbDto
-import org.springframework.data.jpa.repository.JpaRepository
-import org.springframework.data.jpa.repository.Query
+import jakarta.persistence.EntityManager
+import jakarta.persistence.PersistenceContext
+import org.springframework.stereotype.Repository
 import java.time.LocalDateTime
 
-interface JpaSearchStoreRepository : JpaRepository<SearchStoreRdbDto, Long> {
-    @Query(
-        """
+@Repository
+class SearchStoreQueryRepositoryImpl(
+    @PersistenceContext private val em: EntityManager,
+) : SearchStoreQueryRepository {
+    override fun findByStoreId(storeId: Long): SearchStoreRdbDto =
+        em
+            .createQuery(
+                """
             SELECT SearchStoreRdbDto(
                 s.id,
                 s.name,
@@ -30,17 +36,19 @@ interface JpaSearchStoreRepository : JpaRepository<SearchStoreRdbDto, Long> {
                 JOIN ProductEntity p ON p.storeId = s.id
             WHERE s.id = :storeId
         """,
-    )
-    fun findByStoreId(storeId: Long): SearchStoreRdbDto
+                SearchStoreRdbDto::class.java,
+            ).setParameter("storeId", storeId)
+            .singleResult
 
-    @Query(
-        """
-            SELECT
-                p.storeId AS storeId,
-                p.foodTypes AS foodType
+    override fun findFoodTypesByProductUpdatedAt(pivotTime: LocalDateTime): List<SearchStoreFoodTypeDto> =
+        em
+            .createQuery(
+                """
+            SELECT SearchStoreFoodTypeDto(p.storeId, p.foodTypes)
             FROM ProductEntity p
             WHERE p.updatedAt > :pivotTime
-""",
-    )
-    fun findFoodTypesByProductUpdatedAt(pivotTime: LocalDateTime): List<SearchStoreFoodTypeDto>
+        """,
+                SearchStoreFoodTypeDto::class.java,
+            ).setParameter("pivotTime", pivotTime)
+            .resultList
 }
