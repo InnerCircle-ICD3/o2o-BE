@@ -40,4 +40,9 @@ class InventoryRepositoryImpl(
         )
     }
 
+    override fun findLatestByProductIds(productIds: List<Long>): List<Inventory> {
+        return jpaInventoryRepository.findLatestByProductIds(productIds)
+            .map(InventoryMapper::toDomain)
+    }
+
 }

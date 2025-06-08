@@ -119,9 +119,9 @@ class StoreSubscriptionServiceImpl(
      */
     private fun calculateTotalStockCount(storeId: Long): Int {
         val products = productPersistence.findAllActivatedProductByStoreId(storeId)
-        return products.sumOf { product ->
-            inventoryPersistence.findTopByProductIdOrderByVersionDesc(product.id)?.stock ?: 0
-        }
+        val productIds = products.map { it.id }
+        val latestInventories = inventoryPersistence.findLatestByProductIds(productIds)
+        return latestInventories.sumOf { it.stock }
     }
     
     /**
@@ -138,9 +138,13 @@ class StoreSubscriptionServiceImpl(
      * 최저가 상품 정보 배치 조회
      */
     private fun getCheapestProductInfoBatch(storeIds: List<Long>): Map<Long, ProductInfo> {
-        return storeIds.associateWith { storeId ->
-            getCheapestProductInfo(storeId)
-        }
+        val allProducts = productPersistence.findAllActivatedProductsByStoreIds(storeIds)
+        return allProducts.groupBy { it.storeId }
+            .mapValues { (_, products) ->
+                products.minByOrNull { it.price.finalPrice }
+                    ?.let { ProductInfo(it.price.originalPrice, it.price.discountRate, it.price.finalPrice) }
+                    ?: getDefaultProductInfo()
+            }
     }
     
     /**

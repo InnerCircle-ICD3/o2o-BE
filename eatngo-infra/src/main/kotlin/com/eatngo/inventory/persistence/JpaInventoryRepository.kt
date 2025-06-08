@@ -9,6 +9,18 @@ import java.util.*
 
 interface JpaInventoryRepository : JpaRepository<InventoryEntity, Long> {
     fun findTopByProductIdOrderByVersionDesc(productId: Long): Optional<InventoryEntity>
+    
+    @Query("""
+        SELECT i FROM InventoryEntity i 
+        WHERE i.productId IN :productIds 
+        AND i.version = (
+            SELECT MAX(i2.version) 
+            FROM InventoryEntity i2 
+            WHERE i2.productId = i.productId
+        )
+    """)
+    fun findLatestByProductIds(@Param("productIds") productIds: List<Long>): List<InventoryEntity>
+    
     fun deleteByProductId(productId: Long)
 
     @Modifying(clearAutomatically = true, flushAutomatically = true)
