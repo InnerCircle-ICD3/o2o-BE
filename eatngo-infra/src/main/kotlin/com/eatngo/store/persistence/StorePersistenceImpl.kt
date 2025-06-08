@@ -7,7 +7,6 @@ import com.eatngo.store.infra.StorePersistence
 import com.eatngo.store.rdb.entity.StoreJpaEntity
 import com.eatngo.store.rdb.repository.StoreRdbRepository
 import org.springframework.stereotype.Component
-import java.time.LocalDateTime
 
 /**
  * 매장 영속성 구현체
@@ -42,14 +41,10 @@ class StorePersistenceImpl(
             ),
         )
 
-    override fun updateStatus(storeId: Long, status: StoreEnum.StoreStatus): Boolean =
-        storeRdbRepository.updateStatus(storeId, status) > 0
+    override fun updateStatus(
+        storeId: Long,
+        status: StoreEnum.StoreStatus,
+    ): Boolean = storeRdbRepository.updateStatus(storeId, status) > 0
 
-    override fun deleteById(id: Long): Boolean =
-        storeRdbRepository.softDeleteById(id) > 0
-
-    override fun findByUpdatedAt(pivotTime: LocalDateTime): List<Store> =
-        storeRdbRepository
-            .findByUpdatedAt(pivotTime)
-            .map { StoreJpaEntity.toStore(it) }
+    override fun deleteById(id: Long): Boolean = storeRdbRepository.softDeleteById(id) > 0
 }

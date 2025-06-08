@@ -25,6 +25,7 @@ class SearchStore(
     val businessHours: Map<DayOfWeek, TimeRange>, // 매장 영업 시간
     val updatedAt: LocalDateTime, // 마지막 업데이트 시간
     val createdAt: LocalDateTime, // 생성 시간
+    val deletedAt: LocalDateTime? = null, // 삭제 시간 (null: 삭제 안됨, not null: 삭제됨) -> RDB에서만 사용
 ) {
     companion object {
         fun from(store: Store): SearchStore =
@@ -49,6 +50,7 @@ class SearchStore(
                     } ?: emptyMap(),
                 updatedAt = store.updatedAt,
                 createdAt = store.createdAt,
+                deletedAt = store.deletedAt, // 삭제 시간 (null: 삭제 안됨, not null: 삭제됨
             )
     }
 }

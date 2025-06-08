@@ -8,4 +8,6 @@ interface SearchStoreQueryRepository {
     fun findByStoreId(storeId: Long): SearchStoreRdbDto
 
     fun findFoodTypesByProductUpdatedAt(pivotTime: LocalDateTime): List<SearchStoreFoodTypeDto>
+
+    fun findAllByUpdatedAtAfter(pivotTime: LocalDateTime): List<SearchStoreRdbDto>
 }

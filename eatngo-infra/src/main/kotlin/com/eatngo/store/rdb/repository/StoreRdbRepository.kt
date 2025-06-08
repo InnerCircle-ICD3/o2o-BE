@@ -5,7 +5,6 @@ import com.eatngo.store.rdb.entity.StoreJpaEntity
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
-import java.time.LocalDateTime
 import java.util.Optional
 
 interface StoreRdbRepository : JpaRepository<StoreJpaEntity, Long> {
@@ -36,24 +35,18 @@ interface StoreRdbRepository : JpaRepository<StoreJpaEntity, Long> {
     )
     fun findAllByIdIn(ids: List<Long>): List<StoreJpaEntity>
 
-    @Query(
-        """
-    select s from StoreJpaEntity s
-    join fetch s.address
-    where s.updatedAt > :pivotTime
-    """,
-    )
-    fun findByUpdatedAt(pivotTime: LocalDateTime): List<StoreJpaEntity>
-
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query(
         """
         UPDATE StoreJpaEntity s
         SET s.status = :status, s.updatedAt = CURRENT_TIMESTAMP
         WHERE s.id = :storeId
-    """
+    """,
     )
-    fun updateStatus(storeId: Long, status: StoreEnum.StoreStatus): Int
+    fun updateStatus(
+        storeId: Long,
+        status: StoreEnum.StoreStatus,
+    ): Int
 
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query(

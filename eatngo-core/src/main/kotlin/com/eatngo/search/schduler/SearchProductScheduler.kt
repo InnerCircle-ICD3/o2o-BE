@@ -6,8 +6,6 @@ import com.eatngo.search.infra.SearchMapRedisRepository
 import com.eatngo.search.infra.SearchStorePersistence
 import com.eatngo.search.infra.SearchStoreRepository
 import com.eatngo.search.service.SearchService
-import com.eatngo.store.domain.Store
-import com.eatngo.store.infra.StorePersistence
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
@@ -25,7 +23,6 @@ import java.time.LocalDateTime
     matchIfMissing = false,
 )
 class SearchProductScheduler(
-    private val storePersistence: StorePersistence,
     private val searchStoreRepository: SearchStoreRepository,
     private val searchMapRedisRepository: SearchMapRedisRepository,
     private val searchStorePersistence: SearchStorePersistence,
@@ -48,12 +45,12 @@ class SearchProductScheduler(
     }
 
     /**
-     * deprecated : 이벤트 기반으로 수정
+     * todo: 로직 점검 및 사용 여부 결정
      * 상품 검색 인덱스를 업데이트합니다.
      */
     private fun updateSearchIndexFromStore() {
-        val pivotTime = LocalDateTime.now().minusMinutes(10)
-        val stores: List<Store> = storePersistence.findByUpdatedAt(pivotTime = pivotTime)
+        val pivotTime = LocalDateTime.now().minusMinutes(60)
+        val stores: List<SearchStore> = searchStorePersistence.syncAllStoresByUpdateAt(pivotTime = pivotTime)
         if (stores.isEmpty()) {
             return
         }
@@ -65,15 +62,15 @@ class SearchProductScheduler(
         for (store in stores) {
             // MongoDB 업데이트 정보
             if (store.deletedAt != null) {
-                deleteStoreIds.add(store.id)
+                deleteStoreIds.add(store.storeId)
             } else {
-                updateStores.add(SearchStore.from(store))
+                updateStores.add(store)
             }
             // Redis 업데이트 정보
             val box =
                 searchService.getBox(
-                    latitude = store.address.coordinate.latitude,
-                    longitude = store.address.coordinate.longitude,
+                    latitude = store.coordinate.latitude,
+                    longitude = store.coordinate.longitude,
                 )
             val redisKey = searchMapRedisRepository.getKey(box.topLeft)
             redisBoxMap[redisKey] = box

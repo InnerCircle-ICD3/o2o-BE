@@ -51,4 +51,33 @@ class SearchStoreQueryRepositoryImpl(
                 SearchStoreFoodTypeDto::class.java,
             ).setParameter("pivotTime", pivotTime)
             .resultList
+
+    override fun findAllByUpdatedAtAfter(pivotTime: LocalDateTime): List<SearchStoreRdbDto> =
+        em
+            .createQuery(
+                """
+            SELECT SearchStoreRdbDto(
+                s.id,
+                s.name,
+                s.imageUrl,
+                s.storeCategory,
+                s.foodCategory,
+                p.foodTypes,
+                s.address.roadNameAddress,
+                s.address.latitude,
+                s.address.longitude,
+                p.status,
+                s.status,
+                s.businessHours,
+                s.updatedAt,
+                s.createdAt
+            )
+            FROM StoreJpaEntity s 
+                JOIN FETCH s.address
+                JOIN ProductEntity p ON p.storeId = s.id
+            WHERE s.updatedAt > :pivotTime
+        """,
+                SearchStoreRdbDto::class.java,
+            ).setParameter("pivotTime", pivotTime)
+            .resultList
 }
