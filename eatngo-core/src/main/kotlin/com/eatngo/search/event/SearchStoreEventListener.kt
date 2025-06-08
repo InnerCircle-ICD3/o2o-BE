@@ -6,6 +6,7 @@ import com.eatngo.search.infra.SearchStoreRepository
 import com.eatngo.search.service.SearchService
 import com.eatngo.store.event.StoreCUDEvent
 import com.eatngo.store.event.StoreCUDEventType
+import com.eatngo.store.event.StoreStatusChangedEvent
 import org.springframework.context.event.EventListener
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Component
@@ -45,6 +46,15 @@ class SearchStoreEventListener(
         searchService.saveBoxRedis(box = box)
     }
 
-    fun handleStoreStatusChangedEvent() {
+    /**
+     * 매장 상태 변경 이벤트 처리
+     */
+    @Async
+    @EventListener
+    fun handleStoreStatusChangedEvent(event: StoreStatusChangedEvent) {
+        searchStoreRepository.updateStoreStatus(
+            storeId = event.storeId,
+            status = event.currentStatus.name,
+        )
     }
 }

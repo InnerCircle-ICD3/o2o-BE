@@ -224,6 +224,19 @@ class SearchStoreRepositoryImpl(
         bulkOps.execute()
     }
 
+    override fun updateStoreStatus(
+        storeId: Long,
+        status: String,
+    ) {
+        val query = Query(Criteria.where("_id").`is`(storeId))
+        val update =
+            Update()
+                .set("status", status)
+                .set("updatedAt", LocalDateTime.now())
+
+        mongoTemplate.updateFirst(query, update, SearchStoreEntity::class.java, "SearchStore")
+    }
+
     override fun updateFoodTypesAll(foodTypeDataList: List<SearchStoreFoodTypes>) {
         val bulkOps =
             mongoTemplate

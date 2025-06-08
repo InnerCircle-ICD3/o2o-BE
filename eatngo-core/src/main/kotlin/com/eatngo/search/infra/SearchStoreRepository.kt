@@ -37,6 +37,11 @@ interface SearchStoreRepository {
 
     fun saveAll(searchStoreList: List<SearchStore>)
 
+    fun updateStoreStatus(
+        storeId: Long,
+        status: String,
+    )
+
     fun updateFoodTypesAll(searchStoreList: List<SearchStoreFoodTypes>)
 
     fun deleteIds(deleteIds: List<Long>)
