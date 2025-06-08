@@ -38,4 +38,6 @@ interface SearchStoreRepository {
     fun updateFoodTypesAll(searchStoreList: List<SearchStoreFoodTypes>)
 
     fun deleteIds(deleteIds: List<Long>)
+
+    fun deleteId(deleteId: Long)
 }

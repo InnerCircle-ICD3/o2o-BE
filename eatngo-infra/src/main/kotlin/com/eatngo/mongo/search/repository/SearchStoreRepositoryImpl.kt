@@ -234,6 +234,11 @@ class SearchStoreRepositoryImpl(
         mongoTemplate.remove(query, SearchStoreEntity::class.java, "SearchStore")
     }
 
+    override fun deleteId(deleteId: Long) {
+        val query = Query(Criteria.where("_id").`is`(deleteId))
+        mongoTemplate.remove(query, SearchStoreEntity::class.java, "SearchStore")
+    }
+
     /**
      * status 정렬순을 보장하기 위해 status를 지정하여 검색
      */
