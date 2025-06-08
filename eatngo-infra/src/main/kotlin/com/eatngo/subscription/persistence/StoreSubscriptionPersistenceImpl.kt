@@ -56,7 +56,7 @@ class StoreSubscriptionPersistenceImpl(
     }
 
     override fun findAllByQueryParameter(queryParam: StoreSubscriptionQueryParamDto): Cursor<StoreSubscription> {
-        val pageRequest = PageRequest.of(0, 2, Sort.by("id").descending())
+        val pageRequest = PageRequest.of(0, 10, Sort.by("id").descending())
 
         val cursoredSubscriptionJpaEntities = when (queryParam) {
             is CustomerSubscriptionQueryParamDto -> {
