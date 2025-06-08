@@ -23,6 +23,7 @@ class SearchStoreEntity(
     var storeImage: String, // 매장 이미지 S3 URL
     var storeCategory: List<String>,
     var foodCategory: List<String>, // 대표 판매 음식 종류
+    var foodTypes: List<String>? = null, // 대표 판매 음식 종류(검색용)
     var roadNameAddress: String,
     @GeoSpatialIndexed
     var coordinate: GeoJsonPoint,
@@ -44,6 +45,7 @@ class SearchStoreEntity(
                     }
                 },
             foodCategory = foodCategory,
+            foodTypes = foodTypes,
             roadNameAddress = roadNameAddress,
             coordinate =
                 Coordinate.Companion.from(
@@ -69,6 +71,7 @@ class SearchStoreEntity(
                 storeImage = searchStore.storeImage,
                 storeCategory = searchStore.storeCategory.map { it.name },
                 foodCategory = searchStore.foodCategory,
+                foodTypes = searchStore.foodTypes,
                 roadNameAddress = searchStore.roadNameAddress,
                 coordinate =
                     toGeoJsonPoint(

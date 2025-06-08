@@ -3,6 +3,7 @@ package com.eatngo.mongo.search.repository
 import com.eatngo.mongo.search.dto.SearchStoreAutoCompleteDto
 import com.eatngo.mongo.search.entity.SearchStoreEntity
 import com.eatngo.search.domain.SearchStore
+import com.eatngo.search.domain.SearchStoreFoodTypes
 import com.eatngo.search.domain.SearchStoreStatus
 import com.eatngo.search.dto.AutoCompleteStoreNameDto
 import com.eatngo.search.dto.Box
@@ -192,6 +193,30 @@ class SearchStoreRepositoryImpl(
                     .set("businessHours", store.businessHours)
                     .set("updatedAt", LocalDateTime.now())
                     .set("createdAt", store.createdAt)
+
+            bulkOps.upsert(
+                query,
+                update,
+            )
+        }
+
+        bulkOps.execute()
+    }
+
+    override fun updateFoodTypesAll(foodTypeDataList: List<SearchStoreFoodTypes>) {
+        val bulkOps =
+            mongoTemplate
+                .bulkOps(
+                    BulkOperations.BulkMode.UNORDERED,
+                    SearchStoreEntity::class.java,
+                    "SearchStore",
+                )
+        foodTypeDataList.map { foodTypeData ->
+            val query = Query(Criteria.where("_id").`is`(foodTypeData.storeId))
+            val update =
+                Update()
+                    .set("foodTypes", foodTypeData.foodTypes)
+                    .set("updatedAt", LocalDateTime.now())
 
             bulkOps.upsert(
                 query,

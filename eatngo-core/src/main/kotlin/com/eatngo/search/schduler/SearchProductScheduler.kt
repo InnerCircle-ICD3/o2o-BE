@@ -3,6 +3,7 @@ package com.eatngo.search.schduler
 import com.eatngo.search.domain.SearchStore
 import com.eatngo.search.dto.Box
 import com.eatngo.search.infra.SearchMapRedisRepository
+import com.eatngo.search.infra.SearchStorePersistence
 import com.eatngo.search.infra.SearchStoreRepository
 import com.eatngo.search.service.SearchService
 import com.eatngo.store.domain.Store
@@ -27,13 +28,29 @@ class SearchProductScheduler(
     private val storePersistence: StorePersistence,
     private val searchStoreRepository: SearchStoreRepository,
     private val searchMapRedisRepository: SearchMapRedisRepository,
+    private val searchStorePersistence: SearchStorePersistence,
     private val searchService: SearchService,
 ) {
     /**
-     * 상품 검색 인덱스를 업데이트합니다.
-     * 현재는 10분마다 실행되도록 설정되어 있습니다.
+     * 상품 검색 인덱스 업데이트를 위한 스케줄러
+     * 매 10분마다 실행되어, 최근 10분 이내에 업데이트된 상품의 foodTypes를 업데이트합니다.
      */
     @Scheduled(fixedDelay = 10 * 60 * 1000)
+    private fun updateSearchStoreFoodTypes() {
+        val pivotTime = LocalDateTime.now().minusMinutes(10)
+        val foodTypesList = searchStorePersistence.findFoodTypesByProductUpdatedAt(pivotTime)
+        if (foodTypesList.isEmpty()) {
+            return
+        }
+
+        // 검색 인덱스 업데이트
+        searchStoreRepository.updateFoodTypesAll(foodTypesList)
+    }
+
+    /**
+     * deprecated : 이벤트 기반으로 수정
+     * 상품 검색 인덱스를 업데이트합니다.
+     */
     private fun updateSearchIndexFromStore() {
         val pivotTime = LocalDateTime.now().minusMinutes(10)
         val stores: List<Store> = storePersistence.findByUpdatedAt(pivotTime = pivotTime)
