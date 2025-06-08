@@ -32,4 +32,9 @@ class ProductPersistenceImpl(
             .map(ProductMapper::toDomain)
             .orElse(null)
     }
+
+    override fun findAllActivatedProductsByStoreIds(storeIds: List<Long>): List<Product> {
+        return productRepository.findAllByStoreIdInAndDeleteStatus(storeIds, DeletedStatus.ACTIVE)
+            .map(ProductMapper::toDomain)
+    }
 }

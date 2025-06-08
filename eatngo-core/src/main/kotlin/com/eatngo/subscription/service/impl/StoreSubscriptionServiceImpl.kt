@@ -3,14 +3,20 @@ package com.eatngo.subscription.service.impl
 import com.eatngo.common.constant.StoreEnum
 import com.eatngo.common.exception.store.StoreException
 import com.eatngo.common.exception.subscription.SubscriptionException
+import com.eatngo.common.response.Cursor
 import com.eatngo.extension.orThrow
+import com.eatngo.inventory.infra.InventoryPersistence
 import com.eatngo.product.infra.ProductPersistence
 import com.eatngo.store.infra.StorePersistence
 import com.eatngo.subscription.domain.StoreSubscription
+import com.eatngo.subscription.dto.CustomerSubscriptionQueryParamDto
+import com.eatngo.subscription.dto.StoreOwnerSubscriptionQueryParamDto
 import com.eatngo.subscription.dto.StoreSubscriptionDto
+import com.eatngo.subscription.dto.StoreSubscriptionQueryParamDto
 import com.eatngo.subscription.infra.StoreSubscriptionPersistence
 import com.eatngo.subscription.service.StoreSubscriptionService
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 
 /**
  * 상점 구독 서비스 구현체
@@ -19,14 +25,9 @@ import org.springframework.stereotype.Service
 class StoreSubscriptionServiceImpl(
     private val storeSubscriptionPersistence: StoreSubscriptionPersistence,
     private val storePersistence: StorePersistence,
-    private val productPersistence: ProductPersistence
+    private val productPersistence: ProductPersistence,
+    private val inventoryPersistence: InventoryPersistence,
 ) : StoreSubscriptionService {
-    // 임시 상품 정보 (할인율 10%, 원가 10,000원, 할인가 9,000원)
-    private val tempProductInfo = object {
-        val discountRate = 0.1
-        val originalPrice = 10000
-        val discountedPrice = 9000
-    }
 
     override fun toggleSubscription(storeId: Long, customerId: Long): Pair<StoreSubscriptionDto, StoreEnum.SubscriptionStatus> {
         val store = storePersistence.findById(storeId).orThrow { StoreException.StoreNotFound(storeId) }
@@ -52,55 +53,114 @@ class StoreSubscriptionServiceImpl(
         return dto to operationType
     }
 
-    override fun getSubscriptionById(id: Long): StoreSubscriptionDto {
-        val subscription = storeSubscriptionPersistence.findById(id).orThrow { SubscriptionException.SubscriptionNotFound(id) }
-        val store = storePersistence.findById(subscription.storeId).orThrow { StoreException.StoreNotFound(subscription.storeId) }
+    override fun getSubscriptionsByQueryParameter(queryParam: StoreSubscriptionQueryParamDto): Cursor<StoreSubscriptionDto> {
+        // 권한 검증
+        when (queryParam) {
+            is StoreOwnerSubscriptionQueryParamDto -> {
+                val store = storePersistence.findById(queryParam.storeId).orThrow { StoreException.StoreNotFound(queryParam.storeId) }
+                store.requireOwner(queryParam.storeOwnerId)
+            }
+        }
 
-        return StoreSubscriptionDto.from(
-            subscription = subscription,
-            storeName = store.name.value,
-            mainImageUrl = store.imageUrl,
-            status = store.status,
-            discountRate = tempProductInfo.discountRate,
-            originalPrice = tempProductInfo.originalPrice,
-            discountedPrice = tempProductInfo.discountedPrice
+        val cursoredSubscriptions = storeSubscriptionPersistence.findAllByQueryParameter(queryParam)
+        val storeIds = cursoredSubscriptions.contents.map { it.storeId }.distinct()
+        val stores = storePersistence.findAllByIds(storeIds).associateBy { it.id }
+        
+        // 매장별 최저가 상품 정보
+        val cheapestProductInfoMap = getCheapestProductInfoBatch(storeIds)
+
+        val subscriptionDtos = cursoredSubscriptions.contents.map { subscription ->
+            val store = stores[subscription.storeId].orThrow { StoreException.StoreNotFound(subscription.storeId) }
+            
+            when (queryParam) {
+                is CustomerSubscriptionQueryParamDto -> {
+                    // 고객용: 상세 정보 포함
+                    val today = LocalDate.now().dayOfWeek
+                    val todayHour = store.businessHours?.find { it.dayOfWeek == today }
+
+                    //TODO: Redis 로 가져오기
+                    val totalStockCount = calculateTotalStockCount(subscription.storeId)
+                    val cheapestProductInfo = cheapestProductInfoMap[subscription.storeId] ?: getDefaultProductInfo()
+                    
+                    StoreSubscriptionDto.from(
+                        subscription = subscription,
+                        storeName = store.name.value,
+                        description = store.description?.value,
+                        mainImageUrl = store.imageUrl,
+                        foodCategory = store.storeCategoryInfo.foodCategory?.map { it.value },
+                        status = store.status,
+                        discountRate = cheapestProductInfo.discountRate,
+                        originalPrice = cheapestProductInfo.originalPrice,
+                        discountedPrice = cheapestProductInfo.finalPrice,
+                        todayPickupStartTime = todayHour?.openTime,
+                        todayPickupEndTime = todayHour?.closeTime,
+                        totalStockCount = totalStockCount,
+                        pickupDay = store.pickUpDay.pickUpDay.name
+                    )
+                }
+                is StoreOwnerSubscriptionQueryParamDto -> {
+                    // 점주용: 기본 정보만
+                    StoreSubscriptionDto.from(
+                        subscription = subscription,
+                        storeName = store.name.value,
+                        mainImageUrl = store.imageUrl,
+                        status = store.status
+                    )
+                }
+                else -> throw IllegalArgumentException("지원하지 않는 쿼리 파라미터 타입입니다")
+            }
+        }
+
+        return Cursor.from(subscriptionDtos, cursoredSubscriptions.lastId)
+    }
+    
+    /**
+     * 매장 총 재고 수량을 계산 TODO: Redis로 !!
+     */
+    private fun calculateTotalStockCount(storeId: Long): Int {
+        val products = productPersistence.findAllActivatedProductByStoreId(storeId)
+        val productIds = products.map { it.id }
+        val latestInventories = inventoryPersistence.findLatestByProductIds(productIds)
+        return latestInventories.sumOf { it.stock }
+    }
+    
+    /**
+     * 단일 매장 최저가 상품 정보 조회
+     */
+    private fun getCheapestProductInfo(storeId: Long): ProductInfo {
+        val products = productPersistence.findAllActivatedProductByStoreId(storeId)
+        return products.minByOrNull { it.price.finalPrice }
+            ?.let { ProductInfo(it.price.originalPrice, it.price.discountRate, it.price.finalPrice) }
+            ?: getDefaultProductInfo()
+    }
+    
+    /**
+     * 최저가 상품 정보 배치 조회
+     */
+    private fun getCheapestProductInfoBatch(storeIds: List<Long>): Map<Long, ProductInfo> {
+        val allProducts = productPersistence.findAllActivatedProductsByStoreIds(storeIds)
+        return allProducts.groupBy { it.storeId }
+            .mapValues { (_, products) ->
+                products.minByOrNull { it.price.finalPrice }
+                    ?.let { ProductInfo(it.price.originalPrice, it.price.discountRate, it.price.finalPrice) }
+                    ?: getDefaultProductInfo()
+            }
+    }
+    
+    /**
+     * 기본 상품 정보 (상품이 없는 경우)
+     */
+    private fun getDefaultProductInfo(): ProductInfo {
+        return ProductInfo(
+            originalPrice = 0,
+            discountRate = 0.0,
+            finalPrice = 0
         )
     }
 
-    override fun getMySubscriptions(customerId: Long): List<StoreSubscriptionDto> {
-        val subscriptions = storeSubscriptionPersistence.findByUserId(customerId)
-        val storeIds = subscriptions.map { it.storeId }
-        val stores = storePersistence.findAllByIds(storeIds).associateBy { it.id }
-
-        return subscriptions.map { subscription ->
-            val store = stores[subscription.storeId].orThrow {StoreException.StoreNotFound(subscription.storeId)}
-            StoreSubscriptionDto.from(
-                subscription = subscription,
-                storeName = store.name.value,
-                mainImageUrl = store.imageUrl,
-                status = store.status,
-                discountRate = tempProductInfo.discountRate,
-                originalPrice = tempProductInfo.originalPrice,
-                discountedPrice = tempProductInfo.discountedPrice
-            )
-        }
-    }
-
-    override fun getSubscriptionsByStoreId(storeId: Long, storeOwnerId: Long): List<StoreSubscriptionDto> {
-        val store = storePersistence.findById(storeId).orThrow { StoreException.StoreNotFound(storeId) }
-        store.requireOwner(storeOwnerId)
-
-        return storeSubscriptionPersistence.findByStoreId(storeId)
-            .map { subscription ->
-                StoreSubscriptionDto.from(
-                    subscription = subscription,
-                    storeName = store.name.value,
-                    mainImageUrl = store.imageUrl,
-                    status = store.status,
-                    discountRate = tempProductInfo.discountRate,
-                    originalPrice = tempProductInfo.originalPrice,
-                    discountedPrice = tempProductInfo.discountedPrice
-                )
-            }
-    }
+    private data class ProductInfo(
+        val originalPrice: Int,
+        val discountRate: Double,
+        val finalPrice: Int
+    )
 }
