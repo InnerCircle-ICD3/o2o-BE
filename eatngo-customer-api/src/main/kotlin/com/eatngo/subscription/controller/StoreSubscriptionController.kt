@@ -2,7 +2,9 @@ package com.eatngo.subscription.controller
 
 import com.eatngo.auth.annotation.CustomerId
 import com.eatngo.common.response.ApiResponse
+import com.eatngo.common.response.Cursor
 import com.eatngo.subscription.docs.controller.StoreSubscriptionControllerDocs
+import com.eatngo.subscription.dto.CustomerSubscriptionQueryParamDto
 import com.eatngo.subscription.dto.StoreSubscriptionResponse
 import com.eatngo.subscription.dto.SubscriptionToggleResponse
 import com.eatngo.subscription.usecase.CustomerSubscriptionQueryUseCase
@@ -27,9 +29,19 @@ class CustomerStoreSubscriptionController(
 
     @GetMapping("/me")
     override fun getMySubscriptions(
-        @CustomerId customerId: Long
-    ): ApiResponse<List<StoreSubscriptionResponse>> {
-         val subscriptions = customerSubscriptionQueryUseCase.getSubscriptionsByCustomerId(customerId)
-         return ApiResponse.success(subscriptions.map { StoreSubscriptionResponse.from(it) })
+        @CustomerId customerId: Long,
+        @RequestParam(required = false) lastId: Long?
+    ): ApiResponse<Cursor<StoreSubscriptionResponse>> {
+        val queryParam = CustomerSubscriptionQueryParamDto(
+            customerId = customerId,
+            lastId = lastId
+        )
+        val cursoredSubscriptions = customerSubscriptionQueryUseCase.getSubscriptionsByQueryParameter(queryParam)
+
+        val response = Cursor.from(
+            cursoredSubscriptions.contents.map { StoreSubscriptionResponse.from(it) },
+            cursoredSubscriptions.lastId
+        )
+        return ApiResponse.success(response)
     }
 }

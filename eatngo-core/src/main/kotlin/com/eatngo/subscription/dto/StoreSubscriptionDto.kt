@@ -23,7 +23,7 @@ data class StoreSubscriptionDto(
     val todayPickupStartTime: LocalTime? = null,
     val todayPickupEndTime: LocalTime? = null,
     val totalStockCount: Int? = null,
-    val pickupDay: String?? = null,
+    val pickupDay: String? = null,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime,
     val deletedAt: LocalDateTime? = null,
