@@ -33,6 +33,8 @@ interface SearchStoreRepository {
         size: Int = 5,
     ): List<AutoCompleteStoreNameDto>
 
+    fun save(searchStore: SearchStore)
+
     fun saveAll(searchStoreList: List<SearchStore>)
 
     fun updateFoodTypesAll(searchStoreList: List<SearchStoreFoodTypes>)

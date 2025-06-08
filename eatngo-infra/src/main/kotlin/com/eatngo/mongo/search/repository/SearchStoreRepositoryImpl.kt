@@ -168,6 +168,27 @@ class SearchStoreRepositoryImpl(
         }
     }
 
+    override fun save(searchStore: SearchStore) {
+        val store = SearchStoreEntity.from(searchStore)
+
+        val query = Query(Criteria.where("_id").`is`(store.storeId))
+        val update =
+            Update()
+                .set("storeName", store.storeName)
+                .set("storeImage", store.storeImage)
+                .set("storeCategory", store.storeCategory)
+                .set("foodCategory", store.foodCategory)
+                .set("foodTypes", store.foodTypes)
+                .set("roadNameAddress", store.roadNameAddress)
+                .set("coordinate", store.coordinate)
+                .set("status", store.status)
+                .set("businessHours", store.businessHours)
+                .set("updatedAt", LocalDateTime.now())
+                .set("createdAt", store.createdAt)
+
+        mongoTemplate.upsert(query, update, SearchStoreEntity::class.java, "SearchStore")
+    }
+
     override fun saveAll(searchStoreList: List<SearchStore>) {
         val bulkOps =
             mongoTemplate

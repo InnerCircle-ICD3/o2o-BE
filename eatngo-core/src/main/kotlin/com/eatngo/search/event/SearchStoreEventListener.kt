@@ -6,14 +6,12 @@ import com.eatngo.search.infra.SearchStoreRepository
 import com.eatngo.search.service.SearchService
 import com.eatngo.store.event.StoreCUDEvent
 import com.eatngo.store.event.StoreCUDEventType
-import com.eatngo.store.infra.StorePersistence
 import org.springframework.context.event.EventListener
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Component
 
 @Component
 class SearchStoreEventListener(
-    private val storePersistence: StorePersistence,
     private val searchStoreRepository: SearchStoreRepository,
     private val searchMapRedisRepository: SearchMapRedisRepository,
     private val searchStorePersistence: SearchStorePersistence,
@@ -26,17 +24,25 @@ class SearchStoreEventListener(
     @Async
     @EventListener
     fun handleStoreCUDEvent(event: StoreCUDEvent) {
+        val rdbStore = searchStorePersistence.syncStore(event.storeId)
         when (event.eventType) {
             StoreCUDEventType.CREATED,
             StoreCUDEventType.UPDATED,
             -> {
-                // TODO PostgreSQL에서 조인된 Store + Product 정보 읽기 → Mongo 저장
-//                storePersistence.syncStore(event.storeId)
+                searchStoreRepository.save(rdbStore)
             }
             StoreCUDEventType.DELETED -> {
                 searchStoreRepository.deleteId(event.storeId)
             }
         }
+
+        // 매장 정보 변경 후, 검색 맵 캐시를 갱신
+        val box =
+            searchService.getBox(
+                latitude = rdbStore.coordinate.latitude,
+                longitude = rdbStore.coordinate.longitude,
+            )
+        searchService.saveBoxRedis(box = box)
     }
 
     fun handleStoreStatusChangedEvent() {
