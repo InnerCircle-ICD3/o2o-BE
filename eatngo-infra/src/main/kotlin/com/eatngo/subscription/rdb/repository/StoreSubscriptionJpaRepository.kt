@@ -1,6 +1,8 @@
 package com.eatngo.subscription.rdb.repository
 
 import com.eatngo.subscription.rdb.entity.StoreSubscriptionJpaEntity
+import org.springframework.data.domain.Pageable
+import org.springframework.data.domain.Slice
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
@@ -42,4 +44,36 @@ interface StoreSubscriptionJpaRepository : JpaRepository<StoreSubscriptionJpaEnt
      */
     @Query("SELECT s.storeId FROM StoreSubscriptionJpaEntity s WHERE s.userId = :userId AND s.deletedAt IS NULL")
     fun findStoreIdsByUserId(@Param("userId") userId: Long): List<Long>
+
+    /**
+     * 고객용 구독 목록 커서 기반 조회 (무한 스크롤)
+     */
+    @Query("""
+        SELECT s FROM StoreSubscriptionJpaEntity s 
+        WHERE s.userId = :userId 
+        AND s.deletedAt IS NULL 
+        AND (:lastId IS NULL OR s.id < :lastId)
+        ORDER BY s.id DESC
+    """)
+    fun cursoredFindByUserId(
+        @Param("userId") userId: Long,
+        @Param("lastId") lastId: Long?,
+        pageable: Pageable
+    ): Slice<StoreSubscriptionJpaEntity>
+
+    /**
+     * 점주용 구독자 목록 커서 기반 조회 (무한 스크롤)
+     */
+    @Query("""
+        SELECT s FROM StoreSubscriptionJpaEntity s 
+        WHERE s.storeId = :storeId 
+        AND s.deletedAt IS NULL 
+        AND (:lastId IS NULL OR s.id < :lastId)
+        ORDER BY s.id DESC
+    """)
+    fun cursoredFindByStoreId(
+        @Param("storeId") storeId: Long,
+        @Param("lastId") lastId: Long?,
+        pageable: Pageable
+    ): Slice<StoreSubscriptionJpaEntity>
 }
