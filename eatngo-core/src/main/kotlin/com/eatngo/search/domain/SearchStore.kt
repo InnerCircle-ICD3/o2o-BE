@@ -20,6 +20,7 @@ class SearchStore(
     val foodTypes: List<String>?, // 대표 판매 음식 종류(검색용)
     val roadNameAddress: String, // 매장 주소(도로명주소)
     val coordinate: Coordinate, // 매장 위치(위도, 경도)
+    val productStatus: SearchProductStatus, // 상품 상태(검색용)
     val status: SearchStoreStatus, // 매장 오픈 여부
     val businessHours: Map<DayOfWeek, TimeRange>, // 매장 영업 시간
     val updatedAt: LocalDateTime, // 마지막 업데이트 시간
@@ -40,6 +41,7 @@ class SearchStore(
                         latitude = store.address.coordinate.latitude,
                         longitude = store.address.coordinate.longitude,
                     ),
+                productStatus = SearchProductStatus.from(1), // 디폴트 활성화
                 status = SearchStoreStatus.from(store.status),
                 businessHours =
                     store.businessHours?.associate {

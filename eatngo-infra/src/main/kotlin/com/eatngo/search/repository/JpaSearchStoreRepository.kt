@@ -19,6 +19,7 @@ interface JpaSearchStoreRepository : JpaRepository<SearchStoreRdbDto, Long> {
                 s.address.roadNameAddress,
                 s.address.latitude,
                 s.address.longitude,
+                p.status,
                 s.status,
                 s.businessHours,
                 s.updatedAt,

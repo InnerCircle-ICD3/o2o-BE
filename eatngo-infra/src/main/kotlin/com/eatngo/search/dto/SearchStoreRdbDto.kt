@@ -1,7 +1,9 @@
 package com.eatngo.search.dto
 
 import com.eatngo.common.constant.StoreEnum
+import com.eatngo.product.domain.ProductStatus
 import com.eatngo.search.domain.Coordinate
+import com.eatngo.search.domain.SearchProductStatus
 import com.eatngo.search.domain.SearchStore
 import com.eatngo.search.domain.SearchStoreStatus
 import com.eatngo.search.domain.TimeRange
@@ -22,6 +24,7 @@ data class SearchStoreRdbDto(
     val roadNameAddress: String,
     val latitude: Double,
     val longitude: Double,
+    val productStatus: ProductStatus, // 상품 상태(검색용), 디폴트 활성화
     val storeStatus: StoreEnum.StoreStatus, // 매장 오픈 여부
     val businessHours: List<BusinessHourJson>,
     val updatedAt: LocalDateTime = LocalDateTime.now(), // 마지막 업데이트 시간
@@ -41,6 +44,7 @@ data class SearchStoreRdbDto(
                     latitude = latitude,
                     longitude = longitude,
                 ),
+            productStatus = SearchProductStatus.from(productStatus),
             status = SearchStoreStatus.from(storeStatus),
             businessHours =
                 businessHours.associate {

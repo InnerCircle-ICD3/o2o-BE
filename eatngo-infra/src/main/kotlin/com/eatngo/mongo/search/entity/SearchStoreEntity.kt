@@ -4,6 +4,7 @@ import com.eatngo.common.constant.StoreEnum
 import com.eatngo.common.exception.search.SearchException
 import com.eatngo.extension.orThrow
 import com.eatngo.search.domain.Coordinate
+import com.eatngo.search.domain.SearchProductStatus
 import com.eatngo.search.domain.SearchStore
 import com.eatngo.search.domain.SearchStoreStatus
 import com.eatngo.search.domain.TimeRange
@@ -27,6 +28,7 @@ class SearchStoreEntity(
     var roadNameAddress: String,
     @GeoSpatialIndexed
     var coordinate: GeoJsonPoint,
+    var productStatus: Int = 1, // 상품 상태(검색용), 디폴트 활성화
     var status: Int, // 매장 오픈 여부
     @Field("businessHours")
     var businessHours: Map<DayOfWeek, TimeRange>,
@@ -52,7 +54,8 @@ class SearchStoreEntity(
                     latitude = coordinate.coordinates[1],
                     longitude = coordinate.coordinates[0],
                 ),
-            status = SearchStoreStatus.Companion.from(status),
+            productStatus = SearchProductStatus.from(productStatus),
+            status = SearchStoreStatus.from(status),
             businessHours = businessHours,
             updatedAt = updatedAt,
             createdAt = createdAt,
@@ -78,6 +81,7 @@ class SearchStoreEntity(
                         latitude = searchStore.coordinate.latitude,
                         longitude = searchStore.coordinate.longitude,
                     ),
+                productStatus = searchStore.productStatus.code,
                 status = searchStore.status.code,
                 businessHours = searchStore.businessHours,
             )
