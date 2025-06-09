@@ -2,6 +2,7 @@ package com.eatngo.order.dto
 
 import com.eatngo.order.domain.Order
 import com.eatngo.order.domain.OrderItem
+import com.eatngo.order.domain.Status
 import java.time.LocalDateTime
 
 data class OrderDto(
@@ -13,21 +14,35 @@ data class OrderDto(
     val orderItems: List<OrderItemDto>,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime,
+    val readiedAt: LocalDateTime?,
+    val canceledAt: LocalDateTime?,
+    val confirmedAt: LocalDateTime?,
+    val doneAt: LocalDateTime?,
 ) {
     companion object {
         fun from(order: Order) =
-            with(order) {
-                OrderDto(
-                    id = order.id,
-                    orderNumber = order.orderNumber,
-                    customerId = order.customerId,
-                    storeId = order.storeId,
-                    status = order.status.name,
-                    orderItems = order.orderItems.map { OrderItemDto.from(it) },
-                    createdAt = order.createdAt,
-                    updatedAt = order.updatedAt,
-                )
-            }
+            OrderDto(
+                id = order.id,
+                orderNumber = order.orderNumber,
+                customerId = order.customerId,
+                storeId = order.storeId,
+                status = order.status.name,
+                orderItems = order.orderItems.map { OrderItemDto.from(it) },
+                createdAt = order.createdAt,
+                updatedAt = order.updatedAt,
+                readiedAt = order.statusChangedHistories
+                    .firstOrNull { it.status == Status.READY }
+                    ?.updatedAt,
+                canceledAt = order.statusChangedHistories
+                    .firstOrNull { it.status == Status.CANCELED }
+                    ?.updatedAt,
+                confirmedAt = order.statusChangedHistories
+                    .firstOrNull { it.status == Status.CONFIRMED }
+                    ?.updatedAt,
+                doneAt = order.statusChangedHistories
+                    .firstOrNull { it.status == Status.DONE }
+                    ?.updatedAt,
+            )
     }
 }
 
