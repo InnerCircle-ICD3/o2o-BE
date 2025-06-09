@@ -180,28 +180,28 @@ class Store(
     }
 
     /**
-     * 픽업 주문이 가능한 시간인지 확인
+     * 지정된 시간에 픽업 주문이 가능한지 확인
      * 주문 마감: 픽업 시작 시간 전까지만 주문 가능
      */
-    fun isOrderAvailable(): Boolean {
-        val currentTime = LocalDateTime.now().toLocalTime()
-        val today = LocalDateTime.now().dayOfWeek
-        val todayHour = businessHours?.find { it.dayOfWeek == today } ?: return false
+    fun isOrderAvailable(targetDateTime: LocalDateTime): Boolean {
+        val targetTime = targetDateTime.toLocalTime()
+        val targetDay = targetDateTime.dayOfWeek
+        val targetDayHour = businessHours?.find { it.dayOfWeek == targetDay } ?: return false
 
         // 픽업 시작 시간 전까지만 주문 가능
-        return currentTime.isBefore(todayHour.openTime)
+        return targetTime.isBefore(targetDayHour.openTime)
     }
 
     /**
-     * 현재 픽업 가능한 시간인지 확인
+     * 지정된 시간에 픽업이 가능한지 확인
      */
-    fun isPickupAvailable(): Boolean {
-        val currentTime = LocalDateTime.now().toLocalTime()
-        val today = LocalDateTime.now().dayOfWeek
-        val todayHour = businessHours?.find { it.dayOfWeek == today } ?: return false
+    fun isPickupAvailable(targetDateTime: LocalDateTime): Boolean {
+        val targetTime = targetDateTime.toLocalTime()
+        val targetDay = targetDateTime.dayOfWeek
+        val targetDayHour = businessHours?.find { it.dayOfWeek == targetDay } ?: return false
 
         // 픽업 시간 범위 내인지 확인
-        return currentTime.isAfter(todayHour.openTime) && currentTime.isBefore(todayHour.closeTime)
+        return targetTime.isAfter(targetDayHour.openTime) && targetTime.isBefore(targetDayHour.closeTime)
     }
 
     /**
