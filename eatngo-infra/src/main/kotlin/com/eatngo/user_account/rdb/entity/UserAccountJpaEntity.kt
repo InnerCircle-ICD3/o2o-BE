@@ -16,19 +16,19 @@ class UserAccountJpaEntity(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
 
-    @Column(nullable = true, length = 255)
+    @Column(nullable = true, unique = true, length = 255)
     val email: String?,
 
     @Column(nullable = true, length = 255)
     val nickname: String?,
 
-    @OneToMany(mappedBy = "userAccount", fetch = FetchType.LAZY, cascade = [CascadeType.PERSIST])
+    @OneToMany(mappedBy = "userAccount", fetch = FetchType.LAZY, cascade = [CascadeType.PERSIST, CascadeType.MERGE])
     @Filter(name = DELETED_FILTER)
-    val oAuth2: MutableList<UserAccountOAuth2JpaEntity> = mutableListOf(),
+    val oAuth2: MutableSet<UserAccountOAuth2JpaEntity> = mutableSetOf(),
 
     @OneToMany(mappedBy = "account", fetch = FetchType.LAZY, cascade = [CascadeType.PERSIST])
     @Filter(name = DELETED_FILTER)
-    val roles: MutableList<UserAccountRoleJpaEntity> = mutableListOf(),
+    val roles: MutableSet<UserAccountRoleJpaEntity> = mutableSetOf(),
 ) : BaseJpaEntity() {
 
     companion object {
@@ -41,12 +41,12 @@ class UserAccountJpaEntity(
                 it.oAuth2.add(UserAccountOAuth2JpaEntity.of(oauth2, it))
             }
             account.roles.forEach { role ->
-                it.roles.add(UserAccountRoleJpaEntity.of(role, it))
+                it.roles.add(UserAccountRoleJpaEntity.of(role.id, role.role, it))
             }
         }
 
-        fun toUserAccount(account: UserAccountJpaEntity) = with(account) {
-            UserAccount(
+        fun toUserAccount(account: UserAccountJpaEntity): UserAccount = with(account) {
+            val userAccount = UserAccount(
                 id = id,
                 email = email?.let { EmailAddress(it) },
                 nickname = account.nickname?.let { Nickname(it) },
@@ -55,6 +55,12 @@ class UserAccountJpaEntity(
                 deletedAt = deletedAt,
                 roles = roles.map { UserAccountRoleJpaEntity.toRole(it) },
             )
+            account.oAuth2.forEach {
+                userAccount.addOauth2(
+                    UserAccountOAuth2JpaEntity.toUserAccountOAuth2(userAccount, it)
+                )
+            }
+            return userAccount
         }
     }
 

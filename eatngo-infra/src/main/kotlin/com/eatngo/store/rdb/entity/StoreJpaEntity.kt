@@ -86,7 +86,8 @@ class StoreJpaEntity(
                 name = store.name.value,
                 description = store.description?.value,
                 address = AddressJpaEntity(
-                    roadNameAddress = store.address.roadNameAddress.value,
+                    id = store.addressId,
+                    roadNameAddress = store.address.roadNameAddress?.value,
                     lotNumberAddress = store.address.lotNumberAddress.value,
                     buildingName = store.address.buildingName,
                     zipCode = store.address.zipCode.value,
@@ -131,6 +132,7 @@ class StoreJpaEntity(
                     region3DepthName = address.region3DepthName,
                     coordinate = CoordinateVO.from(address.latitude, address.longitude)
                 ),
+                addressId = address.id,
                 businessNumber = BusinessNumberVO.from(businessNumber),
                 contactNumber = contactNumber?.let { ContactNumberVO.from(it) },
                 imageUrl = imageUrl,

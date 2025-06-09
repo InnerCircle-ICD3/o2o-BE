@@ -7,6 +7,7 @@ import com.eatngo.order.domain.OrderItem
 import com.eatngo.order.domain.Status
 import jakarta.persistence.*
 import org.hibernate.annotations.Filter
+import java.time.LocalDateTime
 
 @Filter(name = DELETED_FILTER)
 @Table(name = "orders")
@@ -16,6 +17,7 @@ class OrderJpaEntity(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0,
     val orderNumber: Long,
+    val pickupDateTime: LocalDateTime,
     @Filter(name = DELETED_FILTER)
     @OneToMany(mappedBy = "order", cascade = [CascadeType.ALL])
     val orderItems: MutableList<OrderItemJpaEntity> = mutableListOf(),
@@ -34,9 +36,10 @@ class OrderJpaEntity(
             val orderJpaEntity = OrderJpaEntity(
                 id = order.id,
                 orderNumber = order.orderNumber,
+                pickupDateTime = order.pickupDateTime,
                 customerId = order.customerId,
                 storeId = order.storeId,
-                status = order.status
+                status = order.status,
             )
 
             order.orderItems.forEach { orderItem: OrderItem ->
@@ -52,6 +55,7 @@ class OrderJpaEntity(
             Order(
                 id = id,
                 orderNumber = orderNumber,
+                pickupDateTime = pickupDateTime,
                 orderItems = orderItems.map(OrderItemJpaEntity::toOrderItem),
                 customerId = customerId,
                 storeId = storeId,

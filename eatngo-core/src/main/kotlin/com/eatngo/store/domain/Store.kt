@@ -20,6 +20,7 @@ class Store(
     var name: StoreNameVO,                // 매장명
     var description: DescriptionVO?,           // 매장 설명
     var address: Address,               // 매장 주소
+    var addressId: Long = 0L,           // 주소 테이블의 ID (JPA 매핑용)
     val businessNumber: BusinessNumberVO, // 사업자등록 번호
     var contactNumber: ContactNumberVO?,  // 매장 or 점주 전화번호
     var imageUrl: String?,            // 대표 이미지 url(카드뷰에 보이는 이미지)
@@ -51,6 +52,7 @@ class Store(
                         dto.address.coordinate.longitude ?: 0.0
                     )
                 ),
+                addressId = 0L,
                 businessNumber = BusinessNumberVO.from(dto.businessNumber),
                 contactNumber = dto.contactNumber?.let { ContactNumberVO.from(it) },
                 imageUrl = dto.imageUrl,
@@ -90,6 +92,7 @@ class Store(
                         request.address.coordinate.longitude ?: 0.0
                     )
                 ),
+                addressId = 0L,
                 businessNumber = BusinessNumberVO.from(request.businessNumber),
                 contactNumber = request.contactNumber?.let { ContactNumberVO.from(it) },
                 imageUrl = request.imageUrl,
@@ -177,16 +180,28 @@ class Store(
     }
 
     /**
-     * 활성화된 픽업 시간이 정확히 되었는지(=알림 시점) 반환
+     * 지정된 시간에 픽업 주문이 가능한지 확인
+     * 주문 마감: 픽업 시작 시간 전까지만 주문 가능
      */
-    fun isPickupTime(): Boolean {
-        val currentTime = LocalDateTime.now().toLocalTime()
-        val today = LocalDateTime.now().dayOfWeek
-        val todayHour = businessHours?.find { it.dayOfWeek == today } ?: return false
+    fun isOrderAvailable(targetDateTime: LocalDateTime): Boolean {
+        val targetTime = targetDateTime.toLocalTime()
+        val targetDay = targetDateTime.dayOfWeek
+        val targetDayHour = businessHours?.find { it.dayOfWeek == targetDay } ?: return false
 
-        val startWindow = todayHour.openTime.minusMinutes(1)
-        val endWindow = todayHour.openTime.plusMinutes(1)
-        return currentTime.isAfter(startWindow) && currentTime.isBefore(endWindow)
+        // 픽업 시작 시간 전까지만 주문 가능
+        return targetTime.isBefore(targetDayHour.openTime)
+    }
+
+    /**
+     * 지정된 시간에 픽업이 가능한지 확인
+     */
+    fun isPickupAvailable(targetDateTime: LocalDateTime): Boolean {
+        val targetTime = targetDateTime.toLocalTime()
+        val targetDay = targetDateTime.dayOfWeek
+        val targetDayHour = businessHours?.find { it.dayOfWeek == targetDay } ?: return false
+
+        // 픽업 시간 범위 내인지 확인
+        return targetTime.isAfter(targetDayHour.openTime) && targetTime.isBefore(targetDayHour.closeTime)
     }
 
     /**

@@ -6,6 +6,7 @@ import com.eatngo.customer.domain.Customer
 import com.eatngo.customer.infra.CustomerPersistence
 import com.eatngo.user_account.infra.UserAccountPersistence
 import com.eatngo.user_account.oauth2.constants.Role
+import jakarta.servlet.http.HttpServletResponse
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
@@ -17,7 +18,10 @@ class CustomerOAuth2SuccessPostProcessor(
     private val customerPersistence: CustomerPersistence,
 ) : OAuth2SuccessPostProcessor {
 
-    override fun postProcess(userId: Long): LoginUser {
+    override fun postProcess(
+        userId: Long,
+        response: HttpServletResponse
+    ): LoginUser {
         val customer = customerPersistence.findByUserId(userId) ?: run {
             val userAccount = userAccountPersistence.getByIdOrThrow(userId)
             customerPersistence.save(Customer.create(userAccount))
@@ -33,6 +37,12 @@ class CustomerOAuth2SuccessPostProcessor(
         val authorities = loginCustomer.roles.map { SimpleGrantedAuthority(it) }
         val usernamePasswordAuthenticationToken = UsernamePasswordAuthenticationToken(loginCustomer, null, authorities)
         SecurityContextHolder.getContext().authentication = usernamePasswordAuthenticationToken
+
+        if (loginCustomer.nickname == null) {
+            response.status = HttpServletResponse.SC_MOVED_TEMPORARILY
+            response.setHeader("Location", "/mypage/complete-profile")
+        }
+
         return loginCustomer
     }
 }

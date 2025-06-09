@@ -12,7 +12,7 @@ class UserAccount(
     val id: Long = 0,
     val email: EmailAddress?,
     var nickname: Nickname? = null,
-    var roles: List<Role> = mutableListOf(),
+    var roles: List<UserRole> = mutableListOf(),
     val createdAt: LocalDateTime? = null,
     var updatedAt: LocalDateTime? = null,
     var deletedAt: LocalDateTime? = null,
@@ -28,6 +28,11 @@ class UserAccount(
         userAccountUpdateDto.nickname?.let { this.nickname = it }
     }
 
+    fun updateOauth2(userAccountOauth2: UserAccountOAuth2) {
+        oAuth2.find { it.provider == userAccountOauth2.provider && it.userKey == userAccountOauth2.userKey }
+            ?.update(userAccountOauth2)
+    }
+
     companion object {
 
         fun create(oAuth2: OAuth2): UserAccount {
@@ -41,7 +46,7 @@ class UserAccount(
                     oAuth2 = oAuth2
                 )
             )
-            userAccount.roles = listOf(Role.USER)
+            userAccount.roles = listOf(UserRole(null, Role.USER))
 
             return userAccount
         }

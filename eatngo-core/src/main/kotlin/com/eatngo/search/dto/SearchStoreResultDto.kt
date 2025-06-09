@@ -7,6 +7,7 @@ import com.eatngo.common.util.DistanceCalculator
 import com.eatngo.search.domain.SearchStore
 import com.eatngo.store.dto.BusinessHourDto
 import com.eatngo.store.vo.BusinessHourVO
+import java.time.LocalDateTime
 import java.time.LocalTime
 
 data class SearchStoreResultDto(
@@ -19,23 +20,23 @@ data class SearchStoreResultDto(
         ): SearchStoreResultDto =
             SearchStoreResultDto(
                 storeList =
-                    searchStoreList.map { searchStore ->
-                        SearchStoreDto.from(
-                            searchStore,
-                            DistanceCalculator.calculateDistance(
-                                from = searchStore.coordinate.toVO(),
-                                to = userCoordinate,
-                            ),
-                        )
-                    },
+                searchStoreList.map { searchStore ->
+                    SearchStoreDto.from(
+                        searchStore,
+                        DistanceCalculator.calculateDistance(
+                            from = searchStore.coordinate.toVO(),
+                            to = userCoordinate,
+                        ),
+                    )
+                },
             )
 
         fun from(searchStoreList: List<SearchStoreWithDistance>): SearchStoreResultDto =
             SearchStoreResultDto(
                 storeList =
-                    searchStoreList.map { searchStore ->
-                        SearchStoreDto.from(searchStore.store, searchStore.distance)
-                    },
+                searchStoreList.map { searchStore ->
+                    SearchStoreDto.from(searchStore.store, searchStore.distance)
+                },
             )
     }
 }
@@ -48,10 +49,9 @@ data class SearchStoreDto(
     val foodCategory: List<String>, // 음식 종류
     val distanceKm: Double, // 검색하는 유저와 매장 간의 거리(km)
     val status: StoreEnum.StoreStatus, // 매장 오픈 여부
-    val roadNameAddress: String, // 매장 주소(도로명 주소)
+    val roadNameAddress: String? = null, // 매장 주소(도로명 주소)
     val coordinate: CoordinateResultDto, // 매장 위치(위도, 경도)
     val businessHours: List<BusinessHourVO>, // 매장 영업 시간
-    val pickUpDay: String,
     val todayPickupStartTime: LocalTime?, // 오늘 픽업 시작 시간
     val todayPickupEndTime: LocalTime?, // 오늘 픽업 종료 시간
     // TODO: 리뷰, 찜 기능
@@ -64,8 +64,22 @@ data class SearchStoreDto(
         fun from(
             searchStore: SearchStore,
             distanceKm: Double,
-        ): SearchStoreDto =
-            SearchStoreDto(
+        ): SearchStoreDto {
+            // 픽업 가능 시간 TODO : 검색쪽 필터링 부분과 겹치는 로직으로 리팩토링 필요
+            val now = LocalDateTime.now()
+            val currentDayOfWeek = now.dayOfWeek
+            val todayBusinessHours = searchStore.businessHours[currentDayOfWeek]
+
+            val todayPickupStartTime =
+                todayBusinessHours?.openTime?.let {
+                    DateTimeUtil.parseHHmmToLocalTime(it)
+                }
+            val todayPickupEndTime =
+                todayBusinessHours?.closeTime?.let {
+                    DateTimeUtil.parseHHmmToLocalTime(it)
+                }
+
+            return SearchStoreDto(
                 storeId = searchStore.storeId,
                 storeName = searchStore.storeName,
                 storeImage = searchStore.storeImage,
@@ -76,24 +90,23 @@ data class SearchStoreDto(
                 distanceKm = distanceKm,
                 status = searchStore.status.toStoreStatus(),
                 businessHours =
-                    BusinessHourVO.fromList(
-                        searchStore.businessHours.map { (dayOfWeek, timeRange) ->
-                            BusinessHourDto(
-                                dayOfWeek = dayOfWeek,
-                                openTime = DateTimeUtil.parseHHmmToLocalTime(timeRange.openTime),
-                                closeTime = DateTimeUtil.parseHHmmToLocalTime(timeRange.closeTime),
-                            )
-                        },
-                    ),
-                // TODO: 픽업 가능 요일 선택 MongoDB 에도 추가
-                pickUpDay = searchStore.pickUpDay.name,
-                todayPickupStartTime = DateTimeUtil.parseHHmmToLocalTime(searchStore.pickupHour.openTime),
-                todayPickupEndTime = DateTimeUtil.parseHHmmToLocalTime(searchStore.pickupHour.closeTime),
+                BusinessHourVO.fromList(
+                    searchStore.businessHours.map { (dayOfWeek, timeRange) ->
+                        BusinessHourDto(
+                            dayOfWeek = dayOfWeek,
+                            openTime = DateTimeUtil.parseHHmmToLocalTime(timeRange.openTime),
+                            closeTime = DateTimeUtil.parseHHmmToLocalTime(timeRange.closeTime),
+                        )
+                    },
+                ),
+                todayPickupStartTime = todayPickupStartTime,
+                todayPickupEndTime = todayPickupEndTime,
                 // TODO: 재고 수량은 Redis에서 가져와야 함(상품)
                 stock = 0,
                 // TODO: 리뷰 관련 기능 구현 (Redis에서 가져오기?)
                 ratingAverage = 3.0,
                 ratingCount = 3,
             )
+        }
     }
 }

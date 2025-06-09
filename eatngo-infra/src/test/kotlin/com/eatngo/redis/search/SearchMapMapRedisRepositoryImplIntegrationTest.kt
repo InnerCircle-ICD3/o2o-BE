@@ -36,8 +36,16 @@ class SearchMapMapRedisRepositoryImplIntegrationTest(
 
             val storeMaps =
                 listOf(
-                    SearchStoreMap(storeID = 1L, storeName = "Store A", CoordinateResultDto(latitude = 37.000000, longitude = 127.000000)),
-                    SearchStoreMap(storeID = 2L, storeName = "Store B", CoordinateResultDto(latitude = 37.000001, longitude = 127.000001)),
+                    SearchStoreMap(
+                        storeId = 1L,
+                        storeName = "Store A",
+                        CoordinateResultDto.from(latitude = 37.000000, longitude = 127.00000),
+                    ),
+                    SearchStoreMap(
+                        storeId = 2L,
+                        storeName = "Store B",
+                        CoordinateResultDto.from(latitude = 37.000001, longitude = 127.00001),
+                    ),
                 )
 
             this.`when`("Redis에 저장하고 다시 조회하면") {

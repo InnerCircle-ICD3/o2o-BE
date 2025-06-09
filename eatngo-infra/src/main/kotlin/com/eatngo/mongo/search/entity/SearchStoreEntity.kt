@@ -1,4 +1,4 @@
-package com.eatngo.mongo.entity.search
+package com.eatngo.mongo.search.entity
 
 import com.eatngo.common.constant.StoreEnum
 import com.eatngo.common.exception.search.SearchException
@@ -23,14 +23,12 @@ class SearchStoreEntity(
     var storeImage: String, // 매장 이미지 S3 URL
     var storeCategory: List<String>,
     var foodCategory: List<String>, // 대표 판매 음식 종류
-    var roadNameAddress: String,
+    var roadNameAddress: String? = null,
     @GeoSpatialIndexed
     var coordinate: GeoJsonPoint,
     var status: Int, // 매장 오픈 여부
     @Field("businessHours")
     var businessHours: Map<DayOfWeek, TimeRange>,
-    var pickUpDay: String,
-    var pickupHour: TimeRange, // 매장 픽업 가능 시간
     var updatedAt: LocalDateTime = LocalDateTime.now(), // 마지막 업데이트 시간
     var createdAt: LocalDateTime = LocalDateTime.now(), // 생성 시간
 ) {
@@ -40,22 +38,20 @@ class SearchStoreEntity(
             storeName = storeName,
             storeImage = storeImage,
             storeCategory =
-                storeCategory.map {
-                    StoreEnum.StoreCategory.valueOf(it).orThrow {
-                        SearchException.SearchCategoryNotFound(it)
-                    }
-                },
+            storeCategory.map {
+                StoreEnum.StoreCategory.valueOf(it).orThrow {
+                    SearchException.SearchCategoryNotFound(it)
+                }
+            },
             foodCategory = foodCategory,
             roadNameAddress = roadNameAddress,
             coordinate =
-                Coordinate.from(
-                    latitude = coordinate.coordinates[1],
-                    longitude = coordinate.coordinates[0],
-                ),
-            status = SearchStoreStatus.from(status),
+            Coordinate.Companion.from(
+                latitude = coordinate.coordinates[1],
+                longitude = coordinate.coordinates[0],
+            ),
+            status = SearchStoreStatus.Companion.from(status),
             businessHours = businessHours,
-            pickUpDay = StoreEnum.PickupDay.valueOf(pickUpDay),
-            pickupHour = pickupHour,
             updatedAt = updatedAt,
             createdAt = createdAt,
         )
@@ -65,5 +61,22 @@ class SearchStoreEntity(
             latitude: Double,
             longitude: Double,
         ): GeoJsonPoint = GeoJsonPoint(longitude, latitude)
+
+        fun from(searchStore: SearchStore): SearchStoreEntity =
+            SearchStoreEntity(
+                storeId = searchStore.storeId,
+                storeName = searchStore.storeName,
+                storeImage = searchStore.storeImage,
+                storeCategory = searchStore.storeCategory.map { it.name },
+                foodCategory = searchStore.foodCategory,
+                roadNameAddress = searchStore.roadNameAddress,
+                coordinate =
+                toGeoJsonPoint(
+                    latitude = searchStore.coordinate.latitude,
+                    longitude = searchStore.coordinate.longitude,
+                ),
+                status = searchStore.status.code,
+                businessHours = searchStore.businessHours,
+            )
     }
 }

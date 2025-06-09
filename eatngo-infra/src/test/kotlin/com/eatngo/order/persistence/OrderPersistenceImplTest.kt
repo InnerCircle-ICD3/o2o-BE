@@ -30,12 +30,15 @@ class OrderPersistenceImplIntegrationTest(
                 customerId = 1L,
                 storeId = 1L,
                 orderNumber = 99L,
+                pickupDateTime = LocalDateTime.now(),
                 orderItems = listOf(
                     OrderItem.of(
                         productId = 42L,
                         name = "테스트상품",
                         quantity = 2,
-                        price = 7_500
+                        originPrice = 15_000,
+                        finalPrice = 7_500,
+                        imageUrl =  null,
                     )
                 )
             )
@@ -55,12 +58,15 @@ class OrderPersistenceImplIntegrationTest(
                     customerId = 1L,
                     storeId = 1L,
                     orderNumber = 99L,
+                    pickupDateTime = LocalDateTime.now(),
                     orderItems = listOf(
                         OrderItem.of(
                             productId = 42L,
                             name = "테스트상품",
                             quantity = 2,
-                            price = 7_500
+                            originPrice = 15_000,
+                            finalPrice = 7_500,
+                            imageUrl =  null,
                         )
                     )
                 )
