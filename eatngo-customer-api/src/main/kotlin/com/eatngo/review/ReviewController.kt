@@ -17,14 +17,14 @@ import org.springframework.web.bind.annotation.*
 class ReviewController(
     private val createReviewUseCase: CreateReviewUseCase,
     private val readReviewsUseCase: ReadReviewsUseCase,
-    private val readReviewUseCase: ReadReviewUseCase
+    private val readReviewUseCase: ReadReviewUseCase,
 ) {
     @PostMapping("/api/v1/orders/{orderId}/reviews")
     @Operation(summary = "리뷰 생성", description = "리뷰 생성")
     fun createReview(
         @RequestBody requestDto: CreateReviewRequestDto,
         @PathVariable orderId: Long,
-        @CustomerId customerId: Long
+        @CustomerId customerId: Long,
     ) = ResponseEntity.ok(
         ApiResponse.success(
             ReviewResponseDto.from(
@@ -32,11 +32,11 @@ class ReviewController(
                     CreateReviewRequestDto.toCreateReviewDto(
                         dto = requestDto,
                         orderId = orderId,
-                        customerId = customerId
-                    )
-                )
-            )
-        )
+                        customerId = customerId,
+                    ),
+                ),
+            ),
+        ),
     )
 
     @GetMapping("/api/v1/orders/{orderId}/reviews")
@@ -44,13 +44,13 @@ class ReviewController(
     fun getReview(
         @RequestBody requestDto: CreateReviewRequestDto,
         @PathVariable orderId: Long,
-        @CustomerId customerId: Long
+        @CustomerId customerId: Long,
     ) = ResponseEntity.ok(
         ApiResponse.success(
             ReviewResponseDto.from(
-                readReviewUseCase.getReviewByOrderId(orderId = orderId)
-            )
-        )
+                readReviewUseCase.getReviewByOrderId(orderId = orderId),
+            ),
+        ),
     )
 
     @GetMapping("/api/v1/stores/{storeId}/reviews")
@@ -58,13 +58,13 @@ class ReviewController(
     fun getStoreReviews(
         @PathVariable storeId: Long,
         @CustomerId customerId: Long,
-        @RequestParam(required = false) lastId: Long?
+        @RequestParam(required = false) lastId: Long?,
     ) = ResponseEntity.ok(
         ApiResponse.success(
             readReviewsUseCase.execute(
                 storeId = storeId,
                 lastId = lastId,
-            )
-        )
+            ),
+        ),
     )
 }

@@ -8,12 +8,13 @@ import org.springframework.stereotype.Service
 
 @Service
 class ReadReviewUseCase(
-    private val reviewService: ReviewService
+    private val reviewService: ReviewService,
 ) {
     fun getReviewByOrderId(orderId: Long): ReviewDto {
-        val review = reviewService.findByOrderId(orderId).orThrow {
-            ReviewException.ReviewNotFoundException(orderId = orderId)
-        }
+        val review =
+            reviewService.findByOrderId(orderId).orThrow {
+                ReviewException.ReviewNotFoundException(orderId = orderId)
+            }
 
         return ReviewDto.from(review)
     }

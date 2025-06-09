@@ -11,36 +11,44 @@ import org.springframework.stereotype.Component
 
 @Component
 class ReviewPersistenceImpl(
-    private val reviewRdbRepository: ReviewRdbRepository
+    private val reviewRdbRepository: ReviewRdbRepository,
 ) : ReviewPersistence {
-    override fun save(review: Review) = ReviewJpaEntity.toDomain(
-        reviewRdbRepository.save(
-            ReviewJpaEntity.from(review)
+    override fun save(review: Review) =
+        ReviewJpaEntity.toDomain(
+            reviewRdbRepository.save(
+                ReviewJpaEntity.from(review),
+            ),
         )
-    )
 
     override fun existsByOrderId(orderId: Long) = reviewRdbRepository.findByOrderId(orderId) != null
 
     override fun findByOrderId(orderId: Long) =
-        reviewRdbRepository.findByOrderId(orderId)
+        reviewRdbRepository
+            .findByOrderId(orderId)
             ?.let(ReviewJpaEntity::toDomain)
 
-    override fun findByOrderIds(orderIds: List<Long>) = reviewRdbRepository.findByOrderIds(orderIds)
-        .map(ReviewJpaEntity::toDomain)
+    override fun findByOrderIds(orderIds: List<Long>) =
+        reviewRdbRepository
+            .findByOrderIds(orderIds)
+            .map(ReviewJpaEntity::toDomain)
 
-    override fun findByStoreId(storeId: Long, lastId: Long?): Cursor<Review> {
+    override fun findByStoreId(
+        storeId: Long,
+        lastId: Long?,
+    ): Cursor<Review> {
         val pageRequest = PageRequest.of(0, 50, Sort.by("id").descending())
 
-        val cursoredReviewJpaEntities = reviewRdbRepository.cursoredFindAllByStoreId(
-            storeId = storeId,
-            lastId = lastId,
-            pageable = pageRequest
-        )
+        val cursoredReviewJpaEntities =
+            reviewRdbRepository.cursoredFindAllByStoreId(
+                storeId = storeId,
+                lastId = lastId,
+                pageable = pageRequest,
+            )
 
         return Cursor.from(
             cursoredReviewJpaEntities.content
                 .map(ReviewJpaEntity::toDomain),
-            cursoredReviewJpaEntities.lastOrNull()?.id
+            cursoredReviewJpaEntities.lastOrNull()?.id,
         )
     }
 }
