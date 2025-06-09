@@ -24,6 +24,7 @@ class OrderJpaEntity(
     @OneToMany(mappedBy = "order", cascade = [CascadeType.ALL])
     val statusChangedHistories: MutableList<OrderStatusHistoryJpaEntity> = mutableListOf(),
     val customerId: Long,
+    val nickname: String,
     val storeId: Long,
     @Enumerated(EnumType.STRING)
     var status: Status
@@ -40,6 +41,7 @@ class OrderJpaEntity(
                 orderNumber = order.orderNumber,
                 pickupDateTime = order.pickupDateTime,
                 customerId = order.customerId,
+                nickname = order.nickname,
                 storeId = order.storeId,
                 status = order.status,
             )
@@ -68,6 +70,7 @@ class OrderJpaEntity(
                 statusChangedHistories = statusChangedHistories.map(OrderStatusHistoryJpaEntity::toDomain)
                     .toMutableList(),
                 customerId = customerId,
+                nickname = nickname,
                 storeId = storeId,
                 status = status,
                 createdAt = createdAt,

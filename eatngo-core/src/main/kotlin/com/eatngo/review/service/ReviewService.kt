@@ -20,4 +20,6 @@ class ReviewService(
         )
 
     fun existsReviewByOrderId(orderId: Long) = reviewPersistence.existsByOrderId(orderId)
+
+    fun findByOrderIds(orderIds: List<Long>) = reviewPersistence.findByOrderIds(orderIds)
 }

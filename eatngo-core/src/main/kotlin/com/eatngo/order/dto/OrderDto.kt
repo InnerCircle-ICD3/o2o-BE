@@ -9,6 +9,7 @@ data class OrderDto(
     val id: Long,
     val orderNumber: Long,
     val customerId: Long,
+    val nickname: String,
     val storeId: Long,
     val status: String,
     val orderItems: List<OrderItemDto>,
@@ -21,17 +22,18 @@ data class OrderDto(
     val hasReview: Boolean = false
 ) {
     companion object {
-        fun from(order: Order) =
+        fun from(order: Order, hasReview: Boolean = false) = with(order) {
             OrderDto(
-                id = order.id,
-                orderNumber = order.orderNumber,
-                customerId = order.customerId,
-                storeId = order.storeId,
-                status = order.status.name,
-                orderItems = order.orderItems.map { OrderItemDto.from(it) },
-                createdAt = order.createdAt,
-                updatedAt = order.updatedAt,
-                readiedAt = order.statusChangedHistories
+                id = id,
+                orderNumber = orderNumber,
+                customerId = customerId,
+                nickname = nickname,
+                storeId = storeId,
+                status = status.name,
+                orderItems = orderItems.map { OrderItemDto.from(it) },
+                createdAt = createdAt,
+                updatedAt = updatedAt,
+                readiedAt = statusChangedHistories
                     .firstOrNull { it.status == Status.READY }
                     ?.updatedAt,
                 canceledAt = order.statusChangedHistories
@@ -43,7 +45,9 @@ data class OrderDto(
                 doneAt = order.statusChangedHistories
                     .firstOrNull { it.status == Status.DONE }
                     ?.updatedAt,
+                hasReview = hasReview
             )
+        }
     }
 }
 

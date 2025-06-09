@@ -17,4 +17,7 @@ class ReviewPersistenceImpl(
     )
 
     override fun existsByOrderId(orderId: Long) = reviewRdbRepository.findByOrderId(orderId) != null
+
+    override fun findByOrderIds(orderIds: List<Long>) = reviewRdbRepository.findByOrderIds(orderIds)
+        .map(ReviewJpaEntity::toDomain)
 }

@@ -13,6 +13,7 @@ class Order(
     val orderNumber: Long,
     val orderItems: List<OrderItem>,
     val customerId: Long,
+    val nickname: String,
     val storeId: Long,
     val pickupDateTime: LocalDateTime,
     var status: Status,
@@ -77,6 +78,7 @@ class Order(
             customerId: Long,
             storeId: Long,
             orderNumber: Long,
+            nickname: String,
             pickupDateTime: LocalDateTime,
             orderItems: List<OrderItem>
         ): Order {
@@ -85,6 +87,7 @@ class Order(
                 orderNumber = orderNumber,
                 orderItems = orderItems,
                 customerId = customerId,
+                nickname = nickname,
                 storeId = storeId,
                 status = Status.CREATED,
                 pickupDateTime = pickupDateTime,

@@ -26,11 +26,13 @@ class OrderPersistenceImplIntegrationTest(
 ) : BehaviorSpec() {
     init {
         this.given(name = "domain 객체가 주어지면") {
+            val now = LocalDateTime.now()
             val domainOrder = Order.create(
                 customerId = 1L,
                 storeId = 1L,
                 orderNumber = 99L,
-                pickupDateTime = LocalDateTime.now(),
+                pickupDateTime = now,
+                nickname = "nickname",
                 orderItems = listOf(
                     OrderItem.of(
                         productId = 42L,
@@ -48,6 +50,8 @@ class OrderPersistenceImplIntegrationTest(
                     saved.id shouldBeGreaterThan 0L
                     saved.customerId shouldBe 1L
                     saved.orderItems.size shouldBe 1
+                    saved.nickname shouldBe "nickname"
+                    saved.pickupDateTime shouldBe now
                 }
             }
         }
@@ -56,6 +60,7 @@ class OrderPersistenceImplIntegrationTest(
             val savedOrder = orderPersistence.save(
                 Order.create(
                     customerId = 1L,
+                    nickname = "nickname",
                     storeId = 1L,
                     orderNumber = 99L,
                     pickupDateTime = LocalDateTime.now(),
