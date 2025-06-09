@@ -67,7 +67,7 @@ class InventorySyncScheduler(
 
     private fun fetchAndClearChangedIdsAtomically(): List<String> {
         val redisScript = DefaultRedisScript<List<String>>().apply {
-            LUA_POP_AND_DELETE.trimIndent()
+            setScriptText(LUA_POP_AND_DELETE.trimIndent())
             resultType = List::class.java as Class<List<String>>
         }
 
