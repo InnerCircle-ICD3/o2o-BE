@@ -21,6 +21,8 @@ class OrderJpaEntity(
     @Filter(name = DELETED_FILTER)
     @OneToMany(mappedBy = "order", cascade = [CascadeType.ALL])
     val orderItems: MutableList<OrderItemJpaEntity> = mutableListOf(),
+    @OneToMany(mappedBy = "order", cascade = [CascadeType.ALL])
+    val statusChangedHistories: MutableList<OrderStatusHistoryJpaEntity> = mutableListOf(),
     val customerId: Long,
     val storeId: Long,
     @Enumerated(EnumType.STRING)
@@ -48,6 +50,12 @@ class OrderJpaEntity(
                 )
             }
 
+            order.statusChangedHistories.forEach {
+                orderJpaEntity.statusChangedHistories.add(
+                    OrderStatusHistoryJpaEntity.from(orderStatusHistory = it, orderJpaEntity = orderJpaEntity)
+                )
+            }
+
             return orderJpaEntity
         }
 
@@ -57,6 +65,8 @@ class OrderJpaEntity(
                 orderNumber = orderNumber,
                 pickupDateTime = pickupDateTime,
                 orderItems = orderItems.map(OrderItemJpaEntity::toOrderItem),
+                statusChangedHistories = statusChangedHistories.map(OrderStatusHistoryJpaEntity::toDomain)
+                    .toMutableList(),
                 customerId = customerId,
                 storeId = storeId,
                 status = status,
