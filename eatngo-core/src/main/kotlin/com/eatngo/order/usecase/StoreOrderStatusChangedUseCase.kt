@@ -4,7 +4,7 @@ import com.eatngo.order.domain.Status
 import com.eatngo.order.dto.StoreOrderStatusChangedDto
 import com.eatngo.order.event.OrderEvent
 import com.eatngo.order.service.OrderService
-import com.eatngo.store.service.impl.StoreServiceImpl
+import com.eatngo.store.service.StoreService
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class StoreOrderStatusChangedUseCase(
     private val orderService: OrderService,
-    private val storeService: StoreServiceImpl,
+    private val storeService: StoreService,
     private val eventPublisher: ApplicationEventPublisher
 ) {
     @Transactional

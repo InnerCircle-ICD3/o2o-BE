@@ -53,7 +53,7 @@ class OrderController(
             )
         )
 
-    @GetMapping("/api/stores/{storeId}/v1/store/orders")
+    @GetMapping("/api/v1/stores/{storeId}/store/orders")
     @Operation(summary = "상점 주문 조회", description = "상점 주문 조회")
     fun getOrdersByStoreId(
         @StoreOwnerId storeOwnerId: Long,

@@ -48,7 +48,7 @@ class OrderCreateUseCase(
             requireNotNull(product) { "존재하지 않는 상품을 선택하셨습니다." }
             require(product.name == it.productName) { "상품 명이 다릅니다." }
             require(product.price.finalPrice == it.price) { "상품 가격이 다릅니다." }
-            require(product.inventory.stock < it.quantity) { " 재고가 충분하지 않습니다." }
+            require(product.inventory.stock >= it.quantity) { " 재고가 충분하지 않습니다." }
 
             return@map OrderItemSnapshotDto(
                 productId = product.id!!,
