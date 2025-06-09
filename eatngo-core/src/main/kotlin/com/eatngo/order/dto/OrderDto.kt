@@ -18,6 +18,7 @@ data class OrderDto(
     val canceledAt: LocalDateTime?,
     val confirmedAt: LocalDateTime?,
     val doneAt: LocalDateTime?,
+    val hasReview: Boolean = false
 ) {
     companion object {
         fun from(order: Order) =
