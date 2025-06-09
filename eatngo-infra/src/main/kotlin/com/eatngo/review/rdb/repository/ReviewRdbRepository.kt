@@ -9,7 +9,7 @@ interface ReviewRdbRepository : JpaRepository<ReviewJpaEntity, Long> {
     fun findByOrderId(orderId: Long): ReviewJpaEntity?
 
     @Query(
-        "SELECT r FROM ReviewJpaEntity r WHERE r.id IN (:reviewIds)",
+        "SELECT r FROM ReviewJpaEntity r WHERE r.orderId IN (:orderIds)",
     )
     fun findByOrderIds(orderIds: List<Long>): List<ReviewJpaEntity>
 }

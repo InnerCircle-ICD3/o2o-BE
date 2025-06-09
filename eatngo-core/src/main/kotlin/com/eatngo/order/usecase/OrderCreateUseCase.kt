@@ -34,7 +34,7 @@ class OrderCreateUseCase(
             pickupDateTime = orderDto.pickupDateTime,
             nickname = customer.account
                 .nickname
-                .toString(),
+                ?.toString() ?: "",
             orderItemSnapshotDtos = orderItemSnapshotDtos
         )
 
