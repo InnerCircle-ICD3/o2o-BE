@@ -21,6 +21,7 @@ class OrderService(
         storeId: Long,
         customerId: Long,
         pickupDateTime: LocalDateTime,
+        nickname: String,
         orderItemSnapshotDtos: List<OrderItemSnapshotDto>,
     ): Order {
         val order: Order = Order.create(
@@ -28,6 +29,7 @@ class OrderService(
             customerId = customerId,
             storeId = storeId,
             pickupDateTime = pickupDateTime,
+            nickname = nickname,
             orderItems = orderItemSnapshotDtos.map {
                 with(it) {
                     OrderItem.of(

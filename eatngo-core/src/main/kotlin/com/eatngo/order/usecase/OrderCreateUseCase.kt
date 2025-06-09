@@ -1,5 +1,6 @@
 package com.eatngo.order.usecase
 
+import com.eatngo.customer.service.CustomerService
 import com.eatngo.order.dto.OrderCreateDto
 import com.eatngo.order.dto.OrderDto
 import com.eatngo.order.dto.OrderItemCreateDto
@@ -15,20 +16,25 @@ import org.springframework.stereotype.Service
 @Service
 class OrderCreateUseCase(
     val orderService: OrderService,
+    val customerService: CustomerService,
     val productService: ProductService,
     val eventPublisher: ApplicationEventPublisher
 ) {
     @Transactional
     fun create(orderDto: OrderCreateDto): OrderDto {
+        val customer = customerService.getCustomerById(orderDto.customerId)
         val idToProduct = productService.findAllProducts(orderDto.storeId)
             .associateBy { it.id!! }
-        val orderItemDto = orderDto.orderItems
 
-        val orderItemSnapshotDtos =  toOrderItemSnapshotDto(orderItemDto, idToProduct)
+        val orderItemSnapshotDtos = toOrderItemSnapshotDto(orderDto.orderItems, idToProduct)
+
         val order = orderService.createOrder(
             storeId = orderDto.storeId,
             customerId = orderDto.customerId,
             pickupDateTime = orderDto.pickupDateTime,
+            nickname = customer.account
+                .nickname
+                .toString(),
             orderItemSnapshotDtos = orderItemSnapshotDtos
         )
 
