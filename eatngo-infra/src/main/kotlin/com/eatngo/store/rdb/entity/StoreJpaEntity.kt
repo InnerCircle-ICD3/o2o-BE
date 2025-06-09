@@ -87,7 +87,7 @@ class StoreJpaEntity(
                 description = store.description?.value,
                 address = AddressJpaEntity(
                     id = store.addressId,
-                    roadNameAddress = store.address.roadNameAddress.value,
+                    roadNameAddress = store.address.roadNameAddress?.value,
                     lotNumberAddress = store.address.lotNumberAddress.value,
                     buildingName = store.address.buildingName,
                     zipCode = store.address.zipCode.value,
