@@ -29,6 +29,7 @@ class OrderController(
                 OrderCreateDto(
                     customerId = customerId,
                     storeId = requestDto.storeId,
+                    pickupDateTime = requestDto.pickupDateTime,
                     orderItems = requestDto.orderItems.map {
                         OrderItemCreateDto(
                             productId = it.productId,
