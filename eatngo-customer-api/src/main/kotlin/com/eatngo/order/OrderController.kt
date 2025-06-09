@@ -52,6 +52,15 @@ class OrderController(
             )
         )
 
+    @PostMapping("/api/v1/orders/{orderId}/ready")
+    @Operation(summary = "주문 예약 대기", description = "주문 예약 대기")
+    fun readyOrder(@PathVariable orderId: Long, @CustomerId customerId: Long): ResponseEntity<Unit> =
+        ResponseEntity.ok(
+            orderStatusChangedUseCase.change(
+                OrderStatusChangedDto(orderId, customerId, Status.READY)
+            )
+        )
+
     @PostMapping("/api/v1/orders/{orderId}/done")
     @Operation(summary = "주문 완료", description = "주문 완료")
     fun doneOrder(@PathVariable orderId: Long, @CustomerId customerId: Long): ResponseEntity<Unit> =

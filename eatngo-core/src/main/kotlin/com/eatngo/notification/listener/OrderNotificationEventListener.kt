@@ -5,7 +5,7 @@ import com.eatngo.notification.event.NotificationEventType
 import com.eatngo.notification.event.OrderCreatedMessage
 import com.eatngo.notification.event.OrderItemMessage
 import com.eatngo.notification.infra.NotificationPublisher
-import com.eatngo.order.event.OrderCreatedEvent
+import com.eatngo.order.event.OrderReadyEvent
 import com.eatngo.order.event.OrderEvent
 import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Component
@@ -17,7 +17,7 @@ class OrderNotificationEventListener(
     @EventListener
     fun handle(event: OrderEvent) {
         when (event) {
-            is OrderCreatedEvent -> {
+            is OrderReadyEvent -> {
                 for (orderItem in event.order.orderItems) {
                     notificationPublisher.publish(
                         NotificationEvent(
