@@ -37,7 +37,7 @@ class OAuth2DocController {
             )
         ]
     )
-    @GetMapping("/oauth2/authorization/{provider}")
+    @GetMapping("/api/v1//oauth2/authorization/{provider}")
     fun redirectToKakao(
         @Parameter(
             description = "OAuth2 제공자",
