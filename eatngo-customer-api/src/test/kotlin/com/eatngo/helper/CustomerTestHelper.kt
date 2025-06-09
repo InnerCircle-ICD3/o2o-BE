@@ -38,7 +38,7 @@ class CustomerTestHelper(
 
         val loginCustomer = LoginCustomer(
             userAccountId = account.id,
-            roles = account.roles.map { it.name },
+            roles = account.roles.map { it.role.name },
             customerId = customer.id,
             nickname = customer.account.nickname?.value ?: "홍길동"
         )

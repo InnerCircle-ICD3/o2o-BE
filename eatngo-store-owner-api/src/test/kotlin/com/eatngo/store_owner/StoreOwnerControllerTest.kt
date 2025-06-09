@@ -99,7 +99,7 @@ class StoreOwnerControllerTest(
 
         val loginStoreOwner = LoginStoreOwner(
             userAccountId = account.id,
-            roles = account.roles.map { it.name },
+            roles = account.roles.map { it.role.name },
             storeOwnerId = storeOwner.id,
             nickname = account.nickname?.value ?: "홍길동"
         )

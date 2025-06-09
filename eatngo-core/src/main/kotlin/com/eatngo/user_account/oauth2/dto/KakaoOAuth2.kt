@@ -8,7 +8,7 @@ data class KakaoOAuth2(
     private val attributes: Map<String, Any>,
     override val provider: Oauth2Provider,
     override val token: String,
-    override val expiresAt: LocalDateTime,
+    override val expiresAt: LocalDateTime? = null,
     override val scopes: String,
 ) : OAuth2 {
 

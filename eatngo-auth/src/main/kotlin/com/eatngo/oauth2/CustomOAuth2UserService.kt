@@ -34,6 +34,14 @@ class CustomOAuth2UserService(
 
         val userKey = oAuth2.id.toString()
         val userAccount = (userAccountPersistence.findByOauth(userKey, provider)
+            .also {
+                it?.updateOauth2(
+                    UserAccountOAuth2.of(
+                        account = it,
+                        oAuth2 = oAuth2
+                    )
+                )
+            }
             ?: oAuth2.email
                 ?.let { userAccountPersistence.findByEmail(EmailAddress(it)) }
                 ?.also {
@@ -64,7 +72,7 @@ class CustomOAuth2UserService(
 
     private fun handleRoles(userAccount: UserAccount): List<Role> =
         userAccount.roles.flatMap {
-            when (it) {
+            when (it.role) {
                 ADMIN -> listOf(USER, STORE_OWNER, CUSTOMER, ADMIN)
                 STORE_OWNER -> listOf(USER, STORE_OWNER)
                 CUSTOMER -> listOf(USER, CUSTOMER)
@@ -79,7 +87,7 @@ class CustomOAuth2UserService(
     ) = when (provider) {
         Oauth2Provider.KAKAO -> KakaoOAuth2(
             oAuth2User.attributes, provider, token.tokenValue,
-            token.expiresAt.atZone(ZoneId.systemDefault()).toLocalDateTime(),
+            token.expiresAt?.atZone(ZoneId.of("Asia/Seoul"))?.toLocalDateTime(),
             token.scopes.joinToString(",")
         )
 

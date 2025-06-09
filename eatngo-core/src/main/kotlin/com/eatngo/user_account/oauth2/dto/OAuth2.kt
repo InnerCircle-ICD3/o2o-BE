@@ -12,6 +12,6 @@ interface OAuth2 {
     val principal: String
     val nickname: String?
     val token: String
-    val expiresAt: LocalDateTime
+    val expiresAt: LocalDateTime?
     val scopes: String
 }

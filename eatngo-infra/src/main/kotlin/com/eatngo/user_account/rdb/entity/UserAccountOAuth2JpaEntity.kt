@@ -102,6 +102,22 @@ class UserAccountOAuth2JpaEntity(
             )
             userAccount
         }
+
+        fun toUserAccountOAuth2(
+            userAccount: UserAccount, userAccountOAuth2JpaEntity: UserAccountOAuth2JpaEntity
+        ): UserAccountOAuth2 {
+            return UserAccountOAuth2(
+                id = userAccountOAuth2JpaEntity.id,
+                userAccount = userAccount,
+                email = userAccountOAuth2JpaEntity.email?.let { EmailAddress(it) },
+                nickname = userAccountOAuth2JpaEntity.nickname,
+                provider = userAccountOAuth2JpaEntity.provider,
+                userKey = userAccountOAuth2JpaEntity.userKey,
+                accessToken = userAccountOAuth2JpaEntity.accessToken,
+                expireAt = userAccountOAuth2JpaEntity.expireAt,
+                scopes = userAccountOAuth2JpaEntity.scopes
+            )
+        }
     }
 
 
