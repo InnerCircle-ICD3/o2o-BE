@@ -4,19 +4,18 @@ import com.eatngo.auth.annotation.CustomerId
 import com.eatngo.common.response.ApiResponse
 import com.eatngo.review.dto.CreateReviewRequestDto
 import com.eatngo.review.dto.ReviewResponseDto
-import com.eatngo.review.usecase.ReviewUseCase
+import com.eatngo.review.usecase.CreateReviewUseCase
+import com.eatngo.review.usecase.ReadReviewsUseCase
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 @Tag(name = "리뷰", description = "리뷰 관련 API")
 @RestController
 class ReviewController(
-    private val reviewUseCase: ReviewUseCase
+    private val createReviewUseCase: CreateReviewUseCase,
+    private val readReviewsUseCase: ReadReviewsUseCase,
 ) {
     @PostMapping("/api/v1/orders/{orderId}/reviews")
     @Operation(summary = "리뷰 생성", description = "리뷰 생성")
@@ -27,13 +26,28 @@ class ReviewController(
     ) = ResponseEntity.ok(
         ApiResponse.success(
             ReviewResponseDto.from(
-                reviewUseCase.createReview(
+                createReviewUseCase.createReview(
                     CreateReviewRequestDto.toCreateReviewDto(
                         dto = requestDto,
                         orderId = orderId,
                         customerId = customerId
                     )
                 )
+            )
+        )
+    )
+
+    @GetMapping("/api/v1/stores/{storeId}/reviews")
+    @Operation(summary = "상점 리뷰 목록 조회", description = "상점 리뷰 목록 조회")
+    fun getStoreReviews(
+        @PathVariable storeId: Long,
+        @CustomerId customerId: Long,
+        @RequestParam(required = false) lastId: Long?
+    ) = ResponseEntity.ok(
+        ApiResponse.success(
+            readReviewsUseCase.execute(
+                storeId = storeId,
+                lastId = lastId,
             )
         )
     )

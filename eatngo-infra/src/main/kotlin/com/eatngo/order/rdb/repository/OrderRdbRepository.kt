@@ -32,4 +32,5 @@ interface OrderRdbRepository : JpaRepository<OrderJpaEntity, Long> {
         lastId: Long?,
         pageable: Pageable
     ): Slice<OrderJpaEntity>
+
 }
