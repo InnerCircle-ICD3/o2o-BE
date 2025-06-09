@@ -7,7 +7,8 @@ interface OrderEvent{
     companion object{
         fun from(order: Order, userId: Long): OrderEvent?{
             return when(order.status){
-                Status.CREATED -> OrderCreatedEvent(
+                Status.CREATED -> null
+                Status.READY -> OrderReadyEvent(
                     order = order,
                     userId = userId
                 )
@@ -22,7 +23,7 @@ interface OrderEvent{
     }
 }
 
-data class OrderCreatedEvent(
+data class OrderReadyEvent(
     val userId: Long,
     val order: Order
 ): OrderEvent

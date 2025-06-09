@@ -16,14 +16,17 @@ class CustomerOrderStatusChangedUseCase(
     private val eventPublisher: ApplicationEventPublisher
 ) {
     @Transactional
-    fun change(dto: OrderStatusChangedDto){
+    fun change(dto: OrderStatusChangedDto) {
         val customer = customerService.getCustomerById(dto.userId)
         val order = orderService.getById(dto.orderId)
 
         when (dto.status) {
+            Status.READY -> order.toReady(customer)
             Status.CANCELED -> order.toCancel(customer)
             Status.DONE -> order.toDone(customer)
-            else -> {  throw IllegalStateException("Cannot '${dto.status}' when status is '${order.status}'")}
+            else -> {
+                throw IllegalStateException("Cannot '${dto.status}' when status is '${order.status}'")
+            }
         }
 
         orderService.update(order)

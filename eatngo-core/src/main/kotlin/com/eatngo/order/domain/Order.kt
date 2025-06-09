@@ -16,28 +16,38 @@ class Order(
     val storeId: Long,
     val pickupDateTime: LocalDateTime,
     var status: Status,
+    val statusChangedHistories: MutableList<OrderStatusHistory> = mutableListOf(),
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime,
 ) {
+    fun toReady(customer: Customer) {
+        customer.isEditable(customerId)
+        status = status.ready()
+        statusChangedHistories.add(OrderStatusHistory.from(status, customer))
+    }
 
     fun toCancel(customer: Customer) {
         customer.isEditable(customerId)
         status = status.cancel()
+        statusChangedHistories.add(OrderStatusHistory.from(status, customer))
     }
 
     fun toCancel(store: Store) {
         store.isEditable(storeId)
         status = status.cancel()
+        statusChangedHistories.add(OrderStatusHistory.from(status, store))
     }
 
     fun toConfirm(store: Store) {
         store.isEditable(storeId)
         status = status.confirm()
+        statusChangedHistories.add(OrderStatusHistory.from(status, store))
     }
 
     fun toDone(customer: Customer) {
         customer.isEditable(customerId)
         status = status.done()
+        statusChangedHistories.add(OrderStatusHistory.from(status, customer))
     }
 
     fun createReview(dto: CreateReviewDto, customer: Customer): Review {
