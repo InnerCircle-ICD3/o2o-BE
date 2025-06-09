@@ -28,6 +28,9 @@ enum class BusinessErrorCode(
     ORDER_ALREADY_CANCELED("O003", "이미 취소된 주문입니다.", 409),
     ORDER_ITEM_NOT_AVAILABLE("O004", "주문 가능하지 않은 메뉴입니다.", 400),
 
+    // 주문 관련 오류
+    REVIEW_NOT_FOUND("R001", "리뷰를 찾을 수 없습니다.", 404),
+
     // 주문 관리 오류
     ORDER_ACCEPT_FAILED("O005", "주문 수락에 실패했습니다.", 400),
     ORDER_REJECT_FAILED("O006", "주문 거절에 실패했습니다.", 400),

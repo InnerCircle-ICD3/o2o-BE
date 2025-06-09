@@ -5,6 +5,7 @@ import com.eatngo.common.response.ApiResponse
 import com.eatngo.review.dto.CreateReviewRequestDto
 import com.eatngo.review.dto.ReviewResponseDto
 import com.eatngo.review.usecase.CreateReviewUseCase
+import com.eatngo.review.usecase.ReadReviewUseCase
 import com.eatngo.review.usecase.ReadReviewsUseCase
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.*
 class ReviewController(
     private val createReviewUseCase: CreateReviewUseCase,
     private val readReviewsUseCase: ReadReviewsUseCase,
+    private val readReviewUseCase: ReadReviewUseCase
 ) {
     @PostMapping("/api/v1/orders/{orderId}/reviews")
     @Operation(summary = "리뷰 생성", description = "리뷰 생성")
@@ -33,6 +35,20 @@ class ReviewController(
                         customerId = customerId
                     )
                 )
+            )
+        )
+    )
+
+    @GetMapping("/api/v1/orders/{orderId}/reviews")
+    @Operation(summary = "리뷰 조회", description = "리뷰 조회")
+    fun getReview(
+        @RequestBody requestDto: CreateReviewRequestDto,
+        @PathVariable orderId: Long,
+        @CustomerId customerId: Long
+    ) = ResponseEntity.ok(
+        ApiResponse.success(
+            ReviewResponseDto.from(
+                readReviewUseCase.getReviewByOrderId(orderId = orderId)
             )
         )
     )
