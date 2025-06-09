@@ -2,10 +2,12 @@ package com.eatngo.store.rdb.repository
 
 import com.eatngo.common.constant.StoreEnum
 import com.eatngo.store.rdb.entity.StoreJpaEntity
+import com.eatngo.store.rdb.projection.StoreSchedulerProjection
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
 import java.time.LocalDateTime
+import java.time.LocalTime
 import java.util.Optional
 
 interface StoreRdbRepository : JpaRepository<StoreJpaEntity, Long> {
@@ -64,4 +66,35 @@ interface StoreRdbRepository : JpaRepository<StoreJpaEntity, Long> {
     """,
     )
     fun softDeleteById(id: Long): Int
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query(
+        """
+        UPDATE StoreJpaEntity s
+        SET s.status = 'CLOSED', s.updatedAt = CURRENT_TIMESTAMP
+        WHERE s.id IN :storeIds AND s.status = 'OPEN'
+    """,
+    )
+    fun batchUpdateStatusToClosed(storeIds: List<Long>): Int
+
+    @Query(
+        value = """
+    SELECT s.id as id, s.business_hours as businessHours, s.status as status
+    FROM store s
+    WHERE s.status = 'OPEN'
+    AND s.deleted_at IS NULL
+    AND EXISTS (
+        SELECT 1 FROM jsonb_array_elements(s.business_hours) AS bh
+        WHERE bh->>'dayOfWeek' = :dayOfWeek
+        AND (bh->>'closeTime')::time <= :endTime
+        AND (bh->>'closeTime')::time >= :startTime
+    )
+    """,
+        nativeQuery = true
+    )
+    fun findOpenStoresForScheduler(
+        dayOfWeek: String,
+        startTime: LocalTime,
+        endTime: LocalTime
+    ): List<StoreSchedulerProjection>
 }

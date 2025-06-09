@@ -207,7 +207,7 @@ class Store(
     /**
      * 지정된 시간 기준으로 픽업 종료 시간이 지났는지 확인
      */
-    fun isPickupTimeEnded(targetDateTime: LocalDateTime = LocalDateTime.now()): Boolean {
+    fun isPickupTimeEnded(targetDateTime: LocalDateTime): Boolean {
         val targetTime = targetDateTime.toLocalTime()
         val targetDay = targetDateTime.dayOfWeek
         val todayHour = businessHours?.find { it.dayOfWeek == targetDay } ?: return false
@@ -219,7 +219,7 @@ class Store(
     /**
      * 픽업 종료로 인한 자동 닫기
      */
-    fun closeByPickupEnded(closedAt: LocalDateTime = LocalDateTime.now()) {
+    fun closeByPickupEnded(closedAt: LocalDateTime) {
         if (status == StoreEnum.StoreStatus.OPEN) {
             status = StoreEnum.StoreStatus.CLOSED
             updatedAt = closedAt
