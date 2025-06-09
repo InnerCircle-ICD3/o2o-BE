@@ -42,7 +42,6 @@ class ReviewController(
     @GetMapping("/api/v1/orders/{orderId}/reviews")
     @Operation(summary = "리뷰 조회", description = "리뷰 조회")
     fun getReview(
-        @RequestBody requestDto: CreateReviewRequestDto,
         @PathVariable orderId: Long,
         @CustomerId customerId: Long,
     ) = ResponseEntity.ok(
