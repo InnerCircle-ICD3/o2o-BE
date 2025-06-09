@@ -8,7 +8,7 @@ import com.eatngo.review.service.ReviewService
 import org.springframework.stereotype.Service
 
 @Service
-class ReviewUseCase(
+class CreateReviewUseCase(
     private val reviewService: ReviewService,
     private val orderService: OrderService,
     private val customerService: CustomerService,
