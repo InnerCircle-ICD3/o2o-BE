@@ -64,7 +64,7 @@ class CustomerAddressControllerTest(
                 customerDtos[0] shouldBe CustomerAddressDto(
                     id = customerDtos[0].id,
                     customerId = loginCustomer.customerId,
-                    roadNameAddress = RoadNameAddressVO.from(addressCreateDto.address.roadNameAddress.value),
+                    roadNameAddress = addressCreateDto.address.roadNameAddress?.let { RoadNameAddressVO.from(it.value) },
                     lotNumberAddress = LotNumberAddressVO.from(addressCreateDto.address.lotNumberAddress.value),
                     buildingName = addressCreateDto.address.buildingName,
                     zipCode = ZipCodeVO.from(addressCreateDto.address.zipCode.value),

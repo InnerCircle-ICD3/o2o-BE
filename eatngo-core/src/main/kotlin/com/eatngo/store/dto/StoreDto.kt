@@ -3,9 +3,8 @@ package com.eatngo.store.dto
 import com.eatngo.common.constant.StoreEnum
 import com.eatngo.store.domain.Store
 import java.time.DayOfWeek
-import java.time.LocalTime
 import java.time.LocalDateTime
-import kotlin.String
+import java.time.LocalTime
 
 
 /**
@@ -41,7 +40,7 @@ data class StoreDto(
                 name = store.name.value,
                 description = store.description?.value,
                 address = AddressDto(
-                    roadNameAddress = store.address.roadNameAddress.value,
+                    roadNameAddress = store.address.roadNameAddress?.value,
                     lotNumberAddress = store.address.lotNumberAddress.value,
                     buildingName = store.address.buildingName,
                     zipCode = store.address.zipCode.value,

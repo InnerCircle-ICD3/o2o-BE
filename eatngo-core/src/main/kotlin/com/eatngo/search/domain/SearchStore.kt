@@ -17,7 +17,7 @@ class SearchStore(
     val storeImage: String, // 매장 이미지 S3 URL
     val storeCategory: List<StoreEnum.StoreCategory>, // 매장 카테고리
     val foodCategory: List<String>, // 대표 판매 음식 종류
-    val roadNameAddress: String, // 매장 주소(도로명주소)
+    val roadNameAddress: String? = null, // 매장 주소(도로명주소)
     val coordinate: Coordinate, // 매장 위치(위도, 경도)
     val status: SearchStoreStatus, // 매장 오픈 여부
     val businessHours: Map<DayOfWeek, TimeRange>, // 매장 영업 시간
@@ -32,17 +32,17 @@ class SearchStore(
                 storeImage = store.imageUrl ?: "",
                 storeCategory = store.storeCategoryInfo.storeCategory.map { it.value },
                 foodCategory = store.storeCategoryInfo.foodCategory?.map { it.value } ?: emptyList(),
-                roadNameAddress = store.address.roadNameAddress.value,
+                roadNameAddress = store.address.roadNameAddress?.value,
                 coordinate =
-                    Coordinate.from(
-                        latitude = store.address.coordinate.latitude,
-                        longitude = store.address.coordinate.longitude,
-                    ),
+                Coordinate.from(
+                    latitude = store.address.coordinate.latitude,
+                    longitude = store.address.coordinate.longitude,
+                ),
                 status = SearchStoreStatus.from(store.status),
                 businessHours =
-                    store.businessHours?.associate {
-                        it.dayOfWeek to TimeRange.from(it.openTime, it.closeTime)
-                    } ?: emptyMap(),
+                store.businessHours?.associate {
+                    it.dayOfWeek to TimeRange.from(it.openTime, it.closeTime)
+                } ?: emptyMap(),
                 updatedAt = store.updatedAt,
                 createdAt = store.createdAt,
             )

@@ -31,7 +31,9 @@ data class CustomerAddressJpaEntity(
     @ManyToOne
     @JoinColumn(name = "customer_id", nullable = false)
     val customer: CustomerJpaEntity,
-    val roadNameAddress: RoadNameAddressVO,
+
+    @Column(nullable = true)
+    val roadNameAddress: RoadNameAddressVO? = null,
     val lotNumberAddress: LotNumberAddressVO,
     val buildingName: String?,
     val zipCode: ZipCodeVO,
