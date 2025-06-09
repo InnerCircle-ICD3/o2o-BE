@@ -5,7 +5,7 @@ import com.eatngo.review.domain.Images
 import com.eatngo.review.domain.Review
 import com.eatngo.review.domain.Score
 import com.eatngo.review.dto.CreateReviewDto
-import com.eatngo.store_owner.domain.StoreOwner
+import com.eatngo.store.domain.Store
 import java.time.LocalDateTime
 
 class Order(
@@ -14,21 +14,23 @@ class Order(
     val orderItems: List<OrderItem>,
     val customerId: Long,
     val storeId: Long,
+    val pickupDateTime: LocalDateTime,
     var status: Status,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime,
 ) {
+
     fun toCancel(customer: Customer) {
         customer.isEditable(customerId)
         status = status.cancel()
     }
 
-    fun toCancel(store: StoreOwner) {
+    fun toCancel(store: Store) {
         store.isEditable(storeId)
         status = status.cancel()
     }
 
-    fun toConfirm(store: StoreOwner) {
+    fun toConfirm(store: Store) {
         store.isEditable(storeId)
         status = status.confirm()
     }
@@ -55,22 +57,29 @@ class Order(
         require(customerId == this.id) { "Customer can't edit this order" }
     }
 
-    private fun StoreOwner.isEditable(storeId: Long) {
+    private fun Store.isEditable(storeId: Long) {
         require(storeId == this.id) { "Store can't edit this order" }
     }
 
 
     companion object {
-        fun create(customerId: Long, storeId: Long, orderNumber: Long, orderItems: List<OrderItem>): Order {
+        fun create(
+            customerId: Long,
+            storeId: Long,
+            orderNumber: Long,
+            pickupDateTime: LocalDateTime,
+            orderItems: List<OrderItem>
+        ): Order {
             return Order(
-                0,
-                orderNumber,
-                orderItems,
-                customerId,
-                storeId,
-                Status.CREATED,
-                LocalDateTime.now(),
-                LocalDateTime.now()
+                id = 0,
+                orderNumber = orderNumber,
+                orderItems = orderItems,
+                customerId = customerId,
+                storeId = storeId,
+                status = Status.CREATED,
+                pickupDateTime = pickupDateTime,
+                createdAt = LocalDateTime.now(),
+                updatedAt = LocalDateTime.now()
             )
         }
     }

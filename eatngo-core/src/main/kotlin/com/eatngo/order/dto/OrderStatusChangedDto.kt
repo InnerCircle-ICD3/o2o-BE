@@ -7,3 +7,10 @@ data class OrderStatusChangedDto(
     val userId: Long,
     val status: Status
 )
+
+data class StoreOrderStatusChangedDto(
+    val orderId: Long,
+    val userId: Long,
+    val status: Status,
+    val storeId: Long
+)

@@ -13,7 +13,12 @@ import java.time.LocalDateTime
 
 @Filter(name = DELETED_FILTER)
 @Entity
-@Table(name = "user_account_oauth2")
+@Table(
+    name = "user_account_oauth2",
+    uniqueConstraints = [
+        UniqueConstraint(name = "uk_user_account_oauth2_user_key_provider", columnNames = ["user_key", "provider"])
+    ]
+)
 class UserAccountOAuth2JpaEntity(
 
     @Id
@@ -97,7 +102,24 @@ class UserAccountOAuth2JpaEntity(
             )
             userAccount
         }
+
+        fun toUserAccountOAuth2(
+            userAccount: UserAccount, userAccountOAuth2JpaEntity: UserAccountOAuth2JpaEntity
+        ): UserAccountOAuth2 {
+            return UserAccountOAuth2(
+                id = userAccountOAuth2JpaEntity.id,
+                userAccount = userAccount,
+                email = userAccountOAuth2JpaEntity.email?.let { EmailAddress(it) },
+                nickname = userAccountOAuth2JpaEntity.nickname,
+                provider = userAccountOAuth2JpaEntity.provider,
+                userKey = userAccountOAuth2JpaEntity.userKey,
+                accessToken = userAccountOAuth2JpaEntity.accessToken,
+                expireAt = userAccountOAuth2JpaEntity.expireAt,
+                scopes = userAccountOAuth2JpaEntity.scopes
+            )
+        }
     }
+
 
     override fun delete() {
         super.delete()

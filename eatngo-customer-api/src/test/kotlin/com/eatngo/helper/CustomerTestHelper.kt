@@ -26,7 +26,11 @@ class CustomerTestHelper(
                         "profile" to mapOf("nickname" to "홍길동")
                     )
                 ),
-                Oauth2Provider.KAKAO
+                Oauth2Provider.KAKAO,
+                "token",
+                expiresAt = java.time.LocalDateTime.now().plusDays(1),
+                scopes = "profile,email"
+
             )
         )
 
@@ -34,7 +38,7 @@ class CustomerTestHelper(
 
         val loginCustomer = LoginCustomer(
             userAccountId = account.id,
-            roles = account.roles.map { it.name },
+            roles = account.roles.map { it.role.name },
             customerId = customer.id,
             nickname = customer.account.nickname?.value ?: "홍길동"
         )

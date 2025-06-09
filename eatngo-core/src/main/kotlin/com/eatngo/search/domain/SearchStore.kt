@@ -18,7 +18,7 @@ class SearchStore(
     val storeCategory: List<StoreEnum.StoreCategory>, // 매장 카테고리
     val foodCategory: List<String>, // 대표 판매 음식 종류
     val foodTypes: List<String>?, // 대표 판매 음식 종류(검색용)
-    val roadNameAddress: String, // 매장 주소(도로명주소)
+    val roadNameAddress: String? = null, // 매장 주소(도로명주소)
     val coordinate: Coordinate, // 매장 위치(위도, 경도)
     val productStatus: SearchProductStatus, // 상품 상태(검색용)
     val status: SearchStoreStatus, // 매장 오픈 여부
@@ -36,7 +36,7 @@ class SearchStore(
                 storeCategory = store.storeCategoryInfo.storeCategory.map { it.value },
                 foodCategory = store.storeCategoryInfo.foodCategory?.map { it.value } ?: emptyList(),
                 foodTypes = emptyList(),
-                roadNameAddress = store.address.roadNameAddress.value,
+                roadNameAddress = store.address.roadNameAddress?.value,
                 coordinate =
                     Coordinate.from(
                         latitude = store.address.coordinate.latitude,
@@ -45,9 +45,9 @@ class SearchStore(
                 productStatus = SearchProductStatus.from(1), // 디폴트 활성화
                 status = SearchStoreStatus.from(store.status),
                 businessHours =
-                    store.businessHours?.associate {
-                        it.dayOfWeek to TimeRange.from(it.openTime, it.closeTime)
-                    } ?: emptyMap(),
+                store.businessHours?.associate {
+                    it.dayOfWeek to TimeRange.from(it.openTime, it.closeTime)
+                } ?: emptyMap(),
                 updatedAt = store.updatedAt,
                 createdAt = store.createdAt,
                 deletedAt = store.deletedAt, // 삭제 시간 (null: 삭제 안됨, not null: 삭제됨

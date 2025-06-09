@@ -25,7 +25,7 @@ class SearchStoreEntity(
     var storeCategory: List<String>,
     var foodCategory: List<String>, // 대표 판매 음식 종류
     var foodTypes: List<String>? = null, // 대표 판매 음식 종류(검색용)
-    var roadNameAddress: String,
+    var roadNameAddress: String? = null,
     @GeoSpatialIndexed
     var coordinate: GeoJsonPoint,
     var productStatus: Int = 1, // 상품 상태(검색용), 디폴트 활성화
@@ -41,11 +41,11 @@ class SearchStoreEntity(
             storeName = storeName,
             storeImage = storeImage,
             storeCategory =
-                storeCategory.map {
-                    StoreEnum.StoreCategory.valueOf(it).orThrow {
-                        SearchException.SearchCategoryNotFound(it)
-                    }
-                },
+            storeCategory.map {
+                StoreEnum.StoreCategory.valueOf(it).orThrow {
+                    SearchException.SearchCategoryNotFound(it)
+                }
+            },
             foodCategory = foodCategory,
             foodTypes = foodTypes,
             roadNameAddress = roadNameAddress,

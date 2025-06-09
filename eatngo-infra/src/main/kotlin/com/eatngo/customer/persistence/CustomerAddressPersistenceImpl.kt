@@ -30,8 +30,8 @@ class CustomerAddressPersistenceImpl(
                 .let { CustomerAddressJpaEntity.toCustomerAddress(it) }
         } catch (ViolationException: DataIntegrityViolationException) {
             throw CustomerAddressException.CustomerAddressAlreadyExists(
-                customer.id, customerAddress.address.roadNameAddress,
-                customerAddress.address.lotNumberAddress
+                customer.id, customerAddress.address.roadNameAddress?.value ?: "도로명 주소 없음",
+                customerAddress.address.lotNumberAddress.value
             )
         }
     }
