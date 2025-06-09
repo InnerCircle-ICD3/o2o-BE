@@ -205,6 +205,28 @@ class Store(
     }
 
     /**
+     * 지정된 시간 기준으로 픽업 종료 시간이 지났는지 확인
+     */
+    fun isPickupTimeEnded(targetDateTime: LocalDateTime = LocalDateTime.now()): Boolean {
+        val targetTime = targetDateTime.toLocalTime()
+        val targetDay = targetDateTime.dayOfWeek
+        val todayHour = businessHours?.find { it.dayOfWeek == targetDay } ?: return false
+
+        // 픽업 종료 시간이 지났는지 확인
+        return targetTime.isAfter(todayHour.closeTime)
+    }
+
+    /**
+     * 픽업 종료로 인한 자동 닫기
+     */
+    fun closeByPickupEnded(closedAt: LocalDateTime = LocalDateTime.now()) {
+        if (status == StoreEnum.StoreStatus.OPEN) {
+            status = StoreEnum.StoreStatus.CLOSED
+            updatedAt = closedAt
+        }
+    }
+
+    /**
      * 시스템 상에서 매장 상태를 전환
      * - hasStock: 재고가 있는지 여부
      */
