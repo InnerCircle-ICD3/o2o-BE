@@ -15,7 +15,7 @@ data class CreateProductRequestDto(
 
     @field:Schema(
         description = "상품 사이즈",
-        examples = ["L(large)", "M(medium)", "S(small)"],
+        examples = ["L", "M", "S"],
     )
     val size: String,
 
@@ -23,7 +23,7 @@ data class CreateProductRequestDto(
 
     @field:Schema(
         description = "잇고백 상품 세부 정보들",
-        example = "단팥빵 ,소금빵, 팥빵"
+        example = "[\"단팥빵\", \"소금빵\", \"팥빵\"]"
     )
     val foodType: List<String>,
 
@@ -31,7 +31,7 @@ data class CreateProductRequestDto(
 
     @field:Schema(
         description = "상품 상태",
-        examples = ["ACTIVE(판매중)", "INACTIVE(판매x)", "SOLD_OUT(재고 소진으로 인한 판매 종료)"]
+        examples = ["ACTIVE", "INACTIVE", "SOLD_OUT"]
     )
     val status: String?,
 )
