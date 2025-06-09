@@ -9,6 +9,7 @@ import com.eatngo.store.vo.ZipCodeVO
 data class CustomerAddressDto(
     val id: Long, // 주소 ID
     val customerId: Long, // 고객 ID
+    val radiusInKilometers: Double, // 주소 반경 (단위: km)
     val roadNameAddress: RoadNameAddressVO? = null,     // 도로명 주소
     val lotNumberAddress: LotNumberAddressVO,   // 지번 주소
     val buildingName: String?,                  // 건물명
@@ -27,6 +28,7 @@ data class CustomerAddressDto(
                 CustomerAddressDto(
                     id = customerAddress.id!!,
                     customerId = customerAddress.customerId!!,
+                    radiusInKilometers = customerAddress.radiusInKilometers,
                     roadNameAddress = roadNameAddress?.let { RoadNameAddressVO.from(it.value) },
                     lotNumberAddress = LotNumberAddressVO.from(lotNumberAddress.value),
                     buildingName = buildingName,

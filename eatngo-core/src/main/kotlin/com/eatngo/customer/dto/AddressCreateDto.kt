@@ -6,12 +6,14 @@ import com.eatngo.customer.domain.CustomerAddressType
 
 data class AddressCreateDto(
     val address: Address,
+    val distanceInKilometers: Double,  // 주소 반경 (단위: km)
     val customerAddressType: CustomerAddressType = CustomerAddressType.OTHER, // 주소 타입 (집, 회사, 기타)
     val description: String?, // 주소 설명
 ) {
     fun toCustomerAddress(): CustomerAddress {
         return CustomerAddress(
             address = address,
+            radiusInKilometers = distanceInKilometers,
             customerAddressType = customerAddressType,
             description = description
         )

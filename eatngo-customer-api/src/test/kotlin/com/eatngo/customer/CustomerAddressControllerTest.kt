@@ -64,6 +64,7 @@ class CustomerAddressControllerTest(
                 customerDtos[0] shouldBe CustomerAddressDto(
                     id = customerDtos[0].id,
                     customerId = loginCustomer.customerId,
+                    radiusInKilometers = 1.5,
                     roadNameAddress = addressCreateDto.address.roadNameAddress?.let { RoadNameAddressVO.from(it.value) },
                     lotNumberAddress = LotNumberAddressVO.from(addressCreateDto.address.lotNumberAddress.value),
                     buildingName = addressCreateDto.address.buildingName,
@@ -132,6 +133,7 @@ class CustomerAddressControllerTest(
             )
         ),
         customerAddressType = CustomerAddressType.HOME,
+        distanceInKilometers = 1.5, // 주소 반경 (단위: km)
         description = "집 주소"
     )
 
