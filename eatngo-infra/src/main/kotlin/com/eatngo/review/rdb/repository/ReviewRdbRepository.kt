@@ -22,13 +22,13 @@ interface ReviewRdbRepository : JpaRepository<ReviewJpaEntity, Long> {
       JOIN OrderJpaEntity o ON o.id = r.orderId 
       WHERE 
         o.storeId = :storeId
-        AND (:lastId IS NULL OR o.id < :lastId)
-      ORDER BY o.id DESC
-    """
+        AND (:lastId IS NULL OR r.id < :lastId)
+      ORDER BY r.id DESC
+    """,
     )
     fun cursoredFindAllByStoreId(
         storeId: Long,
         lastId: Long?,
-        pageable: Pageable
+        pageable: Pageable,
     ): Slice<ReviewJpaEntity>
 }
