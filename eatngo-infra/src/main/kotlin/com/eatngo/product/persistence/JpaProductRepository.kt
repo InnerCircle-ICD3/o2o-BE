@@ -7,7 +7,7 @@ import java.util.*
 
 interface JpaProductRepository : JpaRepository<ProductEntity, Long> {
     fun findByIdAndDeleteStatus(productId: Long, deleteStatus: DeletedStatus): Optional<ProductEntity>
-    fun findAllByStoreIdAndDeleteStatus(storeId: Long, deleteStatus: DeletedStatus): List<ProductEntity>
+    fun findAllByStoreIdAndDeleteStatusOrderByCreatedAtDesc(storeId: Long, deleteStatus: DeletedStatus): List<ProductEntity>
     fun findByIdAndStoreIdAndDeleteStatus(
         productId: Long,
         storeId: Long,
