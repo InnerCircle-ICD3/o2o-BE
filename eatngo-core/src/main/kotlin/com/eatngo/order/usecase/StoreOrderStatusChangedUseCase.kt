@@ -17,7 +17,7 @@ class StoreOrderStatusChangedUseCase(
 ) {
     @Transactional
     fun change(dto: StoreOrderStatusChangedDto) {
-        val store = storeService.getStoreById(dto.userId)
+        val store = storeService.getStoreById(dto.storeId)
 
         require(store.storeOwnerId == dto.userId) { "자신의 상점만 조회할 수 있습니다." }
 
