@@ -1,12 +1,12 @@
 package com.eatngo.customer
 
-import com.eatngo.common.type.Address
-import com.eatngo.common.type.CoordinateVO
 import com.eatngo.configuration.TestConfiguration
 import com.eatngo.customer.domain.CustomerAddressType
 import com.eatngo.customer.dto.AddressCreateDto
 import com.eatngo.customer.dto.CustomerAddressDto
 import com.eatngo.helper.CustomerTestHelper
+import com.eatngo.store.dto.AddressDto
+import com.eatngo.store.dto.CoordinateDto
 import com.eatngo.store.vo.LotNumberAddressVO
 import com.eatngo.store.vo.RoadNameAddressVO
 import com.eatngo.store.vo.ZipCodeVO
@@ -65,15 +65,15 @@ class CustomerAddressControllerTest(
                     id = customerDtos[0].id,
                     customerId = loginCustomer.customerId,
                     radiusInKilometers = 1.5,
-                    roadNameAddress = addressCreateDto.address.roadNameAddress?.let { RoadNameAddressVO.from(it.value) },
-                    lotNumberAddress = LotNumberAddressVO.from(addressCreateDto.address.lotNumberAddress.value),
+                    roadNameAddress = addressCreateDto.address.roadNameAddress?.let { RoadNameAddressVO.from(it) },
+                    lotNumberAddress = LotNumberAddressVO.from(addressCreateDto.address.lotNumberAddress),
                     buildingName = addressCreateDto.address.buildingName,
-                    zipCode = ZipCodeVO.from(addressCreateDto.address.zipCode.value),
+                    zipCode = ZipCodeVO.from(addressCreateDto.address.zipCode),
                     region1DepthName = addressCreateDto.address.region1DepthName,
                     region2DepthName = addressCreateDto.address.region2DepthName,
                     region3DepthName = addressCreateDto.address.region3DepthName,
-                    latitude = addressCreateDto.address.coordinate.latitude,
-                    longitude = addressCreateDto.address.coordinate.longitude,
+                    latitude = addressCreateDto.address.coordinate.latitude!!,
+                    longitude = addressCreateDto.address.coordinate.longitude!!,
                     customerAddressType = addressCreateDto.customerAddressType,
                     description = addressCreateDto.description
                 )
@@ -120,17 +120,15 @@ class CustomerAddressControllerTest(
     }
 
     private fun addressCreateDto() = AddressCreateDto(
-        address = Address(
-            RoadNameAddressVO.from("서울특별시 강남구 테헤란로 123"),
-            LotNumberAddressVO.from("서울특별시 강남구 역삼동 456-7"),
+        address = AddressDto(
+            "서울특별시 강남구 테헤란로 123",
+            "서울특별시 강남구 역삼동 456-7",
             "강남역 1번 출구",
-            ZipCodeVO.from("12345"),
+            "12345",
             "서울특별시",
             "강남구",
             "역삼동",
-            CoordinateVO(
-                Pair(37.123455, 127.12346),
-            )
+            CoordinateDto(37.123455, 127.12346)
         ),
         customerAddressType = CustomerAddressType.HOME,
         distanceInKilometers = 1.5, // 주소 반경 (단위: km)
