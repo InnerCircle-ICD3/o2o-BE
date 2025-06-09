@@ -15,6 +15,7 @@ data class StoreOrderQueryParamDto(
     override val customerId: Long? = null,
     override val status: Status? = null,
     override val lastId: Long? = null,
+    val storeOwnerId : Long
 ) : OrderQueryParamDto
 
 data class CustomerOrderQueryParamDto(

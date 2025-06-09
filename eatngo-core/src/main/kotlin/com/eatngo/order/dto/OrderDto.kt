@@ -15,18 +15,19 @@ data class OrderDto(
     val updatedAt: LocalDateTime,
 ) {
     companion object {
-        fun from(order: Order): OrderDto {
-            return OrderDto(
-                order.id,
-                order.orderNumber,
-                order.customerId,
-                order.storeId,
-                order.status.name,
-                order.orderItems.map { OrderItemDto.from(it) },
-                order.createdAt,
-                order.updatedAt,
-            )
-        }
+        fun from(order: Order) =
+            with(order) {
+                OrderDto(
+                    id = order.id,
+                    orderNumber = order.orderNumber,
+                    customerId = order.customerId,
+                    storeId = order.storeId,
+                    status = order.status.name,
+                    orderItems = order.orderItems.map { OrderItemDto.from(it) },
+                    createdAt = order.createdAt,
+                    updatedAt = order.updatedAt,
+                )
+            }
     }
 }
 
@@ -34,17 +35,21 @@ data class OrderItemDto(
     val id: Long,
     val productId: Long,
     val productName: String,
-    val price: Int,
+    val originPrice: Int,
+    val finalPrice: Int,
+    val imageUrl: String?,
     val quantity: Int,
 ) {
     companion object {
-        fun from(orderItem: OrderItem): OrderItemDto {
-            return OrderItemDto(
-                orderItem.id,
-                orderItem.productId,
-                orderItem.productName,
-                orderItem.price,
-                orderItem.quantity,
+        fun from(orderItem: OrderItem) = with(orderItem) {
+            OrderItemDto(
+                id = id,
+                productId = productId,
+                productName = productName,
+                originPrice = originPrice,
+                finalPrice = finalPrice,
+                imageUrl = imageUrl,
+                quantity = quantity,
             )
         }
     }

@@ -17,7 +17,9 @@ class OrderItemJpaEntity(
     val productId: Long,
     val productName: String,
     val quantity: Int,
-    val price: Int,
+    val originPrice: Int,
+    val finalPrice: Int,
+    val imageUrl: String?,
     @ManyToOne
     @JoinColumn(name = "order_id")
     val order: OrderJpaEntity
@@ -29,7 +31,9 @@ class OrderItemJpaEntity(
                 productId = orderItem.productId,
                 productName = orderItem.productName,
                 quantity = orderItem.quantity,
-                price = orderItem.price,
+                originPrice = orderItem.originPrice,
+                finalPrice = orderItem.finalPrice,
+                imageUrl = orderItem.imageUrl,
                 order = order
             )
         }
@@ -41,7 +45,9 @@ class OrderItemJpaEntity(
                     productId = productId,
                     productName = productName,
                     quantity = quantity,
-                    price = price,
+                    originPrice = originPrice,
+                    finalPrice = finalPrice,
+                    imageUrl = imageUrl,
                 )
             }
     }
