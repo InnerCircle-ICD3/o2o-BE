@@ -26,23 +26,12 @@ class OAuth2LoginSuccessHandler(
         val userId = attributes[PRINCIPAL_KEY]?.toString()?.toLongOrNull()
             ?: throw IllegalArgumentException("User ID not found")
 
-        val loginUser = postProcessor.postProcess(userId)
+        val loginUser = postProcessor.postProcess(userId, response)
         val accessToken = tokenProvider.createAccessToken(loginUser)
         tokenProvider.createRefreshToken(loginUser)
 
         val responseCookie = tokenProvider.createHttpOnlyCookie(ACCESS_TOKEN, accessToken)
         response.addHeader(SET_COOKIE_HEADER, responseCookie.toString())
         response.contentType = "application/json"
-
-        val kakaoAccount = attributes["kakao_account"] as? Map<*, *> ?: emptyMap<Any, Any>()
-        val profile = kakaoAccount["profile"] as? Map<*, *> ?: emptyMap<Any, Any>()
-        val oAuthNickname = profile["nickname"] as? String
-
-        if (loginUser.nickname == null || oAuthNickname == null) {
-            response.status = HttpServletResponse.SC_MOVED_TEMPORARILY
-            response.setHeader("Location", "/mypage/complete-profile")
-            return
-        }
     }
-
 }
