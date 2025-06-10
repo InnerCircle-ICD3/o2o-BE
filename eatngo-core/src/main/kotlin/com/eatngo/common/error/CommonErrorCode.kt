@@ -20,5 +20,8 @@ enum class CommonErrorCode(
     VALIDATION_FAILED("CEC007", "유효성 검증에 실패했습니다.", 400),
 
     // Image
-    IMAGE_URL_RESOLVE_FAILED("CEC008","이미지 URL 변환에 실패했습니다.", 500);
+    IMAGE_URL_RESOLVE_FAILED("CEC008","이미지 URL 변환에 실패했습니다.", 500),
+
+    // Retry
+    OPERATION_RETRY_FAILED("CEC009", "작업 재시도가 실패했습니다.", 500);
 }

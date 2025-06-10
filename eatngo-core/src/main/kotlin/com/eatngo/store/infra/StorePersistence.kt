@@ -2,7 +2,9 @@ package com.eatngo.store.infra
 
 import com.eatngo.common.constant.StoreEnum
 import com.eatngo.store.domain.Store
+import com.eatngo.store.dto.StoreSchedulerDto
 import java.time.LocalDateTime
+import java.time.LocalTime
 
 /**
  * 매장 영속성 인터페이스
@@ -44,4 +46,20 @@ interface StorePersistence {
      * @return 삭제 성공 여부
      */
     fun deleteById(id: Long): Boolean
+
+    /**
+     * 여러 매장을 CLOSED 상태로 배치 업데이트
+     * @param storeIds 닫을 매장 ID 리스트
+     * @return 업데이트된 행 수
+     */
+    fun batchUpdateStatusToClosed(storeIds: List<Long>): Int
+
+    /**
+     * 스케줄러 전용: 주소 정보 없이 필요한 필드만 조회
+     */
+    fun findOpenStoresForScheduler(
+        dayOfWeek: String,
+        startTime: LocalTime,
+        endTime: LocalTime
+    ): List<StoreSchedulerDto>
 }

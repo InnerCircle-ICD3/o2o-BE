@@ -75,6 +75,9 @@ enum class BusinessErrorCode(
     SUBSCRIPTION_ALREADY_ACTIVE("S015", "이미 활성화된 구독입니다.", 409),
     SUBSCRIPTION_ALREADY_CANCELED("S016", "이미 취소된 구독입니다.", 409),
 
+    // 매장 스케줄러 관련 오류
+    STORE_BATCH_UPDATE_FAILED("S017", "매장 상태 배치 업데이트에 실패했습니다.", 500),
+
     // 메뉴 관련 오류
     PRODUCT_NOT_FOUND("M001", "메뉴를 찾을 수 없습니다.", 404),
     PRODUCT_NOT_AVAILABLE("M002", "현재 제공하지 않는 메뉴입니다.", 409),
