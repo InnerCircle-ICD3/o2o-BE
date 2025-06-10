@@ -13,7 +13,7 @@ interface StoreReviewStatsRdbRepository : JpaRepository<StoreReviewStatsJpaEntit
     
     /**
      * 리뷰 집계 데이터 계산 쿼리
-     * 주문 테이블을 통해 매장별 리뷰 통계를 계산
+     * 완료된 주문(DONE)의 리뷰만 집계
      */
     @Query("""
         SELECT 
@@ -29,12 +29,14 @@ interface StoreReviewStatsRdbRepository : JpaRepository<StoreReviewStatsJpaEntit
         JOIN OrderJpaEntity o ON r.orderId = o.id
         WHERE r.deletedAt IS NULL 
         AND o.deletedAt IS NULL
+        AND o.status = 'DONE'
         GROUP BY o.storeId
     """, nativeQuery = false)
     fun calculateReviewStatsByStore(): List<ReviewStatsProjection>
     
     /**
      * 특정 매장의 리뷰 집계 데이터 계산
+     * 완료된 주문(DONE)의 리뷰만 집계
      */
     @Query("""
         SELECT 
@@ -50,6 +52,7 @@ interface StoreReviewStatsRdbRepository : JpaRepository<StoreReviewStatsJpaEntit
         JOIN OrderJpaEntity o ON r.orderId = o.id
         WHERE r.deletedAt IS NULL 
         AND o.deletedAt IS NULL
+        AND o.status = 'DONE'
         AND o.storeId = :storeId
         GROUP BY o.storeId
     """, nativeQuery = false)

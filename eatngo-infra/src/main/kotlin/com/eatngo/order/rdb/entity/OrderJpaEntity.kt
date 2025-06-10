@@ -13,7 +13,8 @@ import java.time.LocalDateTime
 @Table(
     name = "orders",
     indexes = [
-        Index(name = "idx_orders_store_deleted", columnList = "storeId, deletedAt")
+        Index(name = "idx_orders_store_deleted", columnList = "storeId, deletedAt"),
+        Index(name = "idx_orders_status_deleted", columnList = "status, deletedAt")
     ]
 )
 @Entity
