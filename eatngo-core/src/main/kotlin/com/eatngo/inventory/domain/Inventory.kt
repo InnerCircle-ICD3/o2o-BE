@@ -3,6 +3,7 @@ package com.eatngo.inventory.domain
 import com.eatngo.product.domain.StockActionType
 import com.eatngo.product.domain.StockActionType.DECREASE
 import com.eatngo.product.domain.StockActionType.INCREASE
+import java.time.LocalDate
 
 data class Inventory(
     val id: Long = 0L,
@@ -10,6 +11,7 @@ data class Inventory(
     var stock: Int, // 현재 재고량
     val version: Long = 0L,
     val productId: Long,
+    val inventoryDate: LocalDate = LocalDate.now(),
 ) {
     fun changeStock(
         action: String,
@@ -43,12 +45,26 @@ data class Inventory(
     }
 
     private fun increaseStock(amount: Int): Inventory {
-        return Inventory(this.id, this.quantity, this.stock + amount, this.version, this.productId)
+        return Inventory(
+            id = this.id,
+            quantity = this.quantity,
+            stock = this.stock + amount,
+            version = this.version,
+            productId = this.productId,
+            inventoryDate = LocalDate.now(),
+        )
     }
 
     private fun decreaseStock(amount: Int): Inventory {
         validateStock(amount)
-        return Inventory(this.id, this.quantity, this.stock - amount, this.version, this.productId)
+        return Inventory(
+            id = this.id,
+            quantity = this.quantity,
+            stock = this.stock - amount,
+            version = this.version,
+            productId = this.productId,
+            inventoryDate = LocalDate.now(),
+        )
     }
 
     private fun validateStock(amount: Int) {
@@ -61,7 +77,8 @@ data class Inventory(
             return Inventory(
                 quantity = quantity,
                 stock = quantity,
-                productId = productId
+                productId = productId,
+                inventoryDate = LocalDate.now(),
             )
         }
     }

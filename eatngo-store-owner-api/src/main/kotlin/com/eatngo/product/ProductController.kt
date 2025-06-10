@@ -13,7 +13,7 @@ import jakarta.validation.Valid
 import org.springframework.web.bind.annotation.*
 
 @Tag(name = "상품", description = "상품 관련 API")
-@RestController
+@RestController("/api/v1")
 class ProductController(
     private val productService: ProductService,
 ) {
@@ -28,8 +28,14 @@ class ProductController(
                 name = createProductRequestDto.name,
                 description = createProductRequestDto.description,
                 size = createProductRequestDto.size,
-                inventory = InventoryDto(createProductRequestDto.quantity),
-                price = ProductPriceDto(createProductRequestDto.originalPrice),
+                inventory = InventoryDto(
+                    quantity = createProductRequestDto.inventory.quantity,
+                    stock = createProductRequestDto.inventory.stock
+                ),
+                price = ProductPriceDto(
+                    originalPrice = createProductRequestDto.price.originalPrice,
+                    discountRate = createProductRequestDto.price.discountRate
+                ),
                 imageUrl = createProductRequestDto.image,
                 storeId = storeId,
                 foodTypes = createProductRequestDto.foodType,

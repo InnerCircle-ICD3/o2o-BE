@@ -12,7 +12,8 @@ class InventoryMapper {
                 quantity = inventory.quantity,
                 stock = inventory.stock,
                 version = inventory.version,
-                productId = inventory.productId
+                productId = inventory.productId,
+                inventoryDate = inventory.inventoryDate,
             )
         }
 
@@ -23,6 +24,7 @@ class InventoryMapper {
                 stock = inventoryEntity.stock,
                 productId = inventoryEntity.productId,
                 version = inventoryEntity.version,
+                inventoryDate = inventoryEntity.inventoryDate,
             )
         }
     }
