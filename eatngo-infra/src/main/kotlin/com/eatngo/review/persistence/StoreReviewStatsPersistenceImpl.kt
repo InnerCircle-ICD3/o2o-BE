@@ -14,26 +14,29 @@ import org.springframework.transaction.annotation.Transactional
 class StoreReviewStatsPersistenceImpl(
     private val storeReviewStatsRdbRepository: StoreReviewStatsRdbRepository
 ) : StoreReviewStatsPersistence {
-    
+
     override fun findByStoreId(storeId: Long): StoreReviewStatsDto? {
         return storeReviewStatsRdbRepository.findById(storeId)
             .map { toDto(it) }
             .orElse(null)
     }
-    
+
     override fun findAllByStoreIds(storeIds: List<Long>): List<StoreReviewStatsDto> {
         return storeReviewStatsRdbRepository.findAllByStoreIdIn(storeIds)
             .map { toDto(it) }
     }
-    
+
     @Transactional
     override fun updateAllStoreReviewStats() {
         val reviewStats = storeReviewStatsRdbRepository.calculateReviewStatsByStore()
-        
-        reviewStats.forEach { stats ->
-            val entity = storeReviewStatsRdbRepository.findById(stats.storeId)
-                .orElse(StoreReviewStatsJpaEntity.create(stats.storeId))
-            
+        val storeIds = reviewStats.map { it.storeId }
+        val existingEntities = storeReviewStatsRdbRepository.findAllByStoreIdIn(storeIds)
+            .associateBy { it.storeId }
+
+        val entitiesToSave = reviewStats.map { stats ->
+            val entity = existingEntities[stats.storeId]
+                ?: StoreReviewStatsJpaEntity.create(stats.storeId)
+
             entity.updateStats(
                 totalCount = stats.totalCount.toInt(),
                 scoreSum = stats.scoreSum,
@@ -43,11 +46,12 @@ class StoreReviewStatsPersistenceImpl(
                 score4Count = stats.score4Count.toInt(),
                 score5Count = stats.score5Count.toInt()
             )
-            
-            storeReviewStatsRdbRepository.save(entity)
+            entity
         }
+
+        storeReviewStatsRdbRepository.saveAll(entitiesToSave)
     }
-    
+
     private fun toDto(entity: StoreReviewStatsJpaEntity): StoreReviewStatsDto {
         return StoreReviewStatsDto(
             storeId = entity.storeId,
@@ -61,4 +65,4 @@ class StoreReviewStatsPersistenceImpl(
             score5Count = entity.score5Count
         )
     }
-} 
+}

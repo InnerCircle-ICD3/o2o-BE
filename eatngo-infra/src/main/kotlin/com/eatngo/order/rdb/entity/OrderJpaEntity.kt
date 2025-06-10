@@ -9,7 +9,12 @@ import jakarta.persistence.*
 import org.hibernate.annotations.Filter
 
 @Filter(name = DELETED_FILTER)
-@Table(name = "orders")
+@Table(
+    name = "orders",
+    indexes = [
+        Index(name = "idx_orders_store_deleted", columnList = "storeId, deletedAt")
+    ]
+)
 @Entity
 class OrderJpaEntity(
     @Id
