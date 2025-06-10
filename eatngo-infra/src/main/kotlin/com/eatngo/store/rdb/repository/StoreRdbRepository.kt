@@ -77,6 +77,17 @@ interface StoreRdbRepository : JpaRepository<StoreJpaEntity, Long> {
     )
     fun batchUpdateStatusToClosed(storeIds: List<Long>): Int
 
+    /**
+     * 스케줄러용 매장 조회 - 성능 최적화를 위한 1차 필터링
+     * 
+     * 시간 윈도우 기반 대략적 후보 조회:
+     * - closeTime이 startTime ~ endTime 범위에 있는 OPEN 상태 매장들
+     * - 도메인 레벨에서 정확한 재검증이 필요 (isPickupTimeEnded)
+     * 
+     * @param dayOfWeek 요일 (MONDAY, TUESDAY, ...)
+     * @param startTime 윈도우 시작 시간 (현재시간 - 31분)
+     * @param endTime 윈도우 종료 시간 (현재시간 - 1분)
+     */
     @Query(
         value = """
     SELECT s.id as id, s.business_hours as businessHours, s.status as status

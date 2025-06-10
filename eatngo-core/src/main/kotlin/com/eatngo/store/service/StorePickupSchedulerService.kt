@@ -29,6 +29,11 @@ class StorePickupSchedulerService(
 
     /**
      * 픽업 종료 시간이 지난 매장들을 자동으로 닫기
+     * 
+     * 이중 필터링 구조:
+     * 1. SQL 레벨: 대략적인 시간 윈도우로 후보 매장들을 빠르게 조회 (성능 최적화)
+     * 2. 도메인 레벨: 정확한 픽업 종료 시간 검증 (정확성 보장)
+     * 
      * @return 닫힌 매장 ID 리스트
      */
     @Transactional
@@ -39,10 +44,16 @@ class StorePickupSchedulerService(
         val endTime = now.toLocalTime().minusMinutes(windowEndMinutes)
         val startTime = now.toLocalTime().minusMinutes(windowStartMinutes)
         
+        // 1차 필터링: SQL 레벨에서 시간 윈도우 기반 대략적 후보 조회
+        // - 성능: 인덱스 활용으로 빠른 조회
+        // - 목적: closeTime이 현재 시점 기준 startTime~endTime 범위에 있는 매장들
         val candidateStores = storePersistence.findOpenStoresForScheduler(
             dayOfWeek, startTime, endTime
         )
         
+        // 2차 필터링: 도메인 로직으로 정확한 픽업 종료 시간 재검증
+        // - 정확성: 실제 현재 시점이 closeTime을 지났는지 정밀 검증
+        // - 목적: false positive 제거 및 비즈니스 로직 적용
         val storesToClose = candidateStores
             .filter { it.isPickupTimeEnded(now.dayOfWeek, now.toLocalTime()) }
             .map { it.id }
