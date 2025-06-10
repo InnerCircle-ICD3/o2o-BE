@@ -1,11 +1,11 @@
 package com.eatngo.store_owner.service
 
 import com.eatngo.common.exception.store.StoreException
+import com.eatngo.customer.event.StoreOwnerDeletedEvent
 import com.eatngo.store_owner.domain.StoreOwner
 import com.eatngo.store_owner.dto.StoreOwnerUpdateDto
 import com.eatngo.store_owner.infra.StoreOwnerPersistence
 import com.eatngo.user_account.domain.UserAccount
-import com.eatngo.user_account.event.StoreOwnerDeleted
 import com.eatngo.user_account.infra.UserAccountPersistence
 import org.springframework.stereotype.Service
 
@@ -23,7 +23,7 @@ class StoreOwnerService(
     fun deleteStoreOwner(id: Long) {
         storeOwnerPersistence.deleteById(id)
         applicationEventPublisher.publishEvent(
-            StoreOwnerDeleted(id)
+            StoreOwnerDeletedEvent(id)
         )
     }
 

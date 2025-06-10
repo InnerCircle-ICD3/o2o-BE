@@ -4,17 +4,16 @@ import com.eatngo.oauth2.OAuth2Service
 import com.eatngo.user_account.event.UserDeletedEvent
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Component
-import org.springframework.transaction.annotation.Transactional
+import org.springframework.transaction.event.TransactionPhase
 import org.springframework.transaction.event.TransactionalEventListener
 
 @Component
-@Transactional
 class UserDeletedEventListener(
     private val oauth2Services: Set<OAuth2Service>,
 ) {
 
     @Async
-    @TransactionalEventListener
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     fun onUserDeleted(event: UserDeletedEvent) {
         event.userAccount.oAuth2.forEach { oauth2 ->
             oauth2Services.find {

@@ -53,7 +53,7 @@ class UserAccountJpaEntity(
                 createdAt = createdAt,
                 updatedAt = updatedAt,
                 deletedAt = deletedAt,
-                roles = roles.map { UserAccountRoleJpaEntity.toRole(it) },
+                roles = roles.map { UserAccountRoleJpaEntity.toRole(it) }.toMutableSet(),
             )
             account.oAuth2.forEach {
                 userAccount.addOauth2(

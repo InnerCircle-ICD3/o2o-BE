@@ -6,18 +6,17 @@ import com.eatngo.user_account.oauth2.constants.Role
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Component
-import org.springframework.transaction.annotation.Transactional
+import org.springframework.transaction.event.TransactionPhase
 import org.springframework.transaction.event.TransactionalEventListener
 
 @Component
-@Transactional
 class StoreOwnerEventListener(
     private val userAccountPersistence: UserAccountPersistence,
     private val applicationEventPublisher: ApplicationEventPublisher
 ) {
 
     @Async
-    @TransactionalEventListener
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     fun onCustomerDeleted(event: StoreOwnerDeletedEvent) {
         val userId = event.userId
         userAccountPersistence.findById(userId)?.let { userAccount ->
