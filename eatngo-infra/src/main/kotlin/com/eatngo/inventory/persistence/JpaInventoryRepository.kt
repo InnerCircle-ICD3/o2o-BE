@@ -9,10 +9,13 @@ import java.time.LocalDate
 import java.util.*
 
 interface JpaInventoryRepository : JpaRepository<InventoryEntity, Long> {
-    fun findTopByProductIdAndInventoryDateOrderByVersionDesc(productId: Long, localDate: LocalDate): Optional<InventoryEntity>
-    fun findTopByProductIdOrderByVersionDesc(productId: Long): Optional<InventoryEntity>
+    fun findTopByProductIdAndInventoryDateOrderByVersionDesc(
+        productId: Long,
+        localDate: LocalDate
+    ): Optional<InventoryEntity>
 
-    @Query("""
+    @Query(
+        """
         SELECT i FROM InventoryEntity i 
         WHERE i.productId IN :productIds 
         AND i.version = (
@@ -20,7 +23,8 @@ interface JpaInventoryRepository : JpaRepository<InventoryEntity, Long> {
             FROM InventoryEntity i2 
             WHERE i2.productId = i.productId
         )
-    """)
+    """
+    )
     fun findLatestByProductIds(@Param("productIds") productIds: List<Long>): List<InventoryEntity>
 
     fun deleteByProductId(productId: Long)
@@ -31,13 +35,13 @@ interface JpaInventoryRepository : JpaRepository<InventoryEntity, Long> {
         UPDATE InventoryEntity i
            SET i.stock = :stock
          WHERE i.productId = :productId
-         AND i.inventoryDate = :LocalDate
+         AND i.inventoryDate = :localDate
         """
     )
     fun updateStock(
         @Param("productId") productId: Long,
         @Param("stock") stock: Int,
-        localDate: LocalDate
+        @Param("localDate") localDate: LocalDate
     ): Int
 
     fun findAllByProductIdInAndInventoryDate(productIds: List<Long>, localDate: LocalDate): List<InventoryEntity>
