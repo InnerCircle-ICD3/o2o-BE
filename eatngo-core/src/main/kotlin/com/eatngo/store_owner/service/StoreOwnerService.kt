@@ -5,13 +5,15 @@ import com.eatngo.store_owner.domain.StoreOwner
 import com.eatngo.store_owner.dto.StoreOwnerUpdateDto
 import com.eatngo.store_owner.infra.StoreOwnerPersistence
 import com.eatngo.user_account.domain.UserAccount
+import com.eatngo.user_account.event.StoreOwnerDeleted
 import com.eatngo.user_account.infra.UserAccountPersistence
 import org.springframework.stereotype.Service
 
 @Service
 class StoreOwnerService(
     private val userAccountPersistence: UserAccountPersistence,
-    private val storeOwnerPersistence: StoreOwnerPersistence
+    private val storeOwnerPersistence: StoreOwnerPersistence,
+    private val applicationEventPublisher: org.springframework.context.ApplicationEventPublisher
 ) {
 
     fun getStoreOwnerById(id: Long): StoreOwner {
@@ -20,7 +22,9 @@ class StoreOwnerService(
 
     fun deleteStoreOwner(id: Long) {
         storeOwnerPersistence.deleteById(id)
-        userAccountPersistence.deleteById(id)
+        applicationEventPublisher.publishEvent(
+            StoreOwnerDeleted(id)
+        )
     }
 
     fun update(storeOwnerId: Long, storeOwnerUpdateDto: StoreOwnerUpdateDto) {

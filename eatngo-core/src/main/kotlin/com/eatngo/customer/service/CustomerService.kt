@@ -5,13 +5,16 @@ import com.eatngo.customer.domain.Customer
 import com.eatngo.customer.dto.CustomerUpdateDto
 import com.eatngo.customer.infra.CustomerPersistence
 import com.eatngo.user_account.domain.UserAccount
+import com.eatngo.user_account.event.CustomerDeleted
 import com.eatngo.user_account.infra.UserAccountPersistence
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 
 @Service
 class CustomerService(
     private val userAccountPersistence: UserAccountPersistence,
     private val customerPersistence: CustomerPersistence,
+    private val applicationEventPublisher: ApplicationEventPublisher
 ) {
 
     fun getCustomerById(id: Long): Customer {
@@ -20,7 +23,9 @@ class CustomerService(
 
     fun deleteCustomer(id: Long) {
         customerPersistence.deleteById(id)
-        userAccountPersistence.deleteById(id)
+        applicationEventPublisher.publishEvent(
+            CustomerDeleted(id)
+        )
     }
 
     fun update(customerId: Long, customerUpdateDto: CustomerUpdateDto) {

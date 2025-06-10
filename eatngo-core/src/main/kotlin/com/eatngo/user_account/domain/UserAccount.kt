@@ -12,7 +12,7 @@ class UserAccount(
     val id: Long = 0,
     val email: EmailAddress?,
     var nickname: Nickname? = null,
-    var roles: List<UserRole> = mutableListOf(),
+    var roles: MutableSet<UserRole> = mutableSetOf(),
     val createdAt: LocalDateTime? = null,
     var updatedAt: LocalDateTime? = null,
     var deletedAt: LocalDateTime? = null,
@@ -46,7 +46,7 @@ class UserAccount(
                     oAuth2 = oAuth2
                 )
             )
-            userAccount.roles = listOf(UserRole(null, Role.USER))
+            userAccount.roles = mutableSetOf(UserRole(null, Role.USER))
 
             return userAccount
         }
