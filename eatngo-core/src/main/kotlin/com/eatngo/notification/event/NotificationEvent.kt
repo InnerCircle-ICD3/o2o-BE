@@ -1,26 +1,16 @@
 package com.eatngo.notification.event
 
-interface NotificationMessage
+import com.eatngo.order.dto.OrderDto
 
-data class OrderCreatedMessage(
-    val orderId : Long,
-    val orderItems: List<OrderItemMessage>
-) : NotificationMessage
-
-data class OrderItemMessage(
-    val name: String,
-    val quantity: Int,
-)
-
-data class NotificationEvent<T: NotificationMessage>(
+data class NotificationEvent<T>(
     val storeId: Long,
     val eventType: NotificationEventType,
-    val message: T
+    val message: T,
 )
 
 enum class NotificationEventType(
     val eventName: String,
-    val messageClass: Class<out NotificationMessage>
+    val messageClass: Class<*>,
 ) {
-    ORDER_CREATED("ORDER_CREATED", OrderCreatedMessage::class.java),
+    ORDER_READIED("ORDER_READIED", OrderDto::class.java),
 }
