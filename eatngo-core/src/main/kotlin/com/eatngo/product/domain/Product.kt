@@ -25,7 +25,8 @@ sealed class Product {
         imageUrl: String?,
         foodTypes: FoodTypes,
         status: ProductStatus,
-    )
+        size: String,
+    ): Product
 
     abstract fun remove()
 
@@ -51,16 +52,48 @@ sealed class Product {
             imageUrl: String?,
             foodTypes: FoodTypes,
             status: ProductStatus,
-        ) {
-            this.name = name
-            this.description = description
-            this.price = ProductPrice(
-                originalPrice = price.originalPrice,
-                discountRate = price.discountRate,
-            )
-            this.imageUrl = imageUrl
-            this.foodTypes = foodTypes
-            this.status = status
+            size: String,
+        ): Product {
+            return when (ProductSizeType.fromValue(size)) {
+                L -> LargeEatNGoBag(
+                    id = id,
+                    name = name,
+                    description = description,
+                    price = price,
+                    imageUrl = imageUrl,
+                    storeId = storeId,
+                    foodTypes = foodTypes,
+                    status = status,
+                    deletedStatus = deletedStatus,
+                    createdAt = createdAt,
+                )
+
+                M -> MediumEatNGoBag(
+                    id = id,
+                    name = name,
+                    description = description,
+                    price = price,
+                    imageUrl = imageUrl,
+                    storeId = storeId,
+                    foodTypes = foodTypes,
+                    status = status,
+                    deletedStatus = deletedStatus,
+                    createdAt = createdAt,
+                )
+
+                S -> SmallEatNGoBag(
+                    id = id,
+                    name = name,
+                    description = description,
+                    price = price,
+                    imageUrl = imageUrl,
+                    storeId = storeId,
+                    foodTypes = foodTypes,
+                    status = status,
+                    deletedStatus = deletedStatus,
+                    createdAt = createdAt,
+                )
+            }
         }
 
         override fun remove() {
@@ -91,16 +124,48 @@ sealed class Product {
             imageUrl: String?,
             foodTypes: FoodTypes,
             status: ProductStatus,
-        ) {
-            this.name = name
-            this.description = description
-            this.price = ProductPrice(
-                originalPrice = price.originalPrice,
-                discountRate = price.discountRate,
-            )
-            this.imageUrl = imageUrl
-            this.foodTypes = foodTypes
-            this.status = status
+            size: String,
+        ): Product {
+            return when (ProductSizeType.fromValue(size)) {
+                L -> LargeEatNGoBag(
+                    id = id,
+                    name = name,
+                    description = description,
+                    price = price,
+                    imageUrl = imageUrl,
+                    storeId = storeId,
+                    foodTypes = foodTypes,
+                    status = status,
+                    deletedStatus = deletedStatus,
+                    createdAt = createdAt,
+                )
+
+                M -> MediumEatNGoBag(
+                    id = id,
+                    name = name,
+                    description = description,
+                    price = price,
+                    imageUrl = imageUrl,
+                    storeId = storeId,
+                    foodTypes = foodTypes,
+                    status = status,
+                    deletedStatus = deletedStatus,
+                    createdAt = createdAt,
+                )
+
+                S -> SmallEatNGoBag(
+                    id = id,
+                    name = name,
+                    description = description,
+                    price = price,
+                    imageUrl = imageUrl,
+                    storeId = storeId,
+                    foodTypes = foodTypes,
+                    status = status,
+                    deletedStatus = deletedStatus,
+                    createdAt = createdAt,
+                )
+            }
         }
 
         override fun remove() {
@@ -131,16 +196,48 @@ sealed class Product {
             imageUrl: String?,
             foodTypes: FoodTypes,
             status: ProductStatus,
-        ) {
-            this.name = name
-            this.description = description
-            this.price = ProductPrice(
-                originalPrice = price.originalPrice,
-                discountRate = price.discountRate,
-            )
-            this.imageUrl = imageUrl
-            this.foodTypes = foodTypes
-            this.status = status
+            size: String,
+        ): Product {
+            return when (ProductSizeType.fromValue(size)) {
+                L -> LargeEatNGoBag(
+                    id = id,
+                    name = name,
+                    description = description,
+                    price = price,
+                    imageUrl = imageUrl,
+                    storeId = storeId,
+                    foodTypes = foodTypes,
+                    status = status,
+                    deletedStatus = deletedStatus,
+                    createdAt = createdAt,
+                )
+
+                M -> MediumEatNGoBag(
+                    id = id,
+                    name = name,
+                    description = description,
+                    price = price,
+                    imageUrl = imageUrl,
+                    storeId = storeId,
+                    foodTypes = foodTypes,
+                    status = status,
+                    deletedStatus = deletedStatus,
+                    createdAt = createdAt,
+                )
+
+                S -> SmallEatNGoBag(
+                    id = id,
+                    name = name,
+                    description = description,
+                    price = price,
+                    imageUrl = imageUrl,
+                    storeId = storeId,
+                    foodTypes = foodTypes,
+                    status = status,
+                    deletedStatus = deletedStatus,
+                    createdAt = createdAt,
+                )
+            }
         }
 
         override fun remove() {

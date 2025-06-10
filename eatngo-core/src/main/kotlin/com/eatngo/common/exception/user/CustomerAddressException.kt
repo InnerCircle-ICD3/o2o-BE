@@ -2,8 +2,6 @@ package com.eatngo.common.exception.user
 
 import com.eatngo.common.error.BusinessErrorCode
 import com.eatngo.common.exception.BusinessException
-import com.eatngo.store.vo.LotNumberAddressVO
-import com.eatngo.store.vo.RoadNameAddressVO
 import org.slf4j.event.Level
 
 
@@ -20,13 +18,13 @@ open class CustomerAddressException(
         data = mapOf("customerAddressId" to customerAddressId)
     )
 
-    class CustomerAddressAlreadyExists(id: Long, roadNameAddressVO: RoadNameAddressVO, lotNumberAddress: LotNumberAddressVO) :
+    class CustomerAddressAlreadyExists(id: Long, roadNameAddress: String, lotNumberAddress: String) :
         CustomerAddressException(
             BusinessErrorCode.CUSTOMER_ADDRESS_ALREADY_EXISTS,
-            "${BusinessErrorCode.CUSTOMER_ADDRESS_ALREADY_EXISTS.message} (ID: $id, Road Name: $roadNameAddressVO, Lot Number: $lotNumberAddress)",
+            "${BusinessErrorCode.CUSTOMER_ADDRESS_ALREADY_EXISTS.message} (ID: $id, Road Name: $roadNameAddress, Lot Number: $lotNumberAddress)",
             mapOf(
                 "addressId" to id,
-                "roadNameAddress" to roadNameAddressVO,
+                "roadNameAddress" to roadNameAddress,
                 "lotNumberAddress" to lotNumberAddress
             )
         )

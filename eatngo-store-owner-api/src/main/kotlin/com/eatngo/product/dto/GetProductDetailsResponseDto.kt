@@ -24,7 +24,7 @@ data class GetProductDetailsResponseDto(
                 name = productDto.name,
                 description = productDto.description,
                 storeId = productDto.storeId,
-                storeName = productDto.name,
+                storeName = productDto.storeName ?: "Unknown Store",
                 price = GetProductPriceResponseDto.from(productDto.price),
                 size = productDto.size,
                 inventory = GetProductInventoryResponseDto.from(productDto.inventory),

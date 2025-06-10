@@ -28,6 +28,7 @@ class ProductService(
     private val fileStorageService: FileStorageService,
     private val inventoryService: InventoryService,
     private val storePersistence: StorePersistence,
+    private val storeProductValidator: StoreProductValidator
 ) {
 
     @Caching(
@@ -79,6 +80,8 @@ class ProductService(
         }
 
         val savedProduct: Product = productPersistence.save(product)
+        storeProductValidator.validateProduct(storeId = store.id)
+
         productDto.id = savedProduct.id
         val savedInventory: InventoryDto = inventoryService.createInventory(productDto)
 
@@ -171,7 +174,7 @@ class ProductService(
             productPersistence.findActivatedProductByIdAndStoreId(productDto.id!!, productDto.storeId)
                 .orThrow { ProductNotFound(productDto.id!!) }
 
-        product.modify(
+        val changedProduct = product.modify(
             name = productDto.name,
             description = productDto.description,
             price = ProductPrice(
@@ -180,11 +183,14 @@ class ProductService(
             ),
             imageUrl = productDto.imageUrl,
             foodTypes = FoodTypes(productDto.foodTypes.map { Food(it) }),
-            status = ProductStatus.fromValue(productDto.status!!)
+            status = ProductStatus.fromValue(productDto.status!!),
+            size = productDto.size,
         )
 
-        val savedProduct: Product = productPersistence.save(product)
-        val initialStock = findTotalInitialStocks(product.storeId)
+        val savedProduct: Product = productPersistence.save(changedProduct)
+        storeProductValidator.validateProduct(storeId = store.id)
+
+        val initialStock = findTotalInitialStocks(savedProduct.storeId)
         val changedInventory: InventoryDto =
             inventoryService.modifyInventory(productDto, initialStock)
 

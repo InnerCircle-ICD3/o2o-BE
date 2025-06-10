@@ -8,11 +8,12 @@ data class CursoredStoreOrderQueryParamDto(
     val lastId: Long?,
 ) {
     companion object {
-        fun toOrderQueryParamDto(storeId: Long, dto: CursoredStoreOrderQueryParamDto) = StoreOrderQueryParamDto(
+        fun toOrderQueryParamDto(storeId: Long, storeOwnerId: Long, dto: CursoredStoreOrderQueryParamDto) = StoreOrderQueryParamDto(
             storeId = storeId,
             customerId = null,
             status = dto.status,
             lastId = dto.lastId,
+            storeOwnerId = storeOwnerId
         )
     }
 }

@@ -5,7 +5,7 @@ import com.eatngo.review.domain.Images
 import com.eatngo.review.domain.Review
 import com.eatngo.review.domain.Score
 import com.eatngo.review.dto.CreateReviewDto
-import com.eatngo.store_owner.domain.StoreOwner
+import com.eatngo.store.domain.Store
 import java.time.LocalDateTime
 
 class Order(
@@ -13,29 +13,42 @@ class Order(
     val orderNumber: Long,
     val orderItems: List<OrderItem>,
     val customerId: Long,
+    val nickname: String,
     val storeId: Long,
+    val pickupDateTime: LocalDateTime,
     var status: Status,
+    val statusChangedHistories: MutableList<OrderStatusHistory> = mutableListOf(),
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime,
 ) {
+    fun toReady(customer: Customer) {
+        customer.isEditable(customerId)
+        status = status.ready()
+        statusChangedHistories.add(OrderStatusHistory.from(status, customer))
+    }
+
     fun toCancel(customer: Customer) {
         customer.isEditable(customerId)
         status = status.cancel()
+        statusChangedHistories.add(OrderStatusHistory.from(status, customer))
     }
 
-    fun toCancel(store: StoreOwner) {
+    fun toCancel(store: Store) {
         store.isEditable(storeId)
         status = status.cancel()
+        statusChangedHistories.add(OrderStatusHistory.from(status, store))
     }
 
-    fun toConfirm(store: StoreOwner) {
+    fun toConfirm(store: Store) {
         store.isEditable(storeId)
         status = status.confirm()
+        statusChangedHistories.add(OrderStatusHistory.from(status, store))
     }
 
     fun toDone(customer: Customer) {
         customer.isEditable(customerId)
         status = status.done()
+        statusChangedHistories.add(OrderStatusHistory.from(status, customer))
     }
 
     fun createReview(dto: CreateReviewDto, customer: Customer): Review {
@@ -55,22 +68,31 @@ class Order(
         require(customerId == this.id) { "Customer can't edit this order" }
     }
 
-    private fun StoreOwner.isEditable(storeId: Long) {
+    private fun Store.isEditable(storeId: Long) {
         require(storeId == this.id) { "Store can't edit this order" }
     }
 
 
     companion object {
-        fun create(customerId: Long, storeId: Long, orderNumber: Long, orderItems: List<OrderItem>): Order {
+        fun create(
+            customerId: Long,
+            storeId: Long,
+            orderNumber: Long,
+            nickname: String,
+            pickupDateTime: LocalDateTime,
+            orderItems: List<OrderItem>
+        ): Order {
             return Order(
-                0,
-                orderNumber,
-                orderItems,
-                customerId,
-                storeId,
-                Status.CREATED,
-                LocalDateTime.now(),
-                LocalDateTime.now()
+                id = 0,
+                orderNumber = orderNumber,
+                orderItems = orderItems,
+                customerId = customerId,
+                nickname = nickname,
+                storeId = storeId,
+                status = Status.CREATED,
+                pickupDateTime = pickupDateTime,
+                createdAt = LocalDateTime.now(),
+                updatedAt = LocalDateTime.now()
             )
         }
     }

@@ -24,7 +24,7 @@ data class UpdateProductResponseDto(
                 name = productDto.name,
                 description = productDto.description,
                 storeId = productDto.storeId,
-                storeName = productDto.storeName!!,
+                storeName = productDto.storeName ?: "Unknown Store",
                 price = UpdateProductPriceResponseDto.from(productDto.price),
                 size = productDto.size,
                 inventory = UpdateProductInventoryResponseDto.from(productDto.inventory),

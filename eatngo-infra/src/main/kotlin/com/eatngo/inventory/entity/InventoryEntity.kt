@@ -2,9 +2,18 @@ package com.eatngo.inventory.entity
 
 import jakarta.persistence.*
 import org.springframework.data.redis.core.RedisHash
+import java.time.LocalDate
 
 @Entity
-@Table(name = "inventory")
+@Table(
+    name = "inventory",
+    indexes = [
+        Index(
+            name = "idx_inventory_product_date",
+            columnList = "product_id, inventory_date"
+        ),
+    ]
+)
 @RedisHash(value = "inventory", timeToLive = 600)
 data class InventoryEntity(
     @Id
@@ -12,6 +21,7 @@ data class InventoryEntity(
     var id: Long = 0L,
     val quantity: Int,
     val stock: Int,
+    val inventoryDate: LocalDate,
 
     @Column(name = "product_id", nullable = false)
     val productId: Long,
