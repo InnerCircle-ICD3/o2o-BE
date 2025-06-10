@@ -19,10 +19,13 @@ data class OrderDto(
     val canceledAt: LocalDateTime?,
     val confirmedAt: LocalDateTime?,
     val doneAt: LocalDateTime?,
-    val hasReview: Boolean = false
+    val hasReview: Boolean = false,
 ) {
     companion object {
-        fun from(order: Order, hasReview: Boolean = false) = with(order) {
+        fun from(
+            order: Order,
+            hasReview: Boolean = false,
+        ) = with(order) {
             OrderDto(
                 id = id,
                 orderNumber = orderNumber,
@@ -33,19 +36,79 @@ data class OrderDto(
                 orderItems = orderItems.map { OrderItemDto.from(it) },
                 createdAt = createdAt,
                 updatedAt = updatedAt,
-                readiedAt = statusChangedHistories
-                    .firstOrNull { it.status == Status.READY }
-                    ?.updatedAt,
-                canceledAt = order.statusChangedHistories
-                    .firstOrNull { it.status == Status.CANCELED }
-                    ?.updatedAt,
-                confirmedAt = order.statusChangedHistories
-                    .firstOrNull { it.status == Status.CONFIRMED }
-                    ?.updatedAt,
-                doneAt = order.statusChangedHistories
-                    .firstOrNull { it.status == Status.DONE }
-                    ?.updatedAt,
-                hasReview = hasReview
+                readiedAt =
+                    statusChangedHistories
+                        .firstOrNull { it.status == Status.READY }
+                        ?.updatedAt,
+                canceledAt =
+                    order.statusChangedHistories
+                        .firstOrNull { it.status == Status.CANCELED }
+                        ?.updatedAt,
+                confirmedAt =
+                    order.statusChangedHistories
+                        .firstOrNull { it.status == Status.CONFIRMED }
+                        ?.updatedAt,
+                doneAt =
+                    order.statusChangedHistories
+                        .firstOrNull { it.status == Status.DONE }
+                        ?.updatedAt,
+                hasReview = hasReview,
+            )
+        }
+    }
+}
+
+data class OrderListDto(
+    val id: Long,
+    val orderNumber: Long,
+    val customerId: Long,
+    val nickname: String,
+    val storeId: Long,
+    val storeName: String,
+    val status: String,
+    val orderItems: List<OrderItemDto>,
+    val createdAt: LocalDateTime,
+    val updatedAt: LocalDateTime,
+    val readiedAt: LocalDateTime?,
+    val canceledAt: LocalDateTime?,
+    val confirmedAt: LocalDateTime?,
+    val doneAt: LocalDateTime?,
+    val hasReview: Boolean = false,
+) {
+    companion object {
+        fun from(
+            order: Order,
+            storeName: String,
+            hasReview: Boolean = false,
+        ) = with(order) {
+            OrderListDto(
+                id = id,
+                orderNumber = orderNumber,
+                customerId = customerId,
+                nickname = nickname,
+                storeId = storeId,
+                status = status.name,
+                orderItems = orderItems.map { OrderItemDto.from(it) },
+                createdAt = createdAt,
+                updatedAt = updatedAt,
+                readiedAt =
+                    statusChangedHistories
+                        .firstOrNull { it.status == Status.READY }
+                        ?.updatedAt,
+                canceledAt =
+                    order.statusChangedHistories
+                        .firstOrNull { it.status == Status.CANCELED }
+                        ?.updatedAt,
+                confirmedAt =
+                    order.statusChangedHistories
+                        .firstOrNull { it.status == Status.CONFIRMED }
+                        ?.updatedAt,
+                doneAt =
+                    order.statusChangedHistories
+                        .firstOrNull { it.status == Status.DONE }
+                        ?.updatedAt,
+                hasReview = hasReview,
+                storeName = storeName,
             )
         }
     }
@@ -61,16 +124,17 @@ data class OrderItemDto(
     val quantity: Int,
 ) {
     companion object {
-        fun from(orderItem: OrderItem) = with(orderItem) {
-            OrderItemDto(
-                id = id,
-                productId = productId,
-                productName = productName,
-                originPrice = originPrice,
-                finalPrice = finalPrice,
-                imageUrl = imageUrl,
-                quantity = quantity,
-            )
-        }
+        fun from(orderItem: OrderItem) =
+            with(orderItem) {
+                OrderItemDto(
+                    id = id,
+                    productId = productId,
+                    productName = productName,
+                    originPrice = originPrice,
+                    finalPrice = finalPrice,
+                    imageUrl = imageUrl,
+                    quantity = quantity,
+                )
+            }
     }
 }
