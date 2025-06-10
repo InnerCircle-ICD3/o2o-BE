@@ -11,6 +11,8 @@ interface UserAccountRdbRepository : JpaRepository<UserAccountJpaEntity, Long> {
     @Query(
         """
         SELECT u FROM UserAccountJpaEntity u
+        JOIN fetch UserAccountOAuth2JpaEntity o2 ON o2.userAccount = u  
+        JOIN fetch UserAccountRoleJpaEntity r ON r.account = u
         WHERE u.id = :id
     """
     )
@@ -19,11 +21,22 @@ interface UserAccountRdbRepository : JpaRepository<UserAccountJpaEntity, Long> {
     @Query(
         """
         SELECT u FROM UserAccountJpaEntity u
-        JOIN UserAccountOAuth2JpaEntity o2 ON o2.userAccount = u  
+        JOIN fetch UserAccountOAuth2JpaEntity o2 ON o2.userAccount = u  
+        JOIN fetch UserAccountRoleJpaEntity r ON r.account = u
         WHERE o2.provider = :provider
         AND o2.userKey = :userKey
     """
     )
     fun findByOAuth2Key(userKey: String, provider: Oauth2Provider): UserAccountJpaEntity?
+
+    @Query(
+        """
+        SELECT u FROM UserAccountJpaEntity u
+        JOIN fetch UserAccountOAuth2JpaEntity o2 ON o2.userAccount = u  
+        JOIN fetch UserAccountRoleJpaEntity r ON r.account = u
+        WHERE u.email = :email
+    """
+    )
+    fun findByEmail(email: String): UserAccountJpaEntity?
 
 }

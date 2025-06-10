@@ -29,6 +29,7 @@ class OrderController(
                 OrderCreateDto(
                     customerId = customerId,
                     storeId = requestDto.storeId,
+                    pickupDateTime = requestDto.pickupDateTime,
                     orderItems = requestDto.orderItems.map {
                         OrderItemCreateDto(
                             productId = it.productId,
@@ -48,6 +49,15 @@ class OrderController(
         ResponseEntity.ok(
             orderStatusChangedUseCase.change(
                 OrderStatusChangedDto(orderId, customerId, Status.CANCELED)
+            )
+        )
+
+    @PostMapping("/api/v1/orders/{orderId}/ready")
+    @Operation(summary = "주문 예약 대기", description = "주문 예약 대기")
+    fun readyOrder(@PathVariable orderId: Long, @CustomerId customerId: Long): ResponseEntity<Unit> =
+        ResponseEntity.ok(
+            orderStatusChangedUseCase.change(
+                OrderStatusChangedDto(orderId, customerId, Status.READY)
             )
         )
 

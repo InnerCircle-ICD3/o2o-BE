@@ -9,7 +9,7 @@ import com.eatngo.inventory.event.InventoryEventPublisher
 import com.eatngo.inventory.infra.InventoryCachePersistence
 import com.eatngo.order.domain.OrderItem
 import com.eatngo.order.event.OrderCanceledEvent
-import com.eatngo.order.event.OrderCreatedEvent
+import com.eatngo.order.event.OrderReadyEvent
 import com.eatngo.order.event.OrderEvent
 import com.eatngo.product.infra.ProductPersistence
 import com.eatngo.product.service.ProductService
@@ -31,7 +31,7 @@ class ProductEventListener(
     @EventListener
     fun handleOrderEvent(event: OrderEvent) {
         when (event) {
-            is OrderCreatedEvent -> event.order.orderItems.forEach { processStockDecrease(it) }
+            is OrderReadyEvent -> event.order.orderItems.forEach { processStockDecrease(it) }
             is OrderCanceledEvent -> event.order.orderItems.forEach { processStockRollback(it) }
         }
     }

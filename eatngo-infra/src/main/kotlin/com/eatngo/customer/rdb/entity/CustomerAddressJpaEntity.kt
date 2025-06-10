@@ -31,7 +31,9 @@ data class CustomerAddressJpaEntity(
     @ManyToOne
     @JoinColumn(name = "customer_id", nullable = false)
     val customer: CustomerJpaEntity,
-    val roadNameAddress: RoadNameAddressVO,
+    val radiusInKilometers: Double = 0.0,
+    @Column(nullable = true)
+    val roadNameAddress: RoadNameAddressVO? = null,
     val lotNumberAddress: LotNumberAddressVO,
     val buildingName: String?,
     val zipCode: ZipCodeVO,
@@ -52,6 +54,7 @@ data class CustomerAddressJpaEntity(
             with(customerAddress) {
                 CustomerAddressJpaEntity(
                     customer = customer,
+                    radiusInKilometers = radiusInKilometers,
                     roadNameAddress = address.roadNameAddress,
                     lotNumberAddress = address.lotNumberAddress,
                     buildingName = address.buildingName,
@@ -70,6 +73,7 @@ data class CustomerAddressJpaEntity(
             return CustomerAddress(
                 id = customerAddressJpaEntity.id,
                 customerId = customerAddressJpaEntity.customer.id,
+                radiusInKilometers = customerAddressJpaEntity.radiusInKilometers,
                 address = Address(
                     roadNameAddress = customerAddressJpaEntity.roadNameAddress,
                     lotNumberAddress = customerAddressJpaEntity.lotNumberAddress,

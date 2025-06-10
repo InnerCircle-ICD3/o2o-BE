@@ -5,29 +5,42 @@ import com.eatngo.common.response.Cursor
 import com.eatngo.extension.orThrow
 import com.eatngo.order.domain.Order
 import com.eatngo.order.domain.OrderItem
-import com.eatngo.order.dto.OrderCreateDto
+import com.eatngo.order.dto.OrderItemSnapshotDto
 import com.eatngo.order.dto.OrderQueryParamDto
 import com.eatngo.order.infra.OrderPersistence
 import com.github.f4b6a3.tsid.TsidCreator
 import org.springframework.stereotype.Service
+import java.time.LocalDateTime
 
 
 @Service
 class OrderService(
     private val orderPersistence: OrderPersistence
 ) {
-    fun createOrder(orderDto: OrderCreateDto): Order {
+    fun createOrder(
+        storeId: Long,
+        customerId: Long,
+        pickupDateTime: LocalDateTime,
+        nickname: String,
+        orderItemSnapshotDtos: List<OrderItemSnapshotDto>,
+    ): Order {
         val order: Order = Order.create(
             orderNumber = TsidCreator.getTsid().toLong(),
-            customerId = orderDto.customerId,
-            storeId = orderDto.storeId,
-            orderItems = orderDto.orderItems.map {
-                OrderItem.of(
-                    productId = it.productId,
-                    name = it.productName,
-                    quantity = it.quantity,
-                    price = it.price
-                )
+            customerId = customerId,
+            storeId = storeId,
+            pickupDateTime = pickupDateTime,
+            nickname = nickname,
+            orderItems = orderItemSnapshotDtos.map {
+                with(it) {
+                    OrderItem.of(
+                        productId = productId,
+                        name = productName,
+                        quantity = quantity,
+                        originPrice = originPrice,
+                        finalPrice = finalPrice,
+                        imageUrl = imageUrl,
+                    )
+                }
             }
         )
 

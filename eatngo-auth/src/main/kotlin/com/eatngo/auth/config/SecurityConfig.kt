@@ -38,7 +38,8 @@ class SecurityConfig(
             .httpBasic { it.disable() }
 
 //            .authorizeHttpRequests {
-//                it.requestMatchers("/", "/oauth2/**", "/login/**", "/api/v1/test/hello").permitAll()
+//                it.requestMatchers("/", "/oauth2/**", "/login/**", "/api/v1/test/hello",
+//                "/api/v1/oauth2/authorization/**").permitAll()
 //                    .anyRequest().authenticated()
 //            }
 
@@ -47,7 +48,13 @@ class SecurityConfig(
             .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter::class.java)
 
             .oauth2Login {
-                it.userInfoEndpoint { userInfo -> userInfo.userService(oAuth2UserService) }
+                it.authorizationEndpoint {
+                    it.baseUri("/api/v1/oauth2/authorization")
+                }
+                it.userInfoEndpoint { userInfo ->
+                    userInfo
+                        .userService(oAuth2UserService)
+                }
                     .successHandler(authenticationSuccessHandler)
             }
 

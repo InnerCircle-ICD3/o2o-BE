@@ -15,7 +15,7 @@ class AddressJpaEntity(
     val id: Long = 0,
 
     @Column(nullable = false)
-    val roadNameAddress: String,
+    val roadNameAddress: String? = null,
 
     @Column(nullable = false)
     val lotNumberAddress: String,
