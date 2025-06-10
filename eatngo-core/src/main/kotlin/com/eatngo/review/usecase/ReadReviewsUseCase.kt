@@ -10,7 +10,7 @@ import org.springframework.transaction.annotation.Transactional
 class ReadReviewsUseCase(
     private val reviewService: ReviewService,
 ) {
-    @Transactional
+    @Transactional(readOnly = true)
     fun execute(
         storeId: Long,
         lastId: Long?,

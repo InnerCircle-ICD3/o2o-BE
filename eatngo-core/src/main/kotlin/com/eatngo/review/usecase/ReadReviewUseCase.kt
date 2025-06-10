@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional
 class ReadReviewUseCase(
     private val reviewService: ReviewService,
 ) {
-    @Transactional
+    @Transactional(readOnly = true)
     fun getReviewByOrderId(orderId: Long): ReviewDto {
         val review =
             reviewService.findByOrderId(orderId).orThrow {
