@@ -18,32 +18,43 @@ import org.springframework.stereotype.Service
 @Service
 class StoreServiceImpl(
     private val storePersistence: StorePersistence,
-    private val fileStorageService: FileStorageService
+    private val fileStorageService: FileStorageService,
 ) : StoreService {
-
     override fun createStore(request: StoreCreateDto): Store {
         val store = Store.create(request)
 
         store.apply {
-            imageUrl = request.imageUrl?.let { fileStorageService.resolveImageUrl(it)
-                .orThrow { FileException.ImageUrlResolveFailed(request.imageUrl) } }
+            imageUrl =
+                request.imageUrl?.let {
+                    fileStorageService
+                        .resolveImageUrl(it)
+                        .orThrow { FileException.ImageUrlResolveFailed(request.imageUrl) }
+                }
         }
         return storePersistence.save(store)
     }
 
-    override fun updateStore(id: Long, request: StoreUpdateDto): Store {
+    override fun updateStore(
+        id: Long,
+        request: StoreUpdateDto,
+    ): Store {
         val existingStore = storePersistence.findById(id).orThrow { StoreException.StoreNotFound(id) }
         existingStore.requireOwner(request.storeOwnerId)
         existingStore.update(request)
         if (request.mainImageUrl != null) {
             existingStore.imageUrl =
-                fileStorageService.resolveImageUrl(request.mainImageUrl)
+                fileStorageService
+                    .resolveImageUrl(request.mainImageUrl)
                     .orThrow { FileException.ImageUrlResolveFailed(request.mainImageUrl) }
         }
         return storePersistence.save(existingStore)
     }
 
-    override fun updateStoreStatus(id: Long, newStatus: StoreEnum.StoreStatus, storeOwnerId: Long?): Store {
+    override fun updateStoreStatus(
+        id: Long,
+        newStatus: StoreEnum.StoreStatus,
+        storeOwnerId: Long?,
+    ): Store {
         val existingStore = storePersistence.findById(id).orThrow { StoreException.StoreNotFound(id) }
         // 점주가 직접 변경하는 경우에만 권한 확인
         storeOwnerId?.let { existingStore.requireOwner(it) }
@@ -62,7 +73,10 @@ class StoreServiceImpl(
         return existingStore
     }
 
-    override fun deleteStore(id: Long, storeOwnerId: Long): Boolean {
+    override fun deleteStore(
+        id: Long,
+        storeOwnerId: Long,
+    ): Boolean {
         val existingStore = storePersistence.findById(id).orThrow { StoreException.StoreNotFound(id) }
         existingStore.requireOwner(storeOwnerId)
 
@@ -78,4 +92,6 @@ class StoreServiceImpl(
         val existingStore = storePersistence.findById(id).orThrow { StoreException.StoreNotFound(id) }
         return existingStore
     }
+
+    override fun getStoresByIds(ids: List<Long>): List<Store> = storePersistence.findAllByIds(ids)
 }

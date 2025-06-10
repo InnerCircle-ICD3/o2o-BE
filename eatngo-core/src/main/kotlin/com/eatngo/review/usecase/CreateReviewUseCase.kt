@@ -6,6 +6,7 @@ import com.eatngo.review.dto.CreateReviewDto
 import com.eatngo.review.dto.ReviewDto
 import com.eatngo.review.service.ReviewService
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 class CreateReviewUseCase(
@@ -13,6 +14,7 @@ class CreateReviewUseCase(
     private val orderService: OrderService,
     private val customerService: CustomerService,
 ) {
+    @Transactional
     fun createReview(dto: CreateReviewDto): ReviewDto {
         val customer = customerService.getCustomerById(dto.customerId)
         val order = orderService.getById(dto.orderId)
@@ -23,8 +25,8 @@ class CreateReviewUseCase(
             reviewService.createReview(
                 dto = dto,
                 order = order,
-                customer = customer
-            )
+                customer = customer,
+            ),
         )
     }
 }
