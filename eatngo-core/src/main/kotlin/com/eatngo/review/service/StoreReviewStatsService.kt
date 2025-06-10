@@ -28,7 +28,7 @@ class StoreReviewStatsService(
     }
     
     /**
-     * 모든 매장의 리뷰 집계 데이터 업데이트 (배치용)
+     * 모든 매장의 리뷰 집계 데이터 업데이트
      */
     fun updateAllStoreReviewStats() {
         storeReviewStatsPersistence.updateAllStoreReviewStats()
