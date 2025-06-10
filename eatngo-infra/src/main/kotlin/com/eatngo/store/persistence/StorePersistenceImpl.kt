@@ -22,6 +22,9 @@ import java.time.DayOfWeek
 class StorePersistenceImpl(
     private val storeRdbRepository: StoreRdbRepository,
 ) : StorePersistence {
+    companion object {
+        private val objectMapper = jacksonObjectMapper()
+    }
     @SoftDeletedFilter
     override fun findById(id: Long): Store? =
         storeRdbRepository
@@ -78,9 +81,8 @@ class StorePersistenceImpl(
                     status = projection.status
                 )
             }
-    
+
     private fun parseBusinessHoursJson(json: String): List<BusinessHourDto> {
-        val objectMapper = jacksonObjectMapper()
         val typeRef = object : TypeReference<List<Map<String, String>>>() {}
         
         return objectMapper.readValue(json, typeRef).map { map ->

@@ -56,4 +56,19 @@ open class StoreException(
         message = "매장 상태 업데이트 실패: 매장 ID $storeId, 상태 $status",
         data = mapOf("storeId" to storeId, "status" to status)
     )
+
+    class StoreBatchUpdateFailed(
+        expectedCount: Int,
+        actualCount: Int,
+        storeIds: List<Long>
+    ) : StoreException(
+        errorCode = BusinessErrorCode.STORE_BATCH_UPDATE_FAILED,
+        message = "${BusinessErrorCode.STORE_BATCH_UPDATE_FAILED.message} (예상: ${expectedCount}개, 실제: ${actualCount}개)",
+        data = mapOf(
+            "expectedCount" to expectedCount,
+            "actualCount" to actualCount,
+            "storeIds" to storeIds
+        ),
+        logLevel = Level.ERROR
+    )
 }

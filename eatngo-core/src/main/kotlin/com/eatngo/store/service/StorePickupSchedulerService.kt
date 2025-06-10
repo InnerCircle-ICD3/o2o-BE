@@ -1,7 +1,10 @@
 package com.eatngo.store.service
 
+import com.eatngo.common.exception.store.StoreException
+import com.eatngo.extension.executeWithRetry
 import com.eatngo.store.event.StorePickupEndedEvent
 import com.eatngo.store.infra.StorePersistence
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -13,7 +16,15 @@ import java.time.LocalDateTime
 @Service
 class StorePickupSchedulerService(
     private val storePersistence: StorePersistence,
-    private val eventPublisher: ApplicationEventPublisher
+    private val eventPublisher: ApplicationEventPublisher,
+    @Value("\${store.scheduler.window.start-minutes:31}")
+    private val windowStartMinutes: Long = 31,
+    @Value("\${store.scheduler.window.end-minutes:1}")
+    private val windowEndMinutes: Long = 1,
+    @Value("\${store.scheduler.retry.max-attempts:3}")
+    private val maxRetryAttempts: Int = 3,
+    @Value("\${store.scheduler.retry.delay-ms:5000}")
+    private val retryDelayMs: Long = 5000
 ) {
 
     /**
@@ -24,9 +35,9 @@ class StorePickupSchedulerService(
     fun closeStoresByPickupEndTime(): List<Long> {
         val now = LocalDateTime.now()
         
-        val dayOfWeek = now.dayOfWeek.toString()
-        val endTime = now.toLocalTime().minusMinutes(1)
-        val startTime = now.toLocalTime().minusMinutes(31)
+        val dayOfWeek = now.dayOfWeek.name
+        val endTime = now.toLocalTime().minusMinutes(windowEndMinutes)
+        val startTime = now.toLocalTime().minusMinutes(windowStartMinutes)
         
         val candidateStores = storePersistence.findOpenStoresForScheduler(
             dayOfWeek, startTime, endTime
@@ -37,7 +48,20 @@ class StorePickupSchedulerService(
             .map { it.id }
         
         if (storesToClose.isNotEmpty()) {
-            storePersistence.batchUpdateStatusToClosed(storesToClose)
+            val updatedCount = executeWithRetry(
+                maxAttempts = maxRetryAttempts,
+                delayMs = retryDelayMs
+            ) { 
+                storePersistence.batchUpdateStatusToClosed(storesToClose)
+            }
+            
+            if (updatedCount != storesToClose.size) {
+                throw StoreException.StoreBatchUpdateFailed(
+                    expectedCount = storesToClose.size,
+                    actualCount = updatedCount,
+                    storeIds = storesToClose
+                )
+            }
 
             eventPublisher.publishEvent(
                 StorePickupEndedEvent(
