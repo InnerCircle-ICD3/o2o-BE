@@ -10,7 +10,13 @@ import org.hibernate.annotations.Filter
 import java.time.LocalDateTime
 
 @Filter(name = DELETED_FILTER)
-@Table(name = "orders")
+@Table(
+    name = "orders",
+    indexes = [
+        Index(name = "idx_orders_store_deleted", columnList = "storeId, deletedAt"),
+        Index(name = "idx_orders_status_deleted", columnList = "status, deletedAt")
+    ]
+)
 @Entity
 class OrderJpaEntity(
     @Id

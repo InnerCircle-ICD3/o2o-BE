@@ -28,7 +28,7 @@ interface StoreOwnerSubscriptionControllerDocs {
             2. 다음 페이지: 이전 응답의 lastId를 사용하여 요청
             3. lastId가 null이면 마지막 페이지
             
-            **페이징:** 50개씩 반환, ID 내림차순 정렬
+            **페이징:** 10개씩 반환, ID 내림차순 정렬
         """
     )
     @ApiResponses(
