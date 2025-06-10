@@ -23,13 +23,13 @@ class StoreOwnerService(
         userAccountPersistence.deleteById(id)
     }
 
-    fun update(StoreOwnerId: Long, StoreOwnerUpdateDto: StoreOwnerUpdateDto) {
-        val storeOwner = storeOwnerPersistence.getByIdOrThrow(StoreOwnerId)
-        storeOwner.update(StoreOwnerUpdateDto)
+    fun update(storeOwnerId: Long, storeOwnerUpdateDto: StoreOwnerUpdateDto) {
+        val storeOwner = storeOwnerPersistence.getByIdOrThrow(storeOwnerId)
+        storeOwner.update(storeOwnerUpdateDto)
         storeOwnerPersistence.save(storeOwner)
 
         val account = userAccountPersistence.getByIdOrThrow(storeOwner.account.id)
-        account.update(StoreOwnerUpdateDto)
+        account.update(storeOwnerUpdateDto)
         userAccountPersistence.save(account)
     }
 

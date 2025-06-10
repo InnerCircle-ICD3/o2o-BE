@@ -1,6 +1,6 @@
 package com.eatngo.user_account.rdb.repository
 
-import com.eatngo.user_account.oauth2.constants.Oauth2Provider
+import com.eatngo.user_account.oauth2.constants.OAuth2Provider
 import com.eatngo.user_account.rdb.entity.UserAccountJpaEntity
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
@@ -27,7 +27,7 @@ interface UserAccountRdbRepository : JpaRepository<UserAccountJpaEntity, Long> {
         AND o2.userKey = :userKey
     """
     )
-    fun findByOAuth2Key(userKey: String, provider: Oauth2Provider): UserAccountJpaEntity?
+    fun findByOAuth2Key(userKey: String, provider: OAuth2Provider): UserAccountJpaEntity?
 
     @Query(
         """

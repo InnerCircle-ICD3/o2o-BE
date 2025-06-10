@@ -6,7 +6,7 @@ import com.eatngo.configuration.TestConfiguration
 import com.eatngo.store_owner.dto.StoreOwnerDto
 import com.eatngo.store_owner.dto.StoreOwnerUpdateDto
 import com.eatngo.store_owner.service.StoreOwnerService
-import com.eatngo.user_account.oauth2.constants.Oauth2Provider
+import com.eatngo.user_account.oauth2.constants.OAuth2Provider
 import com.eatngo.user_account.oauth2.dto.KakaoOAuth2
 import com.eatngo.user_account.service.UserAccountService
 import com.eatngo.user_account.vo.Nickname
@@ -88,7 +88,7 @@ class StoreOwnerControllerTest(
                         "profile" to mapOf("nickname" to "홍길동")
                     )
                 ),
-                Oauth2Provider.KAKAO,
+                OAuth2Provider.KAKAO,
                 "token",
                 LocalDateTime.now().plusHours(1),
                 "profile,email"

@@ -4,7 +4,7 @@ import com.eatngo.auth.dto.LoginCustomer
 import com.eatngo.auth.token.TokenProvider
 import com.eatngo.customer.service.CustomerAddressService
 import com.eatngo.customer.service.CustomerService
-import com.eatngo.user_account.oauth2.constants.Oauth2Provider
+import com.eatngo.user_account.oauth2.constants.OAuth2Provider
 import com.eatngo.user_account.oauth2.dto.KakaoOAuth2
 import com.eatngo.user_account.service.UserAccountService
 import org.springframework.boot.test.context.TestComponent
@@ -26,7 +26,7 @@ class CustomerTestHelper(
                         "profile" to mapOf("nickname" to "홍길동")
                     )
                 ),
-                Oauth2Provider.KAKAO,
+                OAuth2Provider.KAKAO,
                 "token",
                 expiresAt = java.time.LocalDateTime.now().plusDays(1),
                 scopes = "profile,email"

@@ -3,7 +3,7 @@ package com.eatngo.user_account.persistence
 import com.eatngo.aop.SoftDeletedFilter
 import com.eatngo.user_account.domain.UserAccount
 import com.eatngo.user_account.infra.UserAccountPersistence
-import com.eatngo.user_account.oauth2.constants.Oauth2Provider
+import com.eatngo.user_account.oauth2.constants.OAuth2Provider
 import com.eatngo.user_account.rdb.entity.UserAccountJpaEntity
 import com.eatngo.user_account.rdb.repository.UserAccountRdbRepository
 import com.eatngo.user_account.vo.EmailAddress
@@ -36,7 +36,7 @@ class UserAccountPersistenceImpl(
     }
 
     @SoftDeletedFilter
-    override fun findByOauth(userKey: String, provider: Oauth2Provider) =
+    override fun findByOauth(userKey: String, provider: OAuth2Provider) =
         userAccountRdbRepository.findByOAuth2Key(userKey, provider)
             ?.let { UserAccountJpaEntity.toUserAccount(it) }
 

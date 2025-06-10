@@ -1,6 +1,6 @@
 package com.eatngo.user_account.oauth2.constants
 
-enum class Oauth2Provider {
+enum class OAuth2Provider {
     KAKAO;
 
 

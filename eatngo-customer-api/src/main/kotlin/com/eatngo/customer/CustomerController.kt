@@ -5,6 +5,7 @@ import com.eatngo.common.response.ApiResponse
 import com.eatngo.customer.dto.CustomerDto
 import com.eatngo.customer.dto.CustomerUpdateDto
 import com.eatngo.customer.service.CustomerService
+import com.eatngo.oauth2.OAuth2Service
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.ResponseEntity
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping("/api/v1/customers")
 class CustomerController(
     private val customerService: CustomerService,
+    private val oAuth2Service: Set<OAuth2Service>
 ) {
     @Operation(summary = "고객 정보 조회 API", description = "고객 정보를 조회하는 API")
     @GetMapping("/me")
@@ -31,7 +33,13 @@ class CustomerController(
     fun deleteCustomer(
         @CustomerId customerId: Long,
     ): ResponseEntity<Unit> {
+        val customer = customerService.getCustomerById(customerId)
         customerService.deleteCustomer(customerId)
+        customer.account.oAuth2.forEach { oauth2 ->
+            oAuth2Service.find {
+                it.supports(oauth2.provider)
+            }?.unlink(oauth2.accessToken)
+        }
         return ResponseEntity.noContent().build()
     }
 

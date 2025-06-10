@@ -2,6 +2,7 @@ package com.eatngo.store_owner
 
 import com.eatngo.auth.annotaion.StoreOwnerId
 import com.eatngo.common.response.ApiResponse
+import com.eatngo.oauth2.OAuth2Service
 import com.eatngo.store_owner.dto.StoreOwnerDto
 import com.eatngo.store_owner.dto.StoreOwnerUpdateDto
 import com.eatngo.store_owner.service.StoreOwnerService
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping("/api/v1/store-owners")
 class StoreOwnerController(
     private val storeOwnerService: StoreOwnerService,
+    private val oAuth2Service: Set<OAuth2Service>,
 ) {
     @Operation(summary = "고객 정보 조회 API", description = "고객 정보를 조회하는 API")
     @GetMapping("/me")
@@ -32,7 +34,13 @@ class StoreOwnerController(
     fun deleteCustomer(
         @StoreOwnerId storeOwnerId: Long,
     ): ResponseEntity<Unit> {
+        val storeOwner = storeOwnerService.getStoreOwnerById(storeOwnerId)
         storeOwnerService.deleteStoreOwner(storeOwnerId)
+        storeOwner.account.oAuth2.forEach { oauth2 ->
+            oAuth2Service.find {
+                it.supports(oauth2.provider)
+            }?.unlink(oauth2.accessToken)
+        }
         return ResponseEntity.noContent().build()
     }
 

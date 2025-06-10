@@ -1,11 +1,15 @@
 package com.eatngo.auth.config
 
+import com.eatngo.auth.resolver.UserAccountIdArgumentResolver
 import org.springframework.context.annotation.Configuration
+import org.springframework.web.method.support.HandlerMethodArgumentResolver
 import org.springframework.web.servlet.config.annotation.CorsRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 
 @Configuration
-class WebMvcConfig : WebMvcConfigurer {
+class WebMvcConfig(
+    private val userAccountIdArgumentResolver: UserAccountIdArgumentResolver
+) : WebMvcConfigurer {
     override fun addCorsMappings(registry: CorsRegistry) {
         registry
             .addMapping("/**")
@@ -22,5 +26,8 @@ class WebMvcConfig : WebMvcConfigurer {
             ).allowedMethods("*")
             .allowedHeaders("*")
             .allowCredentials(true)
+    }
+    override fun addArgumentResolvers(resolvers: MutableList<HandlerMethodArgumentResolver>) {
+        resolvers.add(userAccountIdArgumentResolver)
     }
 }

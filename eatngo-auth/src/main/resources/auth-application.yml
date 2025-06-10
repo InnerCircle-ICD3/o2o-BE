@@ -21,4 +21,7 @@ spring:
             user-name-attribute: id
 jwt:
   secret: ${JWT_SECRET:YW5Zb3UtY2FuLXVzZS10aGlzLWtleS1mb3ItanVzdC10ZXN0aW5nIQ==}
-  # anYou-can-use-this-key-for-just-testing! Base64-encoded -> // TODO 교체 및 외부 주입
+
+oauth2:
+  kakao:
+    url: https://kapi.kakao.com

@@ -1,7 +1,7 @@
 package com.eatngo.user_account.oauth2.domain
 
 import com.eatngo.user_account.domain.UserAccount
-import com.eatngo.user_account.oauth2.constants.Oauth2Provider
+import com.eatngo.user_account.oauth2.constants.OAuth2Provider
 import com.eatngo.user_account.oauth2.dto.OAuth2
 import com.eatngo.user_account.vo.EmailAddress
 import java.time.LocalDateTime
@@ -11,9 +11,9 @@ class UserAccountOAuth2(
     val userAccount: UserAccount,
     val email: EmailAddress?,
     var nickname: String? = null,
-    var provider: Oauth2Provider,
+    var provider: OAuth2Provider,
     var userKey: String,
-    var accessToken: String? = null,
+    var accessToken: String,
     var expireAt: LocalDateTime? = null,
     var scopes: String? = null,
     val createdAt: LocalDateTime? = null,
