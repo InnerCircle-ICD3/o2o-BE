@@ -2,7 +2,7 @@ package com.eatngo.store.rdb.repository
 
 import com.eatngo.common.constant.StoreEnum
 import com.eatngo.store.rdb.entity.StoreJpaEntity
-import com.eatngo.store.rdb.projection.StoreSchedulerProjection
+import com.eatngo.store.scheduler.StoreSchedulerProjection
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query

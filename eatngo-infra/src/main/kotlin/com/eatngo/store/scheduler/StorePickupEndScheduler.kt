@@ -1,5 +1,6 @@
 package com.eatngo.store.scheduler
 
+import com.eatngo.common.constant.StoreEnum
 import com.eatngo.store.service.StorePickupSchedulerService
 import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.Scheduled
@@ -35,4 +36,13 @@ class StorePickupEndScheduler(
         
         logger.info("매장 픽업 종료 시간 확인 스케줄러 완료")
     }
-} 
+}
+
+/**
+ * 스케줄러용 Store Projection
+ */
+interface StoreSchedulerProjection {
+    val id: Long
+    val businessHours: String // JSON 문자열
+    val status: StoreEnum.StoreStatus
+}

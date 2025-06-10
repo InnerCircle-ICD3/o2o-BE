@@ -5,7 +5,6 @@ import com.eatngo.store.infra.StorePersistence
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.time.DayOfWeek
 import java.time.LocalDateTime
 
 /**
@@ -39,7 +38,7 @@ class StorePickupSchedulerService(
         
         if (storesToClose.isNotEmpty()) {
             storePersistence.batchUpdateStatusToClosed(storesToClose)
-            
+
             eventPublisher.publishEvent(
                 StorePickupEndedEvent(
                     closedStoreIds = storesToClose,
