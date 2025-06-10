@@ -4,9 +4,11 @@ import com.eatngo.inventory.domain.Inventory
 import com.eatngo.inventory.infra.InventoryPersistence
 import org.slf4j.LoggerFactory
 import org.springframework.data.redis.core.RedisTemplate
+import org.springframework.data.redis.core.script.DefaultRedisScript
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDate
 
 @Component
 class InventorySyncScheduler(
@@ -19,18 +21,23 @@ class InventorySyncScheduler(
         private const val REDIS_KEY_PREFIX = "inventory:"
         private const val CHANGED_SET_KEY = "changedProductIds"
         private const val CHUNK_SIZE = 500
+
+        private const val LUA_POP_AND_DELETE = """
+            local members = redis.call('SMEMBERS', KEYS[1])
+            redis.call('DEL', KEYS[1])
+            return members
+        """
     }
 
     @Scheduled(cron = "0 0/10 * * * ?")
     @Transactional
     fun syncInventoryFromRedisToRdb() {
-        val changedIds: Set<String>? = redisTemplate.opsForSet().members(CHANGED_SET_KEY)
-        if (changedIds.isNullOrEmpty()) {
+        val changedIds = fetchAndClearChangedIdsAtomically()
+
+        if (changedIds.isEmpty()) {
             logger.info("동기화할 변경된 재고 ID가 없습니다.")
             return
         }
-
-        redisTemplate.delete(CHANGED_SET_KEY)
 
         val productIds = changedIds.mapNotNull { productId ->
             productId.toLongOrNull().also {
@@ -58,12 +65,26 @@ class InventorySyncScheduler(
         logger.info("Redis → RDB 재고 동기화 작업 완료.")
     }
 
+    private fun fetchAndClearChangedIdsAtomically(): List<String> {
+        val redisScript = DefaultRedisScript<List<String>>().apply {
+            setScriptText(LUA_POP_AND_DELETE.trimIndent())
+            resultType = List::class.java as Class<List<String>>
+        }
+
+        val result = redisTemplate.execute(
+            redisScript,
+            listOf(CHANGED_SET_KEY)
+        )
+
+        return result ?: emptyList()
+    }
+
     private fun updateRdbWithSingleChunk(
         idChunk: List<Long>,
         chunkIndex: Int
     ) {
         val inventories: MutableList<Inventory> =
-            inventoryPersistence.findAllByProductIdIn(idChunk).toMutableList()
+            inventoryPersistence.findAllByProductIdIn(idChunk, LocalDate.now()).toMutableList()
 
         if (inventories.isEmpty()) {
             logger.warn("chunk #$chunkIndex: RDB에서 조회된 엔티티가 없습니다. IDs=$idChunk")

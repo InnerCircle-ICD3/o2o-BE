@@ -4,6 +4,7 @@ import com.eatngo.inventory.domain.Inventory
 import com.eatngo.inventory.infra.InventoryPersistence
 import com.eatngo.inventory.mapper.InventoryMapper
 import org.springframework.stereotype.Repository
+import java.time.LocalDate
 
 @Repository
 class InventoryRepositoryImpl(
@@ -15,8 +16,8 @@ class InventoryRepositoryImpl(
         )
     }
 
-    override fun findTopByProductIdOrderByVersionDesc(productId: Long): Inventory? {
-        return jpaInventoryRepository.findTopByProductIdOrderByVersionDesc(productId)
+    override fun findTopByProductIdOrderByVersionDesc(productId: Long, localDate: LocalDate): Inventory? {
+        return jpaInventoryRepository.findTopByProductIdAndInventoryDateOrderByVersionDesc(productId, localDate)
             .map(InventoryMapper::toDomain)
             .orElse(null)
     }
@@ -25,12 +26,12 @@ class InventoryRepositoryImpl(
         jpaInventoryRepository.deleteByProductId(productId)
     }
 
-    override fun updateStock(productId: Long, stockQuantity: Int): Int {
-        return jpaInventoryRepository.updateStock(productId, stockQuantity)
+    override fun updateStock(productId: Long, stockQuantity: Int, localDate: LocalDate): Int {
+        return jpaInventoryRepository.updateStock(productId, stockQuantity, localDate)
     }
 
-    override fun findAllByProductIdIn(productIds: List<Long>): List<Inventory> {
-        return jpaInventoryRepository.findAllByProductIdIn(productIds)
+    override fun findAllByProductIdIn(productIds: List<Long>, localDate: LocalDate): List<Inventory> {
+        return jpaInventoryRepository.findAllByProductIdInAndInventoryDate(productIds, localDate)
             .map(InventoryMapper.Companion::toDomain)
     }
 

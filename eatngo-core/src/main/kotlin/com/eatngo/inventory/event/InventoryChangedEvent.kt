@@ -2,7 +2,9 @@ package com.eatngo.inventory.event
 
 data class InventoryChangedEvent(
     val productId: Long,
-    val inventoryChangedType: InventoryChangedType
+    val inventoryChangedType: InventoryChangedType,
+    val previousTotalStock: Int,
+    val afterTotalStock: Int
 )
 
 enum class InventoryChangedType(
