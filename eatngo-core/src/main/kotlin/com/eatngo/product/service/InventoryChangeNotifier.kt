@@ -30,7 +30,7 @@ class InventoryChangeNotifier(
                 productId = productId,
                 inventoryChangedType = determineInventoryChangedType(storeId, initialStock),
                 previousTotalStock = initialStock,
-                afterTotalStock = calculateCurrentTotalStock(productId)
+                afterTotalStock = calculateCurrentTotalStock(storeId = storeId)
             )
         )
     }

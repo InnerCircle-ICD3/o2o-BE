@@ -11,7 +11,7 @@ data class CreateProductRequestDto(
     val description: String,
 
     @field:Valid
-    val price: UpdateProductPriceRequestDto,
+    val price: CreateProductPriceRequestDto,
 
     @field:Schema(
         description = "상품 사이즈",
@@ -19,7 +19,7 @@ data class CreateProductRequestDto(
     )
     val size: String,
 
-    val inventory: UpdateProductInventoryRequestDto,
+    val inventory: CreateProductInventoryRequestDto,
 
     @field:Schema(
         description = "잇고백 상품 세부 정보들",
