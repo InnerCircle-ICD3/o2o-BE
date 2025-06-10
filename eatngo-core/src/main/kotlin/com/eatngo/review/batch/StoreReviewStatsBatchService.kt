@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service
 class StoreReviewStatsBatchService(
     private val storeReviewStatsService: StoreReviewStatsService
 ) {
-    private val logger = LoggerFactory.getLogger(StoreReviewStatsBatchService::class.java)
+    companion object{ private val logger = LoggerFactory.getLogger(StoreReviewStatsBatchService::class.java) }
 
     @Scheduled(cron = "0 */30 * * * *")
     fun updateStoreReviewStats() {
