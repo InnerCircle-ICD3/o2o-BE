@@ -1,5 +1,6 @@
 package com.eatngo.mongo.search.repository
 
+import com.eatngo.common.util.toHHmmString
 import com.eatngo.mongo.search.dto.SearchStoreAutoCompleteDto
 import com.eatngo.mongo.search.entity.SearchStoreEntity
 import com.eatngo.search.domain.SearchStore
@@ -314,7 +315,7 @@ class SearchStoreRepositoryImpl(
             // 현재 시간 기준으로 오픈 중인 매장 필터링
             val now = LocalDateTime.now()
             val currentDayOfWeek = now.dayOfWeek
-            val currentTime = now.toLocalTime()
+            val currentTime = now.toLocalTime().toHHmmString()
 
             must += (
                 Document(
