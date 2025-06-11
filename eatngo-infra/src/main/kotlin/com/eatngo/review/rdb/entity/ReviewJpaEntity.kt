@@ -30,31 +30,36 @@ class ReviewJpaEntity(
     @CollectionTable(name = "review_images", joinColumns = [JoinColumn(name = "review_id")])
     val images: MutableList<String> = mutableListOf(),
     val customerId: Long,
+    val nickname: String,
 ) : BaseJpaEntity() {
     companion object {
-        fun from(review: Review): ReviewJpaEntity =
-            ReviewJpaEntity(
-                orderId = review.orderId,
-                content = review.content,
-                score = review.score.value,
-                images = review.images.images.toMutableList(),
-                customerId = review.customerId,
-            )
+        fun from(review: Review) =
+            with(review) {
+                ReviewJpaEntity(
+                    orderId = orderId,
+                    content = content,
+                    score = score.value,
+                    images = images.images.toMutableList(),
+                    customerId = customerId,
+                    nickname = nickname,
+                )
+            }
 
         fun toDomain(reviewJpaEntity: ReviewJpaEntity) =
             with(reviewJpaEntity) {
                 Review(
-                    id = reviewJpaEntity.id,
-                    orderId = reviewJpaEntity.orderId,
-                    content = reviewJpaEntity.content,
-                    score = Score(reviewJpaEntity.score),
-                    images = Images(reviewJpaEntity.images),
-                    customerId = reviewJpaEntity.customerId,
-                    createdAt = reviewJpaEntity.createdAt,
-                    createdBy = reviewJpaEntity.createdBy,
-                    updatedAt = reviewJpaEntity.updatedAt,
-                    updatedBy = reviewJpaEntity.updatedBy,
-                    deletedAt = reviewJpaEntity.deletedAt,
+                    id = id,
+                    orderId = orderId,
+                    content = content,
+                    score = Score(score),
+                    images = Images(images),
+                    nickname = nickname,
+                    customerId = customerId,
+                    createdAt = createdAt,
+                    createdBy = createdBy,
+                    updatedAt = updatedAt,
+                    updatedBy = updatedBy,
+                    deletedAt = deletedAt,
                 )
             }
     }

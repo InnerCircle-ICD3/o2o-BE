@@ -9,20 +9,28 @@ class Review(
     val score: Score,
     val images: Images,
     val customerId: Long,
+    val nickname: String,
     val createdAt: LocalDateTime = LocalDateTime.now(),
     val createdBy: Long? = null,
     val updatedAt: LocalDateTime = LocalDateTime.now(),
     val updatedBy: Long? = null,
-    val deletedAt: LocalDateTime? = null
+    val deletedAt: LocalDateTime? = null,
 ) {
     companion object {
-        fun create(orderId: Long, content: String, score: Score, images: Images, customerId: Long) =
-            Review(
-                orderId = orderId,
-                content = content,
-                score = score,
-                images = images,
-                customerId = customerId,
-            )
+        fun create(
+            orderId: Long,
+            content: String,
+            score: Score,
+            images: Images,
+            customerId: Long,
+            nickname: String,
+        ) = Review(
+            orderId = orderId,
+            content = content,
+            score = score,
+            images = images,
+            customerId = customerId,
+            nickname = nickname,
+        )
     }
 }
