@@ -339,22 +339,22 @@ class SearchStoreRepositoryImpl(
                     ),
             )
         // 반경 조건 추가
-//        must +=
-//            Document(
-//                "geoWithin",
-//                Document()
-//                    .append("path", "coordinate")
-//                    .append(
-//                        "circle",
-//                        Document()
-//                            .append(
-//                                "center",
-//                                Document()
-//                                    .append("type", "Point")
-//                                    .append("coordinates", listOf(longitude, latitude)),
-//                            ).append("radius", maxDistance),
-//                    ),
-//            )
+        must +=
+            Document(
+                "geoWithin",
+                Document()
+                    .append("path", "coordinate")
+                    .append(
+                        "circle",
+                        Document()
+                            .append(
+                                "center",
+                                Document()
+                                    .append("type", "Point")
+                                    .append("coordinates", listOf(longitude, latitude)),
+                            ).append("radius", maxDistance),
+                    ),
+            )
 
         val searchDocument =
             Document()
