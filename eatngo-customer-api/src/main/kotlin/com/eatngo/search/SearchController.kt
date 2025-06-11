@@ -6,7 +6,6 @@ import com.eatngo.search.dto.SearchStoreMapResultDto
 import com.eatngo.search.dto.SearchStoreResultDto
 import com.eatngo.search.dto.SearchSuggestionResultDto
 import com.eatngo.search.dto.StoreFilterDto
-import com.eatngo.search.dto.StoreSearchFilterDto
 import com.eatngo.search.service.SearchService
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
@@ -23,8 +22,8 @@ class SearchController(
 ) {
     // TODO : 공통 Response로 묶기
     @Operation(
-        summary = "매장 리스트 조회 API",
-        description = "위치 기반 매장 리스트 조회 및 필터링 API",
+        summary = "DEPRECATED: 매장 리스트 조회 API -> 삭제 예정!! /api/v1/search/store를 이용해주세요",
+        description = "DEPRECATED",
     )
     @GetMapping("/api/v1/store/list")
     fun listStore(
@@ -47,7 +46,7 @@ class SearchController(
         @RequestParam size: Int = 20,
     ): ResponseEntity<SearchStoreResultDto> =
         ResponseEntity.ok(
-            searchService.listStore(
+            searchService.searchStore(
                 StoreFilterDto.from(
                     latitude = latitude,
                     longitude = longitude,
@@ -73,6 +72,12 @@ class SearchController(
         @RequestParam searchDistance: Double?,
         @Parameter(description = "검색어", example = "쿠키")
         @RequestParam searchText: String,
+        @Parameter(description = "(optional) 필터링할 매장 카테고리\nnull일 경우 모든 카테고리 조회")
+        @RequestParam storeCategory: StoreEnum.StoreCategory?,
+        @Parameter(description = "(optional) HH:mm 형식의 시간\nnull일 경우 모든 픽업시간 조회")
+        @RequestParam time: String?, // TODO: VO로 정의하여 검증 로직 추가
+        @Parameter(description = "(optional) 픽업 가능 매장만 조회 여부\nnull, false시 모든 상태 조회", example = "true")
+        @RequestParam onlyReservable: Boolean = false,
         // TODO : 우선 BE, FE 모두 page+size로 구현 => 추후 개선
         @Parameter(description = "페이지 번호", example = "0")
         @RequestParam page: Int = 0,
@@ -81,10 +86,13 @@ class SearchController(
     ): ResponseEntity<SearchStoreResultDto> =
         ResponseEntity.ok(
             searchService.searchStore(
-                StoreSearchFilterDto.from(
+                StoreFilterDto.from(
                     latitude = latitude,
                     longitude = longitude,
                     searchText = searchText,
+                    storeCategory = storeCategory?.category,
+                    time = time,
+                    onlyReservable = onlyReservable,
                 ),
                 // TODO: 검색반경 프론트와 논의 필요
                 searchDistance = searchDistance ?: 2.0, // 디폴트 검색반경 2km

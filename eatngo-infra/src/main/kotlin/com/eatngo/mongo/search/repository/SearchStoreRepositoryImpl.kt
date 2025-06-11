@@ -57,7 +57,7 @@ class SearchStoreRepositoryImpl(
         }
     }
 
-    override fun listStore(
+    fun listStore(
         longitude: Double,
         latitude: Double,
         maxDistance: Double,
@@ -91,7 +91,7 @@ class SearchStoreRepositoryImpl(
         longitude: Double,
         latitude: Double,
         maxDistance: Double,
-        searchText: String,
+        searchFilter: SearchFilter,
         page: Int,
         size: Int,
     ): List<SearchStore> {
@@ -100,7 +100,7 @@ class SearchStoreRepositoryImpl(
                 longitude = longitude,
                 latitude = latitude,
                 maxDistanceKm = maxDistance,
-                searchText = searchText,
+                searchFilter = searchFilter,
             )
         val skipOp = Aggregation.skip(page.toLong() * size)
         val limitOp = Aggregation.limit(size.toLong())
@@ -282,16 +282,17 @@ class SearchStoreRepositoryImpl(
         longitude: Double,
         latitude: Double,
         maxDistanceKm: Double,
-        searchText: String,
+        searchFilter: SearchFilter,
         status: Int = 1, // 기본적으로 OPEN 상태의 매장을 우선 검색
     ): AggregationOperation {
         val maxDistance = maxDistanceKm * 1000 // km 단위를 meter로 변환
 
+        // TODO: 검색 쿼리 수정
         val must =
             listOf(
                 Document(
                     "text",
-                    Document("query", searchText)
+                    Document("query", searchFilter.searchText ?: "")
                         .append("path", listOf("storeName", "roadNameAddress", "foodCategory"))
                         .append("score", Document("boost", Document("value", 1.0))),
                 ),

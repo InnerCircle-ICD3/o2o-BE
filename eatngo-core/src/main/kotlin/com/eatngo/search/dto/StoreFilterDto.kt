@@ -13,6 +13,7 @@ data class StoreFilterDto(
         fun from(
             latitude: Double,
             longitude: Double,
+            searchText: String? = null, // 검색 키워드
             storeCategory: String?,
             time: String?,
             onlyReservable: Boolean = false, // 매장 상태 (true: 영업중, false,null: 전체)
@@ -25,6 +26,7 @@ data class StoreFilterDto(
             val filter =
                 SearchFilter
                     .from(
+                        searchText = searchText,
                         storeCategory = storeCategory,
                         time = time,
                         onlyReservable = onlyReservable,
@@ -41,18 +43,21 @@ data class StoreFilterDto(
 }
 
 data class SearchFilter(
+    val searchText: String? = null, // 검색 키워드
     val storeCategory: StoreEnum.StoreCategory?, // 매장 카테고리
     val time: String?, // 픽업 가능 시간 (HH:mm 형식) TODO: 검증로직
     val onlyReservable: Boolean, // 매장 상태
 ) {
     companion object {
         fun from(
+            searchText: String? = null, // 검색 키워드
             storeCategory: String? = null,
             time: String? = null,
             onlyReservable: Boolean = false, // 매장 상태 (true: 영업중, false,null: 전체)
         ): SearchFilter {
             val storeCategoryEnum = storeCategory?.let { StoreEnum.StoreCategory.fromString(it) }
             return SearchFilter(
+                searchText = searchText,
                 storeCategory = storeCategoryEnum,
                 time = time,
                 onlyReservable = onlyReservable,
