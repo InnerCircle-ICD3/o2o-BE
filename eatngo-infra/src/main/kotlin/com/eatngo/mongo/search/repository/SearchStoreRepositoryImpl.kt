@@ -92,7 +92,6 @@ class SearchStoreRepositoryImpl(
         latitude: Double,
         maxDistance: Double,
         searchFilter: SearchFilter,
-        page: Int,
         size: Int,
     ): List<SearchStore> {
         val searchOp =
@@ -102,13 +101,40 @@ class SearchStoreRepositoryImpl(
                 maxDistanceKm = maxDistance,
                 searchFilter = searchFilter,
             )
-        val skipOp = Aggregation.skip(page.toLong() * size)
+        val projectOp =
+            AggregationOperation { context ->
+                Document(
+                    "\$project",
+                    Document(
+                        mapOf(
+                            "storeId" to 1,
+                            "storeName" to 1,
+                            "storeImage" to 1,
+                            "storeCategory" to 1,
+                            "foodCategory" to 1,
+                            "foodTypes" to 1,
+                            "roadNameAddress" to 1,
+                            "coordinate" to 1,
+                            "productStatus" to 1,
+                            "status" to 1,
+                            "businessHours" to 1,
+                            "metaSearchScore" to Document("\$meta", "searchScore"), // 검색 점수
+                            "paginationToken" to Document("\$meta", "searchSequenceToken"), // 검색 점수
+                        ),
+                    ),
+                )
+            }
+        val sortOp =
+            Aggregation.sort(
+                Sort.by(Sort.Direction.DESC, "metaSearchScore", "paginationToken"), // 검색 점수와 시퀀스 토큰으로 정렬
+            )
         val limitOp = Aggregation.limit(size.toLong())
 
         val pipeline =
             Aggregation.newAggregation(
                 searchOp,
-                skipOp,
+                projectOp,
+                sortOp,
                 limitOp,
             )
 
@@ -292,7 +318,7 @@ class SearchStoreRepositoryImpl(
             listOf(
                 Document(
                     "text",
-                    Document("query", searchFilter.searchText ?: "")
+                    Document("query", searchFilter.searchText ?: "카페")
                         .append("path", listOf("storeName", "roadNameAddress", "foodCategory"))
                         .append("score", Document("boost", Document("value", 1.0))),
                 ),
@@ -316,22 +342,32 @@ class SearchStoreRepositoryImpl(
                 ),
             )
 
+        val searchDocument =
+            Document()
+                .append("index", searchStoreIndex)
+                .append(
+                    "compound",
+                    Document()
+                        .append(
+                            "must",
+                            must,
+                        ).append(
+                            "filter",
+                            filter,
+                        ),
+                )
+
+        if (searchFilter.lastId != null) {
+            searchDocument.append(
+                "searchAfter",
+                searchFilter.lastId,
+            )
+        }
+
         val searchQuery =
             Document(
                 "\$search",
-                Document()
-                    .append("index", searchStoreIndex)
-                    .append(
-                        "compound",
-                        Document()
-                            .append(
-                                "must",
-                                must,
-                            ).append(
-                                "filter",
-                                filter,
-                            ),
-                    ),
+                searchDocument,
             )
 
         return AggregationOperation { _: AggregationOperationContext -> searchQuery }

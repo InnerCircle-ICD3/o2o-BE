@@ -54,16 +54,14 @@ class SearchController(
                     time = time,
                     onlyReservable = onlyReservable,
                 ),
-                // TODO: 검색반경 프론트와 논의 필요
                 searchDistance = searchDistance ?: 2.0, // 디폴트 검색반경 2km
-                page = page,
-                size = size,
+                size = size, // 디폴트 페이지 사이즈 20
             ),
         )
 
     @Operation(summary = "가게 검색 API", description = "매장 텍스트 검색 API")
     @GetMapping("/api/v1/search/store")
-    fun searchStoreKeyword(
+    fun searchStore(
         @Parameter(description = "중심 좌표의 위도 (latitude)", example = "37.572859")
         @RequestParam latitude: Double,
         @Parameter(description = "중심 좌표의 경도 (latitude)", example = "126.971428")
@@ -75,29 +73,26 @@ class SearchController(
         @Parameter(description = "(optional) 필터링할 매장 카테고리\nnull일 경우 모든 카테고리 조회")
         @RequestParam storeCategory: StoreEnum.StoreCategory?,
         @Parameter(description = "(optional) HH:mm 형식의 시간\nnull일 경우 모든 픽업시간 조회")
-        @RequestParam time: String?, // TODO: VO로 정의하여 검증 로직 추가
+        @RequestParam time: String?,
         @Parameter(description = "(optional) 픽업 가능 매장만 조회 여부\nnull, false시 모든 상태 조회", example = "true")
         @RequestParam onlyReservable: Boolean = false,
-        // TODO : 우선 BE, FE 모두 page+size로 구현 => 추후 개선
-        @Parameter(description = "페이지 번호", example = "0")
-        @RequestParam page: Int = 0,
-        @Parameter(description = "페이지 사이즈", example = "20")
-        @RequestParam size: Int = 20,
+        @Parameter(description = "(optional) 마지막 paginationToken\n첫페이지는 null", example = "CEEVrhj6PyIDGNID")
+        @RequestParam lastId: String?,
+        @Parameter(description = "(optional) 페이지 사이즈\n디폴트는 20", example = "20")
+        @RequestParam size: Int?,
     ): ResponseEntity<SearchStoreResultDto> =
         ResponseEntity.ok(
             searchService.searchStore(
                 StoreFilterDto.from(
                     latitude = latitude,
                     longitude = longitude,
-                    searchText = searchText,
                     storeCategory = storeCategory?.category,
                     time = time,
                     onlyReservable = onlyReservable,
+                    lastId = lastId,
                 ),
-                // TODO: 검색반경 프론트와 논의 필요
                 searchDistance = searchDistance ?: 2.0, // 디폴트 검색반경 2km
-                page = page,
-                size = size,
+                size = size ?: 20, // 디폴트 페이지 사이즈 20
             ),
         )
 

@@ -14,7 +14,6 @@ interface SearchStoreRepository {
         latitude: Double,
         maxDistance: Double,
         searchFilter: SearchFilter,
-        page: Int = 0,
         size: Int = 20,
     ): List<SearchStore>
 

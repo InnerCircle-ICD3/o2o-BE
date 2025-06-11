@@ -28,14 +28,12 @@ class SearchService(
     /**
      * 가게 검색 API - 검색어 입력
      * @param StoreFilterDto 검색하는 유저의 위치 정보와 검색어
-     * @param page 페이지 번호
      * @param size 페이지 사이즈
      * @return 검색 결과 DTO
      */
     fun searchStore(
         storeFilterDto: StoreFilterDto,
         searchDistance: Double,
-        page: Int,
         size: Int,
     ): SearchStoreResultDto {
         val searchStoreList: List<SearchStore> =
@@ -45,7 +43,6 @@ class SearchService(
                     latitude = storeFilterDto.viewCoordinate.latitude,
                     maxDistance = searchDistance,
                     searchFilter = storeFilterDto.filter,
-                    page = page,
                     size = size,
                 ).orThrow { SearchException.SearchStoreListFailed(storeFilterDto.viewCoordinate, storeFilterDto.filter) }
 
