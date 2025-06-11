@@ -68,15 +68,15 @@ class SearchController(
         @RequestParam longitude: Double,
         @Parameter(description = "(optional) 검색반경(Km)\n디폴트는 2.0", example = "2.0")
         @RequestParam searchDistance: Double?,
-        @Parameter(description = "검색어", example = "쿠키")
-        @RequestParam searchText: String,
+        @Parameter(description = "검색어", example = "카페")
+        @RequestParam searchText: String?,
         @Parameter(description = "(optional) 필터링할 매장 카테고리\nnull일 경우 모든 카테고리 조회")
         @RequestParam storeCategory: StoreEnum.StoreCategory?,
         @Parameter(description = "(optional) HH:mm 형식의 시간\nnull일 경우 모든 픽업시간 조회")
         @RequestParam time: String?,
         @Parameter(description = "(optional) 픽업 가능 매장만 조회 여부\nnull, false시 모든 상태 조회", example = "true")
         @RequestParam onlyReservable: Boolean = false,
-        @Parameter(description = "(optional) 마지막 paginationToken\n첫페이지는 null", example = "CEEVrhj6PyIDGNID")
+        @Parameter(description = "(optional) 마지막 paginationToken\n첫페이지는 null")
         @RequestParam lastId: String?,
         @Parameter(description = "(optional) 페이지 사이즈\n디폴트는 20", example = "20")
         @RequestParam size: Int?,
