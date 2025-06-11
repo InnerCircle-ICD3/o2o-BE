@@ -4,17 +4,12 @@ import com.eatngo.mongo.search.dto.SearchStoreAutoCompleteDto
 import com.eatngo.mongo.search.entity.SearchStoreEntity
 import com.eatngo.search.domain.SearchStore
 import com.eatngo.search.domain.SearchStoreFoodTypes
-import com.eatngo.search.domain.SearchStoreStatus
 import com.eatngo.search.dto.AutoCompleteStoreNameDto
 import com.eatngo.search.dto.Box
 import com.eatngo.search.dto.SearchFilter
-import com.eatngo.search.dto.SearchStoreWithDistance
 import com.eatngo.search.infra.SearchStoreRepository
 import org.bson.Document
 import org.springframework.data.domain.Sort
-import org.springframework.data.geo.GeoResults
-import org.springframework.data.geo.Metrics
-import org.springframework.data.geo.Point
 import org.springframework.data.geo.Shape
 import org.springframework.data.mongodb.core.BulkOperations
 import org.springframework.data.mongodb.core.MongoTemplate
@@ -23,7 +18,6 @@ import org.springframework.data.mongodb.core.aggregation.AggregationOperation
 import org.springframework.data.mongodb.core.aggregation.AggregationOperationContext
 import org.springframework.data.mongodb.core.geo.GeoJsonPoint
 import org.springframework.data.mongodb.core.query.Criteria
-import org.springframework.data.mongodb.core.query.NearQuery
 import org.springframework.data.mongodb.core.query.Query
 import org.springframework.data.mongodb.core.query.Update
 import org.springframework.stereotype.Component
@@ -54,36 +48,6 @@ class SearchStoreRepositoryImpl(
 
         return result.map {
             it.to()
-        }
-    }
-
-    fun listStore(
-        longitude: Double,
-        latitude: Double,
-        maxDistance: Double,
-        searchFilter: SearchFilter,
-        page: Int,
-        size: Int,
-    ): List<SearchStoreWithDistance> {
-        // 필수 : 위치 기반 필터링
-        val point = Point(longitude, latitude)
-        val nearQuery =
-            NearQuery
-                .near(point, Metrics.KILOMETERS)
-                .maxDistance(maxDistance) // km 단위로 사용
-                .spherical(true)
-
-        // 서브쿼리 생성
-        val query = makeFilterQuery(searchFilter)
-        // Criteria가 있으면 NearQuery에 붙여주기
-        nearQuery.query(query)
-
-        val geoResults: GeoResults<SearchStoreEntity> = mongoTemplate.geoNear(nearQuery, SearchStoreEntity::class.java)
-        return geoResults.content.map {
-            SearchStoreWithDistance(
-                store = it.content.to(),
-                distance = it.distance.value,
-            )
         }
     }
 
@@ -313,33 +277,72 @@ class SearchStoreRepositoryImpl(
     ): AggregationOperation {
         val maxDistance = maxDistanceKm * 1000 // km 단위를 meter로 변환
 
-        // TODO: 검색 쿼리 수정
-        val must =
-            listOf(
+        val must = mutableListOf<Document>()
+        val filter = mutableListOf<Document>()
+
+        // TODO: STATUS 필터링 로직 개선 필요 -> 예약 가능 상태 필터링
+        must += (
+            Document(
+                "equals",
+                Document("path", "status")
+                    .append("value", status),
+            )
+        )
+        // 검색어 필터링
+        if (searchFilter.searchText != null && searchFilter.searchText != "") {
+            must += (
                 Document(
                     "text",
-                    Document("query", searchFilter.searchText ?: "카페")
+                    Document("query", searchFilter.searchText)
                         .append("path", listOf("storeName", "roadNameAddress", "foodCategory"))
                         .append("score", Document("boost", Document("value", 1.0))),
-                ),
+                )
+            )
+        }
+        // 카테고리 필터링
+        searchFilter.storeCategory?.let { storeCategory ->
+            must += (
                 Document(
                     "equals",
-                    Document("path", "status")
-                        .append("value", status),
-                ),
+                    Document("path", "storeCategory")
+                        .append("value", storeCategory.name),
+                )
             )
-        val filter =
-            listOf( // 거리 필터 (maxDistance)
+        }
+        // 픽업 가능 시간 필터링
+        searchFilter.time?.let {
+            // 현재 시간 기준으로 오픈 중인 매장 필터링
+            val now = LocalDateTime.now()
+            val currentDayOfWeek = now.dayOfWeek
+            val currentTime = now.toLocalTime()
+
+            must += (
                 Document(
-                    "near",
-                    Document("path", "coordinate")
-                        .append("pivot", maxDistance)
-                        .append(
-                            "origin",
-                            Document("type", "Point")
-                                .append("coordinates", listOf(longitude, latitude)),
-                        ),
-                ),
+                    "range",
+                    Document("path", "businessHours.$currentDayOfWeek.openTime")
+                        .append("lte", currentTime),
+                )
+            )
+            must += (
+                Document(
+                    "range",
+                    Document("path", "businessHours.$currentDayOfWeek.closeTime")
+                        .append("gt", currentTime),
+                )
+            )
+        }
+
+        // 거리 필터 (maxDistance)
+        filter +=
+            Document(
+                "near",
+                Document("path", "coordinate")
+                    .append("pivot", maxDistance)
+                    .append(
+                        "origin",
+                        Document("type", "Point")
+                            .append("coordinates", listOf(longitude, latitude)),
+                    ),
             )
 
         val searchDocument =
@@ -348,15 +351,10 @@ class SearchStoreRepositoryImpl(
                 .append(
                     "compound",
                     Document()
-                        .append(
-                            "must",
-                            must,
-                        ).append(
-                            "filter",
-                            filter,
-                        ),
+                        .append("must", must)
+                        .append("filter", filter),
                 )
-
+        // Cursor pagination을 위한 searchAfter 설정
         if (searchFilter.lastId != null) {
             searchDocument.append(
                 "searchAfter",
@@ -388,40 +386,4 @@ class SearchStoreRepositoryImpl(
                     ),
             )
         }
-
-    fun makeFilterQuery(searchFilter: SearchFilter): Query {
-        val query = Query()
-        // 선택 : 카테고리 필터링
-        searchFilter.storeCategory?.let {
-            query.addCriteria(
-                Criteria.where("storeCategory").`is`(it),
-            )
-        }
-
-        searchFilter.time?.let {
-            // 선택 : 픽업 가능 시간 필터링
-            val now = LocalDateTime.now()
-            val currentDayOfWeek = now.dayOfWeek
-            val currentTime = now.toLocalTime()
-
-            val openTimeField = "businessHours.$currentDayOfWeek.openTime"
-            val closeTimeField = "businessHours.$currentDayOfWeek.closeTime"
-            query.addCriteria(
-                Criteria
-                    .where(openTimeField)
-                    .lte(currentTime)
-                    .and(closeTimeField)
-                    .gt(currentTime),
-            )
-        }
-
-        // 선택 : 예약 가능 상태 필터링 -> TODO 로직 확인 필요...(오픈 할 때 마다 예약 가능 상태 변경할건지)
-        if (searchFilter.onlyReservable) {
-            query.addCriteria(
-                Criteria.where("status").`is`(SearchStoreStatus.OPEN.code),
-            )
-        }
-
-        return query
-    }
 }
