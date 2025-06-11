@@ -9,19 +9,21 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter
 @Service
 class NotificationSseService(
     private val notificationPersistence: NotificationPersistence,
-    private val objectMapper: ObjectMapper
+    private val objectMapper: ObjectMapper,
 ) {
     fun findOrCreate(storeId: Long) = notificationPersistence.findOrCreate(storeId)
 
     fun sendMessage(notificationEvent: NotificationEvent<*>) =
-        notificationPersistence.findById(notificationEvent.storeId)
+        notificationPersistence
+            .findById(notificationEvent.storeId)
             ?.send(
-                SseEmitter.event()
+                SseEmitter
+                    .event()
                     .name(notificationEvent.eventType.eventName)
-                    .data(objectMapper.writeValueAsString(notificationEvent.message))
+                    .data(objectMapper.writeValueAsString(notificationEvent.message)),
             )
 
     companion object {
-        const val TIME_OUT_VALUE = 60_000L // 60 seconds
+        const val TIME_OUT_VALUE = 600_000L // 10 minute
     }
 }

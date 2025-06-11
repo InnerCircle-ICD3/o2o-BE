@@ -10,12 +10,14 @@ import java.util.concurrent.ConcurrentHashMap
 class NotificationSsePersistenceImpl : NotificationPersistence {
     private val emitters = ConcurrentHashMap<Long, SseEmitter>()
 
-    override fun findOrCreate(storeId: Long) = emitters.computeIfAbsent(storeId) {
-        SseEmitter(TIME_OUT_VALUE).apply {
-            onTimeout { emitters.remove(storeId) }
-            onCompletion { emitters.remove(storeId) }
+    override fun findOrCreate(storeId: Long) =
+        emitters.computeIfAbsent(storeId) {
+            SseEmitter(TIME_OUT_VALUE)
+                .apply {
+                    onTimeout { emitters.remove(storeId) }
+                    onCompletion { emitters.remove(storeId) }
+                }.also { sseEmitter -> sseEmitter.send(SseEmitter.event().name("CONNECTED")) }
         }
-    }
 
     override fun findById(storeId: Long) = emitters.getOrElse(storeId) { null }
 }
