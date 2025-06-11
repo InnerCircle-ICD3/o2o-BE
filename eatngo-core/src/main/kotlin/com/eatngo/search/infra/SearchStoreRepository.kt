@@ -1,6 +1,7 @@
 package com.eatngo.search.infra
 
 import com.eatngo.search.domain.SearchStore
+import com.eatngo.search.domain.SearchStoreFoodTypes
 import com.eatngo.search.dto.AutoCompleteStoreNameDto
 import com.eatngo.search.dto.Box
 import com.eatngo.search.dto.SearchFilter
@@ -32,7 +33,18 @@ interface SearchStoreRepository {
         size: Int = 5,
     ): List<AutoCompleteStoreNameDto>
 
+    fun save(searchStore: SearchStore)
+
     fun saveAll(searchStoreList: List<SearchStore>)
 
+    fun updateStoreStatus(
+        storeId: Long,
+        status: String,
+    )
+
+    fun updateFoodTypesAll(searchStoreList: List<SearchStoreFoodTypes>)
+
     fun deleteIds(deleteIds: List<Long>)
+
+    fun deleteId(deleteId: Long)
 }

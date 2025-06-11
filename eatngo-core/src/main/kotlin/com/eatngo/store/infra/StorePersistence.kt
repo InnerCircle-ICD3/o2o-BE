@@ -26,11 +26,6 @@ interface StorePersistence {
     fun findByOwnerId(storeOwnerId: Long): List<Store>
 
     /**
-     * updatedAt 기준으로 매장 목록 조회 (Search 동기화 용도)
-     */
-    fun findByUpdatedAt(pivotTime: LocalDateTime): List<Store>
-
-    /**
      * 매장 저장 (전체 정보 업데이트)
      */
     fun save(store: Store): Store

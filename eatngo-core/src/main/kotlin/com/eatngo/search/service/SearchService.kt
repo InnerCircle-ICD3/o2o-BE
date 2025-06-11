@@ -102,14 +102,12 @@ class SearchService(
         // Redis에서 box 검색 결과를 가져온다. -> 위경도 기중 0.005 단위로 박스 매핑
         val redisKey =
             searchMapRedisRepository.getKey(box.topLeft)
-        val searchStoreMapList: List<SearchStoreMap> =
-            searchMapRedisRepository.findByKey(redisKey).orThrow {
-                SearchException.SearchStoreMapFailed(userCoordinate)
-            }
+        val searchStoreList: List<SearchStore> =
+            searchMapRedisRepository.findByKey(redisKey)
 
         return SearchStoreMapResultDto.from(
             box = box,
-            searchStoreMapList = searchStoreMapList,
+            searchStoreMapList = searchStoreList.map { SearchStoreMap.from(it) }, // SearchStore를 SearchStoreMap으로 변환,
         )
     }
 
@@ -135,7 +133,7 @@ class SearchService(
 
         return SearchStoreMapResultDto.from(
             box = box,
-            searchStoreMapList = searchMapList,
+            searchStoreMapList = searchMapList.map { SearchStoreMap.from(it) }, // SearchStore를 SearchStoreMap으로 변환
         )
     }
 
@@ -199,19 +197,18 @@ class SearchService(
         return Box.from(topLeft, bottomRight)
     }
 
-    fun saveBoxRedis(box: Box): List<SearchStoreMap> {
+    fun saveBoxRedis(box: Box): List<SearchStore> {
         val redisKey =
             searchMapRedisRepository.getKey(box.topLeft)
 
         val searchStoreList: List<SearchStore> = searchStoreRepository.findBox(box)
-        val searchStoreMap = searchStoreList.map { SearchStoreMap.from(it) }
         // Redis에 저장
         searchMapRedisRepository
             .save(
                 key = redisKey,
-                value = searchStoreMap,
+                value = searchStoreList,
             )
 
-        return searchStoreMap
+        return searchStoreList
     }
 }

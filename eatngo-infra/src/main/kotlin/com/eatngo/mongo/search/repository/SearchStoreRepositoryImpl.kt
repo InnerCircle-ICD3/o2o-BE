@@ -3,6 +3,7 @@ package com.eatngo.mongo.search.repository
 import com.eatngo.mongo.search.dto.SearchStoreAutoCompleteDto
 import com.eatngo.mongo.search.entity.SearchStoreEntity
 import com.eatngo.search.domain.SearchStore
+import com.eatngo.search.domain.SearchStoreFoodTypes
 import com.eatngo.search.domain.SearchStoreStatus
 import com.eatngo.search.dto.AutoCompleteStoreNameDto
 import com.eatngo.search.dto.Box
@@ -167,6 +168,28 @@ class SearchStoreRepositoryImpl(
         }
     }
 
+    override fun save(searchStore: SearchStore) {
+        val store = SearchStoreEntity.from(searchStore)
+
+        val query = Query(Criteria.where("_id").`is`(store.storeId))
+        val update =
+            Update()
+                .set("storeName", store.storeName)
+                .set("storeImage", store.storeImage)
+                .set("storeCategory", store.storeCategory)
+                .set("foodCategory", store.foodCategory)
+                .set("foodTypes", store.foodTypes)
+                .set("roadNameAddress", store.roadNameAddress)
+                .set("coordinate", store.coordinate)
+                .set("productStatus", store.productStatus)
+                .set("status", store.status)
+                .set("businessHours", store.businessHours)
+                .set("updatedAt", LocalDateTime.now())
+                .set("createdAt", store.createdAt)
+
+        mongoTemplate.upsert(query, update, SearchStoreEntity::class.java, "SearchStore")
+    }
+
     override fun saveAll(searchStoreList: List<SearchStore>) {
         val bulkOps =
             mongoTemplate
@@ -188,6 +211,7 @@ class SearchStoreRepositoryImpl(
                     .set("foodCategory", store.foodCategory)
                     .set("roadNameAddress", store.roadNameAddress)
                     .set("coordinate", store.coordinate)
+                    .set("productStatus", store.productStatus)
                     .set("status", store.status)
                     .set("businessHours", store.businessHours)
                     .set("updatedAt", LocalDateTime.now())
@@ -202,10 +226,52 @@ class SearchStoreRepositoryImpl(
         bulkOps.execute()
     }
 
+    override fun updateStoreStatus(
+        storeId: Long,
+        status: String,
+    ) {
+        val query = Query(Criteria.where("_id").`is`(storeId))
+        val update =
+            Update()
+                .set("status", status)
+                .set("updatedAt", LocalDateTime.now())
+
+        mongoTemplate.updateFirst(query, update, SearchStoreEntity::class.java, "SearchStore")
+    }
+
+    override fun updateFoodTypesAll(foodTypeDataList: List<SearchStoreFoodTypes>) {
+        val bulkOps =
+            mongoTemplate
+                .bulkOps(
+                    BulkOperations.BulkMode.UNORDERED,
+                    SearchStoreEntity::class.java,
+                    "SearchStore",
+                )
+        foodTypeDataList.map { foodTypeData ->
+            val query = Query(Criteria.where("_id").`is`(foodTypeData.storeId))
+            val update =
+                Update()
+                    .set("foodTypes", foodTypeData.foodTypes)
+                    .set("updatedAt", LocalDateTime.now())
+
+            bulkOps.upsert(
+                query,
+                update,
+            )
+        }
+
+        bulkOps.execute()
+    }
+
     override fun deleteIds(deleteIds: List<Long>) {
         if (deleteIds.isEmpty()) return
 
         val query = Query(Criteria.where("_id").`in`(deleteIds))
+        mongoTemplate.remove(query, SearchStoreEntity::class.java, "SearchStore")
+    }
+
+    override fun deleteId(deleteId: Long) {
+        val query = Query(Criteria.where("_id").`is`(deleteId))
         mongoTemplate.remove(query, SearchStoreEntity::class.java, "SearchStore")
     }
 

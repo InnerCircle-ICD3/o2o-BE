@@ -4,6 +4,7 @@ import com.eatngo.common.constant.StoreEnum
 import com.eatngo.common.exception.search.SearchException
 import com.eatngo.extension.orThrow
 import com.eatngo.search.domain.Coordinate
+import com.eatngo.search.domain.SearchProductStatus
 import com.eatngo.search.domain.SearchStore
 import com.eatngo.search.domain.SearchStoreStatus
 import com.eatngo.search.domain.TimeRange
@@ -23,9 +24,11 @@ class SearchStoreEntity(
     var storeImage: String, // 매장 이미지 S3 URL
     var storeCategory: List<String>,
     var foodCategory: List<String>, // 대표 판매 음식 종류
+    var foodTypes: List<String>? = null, // 대표 판매 음식 종류(검색용)
     var roadNameAddress: String? = null,
     @GeoSpatialIndexed
     var coordinate: GeoJsonPoint,
+    var productStatus: Int = 1, // 상품 상태(검색용), 디폴트 활성화
     var status: Int, // 매장 오픈 여부
     @Field("businessHours")
     var businessHours: Map<DayOfWeek, TimeRange>,
@@ -44,13 +47,15 @@ class SearchStoreEntity(
                 }
             },
             foodCategory = foodCategory,
+            foodTypes = foodTypes,
             roadNameAddress = roadNameAddress,
             coordinate =
-            Coordinate.Companion.from(
-                latitude = coordinate.coordinates[1],
-                longitude = coordinate.coordinates[0],
-            ),
-            status = SearchStoreStatus.Companion.from(status),
+                Coordinate.Companion.from(
+                    latitude = coordinate.coordinates[1],
+                    longitude = coordinate.coordinates[0],
+                ),
+            productStatus = SearchProductStatus.from(productStatus),
+            status = SearchStoreStatus.from(status),
             businessHours = businessHours,
             updatedAt = updatedAt,
             createdAt = createdAt,
@@ -69,12 +74,14 @@ class SearchStoreEntity(
                 storeImage = searchStore.storeImage,
                 storeCategory = searchStore.storeCategory.map { it.name },
                 foodCategory = searchStore.foodCategory,
+                foodTypes = searchStore.foodTypes,
                 roadNameAddress = searchStore.roadNameAddress,
                 coordinate =
-                toGeoJsonPoint(
-                    latitude = searchStore.coordinate.latitude,
-                    longitude = searchStore.coordinate.longitude,
-                ),
+                    toGeoJsonPoint(
+                        latitude = searchStore.coordinate.latitude,
+                        longitude = searchStore.coordinate.longitude,
+                    ),
+                productStatus = searchStore.productStatus.code,
                 status = searchStore.status.code,
                 businessHours = searchStore.businessHours,
             )

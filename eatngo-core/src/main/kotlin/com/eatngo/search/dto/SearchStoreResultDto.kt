@@ -55,7 +55,7 @@ data class SearchStoreDto(
     val todayPickupStartTime: LocalTime?, // 오늘 픽업 시작 시간
     val todayPickupEndTime: LocalTime?, // 오늘 픽업 종료 시간
     // TODO: 리뷰, 찜 기능
-    val stock: Int, // 재고 수량
+    val totalStockCount: Int = -1, // 전체 재고 수량 (-1: 오늘 등록 안함, 0: 재고 없음)
     val ratingAverage: Double, // 리뷰 평점
     val ratingCount: Int, // 리뷰 수
     val isFavorite: Boolean? = false, // 찜 여부
@@ -102,7 +102,7 @@ data class SearchStoreDto(
                 todayPickupStartTime = todayPickupStartTime,
                 todayPickupEndTime = todayPickupEndTime,
                 // TODO: 재고 수량은 Redis에서 가져와야 함(상품)
-                stock = 0,
+                totalStockCount = 0,
                 // TODO: 리뷰 관련 기능 구현 (Redis에서 가져오기?)
                 ratingAverage = 3.0,
                 ratingCount = 3,
