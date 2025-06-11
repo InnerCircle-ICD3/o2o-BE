@@ -1,6 +1,6 @@
 package com.eatngo.auth
 
-import com.eatngo.user_account.oauth2.constants.Oauth2Provider
+import com.eatngo.user_account.oauth2.constants.OAuth2Provider
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.headers.Header
@@ -44,7 +44,7 @@ class OAuth2DocController {
             example = "KAKAO",
             required = true
         )
-        @PathVariable provider: Oauth2Provider = Oauth2Provider.KAKAO
+        @PathVariable provider: OAuth2Provider = OAuth2Provider.KAKAO
     ) {
         // 실제 리디렉션은 Spring Security가 수행하므로 여기는 비어 있음
     }

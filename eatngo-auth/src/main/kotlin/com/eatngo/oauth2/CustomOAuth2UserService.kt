@@ -3,7 +3,7 @@ package com.eatngo.oauth2
 import com.eatngo.auth.constants.AuthenticationConstants.PRINCIPAL_KEY
 import com.eatngo.user_account.domain.UserAccount
 import com.eatngo.user_account.infra.UserAccountPersistence
-import com.eatngo.user_account.oauth2.constants.Oauth2Provider
+import com.eatngo.user_account.oauth2.constants.OAuth2Provider
 import com.eatngo.user_account.oauth2.constants.Role
 import com.eatngo.user_account.oauth2.constants.Role.*
 import com.eatngo.user_account.oauth2.domain.UserAccountOAuth2
@@ -28,7 +28,7 @@ class CustomOAuth2UserService(
         val delegate = DefaultOAuth2UserService()
         val oAuth2User = delegate.loadUser(userRequest)
 
-        val provider = Oauth2Provider.valueOfIgnoreCase(userRequest.clientRegistration.registrationId)
+        val provider = OAuth2Provider.valueOfIgnoreCase(userRequest.clientRegistration.registrationId)
         val token = userRequest.accessToken
         val oAuth2: OAuth2 = handleOauth2Attributes(provider, oAuth2User, token)
 
@@ -81,11 +81,11 @@ class CustomOAuth2UserService(
         }.distinct()
 
     private fun handleOauth2Attributes(
-        provider: Oauth2Provider,
+        provider: OAuth2Provider,
         oAuth2User: OAuth2User,
         token: OAuth2AccessToken
     ) = when (provider) {
-        Oauth2Provider.KAKAO -> KakaoOAuth2(
+        OAuth2Provider.KAKAO -> KakaoOAuth2(
             oAuth2User.attributes, provider, token.tokenValue,
             token.expiresAt?.atZone(ZoneId.of("Asia/Seoul"))?.toLocalDateTime(),
             token.scopes.joinToString(",")
