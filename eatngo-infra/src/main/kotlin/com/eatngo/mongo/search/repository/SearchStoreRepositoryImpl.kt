@@ -314,19 +314,19 @@ class SearchStoreRepositoryImpl(
                 Document(
                     "range",
                     Document("path", "businessHours.$currentDayOfWeek.openTime")
-                        .append("gt", searchFilter.time),
+                        .append("lte", searchFilter.time),
                 )
             )
             must += (
                 Document(
                     "range",
                     Document("path", "businessHours.$currentDayOfWeek.closeTime")
-                        .append("lte", searchFilter.time),
+                        .append("gte", searchFilter.time),
                 )
             )
         }
 
-        // 거리 필터 (maxDistance)
+        // 거리 스코어링
         filter +=
             Document(
                 "near",
@@ -338,6 +338,23 @@ class SearchStoreRepositoryImpl(
                             .append("coordinates", listOf(longitude, latitude)),
                     ),
             )
+        // 반경 조건 추가
+//        must +=
+//            Document(
+//                "geoWithin",
+//                Document()
+//                    .append("path", "coordinate")
+//                    .append(
+//                        "circle",
+//                        Document()
+//                            .append(
+//                                "center",
+//                                Document()
+//                                    .append("type", "Point")
+//                                    .append("coordinates", listOf(longitude, latitude)),
+//                            ).append("radius", maxDistance),
+//                    ),
+//            )
 
         val searchDocument =
             Document()
