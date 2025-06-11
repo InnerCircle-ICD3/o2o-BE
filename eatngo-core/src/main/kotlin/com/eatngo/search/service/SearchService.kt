@@ -103,9 +103,7 @@ class SearchService(
         val redisKey =
             searchMapRedisRepository.getKey(box.topLeft)
         val searchStoreList: List<SearchStore> =
-            searchMapRedisRepository.findByKey(redisKey).orThrow {
-                SearchException.SearchStoreMapFailed(userCoordinate)
-            }
+            searchMapRedisRepository.findByKey(redisKey)
 
         return SearchStoreMapResultDto.from(
             box = box,
