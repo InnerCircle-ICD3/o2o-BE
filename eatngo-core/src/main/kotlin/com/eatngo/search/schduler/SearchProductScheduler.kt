@@ -28,20 +28,28 @@ class SearchProductScheduler(
     private val searchStorePersistence: SearchStorePersistence,
     private val searchService: SearchService,
 ) {
+    companion object {
+        private val log = org.slf4j.LoggerFactory.getLogger(this::class.java)
+    }
+
     /**
      * 상품 검색 인덱스 업데이트를 위한 스케줄러
      * 매 10분마다 실행되어, 최근 10분 이내에 업데이트된 상품의 foodTypes를 업데이트합니다.
      */
     @Scheduled(fixedDelay = 10 * 60 * 1000)
     private fun updateSearchStoreFoodTypes() {
-        val pivotTime = LocalDateTime.now().minusMinutes(11)
-        val foodTypesList = searchStorePersistence.findFoodTypesByProductUpdatedAt(pivotTime)
-        if (foodTypesList.isEmpty()) {
-            return
+        try {
+            val pivotTime = LocalDateTime.now().minusMinutes(11)
+            val foodTypesList = searchStorePersistence.findFoodTypesByProductUpdatedAt(pivotTime)
+            if (foodTypesList.isEmpty()) {
+                return
+            }
+            // 검색 인덱스 업데이트
+            searchStoreRepository.updateFoodTypesAll(foodTypesList)
+        } catch (e: Exception) {
+            // 예외 발생 시 로깅
+            log.error("Error updating search index from store", e)
         }
-
-        // 검색 인덱스 업데이트
-        searchStoreRepository.updateFoodTypesAll(foodTypesList)
     }
 
     /**
