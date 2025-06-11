@@ -34,7 +34,7 @@ class SearchProductScheduler(
      */
     @Scheduled(fixedDelay = 10 * 60 * 1000)
     private fun updateSearchStoreFoodTypes() {
-        val pivotTime = LocalDateTime.now().minusMinutes(10)
+        val pivotTime = LocalDateTime.now().minusMinutes(11)
         val foodTypesList = searchStorePersistence.findFoodTypesByProductUpdatedAt(pivotTime)
         if (foodTypesList.isEmpty()) {
             return
@@ -49,7 +49,7 @@ class SearchProductScheduler(
      * 상품 검색 인덱스를 업데이트합니다.
      */
     private fun updateSearchIndexFromStore() {
-        val pivotTime = LocalDateTime.now().minusMinutes(60)
+        val pivotTime = LocalDateTime.now().minusMinutes(61)
         val stores: List<SearchStore> = searchStorePersistence.syncAllStoresByUpdateAt(pivotTime = pivotTime)
         if (stores.isEmpty()) {
             return
