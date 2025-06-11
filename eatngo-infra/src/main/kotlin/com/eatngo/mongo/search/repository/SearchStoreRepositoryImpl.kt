@@ -320,14 +320,14 @@ class SearchStoreRepositoryImpl(
                 Document(
                     "range",
                     Document("path", "businessHours.$currentDayOfWeek.openTime")
-                        .append("lte", currentTime),
+                        .append("gt", currentTime),
                 )
             )
             must += (
                 Document(
                     "range",
                     Document("path", "businessHours.$currentDayOfWeek.closeTime")
-                        .append("gt", currentTime),
+                        .append("lte", currentTime),
                 )
             )
         }
