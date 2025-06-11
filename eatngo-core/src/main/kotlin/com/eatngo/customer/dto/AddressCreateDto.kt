@@ -11,7 +11,7 @@ import com.eatngo.store.vo.ZipCodeVO
 
 data class AddressCreateDto(
     val address: AddressDto,
-    val distanceInKilometers: Double,  // 주소 반경 (단위: km)
+    val radiusInKilometers: Double,  // 주소 반경 (단위: km)
     val customerAddressType: CustomerAddressType = CustomerAddressType.OTHER, // 주소 타입 (집, 회사, 기타)
     val description: String?, // 주소 설명
 ) {
@@ -27,7 +27,7 @@ data class AddressCreateDto(
                 region3DepthName = region3DepthName,
                 coordinate = CoordinateVO.from(coordinate.latitude!!, coordinate.longitude!!)
             ),
-            radiusInKilometers = distanceInKilometers,
+            radiusInKilometers = radiusInKilometers,
             customerAddressType = customerAddressType,
             description = description
         )
