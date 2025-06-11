@@ -68,8 +68,8 @@ class SearchController(
         @RequestParam longitude: Double,
         @Parameter(description = "(optional) 검색반경(Km)\n디폴트는 2.0", example = "2.0")
         @RequestParam searchDistance: Double?,
-        @Parameter(description = "검색어", example = "쿠키")
-        @RequestParam searchText: String,
+        @Parameter(description = "(optional) 검색어", example = "쿠키")
+        @RequestParam searchText: String?,
         @Parameter(description = "(optional) 필터링할 매장 카테고리\nnull일 경우 모든 카테고리 조회")
         @RequestParam storeCategory: StoreEnum.StoreCategory?,
         @Parameter(description = "(optional) HH:mm 형식의 시간\nnull일 경우 모든 픽업시간 조회")
