@@ -42,12 +42,12 @@ class SearchStore(
                         latitude = store.address.coordinate.latitude,
                         longitude = store.address.coordinate.longitude,
                     ),
-                productStatus = SearchProductStatus.from(1), // 디폴트 활성화
+                productStatus = SearchProductStatus.ACTIVE, // 디폴트 활성화
                 status = SearchStoreStatus.from(store.status),
                 businessHours =
-                store.businessHours?.associate {
-                    it.dayOfWeek to TimeRange.from(it.openTime, it.closeTime)
-                } ?: emptyMap(),
+                    store.businessHours?.associate {
+                        it.dayOfWeek to TimeRange.from(it.openTime, it.closeTime)
+                    } ?: emptyMap(),
                 updatedAt = store.updatedAt,
                 createdAt = store.createdAt,
                 deletedAt = store.deletedAt, // 삭제 시간 (null: 삭제 안됨, not null: 삭제됨
