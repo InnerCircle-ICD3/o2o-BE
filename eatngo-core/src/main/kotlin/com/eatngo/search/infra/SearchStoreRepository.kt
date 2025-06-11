@@ -14,7 +14,7 @@ interface SearchStoreRepository {
         latitude: Double,
         maxDistance: Double,
         searchFilter: SearchFilter,
-        size: Int = 20,
+        size: Int,
     ): List<SearchStore>
 
     fun autocompleteStoreName(
