@@ -303,9 +303,9 @@ class SearchStoreRepositoryImpl(
         searchFilter.storeCategory?.let { storeCategory ->
             must += (
                 Document(
-                    "equals",
+                    "term",
                     Document("path", "storeCategory")
-                        .append("value", storeCategory.name),
+                        .append("query", storeCategory.name),
                 )
             )
         }
