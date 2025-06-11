@@ -86,6 +86,7 @@ class SearchController(
                 StoreFilterDto.from(
                     latitude = latitude,
                     longitude = longitude,
+                    searchText = searchText,
                     storeCategory = storeCategory?.category,
                     time = time,
                     onlyReservable = onlyReservable,
