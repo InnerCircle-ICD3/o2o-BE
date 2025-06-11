@@ -32,6 +32,7 @@ class SearchStoreEntity(
     var status: Int, // 매장 오픈 여부
     @Field("businessHours")
     var businessHours: Map<DayOfWeek, TimeRange>,
+    var paginationToken: String? = null, // 검색 paginationToken
     var updatedAt: LocalDateTime = LocalDateTime.now(), // 마지막 업데이트 시간
     var createdAt: LocalDateTime = LocalDateTime.now(), // 생성 시간
 ) {
@@ -41,11 +42,11 @@ class SearchStoreEntity(
             storeName = storeName,
             storeImage = storeImage,
             storeCategory =
-            storeCategory.map {
-                StoreEnum.StoreCategory.valueOf(it).orThrow {
-                    SearchException.SearchCategoryNotFound(it)
-                }
-            },
+                storeCategory.map {
+                    StoreEnum.StoreCategory.valueOf(it).orThrow {
+                        SearchException.SearchCategoryNotFound(it)
+                    }
+                },
             foodCategory = foodCategory,
             foodTypes = foodTypes,
             roadNameAddress = roadNameAddress,
@@ -57,6 +58,7 @@ class SearchStoreEntity(
             productStatus = SearchProductStatus.from(productStatus),
             status = SearchStoreStatus.from(status),
             businessHours = businessHours,
+            paginationToken = paginationToken,
             updatedAt = updatedAt,
             createdAt = createdAt,
         )

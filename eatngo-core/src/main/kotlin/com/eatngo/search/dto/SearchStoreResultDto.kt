@@ -11,33 +11,29 @@ import java.time.LocalDateTime
 import java.time.LocalTime
 
 data class SearchStoreResultDto(
-    val storeList: List<SearchStoreDto>,
+    val contents: List<SearchStoreDto>,
+    val lastId: String,
 ) {
     companion object {
         fun from(
             userCoordinate: CoordinateVO,
             searchStoreList: List<SearchStore>,
-        ): SearchStoreResultDto =
-            SearchStoreResultDto(
-                storeList =
+        ): SearchStoreResultDto {
+            val contents =
                 searchStoreList.map { searchStore ->
-                    SearchStoreDto.from(
-                        searchStore,
+                    val distance =
                         DistanceCalculator.calculateDistance(
-                            from = searchStore.coordinate.toVO(),
-                            to = userCoordinate,
-                        ),
-                    )
-                },
-            )
+                            userCoordinate,
+                            searchStore.coordinate.toVO(),
+                        )
+                    SearchStoreDto.from(searchStore, distance)
+                }
 
-        fun from(searchStoreList: List<SearchStoreWithDistance>): SearchStoreResultDto =
-            SearchStoreResultDto(
-                storeList =
-                searchStoreList.map { searchStore ->
-                    SearchStoreDto.from(searchStore.store, searchStore.distance)
-                },
+            return SearchStoreResultDto(
+                contents = contents,
+                lastId = searchStoreList.lastOrNull()?.paginationToken.orEmpty(),
             )
+        }
     }
 }
 
@@ -90,15 +86,15 @@ data class SearchStoreDto(
                 distanceKm = distanceKm,
                 status = searchStore.status.toStoreStatus(),
                 businessHours =
-                BusinessHourVO.fromList(
-                    searchStore.businessHours.map { (dayOfWeek, timeRange) ->
-                        BusinessHourDto(
-                            dayOfWeek = dayOfWeek,
-                            openTime = DateTimeUtil.parseHHmmToLocalTime(timeRange.openTime),
-                            closeTime = DateTimeUtil.parseHHmmToLocalTime(timeRange.closeTime),
-                        )
-                    },
-                ),
+                    BusinessHourVO.fromList(
+                        searchStore.businessHours.map { (dayOfWeek, timeRange) ->
+                            BusinessHourDto(
+                                dayOfWeek = dayOfWeek,
+                                openTime = DateTimeUtil.parseHHmmToLocalTime(timeRange.openTime),
+                                closeTime = DateTimeUtil.parseHHmmToLocalTime(timeRange.closeTime),
+                            )
+                        },
+                    ),
                 todayPickupStartTime = todayPickupStartTime,
                 todayPickupEndTime = todayPickupEndTime,
                 // TODO: 재고 수량은 Redis에서 가져와야 함(상품)
