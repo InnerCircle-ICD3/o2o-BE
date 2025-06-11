@@ -88,17 +88,12 @@ class SearchStoreRepositoryImpl(
                     ),
                 )
             }
-        val sortOp =
-            Aggregation.sort(
-                Sort.by(Sort.Direction.DESC, "metaSearchScore", "paginationToken"), // 검색 점수와 시퀀스 토큰으로 정렬
-            )
         val limitOp = Aggregation.limit(size.toLong())
 
         val pipeline =
             Aggregation.newAggregation(
                 searchOp,
                 projectOp,
-                sortOp,
                 limitOp,
             )
 
