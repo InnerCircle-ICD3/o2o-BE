@@ -20,16 +20,17 @@ class CustomerEventListener(
     fun onCustomerDeleted(event: CustomerDeletedEvent) {
         val userId = event.userId
         userAccountPersistence.findById(userId)?.let { userAccount ->
-            if (userAccount.roles.isEmpty()) {
+            val roles = userAccount.roles
+            roles.find { it.role == Role.CUSTOMER }?.let {
+                roles.remove(it)
+            }
+            userAccountPersistence.save(userAccount)
+
+            if (roles.isEmpty()) {
                 userAccountPersistence.deleteById(userId)
                 applicationEventPublisher.publishEvent(
                     UserDeletedEvent(userAccount)
                 )
-            } else {
-                userAccount.roles.find { it.role == Role.CUSTOMER }?.let {
-                    userAccount.roles.remove(it)
-                }
-                userAccountPersistence.save(userAccount)
             }
         }
     }

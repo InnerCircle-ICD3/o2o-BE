@@ -20,16 +20,16 @@ class StoreOwnerEventListener(
     fun onCustomerDeleted(event: StoreOwnerDeletedEvent) {
         val userId = event.userId
         userAccountPersistence.findById(userId)?.let { userAccount ->
+            userAccount.roles.find { it.role == Role.STORE_OWNER }?.let {
+                userAccount.roles.remove(it)
+            }
+            userAccountPersistence.save(userAccount)
+
             if (userAccount.roles.isEmpty()) {
                 userAccountPersistence.deleteById(userId)
                 applicationEventPublisher.publishEvent(
                     UserDeletedEvent(userAccount)
                 )
-            } else {
-                userAccount.roles.find { it.role == Role.STORE_OWNER }?.let {
-                    userAccount.roles.remove(it)
-                }
-                userAccountPersistence.save(userAccount)
             }
         }
     }
