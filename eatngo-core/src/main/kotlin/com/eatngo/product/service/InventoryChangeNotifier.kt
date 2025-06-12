@@ -25,7 +25,7 @@ class InventoryChangeNotifier(
     }
 
     fun notifyInventoryStatusChange(storeId: Long, productId: Long, initialStock: Int) {
-        inventoryEventPublisher.publishInventoryChangedEvent(
+        inventoryEventPublisher.sendInventoryChangedEvent(
             InventoryChangedEvent(
                 productId = productId,
                 inventoryChangedType = determineInventoryChangedType(storeId, initialStock),
