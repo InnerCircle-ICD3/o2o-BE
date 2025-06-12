@@ -15,6 +15,7 @@ import com.eatngo.subscription.dto.StoreSubscriptionDto
 import com.eatngo.subscription.dto.StoreSubscriptionQueryParamDto
 import com.eatngo.subscription.infra.StoreSubscriptionPersistence
 import com.eatngo.subscription.service.StoreSubscriptionService
+import com.eatngo.store.service.StoreTotalStockService
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 
@@ -26,7 +27,7 @@ class StoreSubscriptionServiceImpl(
     private val storeSubscriptionPersistence: StoreSubscriptionPersistence,
     private val storePersistence: StorePersistence,
     private val productPersistence: ProductPersistence,
-    private val inventoryPersistence: InventoryPersistence,
+    private val storeTotalStockService: StoreTotalStockService
 ) : StoreSubscriptionService {
 
     override fun toggleSubscription(storeId: Long, customerId: Long): Pair<StoreSubscriptionDto, StoreEnum.SubscriptionStatus> {
@@ -78,8 +79,8 @@ class StoreSubscriptionServiceImpl(
                     val today = LocalDate.now().dayOfWeek
                     val todayHour = store.businessHours?.find { it.dayOfWeek == today }
 
-                    //TODO: Redis 로 가져오기
-                    val totalStockCount = calculateTotalStockCount(subscription.storeId)
+                    // Redis에서 총 재고 수량 조회 (null이면 -1 반환: 오늘 판매 안함)
+                    val totalStockCount = storeTotalStockService.getStoreTotalStockForResponse(subscription.storeId)
                     val cheapestProductInfo = cheapestProductInfoMap[subscription.storeId] ?: getDefaultProductInfo()
                     
                     StoreSubscriptionDto.from(
@@ -112,16 +113,6 @@ class StoreSubscriptionServiceImpl(
         }
 
         return Cursor.from(subscriptionDtos, cursoredSubscriptions.lastId)
-    }
-    
-    /**
-     * 매장 총 재고 수량을 계산 TODO: Redis로 !!
-     */
-    private fun calculateTotalStockCount(storeId: Long): Int {
-        val products = productPersistence.findAllActivatedProductByStoreId(storeId)
-        val productIds = products.map { it.id }
-        val latestInventories = inventoryPersistence.findLatestByProductIds(productIds)
-        return latestInventories.sumOf { it.stock }
     }
     
     /**
