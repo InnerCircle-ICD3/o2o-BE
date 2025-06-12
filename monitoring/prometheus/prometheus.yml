@@ -1,0 +1,44 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+rule_files:
+  - "alerts/*.yml"
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: []
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # 로컬 API (개발용)
+  - job_name: 'eatngo-customer-api-local'
+    static_configs:
+      - targets: ['host.docker.internal:8080']
+    metrics_path: '/actuator/prometheus'
+    scrape_interval: 5s
+
+  - job_name: 'eatngo-store-owner-api-local'
+    static_configs:
+      - targets: ['host.docker.internal:8081']
+    metrics_path: '/actuator/prometheus'
+    scrape_interval: 5s
+
+  # 실서버 API (운영) - 실제 API 도메인 필요
+  # - job_name: 'eatngo-customer-api-prod'
+  #   static_configs:
+  #     - targets: ['api.eatngo.org:443']  # 실제 API 서버 도메인
+  #   metrics_path: '/actuator/prometheus'
+  #   scheme: https
+  #   scrape_interval: 5s
+
+  # - job_name: 'eatngo-store-owner-api-prod'
+  #   static_configs:
+  #     - targets: ['api-owner.eatngo.org:443']  # 실제 API 서버 도메인
+  #   metrics_path: '/actuator/prometheus'
+  #   scheme: https
+  #   scrape_interval: 5s     scrape_interval: 5s 

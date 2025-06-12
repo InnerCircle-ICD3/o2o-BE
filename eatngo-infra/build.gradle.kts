@@ -40,6 +40,10 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
     // PostgreSQL
     implementation("org.postgresql:postgresql:42.7.3") // PG 17 호환
+    
+    // Metrics (Prometheus) - Circuit Breaker 모니터링용
+    implementation("io.micrometer:micrometer-registry-prometheus")
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
     // h2
     runtimeOnly("com.h2database:h2")
 }
