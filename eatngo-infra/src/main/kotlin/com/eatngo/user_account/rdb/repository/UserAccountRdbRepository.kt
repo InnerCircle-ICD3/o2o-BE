@@ -25,6 +25,7 @@ interface UserAccountRdbRepository : JpaRepository<UserAccountJpaEntity, Long> {
         JOIN fetch UserAccountRoleJpaEntity r ON r.account = u
         WHERE o2.provider = :provider
         AND o2.userKey = :userKey
+        order by u.id desc limit 1
     """
     )
     fun findByOAuth2Key(userKey: String, provider: OAuth2Provider): UserAccountJpaEntity?
