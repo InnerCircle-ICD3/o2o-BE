@@ -5,7 +5,7 @@ import com.eatngo.search.domain.SearchSuggestion
 interface SearchSuggestionRepository {
     fun getSuggestionsByKeyword(
         keyword: String,
-        type: String?,
+        type: Int? = null,
         size: Int = 5,
     ): List<SearchSuggestion>
 
