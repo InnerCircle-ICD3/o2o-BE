@@ -3,8 +3,8 @@ package com.eatngo.search.service
 import com.eatngo.common.exception.search.SearchException
 import com.eatngo.common.type.CoordinateVO
 import com.eatngo.extension.orThrow
+import com.eatngo.search.constant.SuggestionType
 import com.eatngo.search.domain.SearchStore
-import com.eatngo.search.dto.AutoCompleteStoreNameDto
 import com.eatngo.search.dto.Box
 import com.eatngo.search.dto.SearchStoreMap
 import com.eatngo.search.dto.SearchStoreMapResultDto
@@ -14,6 +14,8 @@ import com.eatngo.search.dto.SearchSuggestionResultDto
 import com.eatngo.search.dto.StoreFilterDto
 import com.eatngo.search.infra.SearchMapRedisRepository
 import com.eatngo.search.infra.SearchStoreRepository
+import com.eatngo.search.infra.SearchSuggestionRedisRepository
+import com.eatngo.search.infra.SearchSuggestionRepository
 import org.springframework.stereotype.Service
 import kotlin.math.ceil
 import kotlin.math.floor
@@ -21,7 +23,9 @@ import kotlin.math.floor
 @Service
 class SearchService(
     private val searchStoreRepository: SearchStoreRepository,
+    private val searchSuggestionRepository: SearchSuggestionRepository,
     private val searchMapRedisRepository: SearchMapRedisRepository,
+    private val searchSuggestionRedisRepository: SearchSuggestionRedisRepository,
 ) {
     val cacheBoxSize = 0.005
 
@@ -109,33 +113,31 @@ class SearchService(
      * @return 검색어 자동완성 리스트
      */
     fun searchSuggestions(keyword: String): SearchSuggestionResultDto {
-        // 매장명은 autoComplete로 검색어 추천
-        val storeNameList: List<AutoCompleteStoreNameDto> =
-            searchStoreRepository
-                .autocompleteStoreName(
-                    keyword = keyword,
-                )
-        val storeSuggestionList =
-            storeNameList.map {
-                SearchSuggestionDto.from(
-                    value = it.storeName,
-                    field = "storeName",
-                    storeId = it.storeId,
-                )
-            }
-        // 음식명 추천은 ...
-        val foodCategoryList: List<String> = emptyList() // TODO: 음식명 추천 로직 추가 필요
-        val foodSuggestionList =
-            foodCategoryList.map {
-                SearchSuggestionDto.from(
-                    value = it,
-                    field = "foodCategory",
-                )
-            }
+        // Redis에서 검색어 자동완성 결과를 가져온다. TODO: 로직 개선
+        val redisKey = searchSuggestionRedisRepository.getKey(keyword)
+        var cachedSuggestions: List<SearchSuggestionDto> =
+            searchSuggestionRedisRepository.getSuggestsByKey(redisKey)
+
+        if (cachedSuggestions.isEmpty()) {
+            // Redis에 캐싱된 검색어 자동완성 결과가 없으면 MongoDB에서 검색하여 가져온다
+            cachedSuggestions = getSuggestionFromMongo(keyword)
+
+            // MongoDB에서 가져온 검색어 자동완성 결과를 Redis에 저장한다
+            searchSuggestionRedisRepository.saveSuggests(
+                key = redisKey,
+                suggests = cachedSuggestions,
+            )
+        }
 
         return SearchSuggestionResultDto.from(
-            storeNameList = storeSuggestionList,
-            foodList = foodSuggestionList,
+            storeNameList =
+                cachedSuggestions
+                    .filter { it.field == SuggestionType.STORE_NAME }
+                    .sortedBy { it.value },
+            foodList =
+                cachedSuggestions
+                    .filter { it.field == SuggestionType.FOOD_TYPE }
+                    .sortedBy { it.value },
         )
     }
 
@@ -176,5 +178,26 @@ class SearchService(
             )
 
         return searchStoreList
+    }
+
+    fun getSuggestionFromMongo(keyword: String): List<SearchSuggestionDto> {
+        // TODO: 로직 개선
+        val storeNameList: List<SearchSuggestionDto> =
+            searchSuggestionRepository
+                .getSuggestionsByKeyword(
+                    keyword = keyword,
+                    type = SuggestionType.STORE_NAME.code,
+                    size = 5,
+                ).map { it.to() }
+
+        val foodCategoryList: List<SearchSuggestionDto> =
+            searchSuggestionRepository
+                .getSuggestionsByKeyword(
+                    keyword = keyword,
+                    type = SuggestionType.FOOD_TYPE.code,
+                    size = 10,
+                ).map { it.to() }
+
+        return storeNameList + foodCategoryList
     }
 }
