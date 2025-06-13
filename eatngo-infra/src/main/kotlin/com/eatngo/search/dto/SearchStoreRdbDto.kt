@@ -17,10 +17,10 @@ import java.time.LocalTime
 data class SearchStoreRdbDto(
     val storeId: Long,
     val storeName: String,
-    val storeImage: String, // 매장 이미지 S3 URL
+    val storeImage: String?, // 매장 이미지 S3 URL
     val storeCategory: StoreCategoryJson,
     val foodCategory: FoodCategoryJson, // 대표 판매 음식 종류
-    val foodTypes: List<String>, // 매장에서 판매하는 음식 종류
+    val foodTypes: String?, // 매장에서 판매하는 음식 종류 -> flat한 문자열로 저장
     val roadNameAddress: String,
     val latitude: Double,
     val longitude: Double,
@@ -34,10 +34,10 @@ data class SearchStoreRdbDto(
         SearchStore(
             storeId = storeId,
             storeName = storeName,
-            storeImage = storeImage,
+            storeImage = storeImage ?: "",
             storeCategory = storeCategory.value,
             foodCategory = foodCategory.value,
-            foodTypes = foodTypes,
+            foodTypes = foodTypes?.split(",")?.map { it.trim() } ?: emptyList(),
             roadNameAddress = roadNameAddress,
             coordinate =
                 Coordinate.from(

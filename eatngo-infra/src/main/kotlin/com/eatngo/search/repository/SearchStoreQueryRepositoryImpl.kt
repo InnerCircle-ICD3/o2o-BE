@@ -15,27 +15,28 @@ class SearchStoreQueryRepositoryImpl(
         em
             .createQuery(
                 """
-            SELECT SearchStoreRdbDto(
-                s.id,
-                s.name,
-                s.imageUrl,
-                s.storeCategory,
-                s.foodCategory,
-                p.foodTypes,
-                s.address.roadNameAddress,
-                s.address.latitude,
-                s.address.longitude,
-                p.status,
-                s.status,
-                s.businessHours,
-                s.updatedAt,
-                s.createdAt
-            )
-            FROM StoreJpaEntity s 
-                JOIN FETCH s.address
-                JOIN ProductEntity p ON p.storeId = s.id
-            WHERE s.id = :storeId
-        """,
+                SELECT new com.eatngo.search.dto.SearchStoreRdbDto(
+                    s.id,
+                    s.name,
+                    s.imageUrl,
+                    s.storeCategory,
+                    s.foodCategory,
+                    f,
+                    s.address.roadNameAddress,
+                    s.address.latitude,
+                    s.address.longitude,
+                    p.status,
+                    s.status,
+                    s.businessHours,
+                    s.updatedAt,
+                    s.createdAt
+                )
+                FROM StoreJpaEntity s 
+                    JOIN s.address
+                    JOIN ProductEntity p ON p.storeId = s.id
+                    Join p.foodTypes f
+                WHERE s.id = :storeId
+                """.trimIndent(),
                 SearchStoreRdbDto::class.java,
             ).setParameter("storeId", storeId)
             .singleResult
@@ -56,27 +57,28 @@ class SearchStoreQueryRepositoryImpl(
         em
             .createQuery(
                 """
-            SELECT SearchStoreRdbDto(
-                s.id,
-                s.name,
-                s.imageUrl,
-                s.storeCategory,
-                s.foodCategory,
-                p.foodTypes,
-                s.address.roadNameAddress,
-                s.address.latitude,
-                s.address.longitude,
-                p.status,
-                s.status,
-                s.businessHours,
-                s.updatedAt,
-                s.createdAt
-            )
-            FROM StoreJpaEntity s 
-                JOIN FETCH s.address
-                JOIN ProductEntity p ON p.storeId = s.id
-            WHERE s.updatedAt > :pivotTime
-        """,
+                SELECT new com.eatngo.search.dto.SearchStoreRdbDto(
+                    s.id,
+                    s.name,
+                    s.imageUrl,
+                    s.storeCategory,
+                    s.foodCategory,
+                    f,
+                    s.address.roadNameAddress,
+                    s.address.latitude,
+                    s.address.longitude,
+                    p.status,
+                    s.status,
+                    s.businessHours,
+                    s.updatedAt,
+                    s.createdAt
+                )
+                FROM StoreJpaEntity s 
+                    JOIN s.address
+                    JOIN ProductEntity p ON p.storeId = s.id
+                    Join p.foodTypes f
+                WHERE s.updatedAt > :pivotTime
+                """.trimIndent(),
                 SearchStoreRdbDto::class.java,
             ).setParameter("pivotTime", pivotTime)
             .resultList
