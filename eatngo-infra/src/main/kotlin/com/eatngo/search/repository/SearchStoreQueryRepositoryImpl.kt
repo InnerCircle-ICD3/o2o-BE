@@ -25,7 +25,6 @@ class SearchStoreQueryRepositoryImpl(
                     s.address.roadNameAddress,
                     s.address.latitude,
                     s.address.longitude,
-                    p.status,
                     s.status,
                     s.businessHours,
                     s.updatedAt,
@@ -33,8 +32,8 @@ class SearchStoreQueryRepositoryImpl(
                 )
                 FROM StoreJpaEntity s 
                     JOIN s.address
-                    JOIN ProductEntity p ON p.storeId = s.id
-                    Join p.foodTypes f
+                    LEFT JOIN ProductEntity p ON p.storeId = s.id
+                    LEFT JOIN p.foodTypes f
                 WHERE s.id = :storeId
                 """.trimIndent(),
                 SearchStoreRdbDto::class.java,
@@ -68,7 +67,6 @@ class SearchStoreQueryRepositoryImpl(
                     s.address.roadNameAddress,
                     s.address.latitude,
                     s.address.longitude,
-                    p.status,
                     s.status,
                     s.businessHours,
                     s.updatedAt,
@@ -76,8 +74,8 @@ class SearchStoreQueryRepositoryImpl(
                 )
                 FROM StoreJpaEntity s 
                     JOIN s.address
-                    JOIN ProductEntity p ON p.storeId = s.id
-                    Join p.foodTypes f
+                    LEFT JOIN ProductEntity p ON p.storeId = s.id
+                    LEFT JOIN p.foodTypes f
                 WHERE s.updatedAt > :pivotTime
                 """.trimIndent(),
                 SearchStoreRdbDto::class.java,

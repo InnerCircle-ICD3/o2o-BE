@@ -79,7 +79,6 @@ class SearchStoreRepositoryImpl(
                             "foodTypes" to 1,
                             "roadNameAddress" to 1,
                             "coordinate" to 1,
-                            "productStatus" to 1,
                             "status" to 1,
                             "businessHours" to 1,
                             "metaSearchScore" to Document("\$meta", "searchScore"), // 검색 점수
@@ -167,7 +166,6 @@ class SearchStoreRepositoryImpl(
                 .set("foodTypes", store.foodTypes)
                 .set("roadNameAddress", store.roadNameAddress)
                 .set("coordinate", store.coordinate)
-                .set("productStatus", store.productStatus)
                 .set("status", store.status)
                 .set("businessHours", store.businessHours)
                 .set("updatedAt", LocalDateTime.now())
@@ -197,7 +195,6 @@ class SearchStoreRepositoryImpl(
                     .set("foodCategory", store.foodCategory)
                     .set("roadNameAddress", store.roadNameAddress)
                     .set("coordinate", store.coordinate)
-                    .set("productStatus", store.productStatus)
                     .set("status", store.status)
                     .set("businessHours", store.businessHours)
                     .set("updatedAt", LocalDateTime.now())
