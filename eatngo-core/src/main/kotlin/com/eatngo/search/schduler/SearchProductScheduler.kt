@@ -1,10 +1,13 @@
 package com.eatngo.search.schduler
 
+import com.eatngo.search.constant.SuggestionType
 import com.eatngo.search.domain.SearchStore
+import com.eatngo.search.domain.SearchSuggestion
 import com.eatngo.search.dto.Box
 import com.eatngo.search.infra.SearchMapRedisRepository
 import com.eatngo.search.infra.SearchStorePersistence
 import com.eatngo.search.infra.SearchStoreRepository
+import com.eatngo.search.infra.SearchSuggestionRepository
 import com.eatngo.search.service.SearchService
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.scheduling.annotation.Scheduled
@@ -24,6 +27,7 @@ import java.time.LocalDateTime
 )
 class SearchProductScheduler(
     private val searchStoreRepository: SearchStoreRepository,
+    private val searchSuggestionRepository: SearchSuggestionRepository,
     private val searchMapRedisRepository: SearchMapRedisRepository,
     private val searchStorePersistence: SearchStorePersistence,
     private val searchService: SearchService,
@@ -50,6 +54,56 @@ class SearchProductScheduler(
             // 예외 발생 시 로깅
             log.error("Error updating search index from store", e)
         }
+    }
+
+    /**
+     * 상품 검색 인덱스를 업데이트합니다.
+     * 하루에 한 번씩 실행되어, 최근 이내에 업데이트된 매장 정보를 기반으로 검색 인덱스를 업데이트합니다.
+     * @Scheduled(cron = "0 0 0 * * ?") // 매일 자정에 실행
+     */
+    @Scheduled(cron = "0 0 0 * * ?")
+    private fun updateSearchSuggestion() {
+        val pivotTime = LocalDateTime.now().minusMinutes(60 * 24) // 하루 전 시간
+        val stores: List<SearchStore> = searchStorePersistence.syncAllStoresByUpdateAt(pivotTime = pivotTime)
+        if (stores.isEmpty()) {
+            return
+        }
+
+        val deleteStoreIds = mutableListOf<Long>()
+        val updateList = mutableListOf<SearchSuggestion>()
+        val foodTypes = mutableSetOf<String>()
+        for (store in stores) {
+            // MongoDB 업데이트 정보
+            if (store.deletedAt == null) {
+                updateList.add(
+                    SearchSuggestion.from(
+                        keyword = store.storeName,
+                        type = SuggestionType.STORE_NAME,
+                        keywordId = store.storeId,
+                    ),
+                )
+                store.foodTypes?.forEach { foodType ->
+                    foodTypes.add(foodType)
+                }
+            } else {
+                deleteStoreIds.add(store.storeId)
+            }
+        }
+        foodTypes.forEach { foodType ->
+            updateList.add(
+                SearchSuggestion.from(
+                    keyword = foodType,
+                    type = SuggestionType.FOOD_TYPE,
+                ),
+            )
+        }
+
+        // 검색 매장 인덱스 업데이트
+        searchSuggestionRepository.saveSuggestionList(updateList)
+        // 삭제된 매장 업데이트
+        searchSuggestionRepository.deleteByKeywordIdList(deleteStoreIds)
+
+        // TODO: Redis 업데이트 및 삭제된 매장 삭제
     }
 
     /**

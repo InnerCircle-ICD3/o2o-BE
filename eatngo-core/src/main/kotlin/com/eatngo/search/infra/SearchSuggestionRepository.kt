@@ -12,4 +12,6 @@ interface SearchSuggestionRepository {
     fun saveSuggestionList(suggestList: List<SearchSuggestion>)
 
     fun saveSuggestion(suggestion: SearchSuggestion)
+
+    fun deleteByKeywordIdList(keywordIdList: List<Long>)
 }
