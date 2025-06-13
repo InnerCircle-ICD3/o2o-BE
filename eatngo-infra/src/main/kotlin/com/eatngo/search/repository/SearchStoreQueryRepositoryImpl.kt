@@ -45,8 +45,9 @@ class SearchStoreQueryRepositoryImpl(
         em
             .createQuery(
                 """
-            SELECT SearchStoreFoodTypeDto(p.storeId, p.foodTypes)
+            SELECT new com.eatngo.search.dto.SearchStoreFoodTypeDto(p.storeId, f)
             FROM ProductEntity p
+            JOIN p.foodTypes f
             WHERE p.updatedAt > :pivotTime
         """,
                 SearchStoreFoodTypeDto::class.java,
