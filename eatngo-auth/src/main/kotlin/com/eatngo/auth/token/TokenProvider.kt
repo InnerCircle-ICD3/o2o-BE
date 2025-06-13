@@ -145,7 +145,7 @@ class TokenProvider(
         return ResponseCookie
             .from(name, value)
             .httpOnly(true)
-            .domain(".eatngo.com")
+            .domain(".eatngo.org")
             .secure(true)
             .path("/")
             .sameSite("None")
