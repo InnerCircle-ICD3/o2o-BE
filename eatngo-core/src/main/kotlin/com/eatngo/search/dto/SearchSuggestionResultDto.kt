@@ -41,19 +41,3 @@ data class SearchSuggestionDto(
             )
     }
 }
-
-data class AutoCompleteStoreNameDto(
-    val storeId: Long,
-    val storeName: String,
-) {
-    companion object {
-        fun from(
-            storeId: Long,
-            storeName: String,
-        ): AutoCompleteStoreNameDto =
-            AutoCompleteStoreNameDto(
-                storeId = storeId,
-                storeName = storeName,
-            )
-    }
-}
