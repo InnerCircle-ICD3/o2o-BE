@@ -1,15 +1,12 @@
 package com.eatngo.mongo.search.repository
 
-import com.eatngo.mongo.search.dto.SearchStoreAutoCompleteDto
 import com.eatngo.mongo.search.entity.SearchStoreEntity
 import com.eatngo.search.domain.SearchStore
 import com.eatngo.search.domain.SearchStoreFoodTypes
-import com.eatngo.search.dto.AutoCompleteStoreNameDto
 import com.eatngo.search.dto.Box
 import com.eatngo.search.dto.SearchFilter
 import com.eatngo.search.infra.SearchStoreRepository
 import org.bson.Document
-import org.springframework.data.domain.Sort
 import org.springframework.data.geo.Shape
 import org.springframework.data.mongodb.core.BulkOperations
 import org.springframework.data.mongodb.core.MongoTemplate
@@ -28,7 +25,6 @@ class SearchStoreRepositoryImpl(
     private val mongoTemplate: MongoTemplate,
 ) : SearchStoreRepository {
     val searchStoreIndex = "search-store"
-    val autoCompleteIndex = "store-auto-complete"
 
     override fun findBox(box: Box): List<SearchStore> {
         val mongoBox: Shape =
@@ -106,50 +102,6 @@ class SearchStoreRepositoryImpl(
 
         return result.map {
             it.to()
-        }
-    }
-
-    /**
-     * deprecated: 검색어 자동완성 기능을 위한 MongoDB Atlas Search 쿼리
-     * 검색어 자동완성 기능을 위한 MongoDB Atlas Search 쿼리
-     * @param keyword 검색어
-     * @param size 결과 개수
-     * @return 자동완성된 매장 이름 리스트
-     */
-    override fun autocompleteStoreName(
-        keyword: String,
-        size: Int,
-    ): List<AutoCompleteStoreNameDto> {
-        val searchOp = getAutocompleteOperation(keyword)
-        val limitOp = Aggregation.limit(size.toLong())
-        val projectionOp =
-            Aggregation
-                .project("_id", "storeName") // _id, storeName 필드만 추출
-                .andExpression("metaSearchScore")
-                .`as`("score")
-        val sortOp = Aggregation.sort(Sort.by(Sort.Direction.DESC, "score"))
-
-        val pipeline =
-            Aggregation.newAggregation(
-                searchOp,
-                sortOp,
-                limitOp,
-                projectionOp,
-            )
-
-        val result =
-            mongoTemplate
-                .aggregate(
-                    pipeline,
-                    "SearchStore",
-                    SearchStoreAutoCompleteDto::class.java,
-                ).mappedResults
-
-        return result.map {
-            AutoCompleteStoreNameDto.from(
-                storeId = it.storeId,
-                storeName = it.storeName,
-            )
         }
     }
 
@@ -379,20 +331,4 @@ class SearchStoreRepositoryImpl(
 
         return AggregationOperation { _: AggregationOperationContext -> searchQuery }
     }
-
-    fun getAutocompleteOperation(prefix: String): AggregationOperation =
-        AggregationOperation {
-            Document(
-                "\$search",
-                Document()
-                    .append("index", autoCompleteIndex)
-                    .append(
-                        "autocomplete",
-                        Document()
-                            .append("query", prefix)
-                            .append("path", "storeName")
-                            .append("fuzzy", Document("maxEdits", 1)), // 오타 허용
-                    ),
-            )
-        }
 }

@@ -2,7 +2,6 @@ package com.eatngo.search.infra
 
 import com.eatngo.search.domain.SearchStore
 import com.eatngo.search.domain.SearchStoreFoodTypes
-import com.eatngo.search.dto.AutoCompleteStoreNameDto
 import com.eatngo.search.dto.Box
 import com.eatngo.search.dto.SearchFilter
 
@@ -16,12 +15,6 @@ interface SearchStoreRepository {
         searchFilter: SearchFilter,
         size: Int,
     ): List<SearchStore>
-
-    // deprecated: use searchStore instead
-    fun autocompleteStoreName(
-        keyword: String,
-        size: Int = 5,
-    ): List<AutoCompleteStoreNameDto>
 
     fun save(searchStore: SearchStore)
 
