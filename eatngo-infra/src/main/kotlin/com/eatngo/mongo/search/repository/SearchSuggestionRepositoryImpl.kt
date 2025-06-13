@@ -1,0 +1,95 @@
+package com.eatngo.mongo.search.repository
+
+import com.eatngo.mongo.search.entity.SearchSuggestionEntity
+import com.eatngo.search.domain.SearchSuggestion
+import com.eatngo.search.infra.SearchSuggestionRepository
+import org.bson.Document
+import org.springframework.data.mongodb.core.BulkOperations
+import org.springframework.data.mongodb.core.MongoTemplate
+import org.springframework.data.mongodb.core.aggregation.Aggregation
+import org.springframework.data.mongodb.core.aggregation.AggregationOperation
+import org.springframework.data.mongodb.core.query.Criteria
+import org.springframework.data.mongodb.core.query.Query
+import org.springframework.data.mongodb.core.query.Update
+import org.springframework.stereotype.Component
+
+@Component
+class SearchSuggestionRepositoryImpl(
+    private val mongoTemplate: MongoTemplate,
+) : SearchSuggestionRepository {
+    val searchSuggestionIndex = "search-suggestion"
+
+    override fun getSuggestionsByKeyword(
+        keyword: String,
+        type: String?,
+        size: Int,
+    ): List<SearchSuggestion> {
+        val must = mutableListOf<Document>()
+        val filter = mutableListOf<Document>()
+
+        must.add(
+            Document("text", Document("query", keyword).append("path", "keyword")),
+        )
+        if (type != null) {
+            filter.add(
+                Document("equals", Document("value", type).append("path", "type")),
+            )
+        }
+
+        val searchOp =
+            AggregationOperation {
+                Document(
+                    "\$search",
+                    Document()
+                        .append("index", searchSuggestionIndex)
+                        .append(
+                            "compound",
+                            Document()
+                                .append("must", must)
+                                .append("filter", filter),
+                        ),
+                )
+            }
+        val limitOp = Aggregation.limit(size.toLong())
+        val pipeline =
+            Aggregation.newAggregation(
+                searchOp,
+                limitOp,
+            )
+        val results =
+            mongoTemplate
+                .aggregate(
+                    pipeline,
+                    "SearchSuggestion",
+                    SearchSuggestionEntity::class.java,
+                ).mappedResults
+
+        return results.map { it.to() }
+    }
+
+    override fun saveSuggestionList(suggestList: List<SearchSuggestion>) {
+        val bulkOps =
+            mongoTemplate.bulkOps(
+                BulkOperations.BulkMode.UNORDERED,
+                SearchSuggestionEntity::class.java,
+                "SearchSuggestion",
+            )
+        suggestList.forEach { suggestion ->
+            val entity = SearchSuggestionEntity.from(suggestion)
+            bulkOps.upsert(
+                Query(Criteria.where("id").`is`(entity.id)),
+                Update()
+                    .setOnInsert("keyword", entity.keyword)
+                    .setOnInsert("type", entity.type)
+                    .setOnInsert("keywordId", entity.keywordId),
+            )
+        }
+
+        bulkOps.execute()
+    }
+
+    override fun saveSuggestion(suggestion: SearchSuggestion) {
+        val entity = SearchSuggestionEntity.from(suggestion)
+        mongoTemplate.save(entity, "SearchSuggestion")
+    }
+}
