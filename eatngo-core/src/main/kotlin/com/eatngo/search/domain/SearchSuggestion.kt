@@ -11,7 +11,7 @@ class SearchSuggestion(
     fun to(): SearchSuggestionDto =
         SearchSuggestionDto(
             value = keyword,
-            field = type.toString(),
+            field = type,
             storeId = keywordId,
         )
 
