@@ -111,6 +111,7 @@ class SearchStoreRepositoryImpl(
     }
 
     /**
+     * deprecated: 검색어 자동완성 기능을 위한 MongoDB Atlas Search 쿼리
      * 검색어 자동완성 기능을 위한 MongoDB Atlas Search 쿼리
      * @param keyword 검색어
      * @param size 결과 개수
