@@ -21,7 +21,7 @@ class SearchSuggestionRepositoryImpl(
 
     override fun getSuggestionsByKeyword(
         keyword: String,
-        type: String?,
+        type: Int?,
         size: Int,
     ): List<SearchSuggestion> {
         val must = mutableListOf<Document>()

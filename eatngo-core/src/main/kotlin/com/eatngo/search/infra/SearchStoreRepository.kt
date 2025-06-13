@@ -17,6 +17,7 @@ interface SearchStoreRepository {
         size: Int,
     ): List<SearchStore>
 
+    // deprecated: use searchStore instead
     fun autocompleteStoreName(
         keyword: String,
         size: Int = 5,
