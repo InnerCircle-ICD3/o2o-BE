@@ -92,4 +92,12 @@ class SearchSuggestionRepositoryImpl(
         val entity = SearchSuggestionEntity.from(suggestion)
         mongoTemplate.save(entity, "SearchSuggestion")
     }
+
+    override fun deleteByKeywordIdList(keywordIdList: List<Long>) {
+        if (keywordIdList.isEmpty()) {
+            return
+        }
+        val query = Query(Criteria.where("keywordId").`in`(keywordIdList))
+        mongoTemplate.remove(query, SearchSuggestionEntity::class.java, "SearchSuggestion")
+    }
 }
