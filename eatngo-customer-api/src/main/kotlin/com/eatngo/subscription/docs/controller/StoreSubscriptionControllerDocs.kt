@@ -11,11 +11,11 @@ import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
-import io.swagger.v3.oas.annotations.responses.ApiResponse as SwaggerApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestParam
+import io.swagger.v3.oas.annotations.responses.ApiResponse as SwaggerApiResponse
 
 @Tag(name = "매장 구독", description = "매장 구독 관련 API")
 interface StoreSubscriptionControllerDocs {
@@ -46,7 +46,6 @@ interface StoreSubscriptionControllerDocs {
         @Parameter(description = "구독할 매장 ID", required = true)
         @PathVariable storeId: Long,
 
-        @Parameter(description = "고객 ID", required = true)
         @CustomerId customerId: Long
     ): ApiResponse<SubscriptionToggleResponse>
 
@@ -78,7 +77,6 @@ interface StoreSubscriptionControllerDocs {
         ]
     )
     fun getMySubscriptions(
-        @Parameter(description = "고객 ID", required = true)
         @CustomerId customerId: Long,
         
         @Parameter(
