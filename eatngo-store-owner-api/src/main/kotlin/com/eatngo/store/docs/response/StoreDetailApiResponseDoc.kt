@@ -6,13 +6,13 @@ import java.time.LocalTime
 
 /** 컨트롤러에서 반환되는 응답 래핑 */
 
-@Schema(description = "매장 상세 응답 예시")
+@Schema(description = "매장 목록 응답 예시")
 data class StoreDetailApiResponseDoc(
     @Schema(description = "요청 성공 여부", example = "true")
     override val success: Boolean = true,
-    @Schema(description = "응답 데이터")
-    override val data: StoreDetailResponseDoc
-) : ApiResponseSuccessDoc<StoreDetailResponseDoc>(success, data)
+    @Schema(description = "매장 목록 데이터")
+    override val data: List<StoreDetailResponseDoc>
+) : ApiResponseSuccessDoc<List<StoreDetailResponseDoc>>(success, data)
 
 /** StoreDetailResponseDoc */
 

@@ -8,4 +8,5 @@ interface ProductPersistence {
     fun findAllActivatedProductByStoreId(storeId: Long): List<Product>
     fun findAllActivatedProductsByStoreIds(storeIds: List<Long>): List<Product>
     fun findActivatedProductByIdAndStoreId(productId: Long, storeId: Long): Product?
+    fun countActiveProductsByStoreId(storeId: Long): Long
 }

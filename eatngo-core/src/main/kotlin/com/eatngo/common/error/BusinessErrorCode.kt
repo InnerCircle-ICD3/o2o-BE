@@ -99,6 +99,7 @@ enum class BusinessErrorCode(
     // 재고 관련 오류
     STOCK_NOT_FOUND("ST001", "상품의 재고를 찾을 수 없습니다.", 400),
     STOCK_EMPTY("ST002", "상품의 재고가 없습니다.", 409),
-    INVENTORY_NOT_FOUND("I001", "상품 재고를 찾을 수 없습니다.", 400)
+    INVENTORY_NOT_FOUND("I001", "상품 재고를 찾을 수 없습니다.", 400),
+    STORE_TOTAL_STOCK_QUERY_FAILED("ST003", "매장 총 재고 조회에 실패했습니다.", 500),
 
 }
