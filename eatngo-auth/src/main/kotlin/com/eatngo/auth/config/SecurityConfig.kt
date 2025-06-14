@@ -59,7 +59,7 @@ class SecurityConfig(
             }
 
             .logout {
-                it.logoutRequestMatcher(AntPathRequestMatcher("/oauth2/logout", "POST"))
+                it.logoutRequestMatcher(AntPathRequestMatcher("/api/v1/oauth2/logout", "POST"))
                     .logoutSuccessUrl("/")
                     .invalidateHttpSession(true)
                     .logoutSuccessHandler { request, response, _ ->

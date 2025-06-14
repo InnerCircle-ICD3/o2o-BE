@@ -68,7 +68,7 @@ class OAuth2DocController {
             )
         ]
     )
-    @PostMapping("/oauth2/logout")
+    @PostMapping("/api/v1/oauth2/logout")
     fun logOut() {
         // 실제 리디렉션은 Spring Security가 수행하므로 여기는 비어 있음
     }
