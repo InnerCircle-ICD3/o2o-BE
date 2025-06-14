@@ -69,11 +69,7 @@ class SearchService(
                 latitude = userCoordinate.latitude,
             )
 
-        // Redis에서 box 검색 결과를 가져온다. -> 위경도 기중 0.005 단위로 박스 매핑
-        val redisKey =
-            searchMapRedisRepository.getKey(box.topLeft)
-        val searchStoreList: List<SearchStore> =
-            searchMapRedisRepository.findByKey(redisKey)
+        val searchStoreList: List<SearchStore> = getMapListFromBox(box)
 
         return SearchStoreMapResultDto.from(
             box = box,
@@ -199,5 +195,35 @@ class SearchService(
                 ).map { it.to() }
 
         return storeNameList + foodCategoryList
+    }
+
+    fun getMapListFromBox(box: Box): List<SearchStore> {
+        val result = mutableListOf<SearchStore>()
+        val topLeftList: List<CoordinateVO> =
+            getNineBoxesTopLeftFromCenter(box.topLeft)
+
+        topLeftList.forEach { topLeft ->
+            // 좌상단 좌표를 기준으로 Redis에서 검색
+            result.addAll(
+                searchMapRedisRepository
+                    .findByKey(searchMapRedisRepository.getKey(topLeft)),
+            )
+        }
+        return result
+    }
+
+    fun getNineBoxesTopLeftFromCenter(center: CoordinateVO): List<CoordinateVO> {
+        val topLeftList = mutableListOf<CoordinateVO>()
+        for (i in -1..1) {
+            for (j in -1..1) {
+                val topLeft =
+                    CoordinateVO.from(
+                        longitude = center.longitude + i * cacheBoxSize,
+                        latitude = center.latitude + j * cacheBoxSize,
+                    )
+                topLeftList.add(topLeft)
+            }
+        }
+        return topLeftList
     }
 }
