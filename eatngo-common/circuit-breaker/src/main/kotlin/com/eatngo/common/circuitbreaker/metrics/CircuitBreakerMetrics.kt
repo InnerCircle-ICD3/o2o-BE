@@ -5,6 +5,7 @@ import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Timer
 import mu.KotlinLogging
+import org.springframework.beans.factory.InitializingBean
 import org.springframework.stereotype.Component
 import java.time.Duration
 
@@ -12,7 +13,7 @@ import java.time.Duration
 class CircuitBreakerMetrics(
     private val meterRegistry: MeterRegistry?,
     private val circuitBreakerManager: CircuitBreakerManager
-) {
+) : InitializingBean {
     companion object {
         private val logger = KotlinLogging.logger {}
     }
@@ -21,6 +22,15 @@ class CircuitBreakerMetrics(
     private val failureCounters = mutableMapOf<String, Counter>()
     private val fallbackCounters = mutableMapOf<String, Counter>()
     private val timers = mutableMapOf<String, Timer>()
+    
+    override fun afterPropertiesSet() {
+        try {
+            registerStateGauges()
+            logger.info { "Circuit Breaker metrics initialized successfully" }
+        } catch (ex: Exception) {
+            logger.error(ex) { "Circuit Breaker metrics initialization failed: ${ex.message}" }
+        }
+    }
     
     fun recordSuccess(circuitBreakerName: String, executionTime: Duration) {
         meterRegistry?.let {
