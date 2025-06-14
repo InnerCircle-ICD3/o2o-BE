@@ -1,6 +1,7 @@
 package com.eatngo.mongo.search.repository
 
 import com.eatngo.mongo.search.entity.SearchSuggestionEntity
+import com.eatngo.search.constant.SuggestionType
 import com.eatngo.search.domain.SearchSuggestion
 import com.eatngo.search.infra.SearchSuggestionRepository
 import org.bson.Document
@@ -21,7 +22,7 @@ class SearchSuggestionRepositoryImpl(
 
     override fun getSuggestionsByKeyword(
         keyword: String,
-        type: Int?,
+        type: SuggestionType?,
         size: Int,
     ): List<SearchSuggestion> {
         val must = mutableListOf<Document>()
@@ -32,7 +33,7 @@ class SearchSuggestionRepositoryImpl(
         )
         if (type != null) {
             filter.add(
-                Document("equals", Document("value", type).append("path", "type")),
+                Document("equals", Document("value", type.code).append("path", "type")),
             )
         }
 

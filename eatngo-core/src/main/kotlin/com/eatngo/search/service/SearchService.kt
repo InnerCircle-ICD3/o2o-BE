@@ -186,7 +186,7 @@ class SearchService(
             searchSuggestionRepository
                 .getSuggestionsByKeyword(
                     keyword = keyword,
-                    type = SuggestionType.STORE_NAME.code,
+                    type = SuggestionType.STORE_NAME,
                     size = 5,
                 ).map { it.to() }
 
@@ -194,7 +194,7 @@ class SearchService(
             searchSuggestionRepository
                 .getSuggestionsByKeyword(
                     keyword = keyword,
-                    type = SuggestionType.FOOD_TYPE.code,
+                    type = SuggestionType.FOOD_TYPE,
                     size = 10,
                 ).map { it.to() }
 

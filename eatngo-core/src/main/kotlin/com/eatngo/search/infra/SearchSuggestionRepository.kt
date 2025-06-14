@@ -1,11 +1,12 @@
 package com.eatngo.search.infra
 
+import com.eatngo.search.constant.SuggestionType
 import com.eatngo.search.domain.SearchSuggestion
 
 interface SearchSuggestionRepository {
     fun getSuggestionsByKeyword(
         keyword: String,
-        type: Int? = null,
+        type: SuggestionType? = null,
         size: Int = 5,
     ): List<SearchSuggestion>
 
