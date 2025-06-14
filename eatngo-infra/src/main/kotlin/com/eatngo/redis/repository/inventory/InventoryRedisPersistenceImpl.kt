@@ -24,6 +24,13 @@ class InventoryRedisPersistenceImpl(
             redis.call('HINCRBY', KEYS[1], 'stock', -dec)
             return cur - dec
         """
+
+        private const val LUA_ROLLBACK_STOCK = """
+            local exists = redis.call('EXISTS', KEYS[1])
+            if (exists == 0) then return -1 end
+            redis.call('HINCRBY', KEYS[1], 'stock', tonumber(ARGV[1]))
+            return 1
+        """
     }
 
     override fun decreaseStock(productId: Long, stockQuantityToDecrease: Int): Int {
@@ -52,6 +59,24 @@ class InventoryRedisPersistenceImpl(
     }
 
     override fun rollbackStock(productId: Long, stockQuantity: Int) {
-        TODO("Not yet implemented")
+        val script = DefaultRedisScript(LUA_ROLLBACK_STOCK, Long::class.java)
+        val result = redisTemplate.execute(script, listOf(pKey(productId)), stockQuantity.toString())
+            ?: -1L
+        if (result == -1L) throw StockNotFound(productId)
+    }
+
+    override fun saveHash(productId: Long, inventoryDto: InventoryDto) {
+        val key = "inventory:hash:$productId"
+        redisTemplate.opsForHash<String, String>().putAll(
+            key,
+            mapOf(
+                "stock" to inventoryDto.stock.toString(),
+                "quantity" to inventoryDto.quantity.toString()
+            )
+        )
+    }
+
+    override fun deleteHash(productId: Long) {
+        redisTemplate.delete("inventory:hash:$productId")
     }
 }
