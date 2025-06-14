@@ -18,7 +18,7 @@ services:
       - '--storage.tsdb.retention.time=200h'
       - '--web.enable-lifecycle'
       - '--web.enable-admin-api'
-      - '--web.external-url=https://monitor.eatngo.org/prometheus'  # 실제 도메인
+      - '--web.external-url=https://monitor.eatngo.org/prometheus/'  # 실제 도메인
     restart: unless-stopped
 
   grafana:
@@ -31,7 +31,7 @@ services:
       - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}  # 환경변수로 보안
       - GF_USERS_ALLOW_SIGN_UP=false
       - GF_SERVER_ROOT_URL=https://monitor.eatngo.org/grafana  # 실제 도메인
-      - GF_SERVER_SERVE_FROM_SUB_PATH=true
+      - GF_SERVER_SERVE_FROM_SUB_PATH=false
     volumes:
       - grafana_data:/var/lib/grafana
       - ./grafana/provisioning:/etc/grafana/provisioning
