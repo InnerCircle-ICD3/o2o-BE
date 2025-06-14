@@ -3,6 +3,7 @@ package com.eatngo.mongo.search.repository
 import com.eatngo.mongo.search.entity.SearchStoreEntity
 import com.eatngo.search.domain.SearchStore
 import com.eatngo.search.domain.SearchStoreFoodTypes
+import com.eatngo.search.domain.SearchStoreStatus
 import com.eatngo.search.dto.Box
 import com.eatngo.search.dto.SearchFilter
 import com.eatngo.search.infra.SearchStoreRepository
@@ -219,21 +220,31 @@ class SearchStoreRepositoryImpl(
         latitude: Double,
         maxDistanceKm: Double,
         searchFilter: SearchFilter,
-        status: Int = 1, // 기본적으로 OPEN 상태의 매장을 우선 검색
     ): AggregationOperation {
         val maxDistance = maxDistanceKm * 1000 // km 단위를 meter로 변환
 
         val must = mutableListOf<Document>()
         val should = mutableListOf<Document>()
 
-        // TODO: STATUS 필터링 로직 개선 필요 -> 예약 가능 상태 필터링
-        must += (
-            Document(
-                "equals",
-                Document("path", "status")
-                    .append("value", status),
+        // 상태 필터링
+        if (searchFilter.onlyReservable) {
+            must += (
+                Document(
+                    "equals",
+                    Document("path", "status")
+                        .append("value", SearchStoreStatus.OPEN.code),
+                )
             )
-        )
+        } else {
+            should += (
+                Document(
+                    "equals",
+                    Document("path", "status")
+                        .append("value", SearchStoreStatus.OPEN.code),
+                )
+            )
+        }
+
         // 검색어 필터링
         if (searchFilter.searchText != null && searchFilter.searchText != "") {
             must += (
