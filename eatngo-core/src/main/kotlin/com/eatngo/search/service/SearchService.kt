@@ -28,7 +28,7 @@ class SearchService(
     private val searchMapRedisRepository: SearchMapRedisRepository,
     private val searchSuggestionRedisRepository: SearchSuggestionRedisRepository,
 ) {
-    val cacheBoxSize = 0.005
+    val cacheBoxSize = 0.01
 
     /**
      * 가게 검색 API - 검색어 입력
