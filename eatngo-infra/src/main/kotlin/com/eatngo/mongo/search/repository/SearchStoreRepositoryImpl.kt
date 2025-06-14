@@ -220,7 +220,6 @@ class SearchStoreRepositoryImpl(
         latitude: Double,
         maxDistanceKm: Double,
         searchFilter: SearchFilter,
-        status: Int = 1, // 기본적으로 OPEN 상태의 매장을 우선 검색
     ): AggregationOperation {
         val maxDistance = maxDistanceKm * 1000 // km 단위를 meter로 변환
 
