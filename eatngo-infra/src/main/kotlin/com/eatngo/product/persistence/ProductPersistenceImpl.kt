@@ -38,7 +38,7 @@ class ProductPersistenceImpl(
             .map(ProductMapper::toDomain)
     }
 
-    override fun countActiveProductsByStoreId(storeId: Long): Int {
+    override fun countActiveProductsByStoreId(storeId: Long): Long {
         return productRepository.countByStoreIdAndDeleteStatus(storeId, DeletedStatus.ACTIVE)
     }
 }

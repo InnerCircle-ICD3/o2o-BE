@@ -4,6 +4,7 @@ import com.eatngo.inventory.infra.InventoryPersistence
 import com.eatngo.product.infra.ProductPersistence
 import com.eatngo.store.infra.StoreTotalStockRedisRepository
 import com.eatngo.common.circuitbreaker.annotation.RedisCircuitBreaker
+import com.eatngo.common.exception.store.StoreException
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 import java.util.concurrent.ConcurrentHashMap
@@ -14,16 +15,33 @@ class StoreTotalStockService(
     private val inventoryPersistence: InventoryPersistence,
     private val productPersistence: ProductPersistence
 ) {
-    
+    companion object {
+        private const val MAX_CACHE_SIZE = 1000
+    }
+
     // 로컬 메모리 캐시 (앱 재시작까지 유지)
-    private val localCache = ConcurrentHashMap<String, CachedStockInfo>()
-    
+    @Volatile
+    private var localCache = ConcurrentHashMap<String, CachedStockInfo>()
+
+    private fun cleanupExpiredEntries() {
+        if (localCache.size > MAX_CACHE_SIZE * 0.8) {
+            val now = System.currentTimeMillis()
+            localCache.entries.removeIf { it.value.isExpired(now) }
+
+            if (localCache.size > MAX_CACHE_SIZE) {
+                val sortedEntries = localCache.entries.sortedBy { it.value.cachedAt }
+                val toRemove = sortedEntries.take(localCache.size - MAX_CACHE_SIZE)
+                toRemove.forEach { localCache.remove(it.key) }
+            }
+        }
+    }
+
     data class CachedStockInfo(
         val stock: Int,
         val cachedAt: Long = System.currentTimeMillis(),
-        val ttlMs: Long = 300_000L // 5분
     ) {
-        fun isExpired(): Boolean = System.currentTimeMillis() - cachedAt > ttlMs
+        fun isExpired(now: Long = System.currentTimeMillis()): Boolean =
+            now - cachedAt > 300_000L // 5분
     }
 
     /**
@@ -68,6 +86,7 @@ class StoreTotalStockService(
                 getDefaultStock(storeId)
             }
         } catch (dbEx: Exception) {
+            StoreException.StoreTotalStockException(storeId, dbEx)
             getDefaultStock(storeId)
         }
     }
@@ -93,7 +112,7 @@ class StoreTotalStockService(
     private fun calculateTotalStockFromDBWithLimit(storeId: Long): Int {
         val activeProductCount = productPersistence.countActiveProductsByStoreId(storeId)
         
-        if (activeProductCount == 0) return 0
+        if (activeProductCount == 0L) return 0
 
         val products = productPersistence.findAllActivatedProductByStoreId(storeId)
         val productIds = products.map { it.id }

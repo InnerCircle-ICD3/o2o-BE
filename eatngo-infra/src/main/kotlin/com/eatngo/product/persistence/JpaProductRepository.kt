@@ -16,5 +16,5 @@ interface JpaProductRepository : JpaRepository<ProductEntity, Long> {
         deleteStatus: DeletedStatus
     ): Optional<ProductEntity>
     
-    fun countByStoreIdAndDeleteStatus(storeId: Long, deleteStatus: DeletedStatus): Int
+    fun countByStoreIdAndDeleteStatus(storeId: Long, deleteStatus: DeletedStatus): Long
 }
