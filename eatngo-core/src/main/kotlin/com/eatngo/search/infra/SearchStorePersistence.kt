@@ -10,6 +10,4 @@ interface SearchStorePersistence {
     fun findFoodTypesByStoreIds(storeIds: List<Long>): List<SearchStoreFoodTypes>
 
     fun findStoresByUpdateAt(pivotTime: LocalDateTime): List<SearchStore>
-
-    fun syncAllStoresByUpdateAt(pivotTime: LocalDateTime): List<SearchStore>
 }

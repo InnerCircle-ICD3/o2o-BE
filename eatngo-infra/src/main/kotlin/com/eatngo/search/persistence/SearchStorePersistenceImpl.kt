@@ -32,9 +32,4 @@ class SearchStorePersistenceImpl(
         val stores = searchStoreRepository.findStoresByUpdateAt(pivotTime)
         return stores.map { it.toSearchStore() }
     }
-
-    override fun syncAllStoresByUpdateAt(pivotTime: LocalDateTime): List<SearchStore> {
-        val stores = searchStoreRepository.findAllByUpdatedAtAfter(pivotTime)
-        return stores.map { it.toSearchStore() }
-    }
 }
