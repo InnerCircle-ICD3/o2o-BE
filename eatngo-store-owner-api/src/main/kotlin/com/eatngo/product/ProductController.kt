@@ -13,7 +13,8 @@ import jakarta.validation.Valid
 import org.springframework.web.bind.annotation.*
 
 @Tag(name = "상품", description = "상품 관련 API")
-@RestController("/api/v1")
+@RestController
+@RequestMapping("/api/v1")
 class ProductController(
     private val productService: ProductService,
 ) {
