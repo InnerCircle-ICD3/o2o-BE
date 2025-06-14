@@ -7,7 +7,9 @@ import java.time.LocalDateTime
 interface SearchStoreQueryRepository {
     fun findByStoreId(storeId: Long): SearchStoreRdbDto
 
-    fun findFoodTypesByProductUpdatedAt(pivotTime: LocalDateTime): List<SearchStoreFoodTypeDto>
+    fun findFoodTypesByStoreIds(storeIds: List<Long>): List<SearchStoreFoodTypeDto>
+
+    fun findStoresByUpdateAt(pivotTime: LocalDateTime): List<SearchStoreRdbDto>
 
     fun findAllByUpdatedAtAfter(pivotTime: LocalDateTime): List<SearchStoreRdbDto>
 }
