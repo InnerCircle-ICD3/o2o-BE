@@ -1,5 +1,6 @@
 package com.eatngo.product.service
 
+import com.eatngo.product.domain.Product
 import com.eatngo.product.domain.ProductSizeType
 import com.eatngo.product.infra.ProductPersistence
 import org.springframework.stereotype.Service
@@ -15,10 +16,17 @@ class StoreProductValidator(
 
     private fun validateStoreProductSizeType(storeId: Long) {
         val products = productPersistence.findAllActivatedProductByStoreId(storeId)
+        validateTotalProductCountOverInStore(products)
+        validateDuplicateProductTypeInStore(products)
+    }
+
+    private fun validateTotalProductCountOverInStore(products: List<Product>) {
         if (products.size > 3) {
             throw IllegalArgumentException("There is more than 3 products in the store")
         }
+    }
 
+    private fun validateDuplicateProductTypeInStore(products: List<Product>) {
         val sizeCountMap: Map<ProductSizeType, Int> = products.groupingBy { it.getSize() }.eachCount()
 
         if (hasDuplicateProductSize(sizeCountMap)) {
