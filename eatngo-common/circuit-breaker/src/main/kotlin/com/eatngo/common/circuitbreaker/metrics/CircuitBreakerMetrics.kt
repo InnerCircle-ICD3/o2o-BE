@@ -8,6 +8,7 @@ import mu.KotlinLogging
 import org.springframework.beans.factory.InitializingBean
 import org.springframework.stereotype.Component
 import java.time.Duration
+import java.util.concurrent.ConcurrentHashMap
 
 @Component
 class CircuitBreakerMetrics(
@@ -18,10 +19,10 @@ class CircuitBreakerMetrics(
         private val logger = KotlinLogging.logger {}
     }
     
-    private val successCounters = mutableMapOf<String, Counter>()
-    private val failureCounters = mutableMapOf<String, Counter>()
-    private val fallbackCounters = mutableMapOf<String, Counter>()
-    private val timers = mutableMapOf<String, Timer>()
+    private val successCounters = ConcurrentHashMap<String, Counter>()
+    private val failureCounters = ConcurrentHashMap<String, Counter>()
+    private val fallbackCounters = ConcurrentHashMap<String, Counter>()
+    private val timers = ConcurrentHashMap<String, Timer>()
     
     override fun afterPropertiesSet() {
         try {

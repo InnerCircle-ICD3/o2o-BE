@@ -79,6 +79,7 @@ class StoreTotalStockService(
             if (shouldAllowDbQuery(storeId)) {
                 val dbStock = calculateTotalStockFromDBWithLimit(storeId)
                 localCache[cacheKey] = CachedStockInfo(dbStock)
+                cleanupExpiredEntries() // 캐시 정리
                 
                 dbStock
             } else {
@@ -98,12 +99,14 @@ class StoreTotalStockService(
         val now = System.currentTimeMillis()
         val queries = dbQueryTracker.computeIfAbsent(storeId) { mutableListOf() }
         
-        queries.removeIf { it < now - 60_000L }
-        
-        if (queries.size >= 2) return false
-        
-        queries.add(now)
-        return true
+        synchronized(queries) {
+            queries.removeIf { it < now - 60_000L }
+            
+            if (queries.size >= 2) return false
+            
+            queries.add(now)
+            return true
+        }
     }
     
     /**
@@ -148,6 +151,7 @@ class StoreTotalStockService(
             
             val cacheKey = "${storeId}:${date}"
             localCache[cacheKey] = CachedStockInfo(newTotalStock)
+            cleanupExpiredEntries() // 캐시 정리
         } else {
             storeTotalStockRedisRepository.deleteStoreTotalStock(storeId, date)
             localCache.remove("${storeId}:${date}")
