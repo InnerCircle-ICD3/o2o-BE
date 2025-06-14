@@ -145,6 +145,7 @@ class SearchStoreRepositoryImpl(
                     .set("storeImage", store.storeImage)
                     .set("storeCategory", store.storeCategory)
                     .set("foodCategory", store.foodCategory)
+                    .set("foodTypes", store.foodTypes)
                     .set("roadNameAddress", store.roadNameAddress)
                     .set("coordinate", store.coordinate)
                     .set("status", store.status)
