@@ -1,15 +1,12 @@
 package com.eatngo.mongo.search.repository
 
-import com.eatngo.mongo.search.dto.SearchStoreAutoCompleteDto
 import com.eatngo.mongo.search.entity.SearchStoreEntity
 import com.eatngo.search.domain.SearchStore
 import com.eatngo.search.domain.SearchStoreFoodTypes
-import com.eatngo.search.dto.AutoCompleteStoreNameDto
 import com.eatngo.search.dto.Box
 import com.eatngo.search.dto.SearchFilter
 import com.eatngo.search.infra.SearchStoreRepository
 import org.bson.Document
-import org.springframework.data.domain.Sort
 import org.springframework.data.geo.Shape
 import org.springframework.data.mongodb.core.BulkOperations
 import org.springframework.data.mongodb.core.MongoTemplate
@@ -28,7 +25,6 @@ class SearchStoreRepositoryImpl(
     private val mongoTemplate: MongoTemplate,
 ) : SearchStoreRepository {
     val searchStoreIndex = "search-store"
-    val autoCompleteIndex = "store-auto-complete"
 
     override fun findBox(box: Box): List<SearchStore> {
         val mongoBox: Shape =
@@ -79,7 +75,6 @@ class SearchStoreRepositoryImpl(
                             "foodTypes" to 1,
                             "roadNameAddress" to 1,
                             "coordinate" to 1,
-                            "productStatus" to 1,
                             "status" to 1,
                             "businessHours" to 1,
                             "metaSearchScore" to Document("\$meta", "searchScore"), // 검색 점수
@@ -110,49 +105,6 @@ class SearchStoreRepositoryImpl(
         }
     }
 
-    /**
-     * 검색어 자동완성 기능을 위한 MongoDB Atlas Search 쿼리
-     * @param keyword 검색어
-     * @param size 결과 개수
-     * @return 자동완성된 매장 이름 리스트
-     */
-    override fun autocompleteStoreName(
-        keyword: String,
-        size: Int,
-    ): List<AutoCompleteStoreNameDto> {
-        val searchOp = getAutocompleteOperation(keyword)
-        val limitOp = Aggregation.limit(size.toLong())
-        val projectionOp =
-            Aggregation
-                .project("_id", "storeName") // _id, storeName 필드만 추출
-                .andExpression("metaSearchScore")
-                .`as`("score")
-        val sortOp = Aggregation.sort(Sort.by(Sort.Direction.DESC, "score"))
-
-        val pipeline =
-            Aggregation.newAggregation(
-                searchOp,
-                sortOp,
-                limitOp,
-                projectionOp,
-            )
-
-        val result =
-            mongoTemplate
-                .aggregate(
-                    pipeline,
-                    "SearchStore",
-                    SearchStoreAutoCompleteDto::class.java,
-                ).mappedResults
-
-        return result.map {
-            AutoCompleteStoreNameDto.from(
-                storeId = it.storeId,
-                storeName = it.storeName,
-            )
-        }
-    }
-
     override fun save(searchStore: SearchStore) {
         val store = SearchStoreEntity.from(searchStore)
 
@@ -166,7 +118,6 @@ class SearchStoreRepositoryImpl(
                 .set("foodTypes", store.foodTypes)
                 .set("roadNameAddress", store.roadNameAddress)
                 .set("coordinate", store.coordinate)
-                .set("productStatus", store.productStatus)
                 .set("status", store.status)
                 .set("businessHours", store.businessHours)
                 .set("updatedAt", LocalDateTime.now())
@@ -194,9 +145,9 @@ class SearchStoreRepositoryImpl(
                     .set("storeImage", store.storeImage)
                     .set("storeCategory", store.storeCategory)
                     .set("foodCategory", store.foodCategory)
+                    .set("foodTypes", store.foodTypes)
                     .set("roadNameAddress", store.roadNameAddress)
                     .set("coordinate", store.coordinate)
-                    .set("productStatus", store.productStatus)
                     .set("status", store.status)
                     .set("businessHours", store.businessHours)
                     .set("updatedAt", LocalDateTime.now())
@@ -273,7 +224,7 @@ class SearchStoreRepositoryImpl(
         val maxDistance = maxDistanceKm * 1000 // km 단위를 meter로 변환
 
         val must = mutableListOf<Document>()
-        val filter = mutableListOf<Document>()
+        val should = mutableListOf<Document>()
 
         // TODO: STATUS 필터링 로직 개선 필요 -> 예약 가능 상태 필터링
         must += (
@@ -327,7 +278,7 @@ class SearchStoreRepositoryImpl(
         }
 
         // 거리 스코어링
-        filter +=
+        should +=
             Document(
                 "near",
                 Document("path", "coordinate")
@@ -363,7 +314,7 @@ class SearchStoreRepositoryImpl(
                     "compound",
                     Document()
                         .append("must", must)
-                        .append("filter", filter),
+                        .append("should", should),
                 )
         // Cursor pagination을 위한 searchAfter 설정
         if (searchFilter.lastId != null) {
@@ -381,20 +332,4 @@ class SearchStoreRepositoryImpl(
 
         return AggregationOperation { _: AggregationOperationContext -> searchQuery }
     }
-
-    fun getAutocompleteOperation(prefix: String): AggregationOperation =
-        AggregationOperation {
-            Document(
-                "\$search",
-                Document()
-                    .append("index", autoCompleteIndex)
-                    .append(
-                        "autocomplete",
-                        Document()
-                            .append("query", prefix)
-                            .append("path", "storeName")
-                            .append("fuzzy", Document("maxEdits", 1)), // 오타 허용
-                    ),
-            )
-        }
 }

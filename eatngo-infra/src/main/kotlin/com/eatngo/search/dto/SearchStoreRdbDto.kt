@@ -1,9 +1,7 @@
 package com.eatngo.search.dto
 
 import com.eatngo.common.constant.StoreEnum
-import com.eatngo.product.domain.ProductStatus
 import com.eatngo.search.domain.Coordinate
-import com.eatngo.search.domain.SearchProductStatus
 import com.eatngo.search.domain.SearchStore
 import com.eatngo.search.domain.SearchStoreStatus
 import com.eatngo.search.domain.TimeRange
@@ -17,14 +15,13 @@ import java.time.LocalTime
 data class SearchStoreRdbDto(
     val storeId: Long,
     val storeName: String,
-    val storeImage: String, // 매장 이미지 S3 URL
+    val storeImage: String?, // 매장 이미지 S3 URL
     val storeCategory: StoreCategoryJson,
     val foodCategory: FoodCategoryJson, // 대표 판매 음식 종류
-    val foodTypes: List<String>, // 매장에서 판매하는 음식 종류
+    val foodTypes: String?, // 매장에서 판매하는 음식 종류 -> flat한 문자열로 저장
     val roadNameAddress: String,
     val latitude: Double,
     val longitude: Double,
-    val productStatus: ProductStatus, // 상품 상태(검색용), 디폴트 활성화
     val storeStatus: StoreEnum.StoreStatus, // 매장 오픈 여부
     val businessHours: List<BusinessHourJson>,
     val updatedAt: LocalDateTime = LocalDateTime.now(), // 마지막 업데이트 시간
@@ -34,17 +31,16 @@ data class SearchStoreRdbDto(
         SearchStore(
             storeId = storeId,
             storeName = storeName,
-            storeImage = storeImage,
+            storeImage = storeImage ?: "",
             storeCategory = storeCategory.value,
             foodCategory = foodCategory.value,
-            foodTypes = foodTypes,
+            foodTypes = foodTypes?.split(",")?.map { it.trim() } ?: emptyList(),
             roadNameAddress = roadNameAddress,
             coordinate =
                 Coordinate.from(
                     latitude = latitude,
                     longitude = longitude,
                 ),
-            productStatus = SearchProductStatus.from(productStatus),
             status = SearchStoreStatus.from(storeStatus),
             businessHours =
                 businessHours.associate {

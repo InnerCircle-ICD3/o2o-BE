@@ -7,7 +7,7 @@ import java.time.LocalDateTime
 interface SearchStorePersistence {
     fun syncStore(storeId: Long): SearchStore
 
-    fun findFoodTypesByProductUpdatedAt(pivotTime: LocalDateTime): List<SearchStoreFoodTypes>
+    fun findFoodTypesByStoreIds(storeIds: List<Long>): List<SearchStoreFoodTypes>
 
-    fun syncAllStoresByUpdateAt(pivotTime: LocalDateTime): List<SearchStore>
+    fun findStoresByUpdateAt(pivotTime: LocalDateTime): List<SearchStore>
 }
