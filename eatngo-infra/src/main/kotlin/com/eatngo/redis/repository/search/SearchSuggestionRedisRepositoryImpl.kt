@@ -31,7 +31,7 @@ class SearchSuggestionRedisRepositoryImpl(
         val ops = redisTemplate.opsForHash<String, String>()
         val allValues = ops.entries(key)
 
-        // TTL 연장 TODO: 비동기 구현
+        // TTL 연장 TODO: 비동기 구현, 분산락 획득
         redisTemplate.expire(key, Duration.ofSeconds(DEFAULT_TTL_SECONDS))
 
         return allValues.values.map {
