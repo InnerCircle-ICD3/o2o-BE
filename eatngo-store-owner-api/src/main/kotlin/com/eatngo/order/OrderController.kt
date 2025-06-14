@@ -9,6 +9,7 @@ import com.eatngo.order.usecase.StoreOrderStatusChangedUseCase
 import com.eatngo.order.usecase.StoreReadOrderUseCase
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
+import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
@@ -61,7 +62,7 @@ class OrderController(
     fun getOrdersByStoreId(
         @StoreOwnerId storeOwnerId: Long,
         @PathVariable storeId: Long,
-        @ModelAttribute cursoredStoreOrderQueryParamDto: CursoredStoreOrderQueryParamDto,
+        @ParameterObject @ModelAttribute cursoredStoreOrderQueryParamDto: CursoredStoreOrderQueryParamDto,
     ) = ResponseEntity.ok(
         ApiResponse.success(
             storeReadOrderUseCase.findAllByQueryParameter(
