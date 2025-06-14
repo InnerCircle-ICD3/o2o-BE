@@ -1,6 +1,8 @@
 package com.eatngo.review.service
 
+import com.eatngo.common.exception.review.ReviewException
 import com.eatngo.customer.domain.Customer
+import com.eatngo.extension.orThrow
 import com.eatngo.order.domain.Order
 import com.eatngo.review.dto.CreateReviewDto
 import com.eatngo.review.infra.ReviewPersistence
@@ -31,4 +33,11 @@ class ReviewService(
         storeId: Long,
         lastId: Long?,
     ) = reviewPersistence.findByStoreId(storeId, lastId)
+
+    fun findById(id: Long) =
+        reviewPersistence
+            .findById(id)
+            .orThrow { ReviewException.ReviewNotFoundException(id) }
+
+    fun deleteById(id: Long) = reviewPersistence.deleteById(id)
 }
