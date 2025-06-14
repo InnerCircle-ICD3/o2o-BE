@@ -45,7 +45,7 @@ class SearchProductScheduler(
     private fun updateSearchIndex() {
         try {
             val pivotTime = LocalDateTime.now().minusMinutes(60 * 24) // 하루 전 시간
-            val stores: List<SearchStore> = searchStorePersistence.syncAllStoresByUpdateAt(pivotTime = pivotTime)
+            val stores: List<SearchStore> = searchStorePersistence.findStoresByUpdateAt(pivotTime = pivotTime)
             if (stores.isEmpty()) {
                 return
             }
@@ -66,32 +66,33 @@ class SearchProductScheduler(
             // storeId 기준으로 빠르게 매핑
             val storeMap = stores.associateBy { it.storeId }
             // 업데이트 정보 생성
-            for ((storeId, types) in foodTypeMap) {
-                storeMap[storeId]?.let { store ->
+            for ((storeId, store) in storeMap) {
+                foodTypeMap[storeId]?.let { types ->
                     store.foodTypes = types
-
-                    if (store.deletedAt != null) {
-                        deleteStoreIds.add(storeId)
-                    } else {
-                        updateStores.add(store)
-                        foodTypes.addAll(types)
-                        updateSuggestion.add(
-                            SearchSuggestion.from(
-                                keyword = storeMap[storeId]?.storeName ?: "",
-                                type = SuggestionType.STORE_NAME,
-                                keywordId = storeId,
-                            ),
-                        )
-                    }
-                    // Redis 업데이트 정보
-                    val box =
-                        searchService.getBox(
-                            latitude = store.coordinate.latitude,
-                            longitude = store.coordinate.longitude,
-                        )
-                    val redisKey = searchMapRedisRepository.getKey(box.topLeft)
-                    redisBoxMap[redisKey] = box
+                    foodTypes.addAll(types)
                 }
+
+                if (store.deletedAt != null) {
+                    deleteStoreIds.add(storeId)
+                } else {
+                    updateStores.add(store)
+                    // 검색어 정보 업데이트
+                    updateSuggestion.add(
+                        SearchSuggestion.from(
+                            keyword = store.storeName,
+                            type = SuggestionType.STORE_NAME,
+                            keywordId = storeId,
+                        ),
+                    )
+                }
+                // Redis 업데이트 정보
+                val box =
+                    searchService.getBox(
+                        latitude = store.coordinate.latitude,
+                        longitude = store.coordinate.longitude,
+                    )
+                val redisKey = searchMapRedisRepository.getKey(box.topLeft)
+                redisBoxMap[redisKey] = box
             }
             foodTypes.forEach { foodType ->
                 updateSuggestion.add(
