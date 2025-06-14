@@ -6,14 +6,15 @@ import com.eatngo.common.exception.BusinessException
 import org.slf4j.event.Level
 
 /**
- * 매장(점주) 관련 예외
+ * 매장 관련 예외
  */
 open class StoreException(
     override val errorCode: BusinessErrorCode,
     override val message: String = errorCode.message,
     override val data: Map<String, Any>? = null,
     override val logLevel: Level = Level.WARN,
-) : BusinessException(errorCode, message, data, logLevel) {
+    override val cause: Throwable? = null
+) : BusinessException(errorCode, message, data, logLevel, cause) {
 
     class StoreNotFound(storeId: Long) : StoreException(
         errorCode = BusinessErrorCode.STORE_NOT_FOUND,
@@ -70,5 +71,16 @@ open class StoreException(
             "storeIds" to storeIds
         ),
         logLevel = Level.ERROR
+    )
+
+    class StoreTotalStockException(
+        storeId: Long,
+        cause: Throwable? = null
+    ) : StoreException(
+        errorCode = BusinessErrorCode.STORE_TOTAL_STOCK_QUERY_FAILED,
+        message = "FallBack 로직으로 매장 DB 총 재고 조회 실패: storeId=$storeId",
+        data = mapOf("storeId" to storeId),
+        cause = cause,
+        logLevel = Level.WARN
     )
 }

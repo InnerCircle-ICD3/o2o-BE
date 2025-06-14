@@ -1,6 +1,7 @@
 package com.eatngo.store.dto
 
 import com.eatngo.common.constant.StoreEnum
+import com.eatngo.review.dto.StoreReviewStatsDto
 import com.eatngo.store.domain.Store
 import java.time.DayOfWeek
 import java.time.LocalDateTime
@@ -31,7 +32,17 @@ data class StoreDto(
     var deletedAt: LocalDateTime?,
 ) {
     companion object {
+        /**
+         * 리뷰 데이터 없이 Store 도메인을 StoreDto로 변환
+         */
         fun from(store: Store): StoreDto {
+            return from(store, null)
+        }
+        
+        /**
+         * Store 도메인과 리뷰 집계 데이터를 StoreDto로 변환
+         */
+        fun from(store: Store, reviewStats: StoreReviewStatsDto?): StoreDto {
             val today = java.time.LocalDate.now().dayOfWeek
             val todayHour = store.businessHours?.find { it.dayOfWeek == today }
             return StoreDto(
@@ -67,9 +78,8 @@ data class StoreDto(
                 todayPickupStartTime = todayHour?.openTime,
                 todayPickupEndTime = todayHour?.closeTime,
                 reviewInfo = ReviewInfoDto(
-                    //TODO: 리뷰는 dto에만 포함, 추후 기능 개발되면 서비스에서 값 가져와야 함
-                    ratingAverage = 0.0,
-                    ratingCount = 0
+                    ratingAverage = reviewStats?.averageRating?.toDouble() ?: 0.0,
+                    ratingCount = reviewStats?.totalReviewCount ?: 0
                 ),
                 createdAt = store.createdAt,
                 updatedAt = store.updatedAt,

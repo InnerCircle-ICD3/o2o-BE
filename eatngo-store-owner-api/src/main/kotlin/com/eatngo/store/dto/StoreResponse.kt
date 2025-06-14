@@ -11,7 +11,6 @@ data class StoreCUDResponse(val storeId: Long, val actionTime: LocalDateTime? = 
 
 /**
  * 점주가 매장을 관리할 때 상세정보 반환을 위해 사용하는 리스폰스
- * TODO: 추후 백오피스 UI 확정되면 수정 가능성 있음
  */
 data class StoreDetailResponse(
     val id: Long,

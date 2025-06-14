@@ -19,7 +19,7 @@ class StoreSubscriptionRedisRepositoryImpl(
         private const val STORE_SUBSCRIPTION_COUNT_KEY = "store:%d:subscription:count"
         private const val CUSTOMER_SUBSCRIPTION_LIST_KEY = "customer:%d:subscriptions"
         private const val STORE_SUBSCRIPTION_LIST_KEY = "store:%d:subscribers"
-        private const val CACHE_TTL_SECONDS = 60 * 30 // 30분?? TODO: 보통 몇 분으로 설정하는지..?
+        private const val CACHE_TTL_SECONDS = 60 * 30
     }
 
     /**

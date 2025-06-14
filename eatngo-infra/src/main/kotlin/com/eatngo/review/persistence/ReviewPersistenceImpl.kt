@@ -1,6 +1,9 @@
 package com.eatngo.review.persistence
 
+import com.eatngo.aop.SoftDeletedFilter
+import com.eatngo.common.exception.review.ReviewException
 import com.eatngo.common.response.Cursor
+import com.eatngo.extension.mapOrNull
 import com.eatngo.review.domain.Review
 import com.eatngo.review.infra.ReviewPersistence
 import com.eatngo.review.rdb.entity.ReviewJpaEntity
@@ -13,6 +16,7 @@ import org.springframework.stereotype.Component
 class ReviewPersistenceImpl(
     private val reviewRdbRepository: ReviewRdbRepository,
 ) : ReviewPersistence {
+    @SoftDeletedFilter
     override fun save(review: Review) =
         ReviewJpaEntity.toDomain(
             reviewRdbRepository.save(
@@ -20,18 +24,22 @@ class ReviewPersistenceImpl(
             ),
         )
 
+    @SoftDeletedFilter
     override fun existsByOrderId(orderId: Long) = reviewRdbRepository.findByOrderId(orderId) != null
 
+    @SoftDeletedFilter
     override fun findByOrderId(orderId: Long) =
         reviewRdbRepository
             .findByOrderId(orderId)
             ?.let(ReviewJpaEntity::toDomain)
 
+    @SoftDeletedFilter
     override fun findByOrderIds(orderIds: List<Long>) =
         reviewRdbRepository
             .findByOrderIds(orderIds)
             .map(ReviewJpaEntity::toDomain)
 
+    @SoftDeletedFilter
     override fun findByStoreId(
         storeId: Long,
         lastId: Long?,
@@ -50,5 +58,19 @@ class ReviewPersistenceImpl(
                 .map(ReviewJpaEntity::toDomain),
             cursoredReviewJpaEntities.lastOrNull()?.id,
         )
+    }
+
+    @SoftDeletedFilter
+    override fun findById(id: Long): Review? =
+        reviewRdbRepository
+            .findById(id)
+            .mapOrNull(ReviewJpaEntity::toDomain)
+
+    @SoftDeletedFilter
+    override fun deleteById(id: Long) {
+        reviewRdbRepository
+            .findById(id)
+            .orElseThrow { ReviewException.ReviewNotFoundException(id) }
+            .apply { delete() }
     }
 }

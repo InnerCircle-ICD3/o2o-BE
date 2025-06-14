@@ -21,6 +21,12 @@ dependencies {
     testImplementation("io.kotest:kotest-runner-junit5:5.8.1")
     testImplementation("io.kotest:kotest-assertions-core:5.8.1")
     testImplementation("io.mockk:mockk:1.13.10") // mockk
+
+    // Circuit Breaker 모듈
+    implementation(project(":eatngo-common:circuit-breaker"))
+
+    // AOP 지원 (Circuit Breaker용)
+    implementation("org.springframework.boot:spring-boot-starter-aop")
 }
 
 tasks.bootJar {
