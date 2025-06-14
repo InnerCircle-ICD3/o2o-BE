@@ -28,6 +28,10 @@ dependencies {
     implementation("io.awspring.cloud:spring-cloud-aws-starter-parameter-store")
     implementation("io.awspring.cloud:spring-cloud-aws-starter")
 
+    //monitoring
+    implementation("io.micrometer:micrometer-registry-prometheus")
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
+
     // 테스트 의존성
     testImplementation("io.kotest:kotest-runner-junit5:5.8.1")
     testImplementation("io.kotest:kotest-assertions-core:5.8.1")

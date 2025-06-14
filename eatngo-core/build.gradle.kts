@@ -23,7 +23,7 @@ dependencies {
 
     // Circuit Breaker 모듈
     implementation(project(":eatngo-common:circuit-breaker"))
-    
+
     // AOP 지원 (Circuit Breaker용)
     implementation("org.springframework.boot:spring-boot-starter-aop")
 }

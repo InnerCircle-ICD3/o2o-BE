@@ -1,0 +1,30 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+rule_files:
+  - "alerts/*.yml"
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: []
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: 'eatngo-customer-api'
+    static_configs:
+      - targets: ['www.eatngo.org:443']  # HTTPS
+    metrics_path: '/actuator/prometheus'
+    scheme: https
+    scrape_interval: 5s
+
+  - job_name: 'eatngo-store-owner-api'
+    static_configs:
+      - targets: ['ceo.eatngo.org:443']  # HTTPS
+    metrics_path: '/actuator/prometheus'
+    scheme: https
+    scrape_interval: 5s 

@@ -1,0 +1,22 @@
+# Metrics & Monitoring 설정
+management:
+  endpoints:
+    web:
+      exposure:
+        include: prometheus, health, metrics, info
+      base-path: /actuator
+  metrics:
+    distribution:
+      percentiles-histogram:
+        "[http.server.requests]": true
+        "[circuit_breaker_calls_duration]": true
+      percentiles:
+        "[http.server.requests]": 0.5, 0.95, 0.99
+        "[circuit_breaker_calls_duration]": 0.5, 0.95, 0.99
+      slo:
+        "[http.server.requests]": 100ms, 500ms, 1s, 2s, 5s
+        "[circuit_breaker_calls_duration]": 100ms, 500ms, 1s, 2s, 5s
+  prometheus:
+    metrics:
+      export:
+        step: 30s
