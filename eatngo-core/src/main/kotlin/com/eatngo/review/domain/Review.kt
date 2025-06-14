@@ -17,7 +17,7 @@ class Review(
     val updatedBy: Long? = null,
     val deletedAt: LocalDateTime? = null,
 ) {
-    fun canEditable(customer: Customer) = customer.id == id
+    fun canEditable(customer: Customer) = customer.id == customerId
 
     companion object {
         fun create(

@@ -14,16 +14,16 @@ open class ReviewException(
     class ReviewNotFoundExceptionByOrderId(
         orderId: Long,
     ) : ReviewException(
-            errorCode = BusinessErrorCode.ORDER_NOT_FOUND,
-            message = "${BusinessErrorCode.ORDER_NOT_FOUND.message} (ID: $orderId)",
+            errorCode = BusinessErrorCode.REVIEW_NOT_FOUND,
+            message = "${BusinessErrorCode.REVIEW_NOT_FOUND.message} (ID: $orderId)",
             data = mapOf("orderId" to orderId),
         )
 
     class ReviewNotFoundException(
         reviewId: Long,
     ) : ReviewException(
-            errorCode = BusinessErrorCode.ORDER_NOT_FOUND,
-            message = "${BusinessErrorCode.ORDER_NOT_FOUND.message} (ID: $reviewId)",
+            errorCode = BusinessErrorCode.REVIEW_NOT_FOUND,
+            message = "${BusinessErrorCode.REVIEW_NOT_FOUND.message} (ID: $reviewId)",
             data = mapOf("reviewId" to reviewId),
         )
 }
