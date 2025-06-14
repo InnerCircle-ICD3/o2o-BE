@@ -14,9 +14,11 @@ class ReadReviewUseCase(
     @Transactional(readOnly = true)
     fun getReviewByOrderId(orderId: Long): ReviewDto {
         val review =
-            reviewService.findByOrderId(orderId).orThrow {
-                ReviewException.ReviewNotFoundException(orderId = orderId)
-            }
+            reviewService
+                .findByOrderId(orderId)
+                .orThrow {
+                    ReviewException.ReviewNotFoundExceptionByOrderId(orderId = orderId)
+                }
 
         return ReviewDto.from(review)
     }

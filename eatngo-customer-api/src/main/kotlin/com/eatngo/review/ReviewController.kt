@@ -5,6 +5,7 @@ import com.eatngo.common.response.ApiResponse
 import com.eatngo.review.dto.CreateReviewRequestDto
 import com.eatngo.review.dto.ReviewResponseDto
 import com.eatngo.review.usecase.CreateReviewUseCase
+import com.eatngo.review.usecase.DeleteReviewUseCase
 import com.eatngo.review.usecase.ReadReviewUseCase
 import com.eatngo.review.usecase.ReadReviewsUseCase
 import io.swagger.v3.oas.annotations.Operation
@@ -18,6 +19,7 @@ class ReviewController(
     private val createReviewUseCase: CreateReviewUseCase,
     private val readReviewsUseCase: ReadReviewsUseCase,
     private val readReviewUseCase: ReadReviewUseCase,
+    private val deleteReviewUseCase: DeleteReviewUseCase,
 ) {
     @PostMapping("/api/v1/orders/{orderId}/reviews")
     @Operation(summary = "리뷰 생성", description = "리뷰 생성")
@@ -64,6 +66,17 @@ class ReviewController(
                 storeId = storeId,
                 lastId = lastId,
             ),
+        ),
+    )
+
+    @DeleteMapping("/api/v1/reviews/{reviewId}")
+    @Operation(summary = "작성한 리뷰 삭제", description = "작성한 리뷰 삭제")
+    fun deleteReview(
+        @PathVariable reviewId: Long,
+        @CustomerId customerId: Long,
+    ) = ResponseEntity.ok(
+        ApiResponse.success(
+            deleteReviewUseCase.execute(reviewId = reviewId, customerId = customerId),
         ),
     )
 }
