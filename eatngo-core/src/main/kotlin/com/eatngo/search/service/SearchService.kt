@@ -78,26 +78,19 @@ class SearchService(
         )
     }
 
+    /**
+     * 지도 검색 refresh API - MongoDB에서 검색하여 가져온 뒤 캐싱한다
+     * @param userCoordinate 검색하는 사용자의 위치 정보
+     * @return 지도 검색 결과 DTO
+     */
     fun searchStoreMapRefresh(userCoordinate: CoordinateVO): SearchStoreMapResultDto {
-        val searchStoreMapResult: SearchStoreMapResultDto = searchStoreMap(userCoordinate)
-        if (searchStoreMapResult.storeList.isNotEmpty()) {
-            // Redis에 캐싱된 검색 결과가 있으면 그대로 반환
-            return searchStoreMapResult
-        }
-
         // 검색 결과가 없으면 MongoDB에서 검색하여 가져온 뒤 캐싱한다
         val box: Box =
             getBox(
                 longitude = userCoordinate.longitude,
                 latitude = userCoordinate.latitude,
             )
-        val searchMapList =
-            saveBoxRedis(
-                box = box,
-            ).orThrow {
-                SearchException.SearchStoreMapCacheFailed(userCoordinate)
-            }
-
+        val searchMapList = getMapListDBAndSaveCache(box)
         return SearchStoreMapResultDto.from(
             box = box,
             searchStoreMapList = searchMapList.map { SearchStoreMap.from(it) }, // SearchStore를 SearchStoreMap으로 변환
@@ -209,6 +202,24 @@ class SearchService(
                     .findByKey(searchMapRedisRepository.getKey(topLeft)),
             )
         }
+        return result
+    }
+
+    fun getMapListDBAndSaveCache(box: Box): List<SearchStore> {
+        val result = mutableListOf<SearchStore>()
+        val topLeftList: List<CoordinateVO> =
+            getNineBoxesTopLeftFromCenter(box.topLeft)
+
+        topLeftList.forEach { topLeft ->
+            val box =
+                getBox(
+                    longitude = topLeft.longitude,
+                    latitude = topLeft.latitude,
+                )
+            // Redis에 저장
+            result.addAll(saveBoxRedis(box))
+        }
+
         return result
     }
 
