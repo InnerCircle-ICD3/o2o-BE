@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration
 
 @Configuration
 class MetricsConfig {
-    @Value("\${spring.profiles.active:local}")
+    @Value("\${spring.profiles.active:dev}")
     private lateinit var activeProfile: String
 
     @Bean
