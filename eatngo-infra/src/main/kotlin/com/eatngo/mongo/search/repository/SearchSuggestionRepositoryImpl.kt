@@ -37,6 +37,14 @@ class SearchSuggestionRepositoryImpl(
             )
         }
 
+        val compound = Document()
+        if (must.isNotEmpty()) {
+            compound.append("must", must)
+        }
+        if (filter.isNotEmpty()) {
+            compound.append("filter", filter)
+        }
+
         val searchOp =
             AggregationOperation {
                 Document(
@@ -45,9 +53,7 @@ class SearchSuggestionRepositoryImpl(
                         .append("index", searchSuggestionIndex)
                         .append(
                             "compound",
-                            Document()
-                                .append("must", must)
-                                .append("filter", filter),
+                            compound,
                         ),
                 )
             }

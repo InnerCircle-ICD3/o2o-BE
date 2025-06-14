@@ -224,7 +224,7 @@ class SearchStoreRepositoryImpl(
         val maxDistance = maxDistanceKm * 1000 // km 단위를 meter로 변환
 
         val must = mutableListOf<Document>()
-        val filter = mutableListOf<Document>()
+        val should = mutableListOf<Document>()
 
         // TODO: STATUS 필터링 로직 개선 필요 -> 예약 가능 상태 필터링
         must += (
@@ -278,7 +278,7 @@ class SearchStoreRepositoryImpl(
         }
 
         // 거리 스코어링
-        filter +=
+        should +=
             Document(
                 "near",
                 Document("path", "coordinate")
@@ -314,7 +314,7 @@ class SearchStoreRepositoryImpl(
                     "compound",
                     Document()
                         .append("must", must)
-                        .append("filter", filter),
+                        .append("should", should),
                 )
         // Cursor pagination을 위한 searchAfter 설정
         if (searchFilter.lastId != null) {
