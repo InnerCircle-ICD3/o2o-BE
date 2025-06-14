@@ -18,14 +18,19 @@ class SearchStorePersistenceImpl(
         return storeDto.toSearchStore()
     }
 
-    override fun findFoodTypesByProductUpdatedAt(pivotTime: LocalDateTime): List<SearchStoreFoodTypes> {
-        val foodTypeDto = searchStoreRepository.findFoodTypesByProductUpdatedAt(pivotTime)
+    override fun findFoodTypesByStoreIds(storeIds: List<Long>): List<SearchStoreFoodTypes> {
+        val foodTypeDto = searchStoreRepository.findFoodTypesByStoreIds(storeIds)
         return foodTypeDto.map {
             SearchStoreFoodTypes.from(
                 it.storeId,
                 it.foodTypes.split(",").map { it.trim() },
             )
         }
+    }
+
+    override fun findStoresByUpdateAt(pivotTime: LocalDateTime): List<SearchStore> {
+        val stores = searchStoreRepository.findStoresByUpdateAt(pivotTime)
+        return stores.map { it.toSearchStore() }
     }
 
     override fun syncAllStoresByUpdateAt(pivotTime: LocalDateTime): List<SearchStore> {
