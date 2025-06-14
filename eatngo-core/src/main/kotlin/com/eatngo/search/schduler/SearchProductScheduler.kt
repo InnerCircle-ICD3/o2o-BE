@@ -3,10 +3,9 @@ package com.eatngo.search.schduler
 import com.eatngo.search.domain.SearchStore
 import com.eatngo.search.dto.Box
 import com.eatngo.search.infra.SearchMapRedisRepository
+import com.eatngo.search.infra.SearchStorePersistence
 import com.eatngo.search.infra.SearchStoreRepository
 import com.eatngo.search.service.SearchService
-import com.eatngo.store.domain.Store
-import com.eatngo.store.infra.StorePersistence
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
@@ -24,19 +23,42 @@ import java.time.LocalDateTime
     matchIfMissing = false,
 )
 class SearchProductScheduler(
-    private val storePersistence: StorePersistence,
     private val searchStoreRepository: SearchStoreRepository,
     private val searchMapRedisRepository: SearchMapRedisRepository,
+    private val searchStorePersistence: SearchStorePersistence,
     private val searchService: SearchService,
 ) {
+    companion object {
+        private val log = org.slf4j.LoggerFactory.getLogger(this::class.java)
+    }
+
     /**
-     * 상품 검색 인덱스를 업데이트합니다.
-     * 현재는 10분마다 실행되도록 설정되어 있습니다.
+     * 상품 검색 인덱스 업데이트를 위한 스케줄러
+     * 매 10분마다 실행되어, 최근 10분 이내에 업데이트된 상품의 foodTypes를 업데이트합니다.
      */
     @Scheduled(fixedDelay = 10 * 60 * 1000)
+    private fun updateSearchStoreFoodTypes() {
+        try {
+            val pivotTime = LocalDateTime.now().minusMinutes(11)
+            val foodTypesList = searchStorePersistence.findFoodTypesByProductUpdatedAt(pivotTime)
+            if (foodTypesList.isEmpty()) {
+                return
+            }
+            // 검색 인덱스 업데이트
+            searchStoreRepository.updateFoodTypesAll(foodTypesList)
+        } catch (e: Exception) {
+            // 예외 발생 시 로깅
+            log.error("Error updating search index from store", e)
+        }
+    }
+
+    /**
+     * todo: 로직 점검 및 사용 여부 결정
+     * 상품 검색 인덱스를 업데이트합니다.
+     */
     private fun updateSearchIndexFromStore() {
-        val pivotTime = LocalDateTime.now().minusMinutes(10)
-        val stores: List<Store> = storePersistence.findByUpdatedAt(pivotTime = pivotTime)
+        val pivotTime = LocalDateTime.now().minusMinutes(61)
+        val stores: List<SearchStore> = searchStorePersistence.syncAllStoresByUpdateAt(pivotTime = pivotTime)
         if (stores.isEmpty()) {
             return
         }
@@ -48,15 +70,15 @@ class SearchProductScheduler(
         for (store in stores) {
             // MongoDB 업데이트 정보
             if (store.deletedAt != null) {
-                deleteStoreIds.add(store.id)
+                deleteStoreIds.add(store.storeId)
             } else {
-                updateStores.add(SearchStore.from(store))
+                updateStores.add(store)
             }
             // Redis 업데이트 정보
             val box =
                 searchService.getBox(
-                    latitude = store.address.coordinate.latitude,
-                    longitude = store.address.coordinate.longitude,
+                    latitude = store.coordinate.latitude,
+                    longitude = store.coordinate.longitude,
                 )
             val redisKey = searchMapRedisRepository.getKey(box.topLeft)
             redisBoxMap[redisKey] = box

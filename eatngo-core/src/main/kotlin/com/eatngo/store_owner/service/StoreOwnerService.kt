@@ -1,6 +1,7 @@
 package com.eatngo.store_owner.service
 
 import com.eatngo.common.exception.store.StoreException
+import com.eatngo.customer.event.StoreOwnerDeletedEvent
 import com.eatngo.store_owner.domain.StoreOwner
 import com.eatngo.store_owner.dto.StoreOwnerUpdateDto
 import com.eatngo.store_owner.infra.StoreOwnerPersistence
@@ -11,7 +12,8 @@ import org.springframework.stereotype.Service
 @Service
 class StoreOwnerService(
     private val userAccountPersistence: UserAccountPersistence,
-    private val storeOwnerPersistence: StoreOwnerPersistence
+    private val storeOwnerPersistence: StoreOwnerPersistence,
+    private val applicationEventPublisher: org.springframework.context.ApplicationEventPublisher
 ) {
 
     fun getStoreOwnerById(id: Long): StoreOwner {
@@ -20,16 +22,18 @@ class StoreOwnerService(
 
     fun deleteStoreOwner(id: Long) {
         storeOwnerPersistence.deleteById(id)
-        userAccountPersistence.deleteById(id)
+        applicationEventPublisher.publishEvent(
+            StoreOwnerDeletedEvent(id)
+        )
     }
 
-    fun update(StoreOwnerId: Long, StoreOwnerUpdateDto: StoreOwnerUpdateDto) {
-        val storeOwner = storeOwnerPersistence.getByIdOrThrow(StoreOwnerId)
-        storeOwner.update(StoreOwnerUpdateDto)
+    fun update(storeOwnerId: Long, storeOwnerUpdateDto: StoreOwnerUpdateDto) {
+        val storeOwner = storeOwnerPersistence.getByIdOrThrow(storeOwnerId)
+        storeOwner.update(storeOwnerUpdateDto)
         storeOwnerPersistence.save(storeOwner)
 
         val account = userAccountPersistence.getByIdOrThrow(storeOwner.account.id)
-        account.update(StoreOwnerUpdateDto)
+        account.update(storeOwnerUpdateDto)
         userAccountPersistence.save(account)
     }
 

@@ -131,7 +131,7 @@ class CustomerAddressControllerTest(
             CoordinateDto(37.123455, 127.12346)
         ),
         customerAddressType = CustomerAddressType.HOME,
-        distanceInKilometers = 1.5, // 주소 반경 (단위: km)
+        radiusInKilometers = 1.5, // 주소 반경 (단위: km)
         description = "집 주소"
     )
 

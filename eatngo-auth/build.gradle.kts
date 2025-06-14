@@ -11,6 +11,7 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
+    implementation("org.springframework.cloud:spring-cloud-starter-openfeign")
 
     implementation(project(":eatngo-infra"))
     implementation(project(":eatngo-core"))

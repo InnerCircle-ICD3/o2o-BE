@@ -8,7 +8,6 @@ import com.eatngo.customer.infra.CustomerAddressPersistence
 import com.eatngo.customer.rdb.entity.CustomerAddressJpaEntity
 import com.eatngo.customer.rdb.entity.CustomerJpaEntity
 import com.eatngo.customer.rdb.repository.CustomerAddressRdbRepository
-import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 
@@ -18,22 +17,30 @@ class CustomerAddressPersistenceImpl(
     private val customerAddressRdbRepository: CustomerAddressRdbRepository,
 ) : CustomerAddressPersistence {
     override fun save(customer: Customer, customerAddress: CustomerAddress): CustomerAddress {
-        try {
-            val customerAddressJpaEntity = customerAddressRdbRepository.save(
-                CustomerAddressJpaEntity.of(
-                    customer = CustomerJpaEntity.from(customer),
-                    customerAddress = customerAddress
-                )
-            )
-            return customerAddressRdbRepository.findById(customerAddressJpaEntity.id)
-                .orElseThrow { CustomerAddressException.CustomerAddressNotFound(customerAddressJpaEntity.id) }
-                .let { CustomerAddressJpaEntity.toCustomerAddress(it) }
-        } catch (ViolationException: DataIntegrityViolationException) {
+        val addressJpaEntity = CustomerAddressJpaEntity.of(
+            customer = CustomerJpaEntity.from(customer),
+            customerAddress = customerAddress
+        )
+
+        val address = customerAddress.address
+        val existing = customerAddressRdbRepository.findByAddress(
+            radiusInKilometers = customerAddress.radiusInKilometers,
+            customerAddressType = customerAddress.customerAddressType,
+            coordinate = address.coordinate
+        )
+
+        if (existing.isPresent) {
             throw CustomerAddressException.CustomerAddressAlreadyExists(
-                customer.id, customerAddress.address.roadNameAddress?.value ?: "도로명 주소 없음",
-                customerAddress.address.lotNumberAddress.value
+                customer.id,
+                address.roadNameAddress?.value ?: "도로명 주소 없음",
+                address.lotNumberAddress.value
             )
         }
+
+        val saved = customerAddressRdbRepository.save(addressJpaEntity)
+        return customerAddressRdbRepository.findById(saved.id)
+            .orElseThrow { CustomerAddressException.CustomerAddressNotFound(saved.id) }
+            .let { CustomerAddressJpaEntity.toCustomerAddress(it) }
     }
 
     @SoftDeletedFilter

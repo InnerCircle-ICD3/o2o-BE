@@ -11,33 +11,29 @@ import java.time.LocalDateTime
 import java.time.LocalTime
 
 data class SearchStoreResultDto(
-    val storeList: List<SearchStoreDto>,
+    val contents: List<SearchStoreDto>,
+    val lastId: String,
 ) {
     companion object {
         fun from(
             userCoordinate: CoordinateVO,
             searchStoreList: List<SearchStore>,
-        ): SearchStoreResultDto =
-            SearchStoreResultDto(
-                storeList =
+        ): SearchStoreResultDto {
+            val contents =
                 searchStoreList.map { searchStore ->
-                    SearchStoreDto.from(
-                        searchStore,
+                    val distance =
                         DistanceCalculator.calculateDistance(
-                            from = searchStore.coordinate.toVO(),
-                            to = userCoordinate,
-                        ),
-                    )
-                },
-            )
+                            userCoordinate,
+                            searchStore.coordinate.toVO(),
+                        )
+                    SearchStoreDto.from(searchStore, distance)
+                }
 
-        fun from(searchStoreList: List<SearchStoreWithDistance>): SearchStoreResultDto =
-            SearchStoreResultDto(
-                storeList =
-                searchStoreList.map { searchStore ->
-                    SearchStoreDto.from(searchStore.store, searchStore.distance)
-                },
+            return SearchStoreResultDto(
+                contents = contents,
+                lastId = searchStoreList.lastOrNull()?.paginationToken.orEmpty(),
             )
+        }
     }
 }
 
@@ -55,7 +51,7 @@ data class SearchStoreDto(
     val todayPickupStartTime: LocalTime?, // 오늘 픽업 시작 시간
     val todayPickupEndTime: LocalTime?, // 오늘 픽업 종료 시간
     // TODO: 리뷰, 찜 기능
-    val stock: Int, // 재고 수량
+    val totalStockCount: Int = -1, // 전체 재고 수량 (-1: 오늘 등록 안함, 0: 재고 없음)
     val ratingAverage: Double, // 리뷰 평점
     val ratingCount: Int, // 리뷰 수
     val isFavorite: Boolean? = false, // 찜 여부
@@ -90,19 +86,19 @@ data class SearchStoreDto(
                 distanceKm = distanceKm,
                 status = searchStore.status.toStoreStatus(),
                 businessHours =
-                BusinessHourVO.fromList(
-                    searchStore.businessHours.map { (dayOfWeek, timeRange) ->
-                        BusinessHourDto(
-                            dayOfWeek = dayOfWeek,
-                            openTime = DateTimeUtil.parseHHmmToLocalTime(timeRange.openTime),
-                            closeTime = DateTimeUtil.parseHHmmToLocalTime(timeRange.closeTime),
-                        )
-                    },
-                ),
+                    BusinessHourVO.fromList(
+                        searchStore.businessHours.map { (dayOfWeek, timeRange) ->
+                            BusinessHourDto(
+                                dayOfWeek = dayOfWeek,
+                                openTime = DateTimeUtil.parseHHmmToLocalTime(timeRange.openTime),
+                                closeTime = DateTimeUtil.parseHHmmToLocalTime(timeRange.closeTime),
+                            )
+                        },
+                    ),
                 todayPickupStartTime = todayPickupStartTime,
                 todayPickupEndTime = todayPickupEndTime,
                 // TODO: 재고 수량은 Redis에서 가져와야 함(상품)
-                stock = 0,
+                totalStockCount = 0,
                 // TODO: 리뷰 관련 기능 구현 (Redis에서 가져오기?)
                 ratingAverage = 3.0,
                 ratingCount = 3,

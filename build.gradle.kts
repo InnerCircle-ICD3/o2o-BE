@@ -1,3 +1,5 @@
+import io.spring.gradle.dependencymanagement.dsl.DependencyManagementExtension
+
 plugins {
     kotlin("jvm") version "1.9.22"
     kotlin("plugin.spring") version "1.9.22" apply false
@@ -19,6 +21,12 @@ subprojects {
     apply(plugin = "org.jetbrains.kotlin.plugin.spring")
     apply(plugin = "io.spring.dependency-management")
 
+
+    the<DependencyManagementExtension>().apply {
+        imports {
+            mavenBom("org.springframework.cloud:spring-cloud-dependencies:2024.0.1")
+        }
+    }
     // 실행 모듈 목록
     val executableModules = listOf("eatngo-customer-api", "eatngo-store-owner-api")
     val enableJarModules = listOf("common")

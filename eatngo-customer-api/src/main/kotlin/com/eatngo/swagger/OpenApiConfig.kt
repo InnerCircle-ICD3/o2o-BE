@@ -9,6 +9,10 @@ import org.springframework.context.annotation.Configuration
             url = "https://customer.eatngo.org",
             description = "Production server",
         ),
+        Server(
+            url = "http://localhost:8080",
+            description = "Local development server",
+        ),
     ],
 )
 @Configuration

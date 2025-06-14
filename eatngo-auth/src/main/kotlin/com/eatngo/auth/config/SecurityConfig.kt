@@ -48,8 +48,8 @@ class SecurityConfig(
             .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter::class.java)
 
             .oauth2Login {
-                it.authorizationEndpoint {
-                    it.baseUri("/api/v1/oauth2/authorization")
+                it.authorizationEndpoint { auth ->
+                    auth.baseUri("/api/v1/oauth2/authorization")
                 }
                 it.userInfoEndpoint { userInfo ->
                     userInfo
@@ -59,10 +59,10 @@ class SecurityConfig(
             }
 
             .logout {
-                it.logoutRequestMatcher(AntPathRequestMatcher("/oauth2/logout", "POST"))
+                it.logoutRequestMatcher(AntPathRequestMatcher("/api/v1/oauth2/logout", "POST"))
                     .logoutSuccessUrl("/")
                     .invalidateHttpSession(true)
-                    .logoutSuccessHandler { request, response, authentication ->
+                    .logoutSuccessHandler { request, response, _ ->
                         request.cookies
                             ?.find { cookie -> cookie.name == ACCESS_TOKEN }
                             ?.value

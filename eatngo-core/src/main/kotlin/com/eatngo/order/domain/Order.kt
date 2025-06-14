@@ -51,7 +51,10 @@ class Order(
         statusChangedHistories.add(OrderStatusHistory.from(status, customer))
     }
 
-    fun createReview(dto: CreateReviewDto, customer: Customer): Review {
+    fun createReview(
+        dto: CreateReviewDto,
+        customer: Customer,
+    ): Review {
         require(customerId == customer.id) { "주문한 손님만이 리뷰를 작성할 수 있습니다." }
         require(status.equals(Status.DONE)) { "완료된 주문에만 리뷰를 작성할 수 있습니다." }
 
@@ -60,7 +63,8 @@ class Order(
             score = Score(dto.score),
             images = Images(dto.images),
             orderId = id,
-            customerId = customer.id
+            customerId = customer.id,
+            nickname = customer.account.nickname?.toString() ?: "",
         )
     }
 
@@ -72,7 +76,6 @@ class Order(
         require(storeId == this.id) { "Store can't edit this order" }
     }
 
-
     companion object {
         fun create(
             customerId: Long,
@@ -80,9 +83,9 @@ class Order(
             orderNumber: Long,
             nickname: String,
             pickupDateTime: LocalDateTime,
-            orderItems: List<OrderItem>
-        ): Order {
-            return Order(
+            orderItems: List<OrderItem>,
+        ): Order =
+            Order(
                 id = 0,
                 orderNumber = orderNumber,
                 orderItems = orderItems,
@@ -92,8 +95,7 @@ class Order(
                 status = Status.CREATED,
                 pickupDateTime = pickupDateTime,
                 createdAt = LocalDateTime.now(),
-                updatedAt = LocalDateTime.now()
+                updatedAt = LocalDateTime.now(),
             )
-        }
     }
 }

@@ -145,10 +145,11 @@ class TokenProvider(
         return ResponseCookie
             .from(name, value)
             .httpOnly(true)
+            .domain(".eatngo.org")
             .secure(true)
             .path("/")
             .sameSite("None")
-            .maxAge(Duration.ofDays(14))
+            .maxAge(Duration.ofHours(1))
             .build()
     }
 }

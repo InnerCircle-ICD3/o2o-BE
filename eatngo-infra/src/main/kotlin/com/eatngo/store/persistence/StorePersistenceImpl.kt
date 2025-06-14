@@ -57,11 +57,6 @@ class StorePersistenceImpl(
     override fun deleteById(id: Long): Boolean =
         storeRdbRepository.softDeleteById(id) > 0
 
-    override fun findByUpdatedAt(pivotTime: LocalDateTime): List<Store> =
-        storeRdbRepository
-            .findByUpdatedAt(pivotTime)
-            .map { StoreJpaEntity.toStore(it) }
-
     override fun batchUpdateStatusToClosed(storeIds: List<Long>): Int =
         storeRdbRepository.batchUpdateStatusToClosed(storeIds)
 
@@ -84,7 +79,7 @@ class StorePersistenceImpl(
 
     private fun parseBusinessHoursJson(json: String): List<BusinessHourDto> {
         val typeRef = object : TypeReference<List<Map<String, String>>>() {}
-        
+
         return objectMapper.readValue(json, typeRef).map { map ->
             BusinessHourDto(
                 dayOfWeek = DayOfWeek.valueOf(map["dayOfWeek"]!!),

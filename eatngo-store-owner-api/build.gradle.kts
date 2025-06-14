@@ -17,6 +17,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-security") // Spring Security 지원
     implementation("org.jetbrains.kotlin:kotlin-reflect") // Kotlin 리플렉션 지원
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin") // Kotlin JSON 직렬화/역직렬화
+    implementation("org.springframework.cloud:spring-cloud-starter-openfeign")
 
     // API 문서화
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.5") // Swagger UI

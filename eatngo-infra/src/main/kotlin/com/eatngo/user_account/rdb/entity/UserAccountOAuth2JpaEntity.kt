@@ -3,7 +3,7 @@ package com.eatngo.user_account.rdb.entity
 import com.eatngo.common.BaseJpaEntity
 import com.eatngo.constants.DELETED_FILTER
 import com.eatngo.user_account.domain.UserAccount
-import com.eatngo.user_account.oauth2.constants.Oauth2Provider
+import com.eatngo.user_account.oauth2.constants.OAuth2Provider
 import com.eatngo.user_account.oauth2.domain.UserAccountOAuth2
 import com.eatngo.user_account.vo.EmailAddress
 import com.eatngo.user_account.vo.Nickname
@@ -11,14 +11,8 @@ import jakarta.persistence.*
 import org.hibernate.annotations.Filter
 import java.time.LocalDateTime
 
-@Filter(name = DELETED_FILTER)
 @Entity
-@Table(
-    name = "user_account_oauth2",
-    uniqueConstraints = [
-        UniqueConstraint(name = "uk_user_account_oauth2_user_key_provider", columnNames = ["user_key", "provider"])
-    ]
-)
+@Table(name = "user_account_oauth2")
 class UserAccountOAuth2JpaEntity(
 
     @Id
@@ -38,13 +32,13 @@ class UserAccountOAuth2JpaEntity(
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
-    val provider: Oauth2Provider,
+    val provider: OAuth2Provider,
 
     @Column(nullable = false, length = 255)
     val userKey: String,
 
     @Column(columnDefinition = "TEXT")
-    val accessToken: String? = null,
+    val accessToken: String,
 
     val expireAt: LocalDateTime? = null,
 
