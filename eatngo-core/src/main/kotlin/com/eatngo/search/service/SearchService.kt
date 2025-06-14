@@ -2,6 +2,8 @@ package com.eatngo.search.service
 
 import com.eatngo.common.exception.search.SearchException
 import com.eatngo.common.type.CoordinateVO
+import com.eatngo.common.util.normalizeCeil
+import com.eatngo.common.util.normalizeFloor
 import com.eatngo.extension.orThrow
 import com.eatngo.search.constant.SuggestionType
 import com.eatngo.search.domain.SearchStore
@@ -17,8 +19,7 @@ import com.eatngo.search.infra.SearchStoreRepository
 import com.eatngo.search.infra.SearchSuggestionRedisRepository
 import com.eatngo.search.infra.SearchSuggestionRepository
 import org.springframework.stereotype.Service
-import kotlin.math.ceil
-import kotlin.math.floor
+import java.math.BigDecimal
 
 @Service
 class SearchService(
@@ -147,16 +148,15 @@ class SearchService(
         longitude: Double,
         latitude: Double,
     ): Box {
-        // 경도: 왼쪽(서쪽)으로 내림, 오른쪽(동쪽)으로 올림
-        val leftLng = floor(longitude / cacheBoxSize) * cacheBoxSize
-        val rightLng = ceil(longitude / cacheBoxSize) * cacheBoxSize
+        val unit = BigDecimal.valueOf(cacheBoxSize)
 
-        // 위도: 위쪽(북쪽)으로 올림, 아래쪽(남쪽)으로 내림
-        val topLat = ceil(latitude / cacheBoxSize) * cacheBoxSize
-        val bottomLat = floor(latitude / cacheBoxSize) * cacheBoxSize
+        val leftLng = BigDecimal.valueOf(longitude).normalizeFloor(unit).toDouble()
+        val rightLng = BigDecimal.valueOf(longitude).normalizeCeil(unit).toDouble()
+        val bottomLat = BigDecimal.valueOf(latitude).normalizeFloor(unit).toDouble()
+        val topLat = BigDecimal.valueOf(latitude).normalizeCeil(unit).toDouble()
 
-        val topLeft = CoordinateVO.from(longitude = leftLng, latitude = topLat) // 서쪽 + 북쪽
-        val bottomRight = CoordinateVO.from(longitude = rightLng, latitude = bottomLat) // 동쪽 + 남쪽
+        val topLeft = CoordinateVO.from(longitude = leftLng, latitude = topLat)
+        val bottomRight = CoordinateVO.from(longitude = rightLng, latitude = bottomLat)
 
         return Box.from(topLeft, bottomRight)
     }
