@@ -5,20 +5,16 @@ import com.eatngo.common.response.ApiResponse
 import com.eatngo.docs.ApiResponseErrorDoc
 import com.eatngo.store.docs.response.StoreCUDApiResponseDoc
 import com.eatngo.store.docs.response.StoreDetailApiResponseDoc
-import com.eatngo.store.dto.StoreCUDResponse
-import com.eatngo.store.dto.StoreCreateRequest
-import com.eatngo.store.dto.StoreDetailResponse
-import com.eatngo.store.dto.StoreStatusUpdateRequest
-import com.eatngo.store.dto.StoreUpdateRequest
+import com.eatngo.store.dto.*
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
-import io.swagger.v3.oas.annotations.responses.ApiResponse  as SwaggerApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestBody
+import io.swagger.v3.oas.annotations.responses.ApiResponse as SwaggerApiResponse
 
 @Tag(name = "매장 관리", description = "점주의 매장 관리 API")
 interface StoreOwnerControllerDocs {
@@ -42,7 +38,6 @@ interface StoreOwnerControllerDocs {
         ]
     )
     fun getStoresByOwnerId(
-        @Parameter(description = "점주 ID", required = true)
         @StoreOwnerId storeOwnerId: Long
     ): ApiResponse<List<StoreDetailResponse>>
 
@@ -68,7 +63,6 @@ interface StoreOwnerControllerDocs {
         @Parameter(description = "매장 생성 정보", required = true)
         @RequestBody request: StoreCreateRequest,
 
-        @Parameter(description = "점주 ID", required = true)
         @StoreOwnerId storeOwnerId: Long
     ): ApiResponse<StoreCUDResponse>
 
@@ -97,7 +91,6 @@ interface StoreOwnerControllerDocs {
         @Parameter(description = "매장 수정 정보", required = true)
         @RequestBody request: StoreUpdateRequest,
 
-        @Parameter(description = "점주 ID", required = true)
         @StoreOwnerId storeOwnerId: Long
     ): ApiResponse<StoreCUDResponse>
 
@@ -126,7 +119,6 @@ interface StoreOwnerControllerDocs {
         @Parameter(description = "변경할 매장 상태", required = true)
         @RequestBody request: StoreStatusUpdateRequest,
 
-        @Parameter(description = "점주 ID", required = true)
         @StoreOwnerId storeOwnerId: Long
     ): ApiResponse<StoreCUDResponse>
 
@@ -152,7 +144,6 @@ interface StoreOwnerControllerDocs {
         @Parameter(description = "삭제할 매장 ID", required = true)
         @PathVariable storeId: Long,
 
-        @Parameter(description = "점주 ID", required = true)
         @StoreOwnerId storeOwnerId: Long
     ): ApiResponse<StoreCUDResponse>
 }

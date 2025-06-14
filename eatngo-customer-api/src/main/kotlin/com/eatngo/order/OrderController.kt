@@ -13,6 +13,7 @@ import com.eatngo.order.usecase.CustomerReadOrderUseCase
 import com.eatngo.order.usecase.OrderCreateUseCase
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
+import org.springdoc.core.annotations.ParameterObject
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.ModelAttribute
@@ -97,7 +98,7 @@ class OrderController(
     @Operation(summary = "내 주문 조회", description = "내 주문 이력 조회")
     fun getOrdersByCustomerId(
         @CustomerId customerId: Long,
-        @ModelAttribute queryParamDto: CursoredCustomerOrderQueryParamDto,
+        @ParameterObject @ModelAttribute queryParamDto: CursoredCustomerOrderQueryParamDto,
     ) = ResponseEntity.ok(
         ApiResponse.success(
             customerReadOrderUseCase.findAllByQueryParameter(

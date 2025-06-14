@@ -1,5 +1,6 @@
 package com.eatngo.review.domain
 
+import com.eatngo.customer.domain.Customer
 import java.time.LocalDateTime
 
 class Review(
@@ -16,6 +17,8 @@ class Review(
     val updatedBy: Long? = null,
     val deletedAt: LocalDateTime? = null,
 ) {
+    fun canEditable(customer: Customer) = customer.id == customerId
+
     companion object {
         fun create(
             orderId: Long,

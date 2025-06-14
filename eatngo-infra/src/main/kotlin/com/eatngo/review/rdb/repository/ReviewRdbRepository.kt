@@ -5,6 +5,7 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Slice
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
+import java.util.Optional
 
 interface ReviewRdbRepository : JpaRepository<ReviewJpaEntity, Long> {
     @Query("SELECT r FROM ReviewJpaEntity r WHERE r.orderId = :orderId")
@@ -31,4 +32,7 @@ interface ReviewRdbRepository : JpaRepository<ReviewJpaEntity, Long> {
         lastId: Long?,
         pageable: Pageable,
     ): Slice<ReviewJpaEntity>
+
+    @Query("SELECT r FROM ReviewJpaEntity r WHERE r.id = :id")
+    override fun findById(id: Long): Optional<ReviewJpaEntity>
 }
