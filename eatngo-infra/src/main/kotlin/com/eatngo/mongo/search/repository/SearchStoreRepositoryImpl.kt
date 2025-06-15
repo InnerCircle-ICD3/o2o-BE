@@ -78,6 +78,8 @@ class SearchStoreRepositoryImpl(
                             "coordinate" to 1,
                             "status" to 1,
                             "businessHours" to 1,
+                            "totalReviewCount" to 1,
+                            "averageRating" to 1,
                             "metaSearchScore" to Document("\$meta", "searchScore"), // 검색 점수
                             "paginationToken" to Document("\$meta", "searchSequenceToken"), // 검색 점수
                         ),
@@ -106,7 +108,7 @@ class SearchStoreRepositoryImpl(
         }
     }
 
-    override fun save(searchStore: SearchStore) {
+    override fun saveStore(searchStore: SearchStore) {
         val store = SearchStoreEntity.from(searchStore)
 
         val query = Query(Criteria.where("_id").`is`(store.storeId))
@@ -116,7 +118,6 @@ class SearchStoreRepositoryImpl(
                 .set("storeImage", store.storeImage)
                 .set("storeCategory", store.storeCategory)
                 .set("foodCategory", store.foodCategory)
-                .set("foodTypes", store.foodTypes)
                 .set("roadNameAddress", store.roadNameAddress)
                 .set("coordinate", store.coordinate)
                 .set("status", store.status)
@@ -151,6 +152,8 @@ class SearchStoreRepositoryImpl(
                     .set("coordinate", store.coordinate)
                     .set("status", store.status)
                     .set("businessHours", store.businessHours)
+                    .set("totalReviewCount", store.totalReviewCount)
+                    .set("averageRating", store.averageRating)
                     .set("updatedAt", LocalDateTime.now())
                     .set("createdAt", store.createdAt)
 
