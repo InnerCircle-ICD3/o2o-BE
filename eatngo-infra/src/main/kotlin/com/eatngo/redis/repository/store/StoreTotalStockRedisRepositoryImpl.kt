@@ -40,7 +40,9 @@ class StoreTotalStockRedisRepositoryImpl(
         date: LocalDate,
     ): Map<Long, Int> {
         val keys = storeIdList.map { generateKey(it, date) }
-        val values = stringRedisTemplate.opsForValue().multiGet(keys) ?: return emptyMap()
+        val values =
+            stringRedisTemplate.opsForValue().multiGet(keys)
+                ?: List(storeIdList.size) { null } // 모든 key miss 시에도 사이즈 보존
         return storeIdList.zip(values).associate { (storeId, value) ->
             storeId to (value?.toIntOrNull() ?: -1) // null은 -1로 처리
         }
