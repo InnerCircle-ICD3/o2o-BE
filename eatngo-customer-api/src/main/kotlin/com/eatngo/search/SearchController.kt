@@ -74,7 +74,7 @@ class SearchController(
         @RequestParam storeCategory: StoreEnum.StoreCategory?,
         @Parameter(description = "(optional) HH:mm 형식의 시간\nnull일 경우 모든 픽업시간 조회")
         @RequestParam time: String?,
-        @Parameter(description = "(optional) 픽업 가능 매장만 조회 여부\nnull, false시 모든 상태 조회", example = "true")
+        @Parameter(description = "(optional) 픽업 가능 매장만 조회 여부\nnull, false시 모든 상태 조회", example = "false")
         @RequestParam onlyReservable: Boolean = false,
         @Parameter(description = "(optional) 마지막 paginationToken\n첫페이지는 null")
         @RequestParam lastId: String?,
