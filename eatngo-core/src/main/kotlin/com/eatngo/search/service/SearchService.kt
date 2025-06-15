@@ -54,11 +54,10 @@ class SearchService(
                 ).orThrow { SearchException.SearchStoreListFailed(storeFilterDto.viewCoordinate, storeFilterDto.filter) }
 
         // 재고 정보를 조회하여 SearchStore에 추가
-        val storeTotalStockMap = mutableMapOf<Long, Int>()
-        searchStoreList.forEach { searchStore ->
-            val totalStock = storeTotalStockService.getStoreTotalStockForResponse(searchStore.storeId)
-            storeTotalStockMap[searchStore.storeId] = totalStock
-        }
+        val storeTotalStockMap =
+            storeTotalStockService.getStoreStockMapForResponse(
+                storeIds = searchStoreList.map { it.storeId },
+            )
 
         return SearchStoreResultDto.from(
             userCoordinate = storeFilterDto.viewCoordinate,
