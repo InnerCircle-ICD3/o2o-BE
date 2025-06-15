@@ -13,7 +13,6 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web") // REST API 지원
     implementation("org.jetbrains.kotlin:kotlin-reflect") // Kotlin 리플렉션 지원
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin") // Kotlin JSON 직렬화/역직렬화
-    implementation("org.postgresql:postgresql:42.7.3") // PostgreSQL 드라이버
 
     // 테스트 의존성
     testImplementation("io.kotest:kotest-runner-junit5:5.8.1")
@@ -40,6 +39,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
     // PostgreSQL
     implementation("org.postgresql:postgresql:42.7.3") // PG 17 호환
+
     // h2
     runtimeOnly("com.h2database:h2")
 }

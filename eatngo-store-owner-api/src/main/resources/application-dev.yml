@@ -5,6 +5,7 @@ spring:
   config:
     import:
       - classpath:auth-application.yml
+      - classpath:application-metrics.yml
       - aws-parameterstore:/eatngo/
   cloud:
     aws:

@@ -6,6 +6,7 @@ spring:
     import:
       - classpath:auth-application.yml
       - classpath:infra-application.yml
+      - classpath:application-metrics.yml
   application:
     name: eatngo-store-owner-api
   jpa:
