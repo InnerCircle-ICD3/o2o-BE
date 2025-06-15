@@ -94,7 +94,7 @@ class StoreTotalStockService(
                 val stock = getStoreTotalStockFallback(storeId, date, ex)
                 resMap[storeId] = stock
             } catch (fallbackEx: Exception) {
-                // Fallback 실패 시 -1로 처리
+                // Fallback 실패 시 -1로 처리 TODO: 로깅 추가
                 resMap[storeId] = -1
             }
         }
