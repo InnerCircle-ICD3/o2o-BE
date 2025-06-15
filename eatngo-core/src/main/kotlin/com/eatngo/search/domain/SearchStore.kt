@@ -24,7 +24,7 @@ class SearchStore(
     val businessHours: Map<DayOfWeek, TimeRange>, // 매장 영업 시간
     var totalReviewCount: Int?, // 총 리뷰 수
     var averageRating: BigDecimal?, // 평균 평점
-    val paginationToken: String?, // 검색 paginationToken
+    val paginationToken: String? = null, // 검색 paginationToken
     val updatedAt: LocalDateTime, // 마지막 업데이트 시간
     val createdAt: LocalDateTime, // 생성 시간
     val deletedAt: LocalDateTime? = null, // 삭제 시간 (null: 삭제 안됨, not null: 삭제됨) -> RDB에서만 사용
