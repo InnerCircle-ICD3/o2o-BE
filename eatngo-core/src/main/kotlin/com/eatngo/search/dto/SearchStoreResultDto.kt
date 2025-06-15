@@ -17,6 +17,7 @@ data class SearchStoreResultDto(
     companion object {
         fun from(
             userCoordinate: CoordinateVO,
+            totalStockCountMap: Map<Long, Int>,
             searchStoreList: List<SearchStore>,
         ): SearchStoreResultDto {
             val contents =
@@ -26,7 +27,8 @@ data class SearchStoreResultDto(
                             userCoordinate,
                             searchStore.coordinate.toVO(),
                         )
-                    SearchStoreDto.from(searchStore, distance)
+                    val stock = totalStockCountMap[searchStore.storeId] ?: -1
+                    SearchStoreDto.from(searchStore, stock, distance)
                 }
 
             return SearchStoreResultDto(
@@ -59,6 +61,7 @@ data class SearchStoreDto(
     companion object {
         fun from(
             searchStore: SearchStore,
+            stock: Int,
             distanceKm: Double,
         ): SearchStoreDto {
             // 픽업 가능 시간 TODO : 검색쪽 필터링 부분과 겹치는 로직으로 리팩토링 필요
@@ -97,8 +100,7 @@ data class SearchStoreDto(
                     ),
                 todayPickupStartTime = todayPickupStartTime,
                 todayPickupEndTime = todayPickupEndTime,
-                // TODO: 재고 수량은 Redis에서 가져와야 함(상품)
-                totalStockCount = 0,
+                totalStockCount = stock,
                 // TODO: 리뷰 관련 기능 구현 (Redis에서 가져오기?)
                 ratingAverage = 3.0,
                 ratingCount = 3,

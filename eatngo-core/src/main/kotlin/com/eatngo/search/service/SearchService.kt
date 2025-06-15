@@ -18,6 +18,7 @@ import com.eatngo.search.infra.SearchMapRedisRepository
 import com.eatngo.search.infra.SearchStoreRepository
 import com.eatngo.search.infra.SearchSuggestionRedisRepository
 import com.eatngo.search.infra.SearchSuggestionRepository
+import com.eatngo.store.service.StoreTotalStockService
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
 
@@ -27,6 +28,7 @@ class SearchService(
     private val searchSuggestionRepository: SearchSuggestionRepository,
     private val searchMapRedisRepository: SearchMapRedisRepository,
     private val searchSuggestionRedisRepository: SearchSuggestionRedisRepository,
+    private val storeTotalStockService: StoreTotalStockService,
 ) {
     val cacheBoxSize = 0.01
 
@@ -51,8 +53,16 @@ class SearchService(
                     size = size,
                 ).orThrow { SearchException.SearchStoreListFailed(storeFilterDto.viewCoordinate, storeFilterDto.filter) }
 
+        // 재고 정보를 조회하여 SearchStore에 추가
+        val storeTotalStockMap = mutableMapOf<Long, Int>()
+        searchStoreList.forEach { searchStore ->
+            val totalStock = storeTotalStockService.getStoreTotalStockForResponse(searchStore.storeId)
+            storeTotalStockMap[searchStore.storeId] = totalStock
+        }
+
         return SearchStoreResultDto.from(
             userCoordinate = storeFilterDto.viewCoordinate,
+            totalStockCountMap = storeTotalStockMap,
             searchStoreList = searchStoreList,
         )
     }
