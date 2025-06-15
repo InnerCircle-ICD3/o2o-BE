@@ -12,6 +12,7 @@ import org.springframework.data.mongodb.core.geo.GeoJsonPoint
 import org.springframework.data.mongodb.core.index.GeoSpatialIndexed
 import org.springframework.data.mongodb.core.mapping.Document
 import org.springframework.data.mongodb.core.mapping.Field
+import java.math.BigDecimal
 import java.time.DayOfWeek
 import java.time.LocalDateTime
 
@@ -30,6 +31,8 @@ class SearchStoreEntity(
     var status: Int, // 매장 오픈 여부
     @Field("businessHours")
     var businessHours: Map<DayOfWeek, TimeRange>,
+    var totalReviewCount: Int? = 0, // 총 리뷰 수
+    var averageRating: BigDecimal?, // 평균 평점
     var paginationToken: String? = null, // 검색 paginationToken
     var updatedAt: LocalDateTime = LocalDateTime.now(), // 마지막 업데이트 시간
     var createdAt: LocalDateTime = LocalDateTime.now(), // 생성 시간
@@ -55,6 +58,8 @@ class SearchStoreEntity(
                 ),
             status = SearchStoreStatus.from(status),
             businessHours = businessHours,
+            totalReviewCount = totalReviewCount ?: 0,
+            averageRating = averageRating ?: BigDecimal.ZERO,
             paginationToken = paginationToken,
             updatedAt = updatedAt,
             createdAt = createdAt,
@@ -82,6 +87,8 @@ class SearchStoreEntity(
                     ),
                 status = searchStore.status.code,
                 businessHours = searchStore.businessHours,
+                totalReviewCount = searchStore.totalReviewCount,
+                averageRating = searchStore.averageRating,
             )
     }
 }

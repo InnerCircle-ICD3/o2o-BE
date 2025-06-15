@@ -1,5 +1,6 @@
 package com.eatngo.search.schduler
 
+import com.eatngo.review.service.StoreReviewStatsService
 import com.eatngo.search.constant.SuggestionType
 import com.eatngo.search.domain.SearchStore
 import com.eatngo.search.domain.SearchSuggestion
@@ -30,6 +31,7 @@ class SearchProductScheduler(
     private val searchSuggestionRepository: SearchSuggestionRepository,
     private val searchMapRedisRepository: SearchMapRedisRepository,
     private val searchStorePersistence: SearchStorePersistence,
+    private val storeReviewStatsService: StoreReviewStatsService,
     private val searchService: SearchService,
 ) {
     companion object {
@@ -65,6 +67,11 @@ class SearchProductScheduler(
 
             // storeId 기준으로 빠르게 매핑
             val storeMap = stores.associateBy { it.storeId }
+            // 리뷰 통계 데이터 획득
+            val reviewStatsMap =
+                storeReviewStatsService.getStoreReviewStats(
+                    storeIds = storeMap.keys.toList(),
+                ) // 리뷰 통계 정보 추가
             // 업데이트 정보 생성
             for ((storeId, store) in storeMap) {
                 foodTypeMap[storeId]?.let { types ->
@@ -75,6 +82,10 @@ class SearchProductScheduler(
                 if (store.deletedAt != null) {
                     deleteStoreIds.add(storeId)
                 } else {
+                    reviewStatsMap[storeId]?.let { reviewStats ->
+                        store.totalReviewCount = reviewStats.totalReviewCount
+                        store.averageRating = reviewStats.averageRating
+                    }
                     updateStores.add(store)
                     // 검색어 정보 업데이트
                     updateSuggestion.add(
