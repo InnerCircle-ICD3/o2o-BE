@@ -32,7 +32,7 @@ class SearchStoreEntity(
     @Field("businessHours")
     var businessHours: Map<DayOfWeek, TimeRange>,
     var totalReviewCount: Int? = 0, // 총 리뷰 수
-    var averageRating: BigDecimal?, // 평균 평점
+    var averageRating: BigDecimal? = BigDecimal.ZERO, // 평균 평점
     var paginationToken: String? = null, // 검색 paginationToken
     var updatedAt: LocalDateTime = LocalDateTime.now(), // 마지막 업데이트 시간
     var createdAt: LocalDateTime = LocalDateTime.now(), // 생성 시간

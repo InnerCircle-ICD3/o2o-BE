@@ -27,5 +27,5 @@ class SearchStore(
     val paginationToken: String?, // 검색 paginationToken
     val updatedAt: LocalDateTime, // 마지막 업데이트 시간
     val createdAt: LocalDateTime, // 생성 시간
-    val deletedAt: LocalDateTime?, // 삭제 시간 (null: 삭제 안됨, not null: 삭제됨) -> RDB에서만 사용
+    val deletedAt: LocalDateTime? = null, // 삭제 시간 (null: 삭제 안됨, not null: 삭제됨) -> RDB에서만 사용
 )
