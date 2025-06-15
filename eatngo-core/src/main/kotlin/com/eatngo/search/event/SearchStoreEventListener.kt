@@ -42,7 +42,7 @@ class SearchStoreEventListener(
                 StoreCUDEventType.CREATED,
                 StoreCUDEventType.UPDATED,
                 -> {
-                    searchStoreRepository.save(rdbStore)
+                    searchStoreRepository.saveStore(rdbStore)
                     // 매장 정보 변경 후, 검색 맵 캐시를 갱신
                     searchMapRedisRepository.saveStore(
                         key = searchMapKey,

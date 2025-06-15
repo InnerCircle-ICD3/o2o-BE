@@ -1,5 +1,6 @@
 package com.eatngo.search.dto
 
+import com.eatngo.common.constant.StoreEnum
 import com.eatngo.search.domain.SearchStore
 
 data class SearchStoreMapResultDto(
@@ -22,6 +23,7 @@ data class SearchStoreMap(
     val storeId: Long,
     val storeName: String,
     val coordinate: CoordinateResultDto, // 매장 위치(위도, 경도)
+    val status: StoreEnum.StoreStatus,
 ) {
     companion object {
         fun from(searchStore: SearchStore): SearchStoreMap =
@@ -29,6 +31,7 @@ data class SearchStoreMap(
                 storeId = searchStore.storeId,
                 storeName = searchStore.storeName,
                 coordinate = searchStore.coordinate.toDto(),
+                status = searchStore.status.toStoreStatus(),
             )
     }
 }
