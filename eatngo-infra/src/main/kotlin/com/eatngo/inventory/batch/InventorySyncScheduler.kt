@@ -18,7 +18,7 @@ class InventorySyncScheduler(
     private val logger = LoggerFactory.getLogger(javaClass)
 
     companion object {
-        private const val REDIS_KEY_PREFIX = "inventory:"
+        private const val REDIS_KEY_PREFIX = "inventory::"
         private const val CHANGED_SET_KEY = "changedProductIds"
         private const val CHUNK_SIZE = 500
 
