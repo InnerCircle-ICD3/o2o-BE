@@ -28,7 +28,6 @@ class DefaultOAuth2SuccessPostProcessor : OAuth2SuccessPostProcessor {
             override val userAccountId: Long = userId
             override val nickname: String? = null
             override val roles: List<String> = emptyList()
-            override val cookieStoreLocation: String = "/user"
         }
     }
 }
