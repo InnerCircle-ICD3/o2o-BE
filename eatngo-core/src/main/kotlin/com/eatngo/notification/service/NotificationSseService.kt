@@ -1,6 +1,5 @@
 package com.eatngo.notification.service
 
-import com.eatngo.notification.event.EmptyMessage
 import com.eatngo.notification.event.NotificationEvent
 import com.eatngo.notification.event.NotificationEventType
 import com.eatngo.notification.infra.NotificationPersistence
@@ -32,8 +31,7 @@ class NotificationSseService(
                 it.send(
                     SseEmitter
                         .event()
-                        .name(NotificationEventType.HEARTBEAT.eventName)
-                        .data(EmptyMessage()),
+                        .name(NotificationEventType.HEARTBEAT.eventName),
                 )
             }
 
