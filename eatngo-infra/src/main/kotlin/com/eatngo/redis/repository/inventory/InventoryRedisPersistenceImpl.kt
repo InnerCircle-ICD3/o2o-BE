@@ -77,11 +77,14 @@ class InventoryRedisPersistenceImpl(
         )
     }
 
-    override fun rollbackStock(productId: Long, stockQuantity: Int) {
+    override fun rollbackStock(productId: Long, stockQuantity: Int): Int {
         val script = DefaultRedisScript(LUA_ROLLBACK_STOCK, Long::class.java)
         val result = redisTemplate.execute(script, listOf(luaKey(productId)), stockQuantity.toString())
             ?: -1L
         if (result == -1L) throw StockNotFound(productId)
+
+        updateInventoryCacheWithClassInfo(productId)
+        return result.toInt()
     }
 
     override fun saveHash(productId: Long, inventoryDto: InventoryDto) {

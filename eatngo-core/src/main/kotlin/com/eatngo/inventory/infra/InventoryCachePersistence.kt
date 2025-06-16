@@ -5,7 +5,7 @@ import com.eatngo.inventory.dto.InventoryDto
 interface InventoryCachePersistence {
     fun decreaseStock(productId: Long, stockQuantityToDecrease: Int): Int
     fun findByProductId(productId: Long): InventoryDto?
-    fun rollbackStock(productId: Long, stockQuantity: Int)
+    fun rollbackStock(productId: Long, stockQuantity: Int): Int
     fun saveHash(productId: Long, inventoryDto: InventoryDto)
     fun deleteHash(productId: Long)
 }
