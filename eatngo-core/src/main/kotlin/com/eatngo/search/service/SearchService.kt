@@ -2,6 +2,7 @@ package com.eatngo.search.service
 
 import com.eatngo.common.exception.search.SearchException
 import com.eatngo.common.type.CoordinateVO
+import com.eatngo.common.util.DistanceCalculator
 import com.eatngo.common.util.normalizeCeil
 import com.eatngo.common.util.normalizeFloor
 import com.eatngo.extension.orThrow
@@ -43,6 +44,28 @@ class SearchService(
         searchDistance: Double,
         size: Int,
     ): SearchStoreResultDto {
+        // TODO: 로직 개선
+        val firstPage =
+            getFirstPageFromRedis(
+                userCoordinate = storeFilterDto.viewCoordinate,
+                size = size,
+            )
+
+        if (isFirstPage(storeFilterDto)) {
+            val storeTotalStockMap =
+                storeTotalStockService.getStoreStockMapForResponse(
+                    storeIds = firstPage.map { it.storeId },
+                )
+            return SearchStoreResultDto.from(
+                userCoordinate = storeFilterDto.viewCoordinate,
+                totalStockCountMap = storeTotalStockMap,
+                searchStoreList = firstPage,
+            )
+        }
+
+        // 첫 페이지가 아닌 경우: Redis 캐시에서 사용된 storeId를 제외한 결과만 사용
+        val cachedStoreIds: Set<Long> = firstPage.map { it.storeId }.toSet()
+
         val searchStoreList: List<SearchStore> =
             searchStoreRepository
                 .searchStore(
@@ -52,6 +75,7 @@ class SearchService(
                     searchFilter = storeFilterDto.filter,
                     size = size,
                 ).orThrow { SearchException.SearchStoreListFailed(storeFilterDto.viewCoordinate, storeFilterDto.filter) }
+                .filterNot { it.storeId in cachedStoreIds } // 캐시된 storeId를 제외
 
         // 재고 정보를 조회하여 SearchStore에 추가
         val storeTotalStockMap =
@@ -246,4 +270,33 @@ class SearchService(
         }
         return topLeftList
     }
+
+    fun getFirstPageFromRedis(
+        userCoordinate: CoordinateVO,
+        size: Int = 10,
+    ): List<SearchStore> {
+        // center 값을 기준으로 해당하는 box 좌표를 구한다.
+        val box: Box =
+            getBox(
+                longitude = userCoordinate.longitude,
+                latitude = userCoordinate.latitude,
+            )
+        val searchStoreList: List<SearchStore> = getMapListFromBox(box)
+
+        return searchStoreList
+            .onEach { it.paginationToken = "FIRST_PAGE" }
+            .sortedBy {
+                DistanceCalculator.calculateDistance(
+                    userCoordinate,
+                    it.coordinate.toVO(),
+                )
+            }.take(size)
+    }
+
+    fun isFirstPage(storeFilterDto: StoreFilterDto): Boolean =
+        storeFilterDto.filter.searchText == null &&
+            storeFilterDto.filter.storeCategory == null &&
+            storeFilterDto.filter.time == null &&
+            !storeFilterDto.filter.onlyReservable &&
+            storeFilterDto.filter.lastId == null
 }
