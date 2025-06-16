@@ -1,293 +1,79 @@
 {
   "dashboard": {
-    "id": null,
-    "title": "EatNGo Circuit Breaker 모니터링",
-    "tags": ["circuit-breaker", "eatngo"],
-    "timezone": "Asia/Seoul",
+    "title": "Circuit Breaker 모니터링",
+    "tags": ["circuit-breaker", "redis", "monitoring"],
     "panels": [
       {
-        "id": 1,
-        "title": "CLOSED",
+        "title": "Circuit Breaker 상태",
         "type": "stat",
-        "gridPos": {"h": 6, "w": 6, "x": 0, "y": 0},
         "targets": [
           {
-            "expr": "count(circuit_breaker_state == 0)",
-            "legendFormat": "CLOSED"
+            "expr": "circuit_breaker_state",
+            "legendFormat": "{{ name }}"
           }
         ],
         "fieldConfig": {
-          "defaults": {
-            "color": {"mode": "fixed", "fixedColor": "green"},
-            "custom": {
-              "displayMode": "basic"
-            },
-            "thresholds": {
-              "steps": [
-                {"color": "green", "value": null}
-              ]
-            },
-            "unit": "short"
-          }
-        },
-        "options": {
-          "colorMode": "background",
-          "graphMode": "none",
-          "justifyMode": "center",
-          "orientation": "horizontal",
-          "reduceOptions": {
-            "values": false,
-            "calcs": ["lastNotNull"],
-            "fields": ""
-          },
-          "textMode": "value_and_name"
+          "mappings": [
+            {"value": 0, "text": "CLOSED", "color": "green"},
+            {"value": 1, "text": "OPEN", "color": "red"},
+            {"value": 2, "text": "HALF_OPEN", "color": "yellow"}
+          ]
         }
       },
       {
-        "id": 2,
-        "title": "OPEN",
-        "type": "stat",
-        "gridPos": {"h": 6, "w": 6, "x": 6, "y": 0},
-        "targets": [
-          {
-            "expr": "count(circuit_breaker_state == 1)",
-            "legendFormat": "OPEN"
-          }
-        ],
-        "fieldConfig": {
-          "defaults": {
-            "color": {"mode": "fixed", "fixedColor": "red"},
-            "thresholds": {
-              "steps": [
-                {"color": "red", "value": null}
-              ]
-            },
-            "unit": "short"
-          }
-        },
-        "options": {
-          "colorMode": "background",
-          "graphMode": "none",
-          "justifyMode": "center",
-          "orientation": "horizontal",
-          "reduceOptions": {
-            "values": false,
-            "calcs": ["lastNotNull"],
-            "fields": ""
-          },
-          "textMode": "value_and_name"
-        }
-      },
-      {
-        "id": 3,
-        "title": "HALF_OPEN",
-        "type": "stat",
-        "gridPos": {"h": 6, "w": 6, "x": 12, "y": 0},
-        "targets": [
-          {
-            "expr": "count(circuit_breaker_state == 2)",
-            "legendFormat": "HALF_OPEN"
-          }
-        ],
-        "fieldConfig": {
-          "defaults": {
-            "color": {"mode": "fixed", "fixedColor": "yellow"},
-            "thresholds": {
-              "steps": [
-                {"color": "yellow", "value": null}
-              ]
-            },
-            "unit": "short"
-          }
-        },
-        "options": {
-          "colorMode": "background",
-          "graphMode": "none",
-          "justifyMode": "center",
-          "orientation": "horizontal",
-          "reduceOptions": {
-            "values": false,
-            "calcs": ["lastNotNull"],
-            "fields": ""
-          },
-          "textMode": "value_and_name"
-        }
-      },
-      {
-        "id": 4,
-        "title": "총 Circuit Breaker 수",
-        "type": "stat",
-        "gridPos": {"h": 6, "w": 6, "x": 18, "y": 0},
-        "targets": [
-          {
-            "expr": "count(circuit_breaker_state)",
-            "legendFormat": "Total"
-          }
-        ],
-        "fieldConfig": {
-          "defaults": {
-            "color": {"mode": "fixed", "fixedColor": "blue"},
-            "thresholds": {
-              "steps": [
-                {"color": "blue", "value": null}
-              ]
-            },
-            "unit": "short"
-          }
-        },
-        "options": {
-          "colorMode": "background",
-          "graphMode": "none",
-          "justifyMode": "center",
-          "orientation": "horizontal",
-          "reduceOptions": {
-            "values": false,
-            "calcs": ["lastNotNull"],
-            "fields": ""
-          },
-          "textMode": "value_and_name"
-        }
-      },
-      {
-        "id": 5,
-        "title": "Circuit Breaker 호출 성공/실패 (TPS)",
+        "title": "Circuit Breaker 호출 성공/실패율",
         "type": "timeseries",
-        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 6},
         "targets": [
           {
-            "expr": "rate(circuit_breaker_calls_total{result=\"success\"}[1m])",
-            "legendFormat": "성공 - {{name}}"
+            "expr": "rate(circuit_breaker_calls{result=\"success\"}[5m])",
+            "legendFormat": "성공 - {{ name }}"
           },
           {
-            "expr": "rate(circuit_breaker_calls_total{result=\"failure\"}[1m])",
-            "legendFormat": "실패 - {{name}}"
+            "expr": "rate(circuit_breaker_calls{result=\"failure\"}[5m])",
+            "legendFormat": "실패 - {{ name }}"
           }
-        ],
-        "fieldConfig": {
-          "defaults": {
-            "color": {"mode": "palette-classic"},
-            "custom": {
-              "axisLabel": "호출/초",
-              "axisPlacement": "auto",
-              "drawStyle": "line",
-              "fillOpacity": 10,
-              "lineWidth": 2,
-              "pointSize": 5,
-              "showPoints": "never",
-              "spanNulls": false
-            },
-            "unit": "reqps"
-          }
-        }
+        ]
       },
       {
-        "id": 6,
         "title": "Circuit Breaker 응답시간 (95th percentile)",
         "type": "timeseries",
-        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 6},
         "targets": [
           {
             "expr": "histogram_quantile(0.95, rate(circuit_breaker_calls_duration_bucket[5m]))",
-            "legendFormat": "95th - {{name}}"
-          },
-          {
-            "expr": "histogram_quantile(0.50, rate(circuit_breaker_calls_duration_bucket[5m]))",
-            "legendFormat": "50th - {{name}}"
+            "legendFormat": "{{ name }}"
           }
-        ],
-        "fieldConfig": {
-          "defaults": {
-            "color": {"mode": "palette-classic"},
-            "custom": {
-              "axisLabel": "응답시간",
-              "axisPlacement": "auto",
-              "drawStyle": "line",
-              "fillOpacity": 10,
-              "lineWidth": 2
-            },
-            "unit": "s"
-          }
-        }
+        ]
       },
       {
-        "id": 7,
         "title": "Fallback 실행 횟수",
         "type": "timeseries",
-        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 14},
         "targets": [
           {
-            "expr": "rate(circuit_breaker_fallbacks_total[1m])",
-            "legendFormat": "Fallback - {{name}}"
+            "expr": "rate(circuit_breaker_fallbacks[5m])",
+            "legendFormat": "{{ name }}"
           }
-        ],
-        "fieldConfig": {
-          "defaults": {
-            "color": {"mode": "palette-classic"},
-            "custom": {
-              "axisLabel": "Fallback/초",
-              "drawStyle": "line",
-              "fillOpacity": 10,
-              "lineWidth": 2
-            },
-            "unit": "reqps"
-          }
-        }
+        ]
       },
       {
-        "id": 8,
         "title": "Circuit Breaker 실패 카운트",
         "type": "timeseries",
-        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 14},
         "targets": [
           {
             "expr": "circuit_breaker_failure_count",
-            "legendFormat": "실패 카운트 - {{name}}"
+            "legendFormat": "{{ name }}"
           }
-        ],
-        "fieldConfig": {
-          "defaults": {
-            "color": {"mode": "palette-classic"},
-            "custom": {
-              "axisLabel": "실패 횟수",
-              "drawStyle": "line",
-              "fillOpacity": 10,
-              "lineWidth": 2
-            },
-            "unit": "short"
-          }
-        }
+        ]
       },
       {
-        "id": 9,
-        "title": "Circuit Breaker 상태 변화",
+        "title": "상태 변화 횟수",
         "type": "timeseries",
-        "gridPos": {"h": 8, "w": 24, "x": 0, "y": 22},
         "targets": [
           {
-            "expr": "rate(circuit_breaker_state_transitions_total[1m])",
-            "legendFormat": "{{name}}: {{from_state}} → {{to_state}}"
+            "expr": "rate(circuit_breaker_state_transitions[5m])",
+            "legendFormat": "{{ from_state }} → {{ to_state }}"
           }
-        ],
-        "fieldConfig": {
-          "defaults": {
-            "color": {"mode": "palette-classic"},
-            "custom": {
-              "axisLabel": "상태변화/초",
-              "drawStyle": "line",
-              "fillOpacity": 10,
-              "lineWidth": 2
-            },
-            "unit": "reqps"
-          }
-        }
+        ]
       }
-    ],
-    "time": {
-      "from": "now-1h",
-      "to": "now"
-    },
-    "refresh": "5s",
-    "schemaVersion": 30,
-    "version": 1
+    ]
   }
 } 
