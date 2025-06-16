@@ -44,48 +44,22 @@ class SearchService(
         searchDistance: Double,
         size: Int,
     ): SearchStoreResultDto {
-        // TODO: 로직 개선
-        val firstPage =
+        val cachedFirstPageList =
             getFirstPageFromRedis(
                 userCoordinate = storeFilterDto.viewCoordinate,
                 size = size,
             )
 
-        if (isFirstPage(storeFilterDto)) {
-            val storeTotalStockMap =
-                storeTotalStockService.getStoreStockMapForResponse(
-                    storeIds = firstPage.map { it.storeId },
-                )
-            return SearchStoreResultDto.from(
-                userCoordinate = storeFilterDto.viewCoordinate,
-                totalStockCountMap = storeTotalStockMap,
-                searchStoreList = firstPage,
-            )
-        }
+        val searchStoreList =
+            if (isFirstPage(storeFilterDto)) {
+                cachedFirstPageList
+            } else {
+                val cachedStoreIds = cachedFirstPageList.map { it.storeId }.toSet()
+                getFilteredSearchStoreList(storeFilterDto, searchDistance, size, cachedStoreIds)
+            }
 
-        // 첫 페이지가 아닌 경우: Redis 캐시에서 사용된 storeId를 제외한 결과만 사용
-        val cachedStoreIds: Set<Long> = firstPage.map { it.storeId }.toSet()
-
-        val searchStoreList: List<SearchStore> =
-            searchStoreRepository
-                .searchStore(
-                    longitude = storeFilterDto.viewCoordinate.longitude,
-                    latitude = storeFilterDto.viewCoordinate.latitude,
-                    maxDistance = searchDistance,
-                    searchFilter = storeFilterDto.filter,
-                    size = size,
-                ).orThrow { SearchException.SearchStoreListFailed(storeFilterDto.viewCoordinate, storeFilterDto.filter) }
-                .filterNot { it.storeId in cachedStoreIds } // 캐시된 storeId를 제외
-
-        // 재고 정보를 조회하여 SearchStore에 추가
-        val storeTotalStockMap =
-            storeTotalStockService.getStoreStockMapForResponse(
-                storeIds = searchStoreList.map { it.storeId },
-            )
-
-        return SearchStoreResultDto.from(
+        return buildSearchResult(
             userCoordinate = storeFilterDto.viewCoordinate,
-            totalStockCountMap = storeTotalStockMap,
             searchStoreList = searchStoreList,
         )
     }
@@ -293,10 +267,43 @@ class SearchService(
             }.take(size)
     }
 
+    fun getFilteredSearchStoreList(
+        storeFilterDto: StoreFilterDto,
+        searchDistance: Double,
+        size: Int,
+        excludedStoreIds: Set<Long>,
+    ): List<SearchStore> {
+        return searchStoreRepository
+            .searchStore(
+                longitude = storeFilterDto.viewCoordinate.longitude,
+                latitude = storeFilterDto.viewCoordinate.latitude,
+                maxDistance = searchDistance,
+                searchFilter = storeFilterDto.filter,
+                size = size,
+            ).orThrow { SearchException.SearchStoreListFailed(storeFilterDto.viewCoordinate, storeFilterDto.filter) }
+            .filterNot { it.storeId in excludedStoreIds } // 캐시된 storeId를 제외
+    }
+
     fun isFirstPage(storeFilterDto: StoreFilterDto): Boolean =
         storeFilterDto.filter.searchText == null &&
             storeFilterDto.filter.storeCategory == null &&
             storeFilterDto.filter.time == null &&
             !storeFilterDto.filter.onlyReservable &&
             storeFilterDto.filter.lastId == null
+
+    private fun buildSearchResult(
+        userCoordinate: CoordinateVO,
+        searchStoreList: List<SearchStore>,
+    ): SearchStoreResultDto {
+        val storeTotalStockMap =
+            storeTotalStockService.getStoreStockMapForResponse(
+                storeIds = searchStoreList.map { it.storeId },
+            )
+
+        return SearchStoreResultDto.from(
+            userCoordinate = userCoordinate,
+            totalStockCountMap = storeTotalStockMap,
+            searchStoreList = searchStoreList,
+        )
+    }
 }
