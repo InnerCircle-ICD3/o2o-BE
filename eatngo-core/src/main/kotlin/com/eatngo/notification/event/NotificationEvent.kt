@@ -13,4 +13,7 @@ enum class NotificationEventType(
     val messageClass: Class<*>,
 ) {
     ORDER_READIED("ORDER_READIED", OrderDto::class.java),
+    HEARTBEAT("HEARTBEAT", EmptyMessage::class.java),
 }
+
+class EmptyMessage

@@ -20,4 +20,6 @@ class NotificationSsePersistenceImpl : NotificationPersistence {
         }
 
     override fun findById(storeId: Long) = emitters.getOrElse(storeId) { null }
+
+    override fun getAll(): List<SseEmitter> = emitters.values.toList()
 }
