@@ -101,7 +101,7 @@ class StoreOwnerControllerTest(
             userAccountId = account.id,
             roles = account.roles.map { it.role.name },
             storeOwnerId = storeOwner.id,
-            nickname = account.nickname?.value ?: "홍길동",
+            nickname = account.nickname?.value ?: "홍길동"
         )
 
         val token = tokenProvider.createAccessToken(loginStoreOwner)

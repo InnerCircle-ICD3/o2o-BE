@@ -50,7 +50,7 @@ class JwtAuthenticationFilter(
             val loginUser = tokenProvider.getAuthentication(refreshToken).principal as LoginUser
             val newAccessToken = tokenProvider.createAccessToken(loginUser)
 
-            val responseCookie = tokenProvider.createHttpOnlyCookie(ACCESS_TOKEN, newAccessToken, loginUser.cookieStoreLocation)
+            val responseCookie = tokenProvider.createHttpOnlyCookie(ACCESS_TOKEN, newAccessToken)
             response.addHeader(SET_COOKIE_HEADER, responseCookie.toString())
 
             val newAuth = tokenProvider.getAuthentication(newAccessToken)
