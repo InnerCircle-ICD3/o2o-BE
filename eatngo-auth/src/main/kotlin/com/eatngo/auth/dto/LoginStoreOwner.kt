@@ -6,8 +6,7 @@ data class LoginStoreOwner(
     override val userAccountId: Long,
     override val roles: List<String>,
     override val nickname: String?,
-    val storeOwnerId: Long,
-    override val cookieStoreLocation: String = "/store-owner",
+    val storeOwnerId: Long
 ) : LoginUser {
     override fun getCurrentRole(): Role = Role.STORE_OWNER
 }

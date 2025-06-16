@@ -8,5 +8,4 @@ interface LoginUser {
     val userAccountId: Long
     val nickname: String?
     val roles: List<String>
-    val cookieStoreLocation: String
 }

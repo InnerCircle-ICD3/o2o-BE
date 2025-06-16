@@ -141,17 +141,13 @@ class TokenProvider(
             ?: throw IllegalArgumentException("Refresh token not found for user: ${loginUser.userAccountId}")
     }
 
-    fun createHttpOnlyCookie(
-        name: String,
-        value: String,
-        cookieStoreLocation: String
-    ): ResponseCookie {
+    fun createHttpOnlyCookie(name: String, value: String): ResponseCookie {
         return ResponseCookie
             .from(name, value)
             .httpOnly(true)
             .domain(".eatngo.org")
             .secure(true)
-            .path(cookieStoreLocation)
+            .path("/")
             .sameSite("None")
             .maxAge(Duration.ofHours(1))
             .build()
