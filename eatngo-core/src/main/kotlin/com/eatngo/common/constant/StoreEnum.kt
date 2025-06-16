@@ -57,9 +57,7 @@ object StoreEnum {
         val category: String,
     ) {
         BREAD("빵"),
-        BAKERY("베이커리"),
         CAFE("카페"),
-        DESSERT("디저트"),
         KOREAN("한식"),
         FRUIT("과일"),
         PIZZA("피자"),

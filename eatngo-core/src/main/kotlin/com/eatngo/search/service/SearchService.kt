@@ -2,9 +2,11 @@ package com.eatngo.search.service
 
 import com.eatngo.common.exception.search.SearchException
 import com.eatngo.common.type.CoordinateVO
+import com.eatngo.common.util.normalizeCeil
+import com.eatngo.common.util.normalizeFloor
 import com.eatngo.extension.orThrow
+import com.eatngo.search.constant.SuggestionType
 import com.eatngo.search.domain.SearchStore
-import com.eatngo.search.dto.AutoCompleteStoreNameDto
 import com.eatngo.search.dto.Box
 import com.eatngo.search.dto.SearchStoreMap
 import com.eatngo.search.dto.SearchStoreMapResultDto
@@ -14,16 +16,21 @@ import com.eatngo.search.dto.SearchSuggestionResultDto
 import com.eatngo.search.dto.StoreFilterDto
 import com.eatngo.search.infra.SearchMapRedisRepository
 import com.eatngo.search.infra.SearchStoreRepository
+import com.eatngo.search.infra.SearchSuggestionRedisRepository
+import com.eatngo.search.infra.SearchSuggestionRepository
+import com.eatngo.store.service.StoreTotalStockService
 import org.springframework.stereotype.Service
-import kotlin.math.ceil
-import kotlin.math.floor
+import java.math.BigDecimal
 
 @Service
 class SearchService(
     private val searchStoreRepository: SearchStoreRepository,
+    private val searchSuggestionRepository: SearchSuggestionRepository,
     private val searchMapRedisRepository: SearchMapRedisRepository,
+    private val searchSuggestionRedisRepository: SearchSuggestionRedisRepository,
+    private val storeTotalStockService: StoreTotalStockService,
 ) {
-    val cacheBoxSize = 0.005
+    val cacheBoxSize = 0.01
 
     /**
      * 가게 검색 API - 검색어 입력
@@ -46,8 +53,15 @@ class SearchService(
                     size = size,
                 ).orThrow { SearchException.SearchStoreListFailed(storeFilterDto.viewCoordinate, storeFilterDto.filter) }
 
+        // 재고 정보를 조회하여 SearchStore에 추가
+        val storeTotalStockMap =
+            storeTotalStockService.getStoreStockMapForResponse(
+                storeIds = searchStoreList.map { it.storeId },
+            )
+
         return SearchStoreResultDto.from(
             userCoordinate = storeFilterDto.viewCoordinate,
+            totalStockCountMap = storeTotalStockMap,
             searchStoreList = searchStoreList,
         )
     }
@@ -65,11 +79,7 @@ class SearchService(
                 latitude = userCoordinate.latitude,
             )
 
-        // Redis에서 box 검색 결과를 가져온다. -> 위경도 기중 0.005 단위로 박스 매핑
-        val redisKey =
-            searchMapRedisRepository.getKey(box.topLeft)
-        val searchStoreList: List<SearchStore> =
-            searchMapRedisRepository.findByKey(redisKey)
+        val searchStoreList: List<SearchStore> = getMapListFromBox(box)
 
         return SearchStoreMapResultDto.from(
             box = box,
@@ -77,26 +87,19 @@ class SearchService(
         )
     }
 
+    /**
+     * 지도 검색 refresh API - MongoDB에서 검색하여 가져온 뒤 캐싱한다
+     * @param userCoordinate 검색하는 사용자의 위치 정보
+     * @return 지도 검색 결과 DTO
+     */
     fun searchStoreMapRefresh(userCoordinate: CoordinateVO): SearchStoreMapResultDto {
-        val searchStoreMapResult: SearchStoreMapResultDto = searchStoreMap(userCoordinate)
-        if (searchStoreMapResult.storeList.isNotEmpty()) {
-            // Redis에 캐싱된 검색 결과가 있으면 그대로 반환
-            return searchStoreMapResult
-        }
-
         // 검색 결과가 없으면 MongoDB에서 검색하여 가져온 뒤 캐싱한다
         val box: Box =
             getBox(
                 longitude = userCoordinate.longitude,
                 latitude = userCoordinate.latitude,
             )
-        val searchMapList =
-            saveBoxRedis(
-                box = box,
-            ).orThrow {
-                SearchException.SearchStoreMapCacheFailed(userCoordinate)
-            }
-
+        val searchMapList = getMapListDBAndSaveCache(box)
         return SearchStoreMapResultDto.from(
             box = box,
             searchStoreMapList = searchMapList.map { SearchStoreMap.from(it) }, // SearchStore를 SearchStoreMap으로 변환
@@ -109,33 +112,31 @@ class SearchService(
      * @return 검색어 자동완성 리스트
      */
     fun searchSuggestions(keyword: String): SearchSuggestionResultDto {
-        // 매장명은 autoComplete로 검색어 추천
-        val storeNameList: List<AutoCompleteStoreNameDto> =
-            searchStoreRepository
-                .autocompleteStoreName(
-                    keyword = keyword,
-                )
-        val storeSuggestionList =
-            storeNameList.map {
-                SearchSuggestionDto.from(
-                    value = it.storeName,
-                    field = "storeName",
-                    storeId = it.storeId,
-                )
-            }
-        // 음식명 추천은 ...
-        val foodCategoryList: List<String> = emptyList() // TODO: 음식명 추천 로직 추가 필요
-        val foodSuggestionList =
-            foodCategoryList.map {
-                SearchSuggestionDto.from(
-                    value = it,
-                    field = "foodCategory",
-                )
-            }
+        // Redis에서 검색어 자동완성 결과를 가져온다. TODO: 로직 개선
+        val redisKey = searchSuggestionRedisRepository.getKey(keyword)
+        var cachedSuggestions: List<SearchSuggestionDto> =
+            searchSuggestionRedisRepository.getSuggestsByKey(redisKey)
+
+        if (cachedSuggestions.isEmpty()) {
+            // Redis에 캐싱된 검색어 자동완성 결과가 없으면 MongoDB에서 검색하여 가져온다
+            cachedSuggestions = getSuggestionFromMongo(keyword)
+
+            // MongoDB에서 가져온 검색어 자동완성 결과를 Redis에 저장한다
+            searchSuggestionRedisRepository.saveSuggests(
+                key = redisKey,
+                suggests = cachedSuggestions,
+            )
+        }
 
         return SearchSuggestionResultDto.from(
-            storeNameList = storeSuggestionList,
-            foodList = foodSuggestionList,
+            storeNameList =
+                cachedSuggestions
+                    .filter { it.field == SuggestionType.STORE_NAME }
+                    .sortedBy { it.value },
+            foodList =
+                cachedSuggestions
+                    .filter { it.field == SuggestionType.FOOD_TYPE }
+                    .sortedBy { it.value },
         )
     }
 
@@ -149,16 +150,15 @@ class SearchService(
         longitude: Double,
         latitude: Double,
     ): Box {
-        // 경도: 왼쪽(서쪽)으로 내림, 오른쪽(동쪽)으로 올림
-        val leftLng = floor(longitude / cacheBoxSize) * cacheBoxSize
-        val rightLng = ceil(longitude / cacheBoxSize) * cacheBoxSize
+        val unit = BigDecimal.valueOf(cacheBoxSize)
 
-        // 위도: 위쪽(북쪽)으로 올림, 아래쪽(남쪽)으로 내림
-        val topLat = ceil(latitude / cacheBoxSize) * cacheBoxSize
-        val bottomLat = floor(latitude / cacheBoxSize) * cacheBoxSize
+        val leftLng = BigDecimal.valueOf(longitude).normalizeFloor(unit).toDouble()
+        val rightLng = BigDecimal.valueOf(longitude).normalizeCeil(unit).toDouble()
+        val bottomLat = BigDecimal.valueOf(latitude).normalizeFloor(unit).toDouble()
+        val topLat = BigDecimal.valueOf(latitude).normalizeCeil(unit).toDouble()
 
-        val topLeft = CoordinateVO.from(longitude = leftLng, latitude = topLat) // 서쪽 + 북쪽
-        val bottomRight = CoordinateVO.from(longitude = rightLng, latitude = bottomLat) // 동쪽 + 남쪽
+        val topLeft = CoordinateVO.from(longitude = leftLng, latitude = topLat)
+        val bottomRight = CoordinateVO.from(longitude = rightLng, latitude = bottomLat)
 
         return Box.from(topLeft, bottomRight)
     }
@@ -176,5 +176,74 @@ class SearchService(
             )
 
         return searchStoreList
+    }
+
+    fun getSuggestionFromMongo(keyword: String): List<SearchSuggestionDto> {
+        // TODO: 로직 개선
+        val storeNameList: List<SearchSuggestionDto> =
+            searchSuggestionRepository
+                .getSuggestionsByKeyword(
+                    keyword = keyword,
+                    type = SuggestionType.STORE_NAME,
+                    size = 5,
+                ).map { it.to() }
+
+        val foodCategoryList: List<SearchSuggestionDto> =
+            searchSuggestionRepository
+                .getSuggestionsByKeyword(
+                    keyword = keyword,
+                    type = SuggestionType.FOOD_TYPE,
+                    size = 10,
+                ).map { it.to() }
+
+        return storeNameList + foodCategoryList
+    }
+
+    fun getMapListFromBox(box: Box): List<SearchStore> {
+        val result = mutableListOf<SearchStore>()
+        val topLeftList: List<CoordinateVO> =
+            getNineBoxesTopLeftFromCenter(box.topLeft)
+
+        topLeftList.forEach { topLeft ->
+            // 좌상단 좌표를 기준으로 Redis에서 검색
+            result.addAll(
+                searchMapRedisRepository
+                    .findByKey(searchMapRedisRepository.getKey(topLeft)),
+            )
+        }
+        return result
+    }
+
+    fun getMapListDBAndSaveCache(box: Box): List<SearchStore> {
+        val result = mutableListOf<SearchStore>()
+        val topLeftList: List<CoordinateVO> =
+            getNineBoxesTopLeftFromCenter(box.topLeft)
+
+        topLeftList.forEach { topLeft ->
+            val box =
+                getBox(
+                    longitude = topLeft.longitude,
+                    latitude = topLeft.latitude,
+                )
+            // Redis에 저장
+            result.addAll(saveBoxRedis(box))
+        }
+
+        return result
+    }
+
+    fun getNineBoxesTopLeftFromCenter(center: CoordinateVO): List<CoordinateVO> {
+        val topLeftList = mutableListOf<CoordinateVO>()
+        for (i in -1..1) {
+            for (j in -1..1) {
+                val topLeft =
+                    CoordinateVO.from(
+                        longitude = center.longitude + i * cacheBoxSize,
+                        latitude = center.latitude + j * cacheBoxSize,
+                    )
+                topLeftList.add(topLeft)
+            }
+        }
+        return topLeftList
     }
 }

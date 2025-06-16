@@ -8,4 +8,5 @@ abstract class BusinessException(
     override val message: String = errorCode.message,
     open val data: Map<String, Any>? = null,
     open val logLevel: Level = Level.WARN,
-) : RuntimeException(message)
+    override val cause: Throwable? = null
+) : RuntimeException(message, cause)

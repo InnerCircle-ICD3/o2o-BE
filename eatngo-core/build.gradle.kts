@@ -6,9 +6,9 @@ plugins {
 dependencies {
     // Spring Boot 기본 의존성
 
-    implementation("org.springframework:spring-context")  // REST API 지원
+    implementation("org.springframework:spring-context") // REST API 지원
     implementation("org.springframework.boot:spring-boot-starter-web") // SSE Emitter 지원
-    implementation("org.jetbrains.kotlin:kotlin-reflect")              // Kotlin 리플렉션 지원
+    implementation("org.jetbrains.kotlin:kotlin-reflect") // Kotlin 리플렉션 지원
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin") // Kotlin JSON 직렬화/역직렬화
     implementation("org.springframework.boot:spring-boot-starter-data-jpa") // Transactional 사용
     // tsid 생성기
@@ -20,13 +20,20 @@ dependencies {
     // 테스트 의존성
     testImplementation("io.kotest:kotest-runner-junit5:5.8.1")
     testImplementation("io.kotest:kotest-assertions-core:5.8.1")
+    testImplementation("io.mockk:mockk:1.13.10") // mockk
+
+    // Circuit Breaker 모듈
+    implementation(project(":eatngo-common:circuit-breaker"))
+
+    // AOP 지원 (Circuit Breaker용)
+    implementation("org.springframework.boot:spring-boot-starter-aop")
 }
 
-tasks.bootJar{
+tasks.bootJar {
     enabled = false
 }
 
-tasks.jar{
+tasks.jar {
     enabled = true
     archiveFileName.set("${project.name}.jar")
 }

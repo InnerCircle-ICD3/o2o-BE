@@ -15,68 +15,67 @@ class SearchStoreQueryRepositoryImpl(
         em
             .createQuery(
                 """
-            SELECT SearchStoreRdbDto(
-                s.id,
-                s.name,
-                s.imageUrl,
-                s.storeCategory,
-                s.foodCategory,
-                p.foodTypes,
-                s.address.roadNameAddress,
-                s.address.latitude,
-                s.address.longitude,
-                p.status,
-                s.status,
-                s.businessHours,
-                s.updatedAt,
-                s.createdAt
-            )
-            FROM StoreJpaEntity s 
-                JOIN FETCH s.address
-                JOIN ProductEntity p ON p.storeId = s.id
-            WHERE s.id = :storeId
-        """,
+                SELECT new com.eatngo.search.dto.SearchStoreRdbDto(
+                    s.id,
+                    s.name,
+                    s.imageUrl,
+                    s.storeCategory,
+                    s.foodCategory,
+                    f,
+                    s.address.roadNameAddress,
+                    s.address.latitude,
+                    s.address.longitude,
+                    s.status,
+                    s.businessHours,
+                    s.updatedAt,
+                    s.createdAt
+                )
+                FROM StoreJpaEntity s 
+                    JOIN s.address
+                    LEFT JOIN ProductEntity p ON p.storeId = s.id
+                    LEFT JOIN p.foodTypes f
+                WHERE s.id = :storeId
+                """.trimIndent(),
                 SearchStoreRdbDto::class.java,
             ).setParameter("storeId", storeId)
             .singleResult
 
-    override fun findFoodTypesByProductUpdatedAt(pivotTime: LocalDateTime): List<SearchStoreFoodTypeDto> =
+    override fun findFoodTypesByStoreIds(storeIds: List<Long>): List<SearchStoreFoodTypeDto> =
         em
             .createQuery(
                 """
-            SELECT SearchStoreFoodTypeDto(p.storeId, p.foodTypes)
+            SELECT new com.eatngo.search.dto.SearchStoreFoodTypeDto(p.storeId, f)
             FROM ProductEntity p
-            WHERE p.updatedAt > :pivotTime
+            JOIN p.foodTypes f
+            WHERE p.storeId IN :storeIds
         """,
                 SearchStoreFoodTypeDto::class.java,
-            ).setParameter("pivotTime", pivotTime)
+            ).setParameter("storeIds", storeIds)
             .resultList
 
-    override fun findAllByUpdatedAtAfter(pivotTime: LocalDateTime): List<SearchStoreRdbDto> =
+    override fun findStoresByUpdateAt(pivotTime: LocalDateTime): List<SearchStoreRdbDto> =
         em
             .createQuery(
                 """
-            SELECT SearchStoreRdbDto(
-                s.id,
-                s.name,
-                s.imageUrl,
-                s.storeCategory,
-                s.foodCategory,
-                p.foodTypes,
-                s.address.roadNameAddress,
-                s.address.latitude,
-                s.address.longitude,
-                p.status,
-                s.status,
-                s.businessHours,
-                s.updatedAt,
-                s.createdAt
-            )
-            FROM StoreJpaEntity s 
-                JOIN FETCH s.address
-                JOIN ProductEntity p ON p.storeId = s.id
-            WHERE s.updatedAt > :pivotTime
-        """,
+                SELECT new com.eatngo.search.dto.SearchStoreRdbDto(
+                    s.id,
+                    s.name,
+                    s.imageUrl,
+                    s.storeCategory,
+                    s.foodCategory,
+                    null,
+                    s.address.roadNameAddress,
+                    s.address.latitude,
+                    s.address.longitude,
+                    s.status,
+                    s.businessHours,
+                    s.updatedAt,
+                    s.createdAt
+                )
+                FROM StoreJpaEntity s 
+                    JOIN s.address
+                WHERE s.updatedAt > :pivotTime
+                """.trimIndent(),
                 SearchStoreRdbDto::class.java,
             ).setParameter("pivotTime", pivotTime)
             .resultList
