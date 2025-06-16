@@ -17,6 +17,7 @@ data class SearchStoreResultDto(
     companion object {
         fun from(
             userCoordinate: CoordinateVO,
+            totalStockCountMap: Map<Long, Int>,
             searchStoreList: List<SearchStore>,
         ): SearchStoreResultDto {
             val contents =
@@ -26,7 +27,8 @@ data class SearchStoreResultDto(
                             userCoordinate,
                             searchStore.coordinate.toVO(),
                         )
-                    SearchStoreDto.from(searchStore, distance)
+                    val stock = totalStockCountMap[searchStore.storeId] ?: -1
+                    SearchStoreDto.from(searchStore, stock, distance)
                 }
 
             return SearchStoreResultDto(
@@ -50,15 +52,16 @@ data class SearchStoreDto(
     val businessHours: List<BusinessHourVO>, // 매장 영업 시간
     val todayPickupStartTime: LocalTime?, // 오늘 픽업 시작 시간
     val todayPickupEndTime: LocalTime?, // 오늘 픽업 종료 시간
-    // TODO: 리뷰, 찜 기능
     val totalStockCount: Int = -1, // 전체 재고 수량 (-1: 오늘 등록 안함, 0: 재고 없음)
     val ratingAverage: Double, // 리뷰 평점
     val ratingCount: Int, // 리뷰 수
+    // TODO: 찜 기능
     val isFavorite: Boolean? = false, // 찜 여부
 ) {
     companion object {
         fun from(
             searchStore: SearchStore,
+            stock: Int,
             distanceKm: Double,
         ): SearchStoreDto {
             // 픽업 가능 시간 TODO : 검색쪽 필터링 부분과 겹치는 로직으로 리팩토링 필요
@@ -97,11 +100,9 @@ data class SearchStoreDto(
                     ),
                 todayPickupStartTime = todayPickupStartTime,
                 todayPickupEndTime = todayPickupEndTime,
-                // TODO: 재고 수량은 Redis에서 가져와야 함(상품)
-                totalStockCount = 0,
-                // TODO: 리뷰 관련 기능 구현 (Redis에서 가져오기?)
-                ratingAverage = 3.0,
-                ratingCount = 3,
+                totalStockCount = stock,
+                ratingAverage = searchStore.averageRating?.toDouble() ?: 0.0,
+                ratingCount = searchStore.totalReviewCount ?: 0,
             )
         }
     }

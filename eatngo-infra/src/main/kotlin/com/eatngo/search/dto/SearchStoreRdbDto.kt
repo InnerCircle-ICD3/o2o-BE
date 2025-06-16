@@ -8,6 +8,7 @@ import com.eatngo.search.domain.TimeRange
 import com.eatngo.store.rdb.json_converter.BusinessHourJson
 import com.eatngo.store.rdb.json_converter.FoodCategoryJson
 import com.eatngo.store.rdb.json_converter.StoreCategoryJson
+import java.math.BigDecimal
 import java.time.DayOfWeek
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -47,6 +48,8 @@ data class SearchStoreRdbDto(
                     DayOfWeek.valueOf(it.dayOfWeek) to
                         TimeRange.from(LocalTime.parse(it.openTime), LocalTime.parse(it.closeTime))
                 },
+            totalReviewCount = 0,
+            averageRating = BigDecimal.ZERO,
             updatedAt = updatedAt,
             createdAt = createdAt,
         )

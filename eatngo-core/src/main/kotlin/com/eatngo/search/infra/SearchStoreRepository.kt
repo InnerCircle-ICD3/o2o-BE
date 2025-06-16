@@ -16,7 +16,7 @@ interface SearchStoreRepository {
         size: Int,
     ): List<SearchStore>
 
-    fun save(searchStore: SearchStore)
+    fun saveStore(searchStore: SearchStore)
 
     fun saveAll(searchStoreList: List<SearchStore>)
 

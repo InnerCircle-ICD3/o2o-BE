@@ -3,6 +3,7 @@ package com.eatngo.mongo.search.repository
 import com.eatngo.mongo.search.entity.SearchStoreEntity
 import com.eatngo.search.domain.SearchStore
 import com.eatngo.search.domain.SearchStoreFoodTypes
+import com.eatngo.search.domain.SearchStoreStatus
 import com.eatngo.search.dto.Box
 import com.eatngo.search.dto.SearchFilter
 import com.eatngo.search.infra.SearchStoreRepository
@@ -77,6 +78,8 @@ class SearchStoreRepositoryImpl(
                             "coordinate" to 1,
                             "status" to 1,
                             "businessHours" to 1,
+                            "totalReviewCount" to 1,
+                            "averageRating" to 1,
                             "metaSearchScore" to Document("\$meta", "searchScore"), // 검색 점수
                             "paginationToken" to Document("\$meta", "searchSequenceToken"), // 검색 점수
                         ),
@@ -105,7 +108,7 @@ class SearchStoreRepositoryImpl(
         }
     }
 
-    override fun save(searchStore: SearchStore) {
+    override fun saveStore(searchStore: SearchStore) {
         val store = SearchStoreEntity.from(searchStore)
 
         val query = Query(Criteria.where("_id").`is`(store.storeId))
@@ -115,7 +118,6 @@ class SearchStoreRepositoryImpl(
                 .set("storeImage", store.storeImage)
                 .set("storeCategory", store.storeCategory)
                 .set("foodCategory", store.foodCategory)
-                .set("foodTypes", store.foodTypes)
                 .set("roadNameAddress", store.roadNameAddress)
                 .set("coordinate", store.coordinate)
                 .set("status", store.status)
@@ -150,6 +152,8 @@ class SearchStoreRepositoryImpl(
                     .set("coordinate", store.coordinate)
                     .set("status", store.status)
                     .set("businessHours", store.businessHours)
+                    .set("totalReviewCount", store.totalReviewCount)
+                    .set("averageRating", store.averageRating)
                     .set("updatedAt", LocalDateTime.now())
                     .set("createdAt", store.createdAt)
 
@@ -219,21 +223,31 @@ class SearchStoreRepositoryImpl(
         latitude: Double,
         maxDistanceKm: Double,
         searchFilter: SearchFilter,
-        status: Int = 1, // 기본적으로 OPEN 상태의 매장을 우선 검색
     ): AggregationOperation {
         val maxDistance = maxDistanceKm * 1000 // km 단위를 meter로 변환
 
         val must = mutableListOf<Document>()
         val should = mutableListOf<Document>()
 
-        // TODO: STATUS 필터링 로직 개선 필요 -> 예약 가능 상태 필터링
-        must += (
-            Document(
-                "equals",
-                Document("path", "status")
-                    .append("value", status),
+        // 상태 필터링
+        if (searchFilter.onlyReservable) {
+            must += (
+                Document(
+                    "equals",
+                    Document("path", "status")
+                        .append("value", SearchStoreStatus.OPEN.code),
+                )
             )
-        )
+        } else {
+            should += (
+                Document(
+                    "equals",
+                    Document("path", "status")
+                        .append("value", SearchStoreStatus.OPEN.code),
+                )
+            )
+        }
+
         // 검색어 필터링
         if (searchFilter.searchText != null && searchFilter.searchText != "") {
             must += (
