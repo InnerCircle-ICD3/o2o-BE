@@ -61,7 +61,7 @@ class CircuitBreakerMetrics(
     
     fun recordStateChange(circuitBreakerName: String, fromState: CircuitBreakerManager.State, toState: CircuitBreakerManager.State) {
         meterRegistry?.let { registry ->
-            Counter.builder("circuit_breaker_state_transitions")
+            Counter.builder("circuit_breaker_state_transitions_total")
                 .tag("name", circuitBreakerName)
                 .tag("from_state", fromState.name)
                 .tag("to_state", toState.name)
@@ -74,7 +74,7 @@ class CircuitBreakerMetrics(
     
     private fun getSuccessCounter(name: String): Counter {
         return successCounters.computeIfAbsent(name) {
-            Counter.builder("circuit_breaker_calls")
+            Counter.builder("circuit_breaker_calls_total")
                 .tag("name", name)
                 .tag("result", "success")
                 .description("Circuit breaker successful calls")
@@ -84,7 +84,7 @@ class CircuitBreakerMetrics(
     
     private fun getFailureCounter(name: String): Counter {
         return failureCounters.computeIfAbsent(name) {
-            Counter.builder("circuit_breaker_calls")
+            Counter.builder("circuit_breaker_calls_total")
                 .tag("name", name)
                 .tag("result", "failure")
                 .description("Circuit breaker failed calls")
@@ -94,7 +94,7 @@ class CircuitBreakerMetrics(
     
     private fun getFallbackCounter(name: String): Counter {
         return fallbackCounters.computeIfAbsent(name) {
-            Counter.builder("circuit_breaker_fallbacks")
+            Counter.builder("circuit_breaker_fallbacks_total")
                 .tag("name", name)
                 .description("Circuit breaker fallback executions")
                 .register(meterRegistry!!)
