@@ -12,7 +12,7 @@ import org.springframework.stereotype.Repository
 @Repository
 class InventoryRedisPersistenceImpl(
     @Qualifier("stringRedisTemplate")
-    private val redisTemplate: RedisTemplate<String, String>,
+    private val stringRedisTemplate: RedisTemplate<String, String>,
     @Qualifier("typeRedisTemplate")
     private val typeRedisTemplate: RedisTemplate<String, Any>,
 ) : InventoryCachePersistence {
@@ -40,7 +40,7 @@ class InventoryRedisPersistenceImpl(
 
     override fun decreaseStock(productId: Long, stockQuantityToDecrease: Int): Int {
         val script = DefaultRedisScript(LUA_DEC_STOCK, Long::class.java)
-        val result = redisTemplate.execute(
+        val result = stringRedisTemplate.execute(
             script,
             listOf(luaKey(productId)),
             stockQuantityToDecrease.toString()
@@ -60,15 +60,15 @@ class InventoryRedisPersistenceImpl(
         typeRedisTemplate.opsForValue().set(pKey(productId), updated)
 
         // 상품 캐시 삭제 필요 ~> ProductDto의 InventoryDto 가 갱신되지 않기 때문
-        redisTemplate.delete("product::$productId")
+        stringRedisTemplate.delete("product::$productId")
     }
 
     override fun findByProductId(productId: Long): InventoryDto? {
         val key = luaKey(productId)
-        val quantityValue = redisTemplate.opsForHash<String, String>()
+        val quantityValue = stringRedisTemplate.opsForHash<String, String>()
             .get(key, "quantity") ?: return null
 
-        val stockValue = redisTemplate.opsForHash<String, String>()
+        val stockValue = stringRedisTemplate.opsForHash<String, String>()
             .get(key, "stock") ?: return null
 
         return InventoryDto(
@@ -79,7 +79,7 @@ class InventoryRedisPersistenceImpl(
 
     override fun rollbackStock(productId: Long, stockQuantity: Int): Int {
         val script = DefaultRedisScript(LUA_ROLLBACK_STOCK, Long::class.java)
-        val result = redisTemplate.execute(script, listOf(luaKey(productId)), stockQuantity.toString())
+        val result = stringRedisTemplate.execute(script, listOf(luaKey(productId)), stockQuantity.toString())
             ?: -1L
         if (result == -1L) throw StockNotFound(productId)
 
@@ -89,7 +89,7 @@ class InventoryRedisPersistenceImpl(
 
     override fun saveHash(productId: Long, inventoryDto: InventoryDto) {
         val key = "inventory:hash:$productId"
-        redisTemplate.opsForHash<String, String>().putAll(
+        stringRedisTemplate.opsForHash<String, String>().putAll(
             key,
             mapOf(
                 "stock" to inventoryDto.stock.toString(),
@@ -99,6 +99,6 @@ class InventoryRedisPersistenceImpl(
     }
 
     override fun deleteHash(productId: Long) {
-        redisTemplate.delete("inventory:hash:$productId")
+        stringRedisTemplate.delete("inventory:hash:$productId")
     }
 }
