@@ -4,16 +4,17 @@ import com.eatngo.common.exception.product.StockException.StockEmpty
 import com.eatngo.common.exception.product.StockException.StockNotFound
 import com.eatngo.inventory.dto.InventoryDto
 import com.eatngo.inventory.infra.InventoryCachePersistence
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.data.redis.core.script.DefaultRedisScript
 import org.springframework.stereotype.Repository
 
 @Repository
 class InventoryRedisPersistenceImpl(
-//    @Qualifier("typeRedisTemplate")
+    @Qualifier("stringRedisTemplate")
     private val redisTemplate: RedisTemplate<String, String>,
+    @Qualifier("typeRedisTemplate")
+    private val typeRedisTemplate: RedisTemplate<String, Any>,
 ) : InventoryCachePersistence {
 
     companion object {
@@ -38,13 +39,6 @@ class InventoryRedisPersistenceImpl(
     }
 
     override fun decreaseStock(productId: Long, stockQuantityToDecrease: Int): Int {
-        val keys = redisTemplate.keys("inventory:hash:*")
-        println("🔥 [Redis Keys] Found ${keys.size} keys:")
-        keys.forEach { key ->
-            val entries = redisTemplate.opsForHash<String, String>().entries(key)
-            println("  - Key: $key")
-            println("    -> Entries: $entries")
-        }
         val script = DefaultRedisScript(LUA_DEC_STOCK, Long::class.java)
         val result = redisTemplate.execute(
             script,
@@ -63,15 +57,7 @@ class InventoryRedisPersistenceImpl(
 
     private fun updateInventoryCacheWithClassInfo(productId: Long) {
         val updated = findByProductId(productId) ?: return
-
-        val mapperWithTyping = ObjectMapper().activateDefaultTyping(
-            LaissezFaireSubTypeValidator.instance,
-            ObjectMapper.DefaultTyping.NON_FINAL
-        )
-
-        val json = mapperWithTyping.writeValueAsString(updated)
-
-        redisTemplate.opsForValue().set(pKey(productId), json)
+        typeRedisTemplate.opsForValue().set(pKey(productId), updated)
 
         // 상품 캐시 삭제 필요 ~> ProductDto의 InventoryDto 가 갱신되지 않기 때문
         redisTemplate.delete("product::$productId")

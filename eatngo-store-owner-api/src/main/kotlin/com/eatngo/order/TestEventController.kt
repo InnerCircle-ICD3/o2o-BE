@@ -16,7 +16,7 @@ import java.time.LocalDateTime
 @RestController
 @RequestMapping("/fake-order")
 @Transactional
-class FakeOrderController(
+class TestEventController(
     private val eventPublisher: ApplicationEventPublisher,
     private val orderService: OrderService,
     private val productEventListener: ProductEventListener,

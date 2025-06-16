@@ -83,31 +83,30 @@ class RedisConfig(
         return template
     }
 
-    @Bean(value = ["typeRedisTemplate"])
+    @Bean(name = ["typeRedisTemplate"])
     fun typeRedisTemplate(redisConnectionFactory: RedisConnectionFactory): RedisTemplate<String, Any> {
         val template = RedisTemplate<String, Any>()
         template.connectionFactory = redisConnectionFactory
 
-        val typedMapper = objectMapper.copy().apply {
+        val dtoMapper = objectMapper.copy().apply {
             registerKotlinModule()
             activateDefaultTyping(
                 LaissezFaireSubTypeValidator.instance,
-                ObjectMapper.DefaultTyping.NON_FINAL,
+                ObjectMapper.DefaultTyping.EVERYTHING,
                 JsonTypeInfo.As.PROPERTY
             )
             configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
         }
 
-        val jsonSerializer = GenericJackson2JsonRedisSerializer(typedMapper)
+        val jsonSerializer = GenericJackson2JsonRedisSerializer(dtoMapper)
 
-        template.keySerializer = stringSerializer
-        template.hashKeySerializer = stringSerializer
+        template.keySerializer = StringRedisSerializer()
         template.valueSerializer = jsonSerializer
-        template.hashValueSerializer = stringSerializer
+        template.hashValueSerializer = jsonSerializer
+        template.hashValueSerializer = jsonSerializer
 
         return template
     }
-
 
     @Bean
     fun reactiveStringRedisTemplate(
