@@ -17,22 +17,28 @@ class NotificationSseService(
     fun sendMessage(notificationEvent: NotificationEvent<*>) =
         notificationPersistence
             .findById(notificationEvent.storeId)
-            ?.send(
-                SseEmitter
-                    .event()
-                    .name(notificationEvent.eventType.eventName)
-                    .data(objectMapper.writeValueAsString(notificationEvent.message)),
-            )
+            ?.runCatching {
+                send(
+                    SseEmitter
+                        .event()
+                        .name(notificationEvent.eventType.eventName)
+                        .data(objectMapper.writeValueAsString(notificationEvent.message)),
+                )
+            }?.onFailure {
+                notificationPersistence.remove(notificationEvent.storeId)
+            }
 
     fun sendHeartbeat() =
         notificationPersistence
             .getAll()
-            .forEach {
-                it.send(
-                    SseEmitter
-                        .event()
-                        .name(NotificationEventType.HEARTBEAT.eventName),
-                )
+            .forEach { (storeId, sseEmitter) ->
+                runCatching {
+                    sseEmitter.send(
+                        SseEmitter
+                            .event()
+                            .name(NotificationEventType.HEARTBEAT.eventName),
+                    )
+                }.onFailure { notificationPersistence.remove(storeId) }
             }
 
     companion object {

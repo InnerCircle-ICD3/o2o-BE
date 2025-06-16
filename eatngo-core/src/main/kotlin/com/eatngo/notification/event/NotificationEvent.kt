@@ -14,6 +14,7 @@ enum class NotificationEventType(
 ) {
     ORDER_READIED("ORDER_READIED", OrderDto::class.java),
     HEARTBEAT("HEARTBEAT", EmptyMessage::class.java),
+    CONNECTED("CONNECTED", EmptyMessage::class.java),
 }
 
 class EmptyMessage

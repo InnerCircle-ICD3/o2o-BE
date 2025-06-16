@@ -7,5 +7,7 @@ interface NotificationPersistence {
 
     fun findById(storeId: Long): SseEmitter?
 
-    fun getAll(): List<SseEmitter>
+    fun getAll(): Map<Long, SseEmitter>
+
+    fun remove(storeId: Long)
 }
