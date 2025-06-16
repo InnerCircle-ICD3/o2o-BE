@@ -44,7 +44,7 @@ data class Inventory(
         this.stock = stock
     }
 
-    private fun increaseStock(amount: Int): Inventory {
+    fun increaseStock(amount: Int): Inventory {
         return Inventory(
             id = this.id,
             quantity = this.quantity,
@@ -55,7 +55,7 @@ data class Inventory(
         )
     }
 
-    private fun decreaseStock(amount: Int): Inventory {
+    fun decreaseStock(amount: Int): Inventory {
         validateStock(amount)
         return Inventory(
             id = this.id,
