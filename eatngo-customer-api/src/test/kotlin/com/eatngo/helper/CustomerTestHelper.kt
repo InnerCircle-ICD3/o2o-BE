@@ -40,7 +40,7 @@ class CustomerTestHelper(
             userAccountId = account.id,
             roles = account.roles.map { it.role.name },
             customerId = customer.id,
-            nickname = customer.account.nickname?.value ?: "홍길동"
+            nickname = customer.account.nickname?.value ?: "홍길동",
         )
 
         val token = tokenProvider.createAccessToken(loginCustomer)

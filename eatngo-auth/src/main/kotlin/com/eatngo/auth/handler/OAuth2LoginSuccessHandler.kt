@@ -30,7 +30,7 @@ class OAuth2LoginSuccessHandler(
         val accessToken = tokenProvider.createAccessToken(loginUser)
         tokenProvider.createRefreshToken(loginUser)
 
-        val responseCookie = tokenProvider.createHttpOnlyCookie(ACCESS_TOKEN, accessToken)
+        val responseCookie = tokenProvider.createHttpOnlyCookie(ACCESS_TOKEN, accessToken, loginUser.cookieStoreLocation)
         response.addHeader(SET_COOKIE_HEADER, responseCookie.toString())
         response.contentType = "application/json"
         response.status = HttpServletResponse.SC_MOVED_TEMPORARILY
