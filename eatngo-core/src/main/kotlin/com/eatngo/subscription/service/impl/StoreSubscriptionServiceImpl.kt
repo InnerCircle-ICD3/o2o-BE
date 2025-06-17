@@ -121,6 +121,7 @@ class StoreSubscriptionServiceImpl(
     }
 
     override fun getSubscribedStoreIds(customerId: Long): List<Long> {
+        // Repository에서 이미 deletedAt IS NULL 조건으로 활성 구독만 조회
         return storeSubscriptionPersistence.findStoreIdsByUserId(customerId)
     }
     

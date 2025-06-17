@@ -60,7 +60,7 @@ data class StoreDetailResponse(
     val isFavorite: Boolean = false,
 ) {
     companion object {
-        fun from(storeDto: StoreDto, isFavorite: Boolean = false): StoreDetailResponse {
+        fun from(storeDto: StoreDto, isFavorite: Boolean): StoreDetailResponse {
             return StoreDetailResponse(
                 id = storeDto.storeId,
                 name = storeDto.name,

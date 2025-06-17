@@ -7,7 +7,6 @@ import com.eatngo.subscription.docs.controller.StoreSubscriptionControllerDocs
 import com.eatngo.subscription.dto.CustomerSubscriptionQueryParamDto
 import com.eatngo.subscription.dto.StoreSubscriptionResponse
 import com.eatngo.subscription.dto.SubscriptionToggleResponse
-import com.eatngo.subscription.service.StoreSubscriptionService
 import com.eatngo.subscription.usecase.CustomerSubscriptionQueryUseCase
 import com.eatngo.subscription.usecase.CustomerSubscriptionToggleUseCase
 import org.springframework.web.bind.annotation.*
@@ -17,8 +16,7 @@ import org.springframework.web.bind.annotation.*
 
 class CustomerStoreSubscriptionController(
     private val customerSubscriptionToggleUseCase: CustomerSubscriptionToggleUseCase,
-    private val customerSubscriptionQueryUseCase: CustomerSubscriptionQueryUseCase,
-    private val storeSubscriptionService: StoreSubscriptionService
+    private val customerSubscriptionQueryUseCase: CustomerSubscriptionQueryUseCase
 ) : StoreSubscriptionControllerDocs {
     @PostMapping("/{storeId}")
     override fun toggleSubscription(
@@ -49,7 +47,7 @@ class CustomerStoreSubscriptionController(
 
     @GetMapping("/store-ids")
     override fun getSubscribedStoreIds(@CustomerId customerId: Long): ApiResponse<List<Long>> {
-        val response = storeSubscriptionService.getSubscribedStoreIds(customerId)
+        val response = customerSubscriptionQueryUseCase.getSubscribedStoreIds(customerId)
         return ApiResponse.success(response)
     }
 }

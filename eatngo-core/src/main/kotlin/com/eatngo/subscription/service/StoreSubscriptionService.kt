@@ -25,7 +25,7 @@ interface StoreSubscriptionService {
     fun isSubscribed(storeId: Long, customerId: Long): Boolean
 
     /**
-     * 사용자가 구독하고 있는 매장 ID 목록 조회
+     * 사용자가 구독하고 있는 매장 ID 목록 조회 (활성 구독만)
      */
     fun getSubscribedStoreIds(customerId: Long): List<Long>
 }
