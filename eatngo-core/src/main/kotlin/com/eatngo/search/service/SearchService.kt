@@ -149,11 +149,22 @@ class SearchService(
         latitude: Double,
     ): Box {
         val unit = BigDecimal.valueOf(cacheBoxSize)
+        val epsilon = unit.divide(BigDecimal("10")) // 예: 0.001 (unit이 0.01일 때)
 
         val leftLng = BigDecimal.valueOf(longitude).normalizeFloor(unit).toDouble()
-        val rightLng = BigDecimal.valueOf(longitude).normalizeCeil(unit).toDouble()
+        val rightLng =
+            BigDecimal
+                .valueOf(longitude)
+                .add(epsilon)
+                .normalizeCeil(unit)
+                .toDouble()
         val bottomLat = BigDecimal.valueOf(latitude).normalizeFloor(unit).toDouble()
-        val topLat = BigDecimal.valueOf(latitude).normalizeCeil(unit).toDouble()
+        val topLat =
+            BigDecimal
+                .valueOf(latitude)
+                .add(epsilon)
+                .normalizeCeil(unit)
+                .toDouble()
 
         val topLeft = CoordinateVO.from(longitude = leftLng, latitude = topLat)
         val bottomRight = CoordinateVO.from(longitude = rightLng, latitude = bottomLat)
