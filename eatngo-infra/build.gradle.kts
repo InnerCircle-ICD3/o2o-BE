@@ -37,6 +37,9 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
     // Redis
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
+    // shedlock
+    implementation("net.javacrumbs.shedlock:shedlock-spring:5.13.0")
+    implementation("net.javacrumbs.shedlock:shedlock-provider-redis-spring:5.13.0")
     // PostgreSQL
     implementation("org.postgresql:postgresql:42.7.3") // PG 17 호환
 
