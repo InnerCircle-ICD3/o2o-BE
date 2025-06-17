@@ -86,6 +86,33 @@ interface StoreSubscriptionControllerDocs {
         )
         @RequestParam(required = false) lastId: Long?
     ): ApiResponse<Cursor<StoreSubscriptionResponse>>
+
+    @Operation(
+        summary = "구독한 매장 ID 목록 조회",
+        description = """
+            현재 로그인한 고객이 구독한 매장의 ID만 간단하게 조회합니다.
+            pull-to-refresh 시 자주 호출되는 가벼운 API입니다.
+            - 매장 ID 목록만 반환
+            - 메인 화면 구독 상태 표시용
+        """
+    )
+    @ApiResponses(
+        value = [
+            SwaggerApiResponse(
+                responseCode = "200",
+                description = "구독한 매장 ID 목록 조회 성공",
+                content = [Content(schema = Schema(implementation = StoreIdsApiResponseDoc::class))]
+            ),
+            SwaggerApiResponse(
+                responseCode = "400",
+                description = "잘못된 요청(400~500 에러 포함)",
+                content = [Content(schema = Schema(implementation = ApiResponseErrorDoc::class))]
+            )
+        ]
+    )
+    fun getSubscribedStoreIds(
+        @CustomerId customerId: Long
+    ): ApiResponse<List<Long>>
 }
 
 /**
@@ -145,4 +172,16 @@ data class StoreSubscriptionResponseDoc(
     val pickupDay: String?,
     @Schema(description = "구독 일시", example = "2025-01-15T10:30:00")
     val subscribedAt: String
+)
+
+/**
+ * 구독한 매장 ID 목록 응답 문서
+ */
+@Schema(description = "구독한 매장 ID 목록 응답")
+data class StoreIdsApiResponseDoc(
+    @Schema(description = "요청 성공 여부", example = "true")
+    val success: Boolean = true,
+    
+    @Schema(description = "구독한 매장 ID 목록", example = "[123, 456, 789]")
+    val data: List<Long> = listOf(123, 456, 789)
 )
