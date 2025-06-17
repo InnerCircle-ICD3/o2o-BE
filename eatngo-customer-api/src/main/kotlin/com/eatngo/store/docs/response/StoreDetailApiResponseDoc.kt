@@ -64,7 +64,10 @@ data class StoreDetailResponseDoc(
     val foodCategory: List<String>? = null,
 
     @Schema(description = "매장 카테고리 목록", example = "[\"BREAD\"]")
-    val storeCategory: List<String>? = null
+    val storeCategory: List<String>? = null,
+
+    @Schema(description = "구독(찜) 여부", example = "true")
+    val isFavorite: Boolean = false
 )
 
 /** DTO로 처리한 부분들 docs */

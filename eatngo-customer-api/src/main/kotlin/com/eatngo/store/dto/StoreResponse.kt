@@ -57,9 +57,10 @@ data class StoreDetailResponse(
     val ratingCount: Int,
     val foodCategory: List<String>?,
     val storeCategory: List<String>?,
+    val isFavorite: Boolean = false,
 ) {
     companion object {
-        fun from(storeDto: StoreDto): StoreDetailResponse {
+        fun from(storeDto: StoreDto, isFavorite: Boolean = false): StoreDetailResponse {
             return StoreDetailResponse(
                 id = storeDto.storeId,
                 name = storeDto.name,
@@ -94,7 +95,8 @@ data class StoreDetailResponse(
                 ratingAverage = storeDto.reviewInfo.ratingAverage,
                 ratingCount = storeDto.reviewInfo.ratingCount,
                 foodCategory = storeDto.storeCategoryInfo.foodCategory,
-                storeCategory = storeDto.storeCategoryInfo.storeCategory
+                storeCategory = storeDto.storeCategoryInfo.storeCategory,
+                isFavorite = isFavorite
             )
         }
     }
