@@ -20,8 +20,8 @@ class OrderPersistenceImpl(
     override fun save(order: Order) =
         OrderJpaEntity.toOrder(
             orderRdbRepository.save(
-                OrderJpaEntity.from(order)
-            )
+                OrderJpaEntity.from(order),
+            ),
         )
 
     override fun findById(id: Long): Order? =
@@ -29,30 +29,32 @@ class OrderPersistenceImpl(
             .findById(id)
             .mapOrNull(OrderJpaEntity::toOrder)
 
-    override fun findAllByQueryParameter(
-        queryParam: OrderQueryParamDto
-    ): Cursor<Order> {
+    override fun findAllByQueryParameter(queryParam: OrderQueryParamDto): Cursor<Order> {
         val pageRequest = PageRequest.of(0, 50, Sort.by("id").descending())
 
-        val cursoredOrderJpaEntities = orderRdbRepository.cursoredFindAllByStatus(
-            status = queryParam.status,
-            customerId = queryParam.customerId,
-            storeId = queryParam.storeId,
-            lastId = queryParam.lastId,
-            pageable = pageRequest
-        )
+        val cursoredOrderJpaEntities =
+            orderRdbRepository.cursoredFindAllByStatus(
+                status = queryParam.status,
+                customerId = queryParam.customerId,
+                storeId = queryParam.storeId,
+                lastId = queryParam.lastId,
+                updatedAt = queryParam.updatedAt,
+                pageable = pageRequest,
+            )
 
         return Cursor.from(
             cursoredOrderJpaEntities.content
                 .map(OrderJpaEntity::toOrder),
-            cursoredOrderJpaEntities.lastOrNull()?.id
+            cursoredOrderJpaEntities.lastOrNull()?.id,
         )
     }
 
     override fun update(order: Order): Order {
-        val orderJpaEntity = orderRdbRepository.findById(order.id)
-            .orElseThrow()
-            .orThrow { OrderException.OrderNotFound(order.id) }
+        val orderJpaEntity =
+            orderRdbRepository
+                .findById(order.id)
+                .orElseThrow()
+                .orThrow { OrderException.OrderNotFound(order.id) }
 
         orderJpaEntity.update(order)
 

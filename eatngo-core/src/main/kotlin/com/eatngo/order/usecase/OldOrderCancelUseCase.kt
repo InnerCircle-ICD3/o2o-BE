@@ -27,7 +27,10 @@ class OldOrderCancelUseCase(
                         customerId = null,
                         status = CREATED,
                         lastId = lastId,
-                        updatedAt = LocalDateTime.now().plusMinutes(AUTO_ORDER_CANCELED_MINUTE),
+                        updatedAt =
+                            LocalDateTime
+                                .now()
+                                .minusMinutes(AUTO_ORDER_CANCELED_MINUTE),
                     ),
                 )
 
@@ -38,7 +41,7 @@ class OldOrderCancelUseCase(
                 it.toCancelByTimeout(now)
                 orderService.update(it)
                 OrderEvent
-                    .from(it, it.id)
+                    .from(it, it.customerId)
                     ?.let { eventPublisher.publishEvent(it) }
             }
 
