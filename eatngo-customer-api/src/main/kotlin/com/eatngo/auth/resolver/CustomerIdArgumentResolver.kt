@@ -14,7 +14,7 @@ import org.springframework.web.method.support.ModelAndViewContainer
 class CustomerIdArgumentResolver : HandlerMethodArgumentResolver {
     override fun supportsParameter(parameter: MethodParameter): Boolean {
         return parameter.hasParameterAnnotation(CustomerId::class.java)
-                && parameter.parameterType == Long::class.java
+                && (parameter.parameterType == Long::class.java || parameter.parameterType == Long::class.javaObjectType)
     }
 
     override fun resolveArgument(
@@ -26,10 +26,13 @@ class CustomerIdArgumentResolver : HandlerMethodArgumentResolver {
         val authentication = SecurityContextHolder.getContext().authentication
         val principal = authentication?.principal
 
-        return when (principal) {
+        val result = when (principal) {
             is String -> if (principal == "anonymousUser") null else principal.toLongOrNull()
             is LoginCustomer -> principal.customerId
             else -> null
         }
+        
+        println("DEBUG: CustomerIdArgumentResolver - principal=$principal, result=$result")
+        return result
     }
 }
