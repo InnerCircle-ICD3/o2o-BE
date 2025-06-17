@@ -39,6 +39,11 @@ class Order(
         statusChangedHistories.add(OrderStatusHistory.from(status, store))
     }
 
+    fun toCancelByTimeout() {
+        status = status.cancel()
+        statusChangedHistories.add(OrderStatusHistory.from(status, customerId))
+    }
+
     fun toConfirm(store: Store) {
         store.isEditable(storeId)
         status = status.confirm()
@@ -77,6 +82,8 @@ class Order(
     }
 
     companion object {
+        const val AUTO_ORDER_CANCELED_MINUTE: Long = 10
+
         fun create(
             customerId: Long,
             storeId: Long,
