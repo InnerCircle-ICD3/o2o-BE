@@ -8,7 +8,6 @@ import com.eatngo.store.event.StoreCUDEvent
 import com.eatngo.store.event.StoreCUDEventType
 import com.eatngo.store.event.StoreStatusChangedEvent
 import org.slf4j.LoggerFactory
-import org.springframework.context.event.EventListener
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Component
 import org.springframework.transaction.event.TransactionPhase
