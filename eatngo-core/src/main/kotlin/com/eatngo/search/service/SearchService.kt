@@ -2,6 +2,7 @@ package com.eatngo.search.service
 
 import com.eatngo.common.exception.search.SearchException
 import com.eatngo.common.type.CoordinateVO
+import com.eatngo.common.util.DistanceCalculator
 import com.eatngo.common.util.normalizeCeil
 import com.eatngo.common.util.normalizeFloor
 import com.eatngo.extension.orThrow
@@ -43,25 +44,22 @@ class SearchService(
         searchDistance: Double,
         size: Int,
     ): SearchStoreResultDto {
-        val searchStoreList: List<SearchStore> =
-            searchStoreRepository
-                .searchStore(
-                    longitude = storeFilterDto.viewCoordinate.longitude,
-                    latitude = storeFilterDto.viewCoordinate.latitude,
-                    maxDistance = searchDistance,
-                    searchFilter = storeFilterDto.filter,
-                    size = size,
-                ).orThrow { SearchException.SearchStoreListFailed(storeFilterDto.viewCoordinate, storeFilterDto.filter) }
-
-        // 재고 정보를 조회하여 SearchStore에 추가
-        val storeTotalStockMap =
-            storeTotalStockService.getStoreStockMapForResponse(
-                storeIds = searchStoreList.map { it.storeId },
+        val cachedFirstPageList =
+            getFirstPageFromRedis(
+                userCoordinate = storeFilterDto.viewCoordinate,
+                size = size,
             )
 
-        return SearchStoreResultDto.from(
+        val searchStoreList =
+            if (isFirstPage(storeFilterDto)) {
+                cachedFirstPageList
+            } else {
+                val cachedStoreIds = cachedFirstPageList.map { it.storeId }.toSet()
+                getFilteredSearchStoreList(storeFilterDto, searchDistance, size, cachedStoreIds)
+            }
+
+        return buildSearchResult(
             userCoordinate = storeFilterDto.viewCoordinate,
-            totalStockCountMap = storeTotalStockMap,
             searchStoreList = searchStoreList,
         )
     }
@@ -151,11 +149,22 @@ class SearchService(
         latitude: Double,
     ): Box {
         val unit = BigDecimal.valueOf(cacheBoxSize)
+        val epsilon = unit.divide(BigDecimal("10")) // 예: 0.001 (unit이 0.01일 때)
 
         val leftLng = BigDecimal.valueOf(longitude).normalizeFloor(unit).toDouble()
-        val rightLng = BigDecimal.valueOf(longitude).normalizeCeil(unit).toDouble()
+        val rightLng =
+            BigDecimal
+                .valueOf(longitude)
+                .add(epsilon)
+                .normalizeCeil(unit)
+                .toDouble()
         val bottomLat = BigDecimal.valueOf(latitude).normalizeFloor(unit).toDouble()
-        val topLat = BigDecimal.valueOf(latitude).normalizeCeil(unit).toDouble()
+        val topLat =
+            BigDecimal
+                .valueOf(latitude)
+                .add(epsilon)
+                .normalizeCeil(unit)
+                .toDouble()
 
         val topLeft = CoordinateVO.from(longitude = leftLng, latitude = topLat)
         val bottomRight = CoordinateVO.from(longitude = rightLng, latitude = bottomLat)
@@ -245,5 +254,67 @@ class SearchService(
             }
         }
         return topLeftList
+    }
+
+    fun getFirstPageFromRedis(
+        userCoordinate: CoordinateVO,
+        size: Int = 10,
+    ): List<SearchStore> {
+        // center 값을 기준으로 해당하는 box 좌표를 구한다.
+        val box: Box =
+            getBox(
+                longitude = userCoordinate.longitude,
+                latitude = userCoordinate.latitude,
+            )
+        val searchStoreList: List<SearchStore> = getMapListFromBox(box)
+
+        return searchStoreList
+            .onEach { it.paginationToken = "FIRST_PAGE" }
+            .sortedBy {
+                DistanceCalculator.calculateDistance(
+                    userCoordinate,
+                    it.coordinate.toVO(),
+                )
+            }.take(size)
+    }
+
+    fun getFilteredSearchStoreList(
+        storeFilterDto: StoreFilterDto,
+        searchDistance: Double,
+        size: Int,
+        excludedStoreIds: Set<Long>,
+    ): List<SearchStore> {
+        return searchStoreRepository
+            .searchStore(
+                longitude = storeFilterDto.viewCoordinate.longitude,
+                latitude = storeFilterDto.viewCoordinate.latitude,
+                maxDistance = searchDistance,
+                searchFilter = storeFilterDto.filter,
+                size = size,
+            ).orThrow { SearchException.SearchStoreListFailed(storeFilterDto.viewCoordinate, storeFilterDto.filter) }
+            .filterNot { it.storeId in excludedStoreIds } // 캐시된 storeId를 제외
+    }
+
+    fun isFirstPage(storeFilterDto: StoreFilterDto): Boolean =
+        storeFilterDto.filter.searchText == null &&
+            storeFilterDto.filter.storeCategory == null &&
+            storeFilterDto.filter.time == null &&
+            !storeFilterDto.filter.onlyReservable &&
+            storeFilterDto.filter.lastId == null
+
+    private fun buildSearchResult(
+        userCoordinate: CoordinateVO,
+        searchStoreList: List<SearchStore>,
+    ): SearchStoreResultDto {
+        val storeTotalStockMap =
+            storeTotalStockService.getStoreStockMapForResponse(
+                storeIds = searchStoreList.map { it.storeId },
+            )
+
+        return SearchStoreResultDto.from(
+            userCoordinate = userCoordinate,
+            totalStockCountMap = storeTotalStockMap,
+            searchStoreList = searchStoreList,
+        )
     }
 }

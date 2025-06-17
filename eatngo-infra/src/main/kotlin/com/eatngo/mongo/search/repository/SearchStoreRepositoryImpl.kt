@@ -26,6 +26,7 @@ class SearchStoreRepositoryImpl(
     private val mongoTemplate: MongoTemplate,
 ) : SearchStoreRepository {
     val searchStoreIndex = "search-store"
+    val firstPageLastId = "FIRST_PAGE"
 
     override fun findBox(box: Box): List<SearchStore> {
         val mongoBox: Shape =
@@ -331,7 +332,7 @@ class SearchStoreRepositoryImpl(
                         .append("should", should),
                 )
         // Cursor pagination을 위한 searchAfter 설정
-        if (searchFilter.lastId != null) {
+        if (isLastId(searchFilter.lastId)) {
             searchDocument.append(
                 "searchAfter",
                 searchFilter.lastId,
@@ -345,5 +346,12 @@ class SearchStoreRepositoryImpl(
             )
 
         return AggregationOperation { _: AggregationOperationContext -> searchQuery }
+    }
+
+    fun isLastId(lastId: String?): Boolean {
+        if (lastId == null || lastId == firstPageLastId) {
+            return false
+        }
+        return true
     }
 }
