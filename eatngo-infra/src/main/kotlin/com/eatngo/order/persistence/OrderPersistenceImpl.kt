@@ -10,6 +10,7 @@ import com.eatngo.order.infra.OrderPersistence
 import com.eatngo.order.rdb.entity.OrderJpaEntity
 import com.eatngo.order.rdb.repository.OrderRdbRepository
 import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Slice
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Component
 
@@ -33,19 +34,36 @@ class OrderPersistenceImpl(
         val pageRequest = PageRequest.of(0, 50, Sort.by("id").descending())
 
         val cursoredOrderJpaEntities =
-            orderRdbRepository.cursoredFindAllByStatus(
-                status = queryParam.status,
-                customerId = queryParam.customerId,
-                storeId = queryParam.storeId,
-                lastId = queryParam.lastId,
-                updatedAt = queryParam.updatedAt,
-                pageable = pageRequest,
-            )
+            getCursoredOrderJpaEntities(queryParam, pageRequest)
 
         return Cursor.from(
             cursoredOrderJpaEntities.content
                 .map(OrderJpaEntity::toOrder),
             cursoredOrderJpaEntities.lastOrNull()?.id,
+        )
+    }
+
+    private fun getCursoredOrderJpaEntities(
+        queryParam: OrderQueryParamDto,
+        pageRequest: PageRequest,
+    ): Slice<OrderJpaEntity> {
+        if (queryParam.updatedAt != null) {
+            return orderRdbRepository.cursoredFindAllByStatus(
+                status = queryParam.status,
+                customerId = queryParam.customerId,
+                storeId = queryParam.storeId,
+                lastId = queryParam.lastId,
+                updatedAt = queryParam.updatedAt!!,
+                pageable = pageRequest,
+            )
+        }
+
+        return orderRdbRepository.cursoredFindAllByStatus(
+            status = queryParam.status,
+            customerId = queryParam.customerId,
+            storeId = queryParam.storeId,
+            lastId = queryParam.lastId,
+            pageable = pageRequest,
         )
     }
 
