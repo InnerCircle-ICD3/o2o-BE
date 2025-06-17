@@ -39,7 +39,14 @@ class Order(
         statusChangedHistories.add(OrderStatusHistory.from(status, store))
     }
 
-    fun toCancelByTimeout() {
+    fun toCancelByTimeout(localDateTime: LocalDateTime) {
+        require(
+            localDateTime.isBefore(
+                LocalDateTime
+                    .now()
+                    .plusMinutes(AUTO_ORDER_CANCELED_MINUTE),
+            ),
+        ) { "Local time must be after now" }
         status = status.cancel()
         statusChangedHistories.add(OrderStatusHistory.from(status, customerId))
     }

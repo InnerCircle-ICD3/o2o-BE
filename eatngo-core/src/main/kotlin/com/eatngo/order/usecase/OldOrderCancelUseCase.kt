@@ -17,6 +17,8 @@ class OldOrderCancelUseCase(
 ) {
     @Transactional
     fun execute(lastId: Long?): Long? {
+        val now = LocalDateTime.now()
+
         val cursoredOrders =
             orderService
                 .findAllByQueryParam(
@@ -33,7 +35,7 @@ class OldOrderCancelUseCase(
             .contents
             .asSequence()
             .forEach {
-                it.toCancelByTimeout()
+                it.toCancelByTimeout(now)
                 orderService.update(it)
                 OrderEvent
                     .from(it, it.id)

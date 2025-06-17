@@ -14,13 +14,19 @@ class OrderScheduler(
     @Scheduled(cron = "0 */5 * * * *") // 매 5분 마다 실행
     fun execute() {
         logger.info("Starting oldOrder Cancel")
-        var lastId: Long? = null
-        run {
-            lastId = oldOrderCancelUseCase.execute(lastId)
-        }
-        while (lastId != null) {
-            lastId = oldOrderCancelUseCase.execute(lastId)
-        }
-        logger.info("End oldOrder Cancel")
+        kotlin
+            .runCatching {
+                var lastId: Long? = null
+                run {
+                    lastId = oldOrderCancelUseCase.execute(lastId)
+                }
+                while (lastId != null) {
+                    lastId = oldOrderCancelUseCase.execute(lastId)
+                }
+            }.onFailure {
+                logger.info("End oldOrder Failed")
+            }.onSuccess {
+                logger.info("End oldOrder Cancel")
+            }
     }
 }
