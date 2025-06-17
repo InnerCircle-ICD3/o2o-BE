@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Slice
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
+import org.springframework.data.repository.query.Param
 import java.time.LocalDateTime
 import java.util.*
 
@@ -28,11 +29,11 @@ interface OrderRdbRepository : JpaRepository<OrderJpaEntity, Long> {
     """,
     )
     fun cursoredFindAllByStatus(
-        status: Status?,
-        customerId: Long?,
-        storeId: Long?,
-        lastId: Long?,
-        updatedAt: LocalDateTime?,
+        @Param("status") status: Status?,
+        @Param("customerId") customerId: Long?,
+        @Param("storeId") storeId: Long?,
+        @Param("lastId") lastId: Long?,
+        @Param("updatedAt") updatedAt: LocalDateTime?,
         pageable: Pageable,
     ): Slice<OrderJpaEntity>
 }
