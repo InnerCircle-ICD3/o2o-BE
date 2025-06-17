@@ -348,10 +348,5 @@ class SearchStoreRepositoryImpl(
         return AggregationOperation { _: AggregationOperationContext -> searchQuery }
     }
 
-    fun isLastId(lastId: String?): Boolean {
-        if (lastId == null || lastId == firstPageLastId) {
-            return false
-        }
-        return true
-    }
+    fun isLastId(lastId: String?): Boolean = !lastId.isNullOrBlank() && lastId != firstPageLastId
 }
