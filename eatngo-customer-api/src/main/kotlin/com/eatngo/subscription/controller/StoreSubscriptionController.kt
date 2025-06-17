@@ -44,4 +44,10 @@ class CustomerStoreSubscriptionController(
         )
         return ApiResponse.success(response)
     }
+
+    @GetMapping("/store-ids")
+    override fun getSubscribedStoreIds(@CustomerId customerId: Long): ApiResponse<List<Long>> {
+        val response = customerSubscriptionQueryUseCase.getSubscribedStoreIds(customerId)
+        return ApiResponse.success(response)
+    }
 }
