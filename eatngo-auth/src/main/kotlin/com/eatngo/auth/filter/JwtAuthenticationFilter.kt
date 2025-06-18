@@ -1,13 +1,17 @@
 package com.eatngo.auth.filter
 
 import com.eatngo.auth.constants.AuthenticationConstants.ACCESS_TOKEN
+import com.eatngo.auth.constants.AuthenticationConstants.ANONYMOUS_USER_PRINCIPAL
 import com.eatngo.auth.constants.AuthenticationConstants.SET_COOKIE_HEADER
 import com.eatngo.auth.dto.LoginUser
 import com.eatngo.auth.token.TokenProvider
+import com.eatngo.user_account.oauth2.constants.Role
 import io.jsonwebtoken.ExpiredJwtException
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
+import org.springframework.security.authentication.AnonymousAuthenticationToken
+import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Component
 import org.springframework.web.filter.OncePerRequestFilter
@@ -34,6 +38,9 @@ class JwtAuthenticationFilter(
                 logger.debug("Invalid token: ${e.message}")
                 SecurityContextHolder.clearContext()
             }
+        } else {
+            SecurityContextHolder.getContext().authentication =
+                AnonymousAuthenticationToken("anonymous", ANONYMOUS_USER_PRINCIPAL, listOf(SimpleGrantedAuthority(Role.ANONYMOUS.name)))
         }
 
         filterChain.doFilter(request, response)

@@ -1,6 +1,7 @@
 package com.eatngo.auth.resolver
 
 import com.eatngo.auth.annotation.UserAccountId
+import com.eatngo.auth.constants.AuthenticationConstants.ANONYMOUS_USER_PRINCIPAL
 import com.eatngo.auth.dto.LoginUser
 import org.springframework.core.MethodParameter
 import org.springframework.security.core.context.SecurityContextHolder
@@ -27,7 +28,7 @@ class UserAccountIdArgumentResolver : HandlerMethodArgumentResolver {
         val principal = authentication?.principal
 
         return when (principal) {
-            is String -> if (principal == "anonymousUser") null else principal.toLongOrNull()
+            is String -> if (principal == ANONYMOUS_USER_PRINCIPAL) null else principal.toLongOrNull()
             is LoginUser -> principal.userAccountId
             else -> null
         }
