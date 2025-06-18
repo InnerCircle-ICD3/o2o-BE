@@ -8,9 +8,10 @@ import com.eatngo.store.event.StoreCUDEvent
 import com.eatngo.store.event.StoreCUDEventType
 import com.eatngo.store.event.StoreStatusChangedEvent
 import org.slf4j.LoggerFactory
-import org.springframework.context.event.EventListener
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Component
+import org.springframework.transaction.event.TransactionPhase
+import org.springframework.transaction.event.TransactionalEventListener
 
 @Component
 class SearchStoreEventListener(
@@ -28,7 +29,7 @@ class SearchStoreEventListener(
      * 검색 시스템에서 매장 정보 변경을 반영하기 위한 메소드
      */
     @Async
-    @EventListener
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     fun handleStoreCUDEvent(event: StoreCUDEvent) {
         val rdbStore = searchStorePersistence.syncStore(event.storeId)
         val box =
@@ -68,7 +69,7 @@ class SearchStoreEventListener(
      * 매장 상태 변경 이벤트 처리
      */
     @Async
-    @EventListener
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     fun handleStoreStatusChangedEvent(event: StoreStatusChangedEvent) {
         try {
             searchStoreRepository.updateStoreStatus(

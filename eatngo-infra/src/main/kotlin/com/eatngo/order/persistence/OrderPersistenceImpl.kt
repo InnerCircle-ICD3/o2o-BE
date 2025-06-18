@@ -10,6 +10,7 @@ import com.eatngo.order.infra.OrderPersistence
 import com.eatngo.order.rdb.entity.OrderJpaEntity
 import com.eatngo.order.rdb.repository.OrderRdbRepository
 import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Slice
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Component
 
@@ -20,8 +21,8 @@ class OrderPersistenceImpl(
     override fun save(order: Order) =
         OrderJpaEntity.toOrder(
             orderRdbRepository.save(
-                OrderJpaEntity.from(order)
-            )
+                OrderJpaEntity.from(order),
+            ),
         )
 
     override fun findById(id: Long): Order? =
@@ -29,30 +30,49 @@ class OrderPersistenceImpl(
             .findById(id)
             .mapOrNull(OrderJpaEntity::toOrder)
 
-    override fun findAllByQueryParameter(
-        queryParam: OrderQueryParamDto
-    ): Cursor<Order> {
+    override fun findAllByQueryParameter(queryParam: OrderQueryParamDto): Cursor<Order> {
         val pageRequest = PageRequest.of(0, 50, Sort.by("id").descending())
 
-        val cursoredOrderJpaEntities = orderRdbRepository.cursoredFindAllByStatus(
-            status = queryParam.status,
-            customerId = queryParam.customerId,
-            storeId = queryParam.storeId,
-            lastId = queryParam.lastId,
-            pageable = pageRequest
-        )
+        val cursoredOrderJpaEntities =
+            getCursoredOrderJpaEntities(queryParam, pageRequest)
 
         return Cursor.from(
             cursoredOrderJpaEntities.content
                 .map(OrderJpaEntity::toOrder),
-            cursoredOrderJpaEntities.lastOrNull()?.id
+            cursoredOrderJpaEntities.lastOrNull()?.id,
+        )
+    }
+
+    private fun getCursoredOrderJpaEntities(
+        queryParam: OrderQueryParamDto,
+        pageRequest: PageRequest,
+    ): Slice<OrderJpaEntity> {
+        if (queryParam.updatedAt != null) {
+            return orderRdbRepository.cursoredFindAllByStatus(
+                status = queryParam.status,
+                customerId = queryParam.customerId,
+                storeId = queryParam.storeId,
+                lastId = queryParam.lastId,
+                updatedAt = queryParam.updatedAt!!,
+                pageable = pageRequest,
+            )
+        }
+
+        return orderRdbRepository.cursoredFindAllByStatus(
+            status = queryParam.status,
+            customerId = queryParam.customerId,
+            storeId = queryParam.storeId,
+            lastId = queryParam.lastId,
+            pageable = pageRequest,
         )
     }
 
     override fun update(order: Order): Order {
-        val orderJpaEntity = orderRdbRepository.findById(order.id)
-            .orElseThrow()
-            .orThrow { OrderException.OrderNotFound(order.id) }
+        val orderJpaEntity =
+            orderRdbRepository
+                .findById(order.id)
+                .orElseThrow()
+                .orThrow { OrderException.OrderNotFound(order.id) }
 
         orderJpaEntity.update(order)
 

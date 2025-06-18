@@ -22,6 +22,8 @@ dependencies {
     testImplementation("io.kotest:kotest-assertions-core:5.8.1")
     testImplementation("io.mockk:mockk:1.13.10") // mockk
 
+    // Redis
+    implementation("net.javacrumbs.shedlock:shedlock-spring:5.13.0")
     // Circuit Breaker 모듈
     implementation(project(":eatngo-common:circuit-breaker"))
 

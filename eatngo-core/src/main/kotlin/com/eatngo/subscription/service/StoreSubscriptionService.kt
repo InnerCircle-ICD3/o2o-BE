@@ -18,4 +18,14 @@ interface StoreSubscriptionService {
      * 커서 기반 구독 목록 조회 (무한 스크롤)
      */
     fun getSubscriptionsByQueryParameter(queryParam: StoreSubscriptionQueryParamDto): Cursor<StoreSubscriptionDto>
+
+    /**
+     * 사용자가 매장을 구독하고 있는지 확인
+     */
+    fun isSubscribed(storeId: Long, customerId: Long): Boolean
+
+    /**
+     * 사용자가 구독하고 있는 매장 ID 목록 조회 (활성 구독만)
+     */
+    fun getSubscribedStoreIds(customerId: Long): List<Long>
 }

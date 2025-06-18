@@ -6,4 +6,8 @@ interface NotificationPersistence {
     fun findOrCreate(storeId: Long): SseEmitter
 
     fun findById(storeId: Long): SseEmitter?
+
+    fun getAll(): Map<Long, SseEmitter>
+
+    fun remove(storeId: Long)
 }

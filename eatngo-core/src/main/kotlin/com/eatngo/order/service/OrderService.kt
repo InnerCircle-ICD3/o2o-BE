@@ -12,10 +12,9 @@ import com.github.f4b6a3.tsid.TsidCreator
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 
-
 @Service
 class OrderService(
-    private val orderPersistence: OrderPersistence
+    private val orderPersistence: OrderPersistence,
 ) {
     fun createOrder(
         storeId: Long,
@@ -24,37 +23,34 @@ class OrderService(
         nickname: String,
         orderItemSnapshotDtos: List<OrderItemSnapshotDto>,
     ): Order {
-        val order: Order = Order.create(
-            orderNumber = TsidCreator.getTsid().toLong(),
-            customerId = customerId,
-            storeId = storeId,
-            pickupDateTime = pickupDateTime,
-            nickname = nickname,
-            orderItems = orderItemSnapshotDtos.map {
-                with(it) {
-                    OrderItem.of(
-                        productId = productId,
-                        name = productName,
-                        quantity = quantity,
-                        originPrice = originPrice,
-                        finalPrice = finalPrice,
-                        imageUrl = imageUrl,
-                    )
-                }
-            }
-        )
+        val order: Order =
+            Order.create(
+                orderNumber = TsidCreator.getTsid().toLong(),
+                customerId = customerId,
+                storeId = storeId,
+                pickupDateTime = pickupDateTime,
+                nickname = nickname,
+                orderItems =
+                    orderItemSnapshotDtos.map {
+                        with(it) {
+                            OrderItem.of(
+                                productId = productId,
+                                name = productName,
+                                quantity = quantity,
+                                originPrice = originPrice,
+                                finalPrice = finalPrice,
+                                imageUrl = imageUrl,
+                            )
+                        }
+                    },
+            )
 
         return orderPersistence.save(order)
     }
 
-    fun getById(orderId: Long): Order {
-        return orderPersistence.findById(orderId).orThrow { OrderException.OrderNotFound(orderId) }
-    }
+    fun getById(orderId: Long): Order = orderPersistence.findById(orderId).orThrow { OrderException.OrderNotFound(orderId) }
 
-    fun update(order: Order): Order {
-        return orderPersistence.update(order)
-    }
+    fun update(order: Order): Order = orderPersistence.update(order)
 
-    fun findAllByQueryParam(queryParam: OrderQueryParamDto): Cursor<Order> =
-        orderPersistence.findAllByQueryParameter(queryParam)
+    fun findAllByQueryParam(queryParam: OrderQueryParamDto): Cursor<Order> = orderPersistence.findAllByQueryParameter(queryParam)
 }

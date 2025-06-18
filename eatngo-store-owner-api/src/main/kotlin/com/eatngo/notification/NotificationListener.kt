@@ -35,6 +35,7 @@ class NotificationListener(
                 eventType = eventType,
                 message = convertedMessage,
             )
+
         notificationSseService.sendMessage(notificationEvent)
     }
 }

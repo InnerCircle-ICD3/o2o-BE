@@ -1,5 +1,6 @@
 package com.eatngo.store.controller
 
+import com.eatngo.auth.annotation.CustomerId
 import com.eatngo.common.response.ApiResponse
 import com.eatngo.store.docs.controller.StoreCustomerControllerDocs
 import com.eatngo.store.dto.StoreDetailResponse
@@ -15,9 +16,9 @@ class StoreController(
     private val storeQueryUseCase: StoreQueryUseCase
 ) : StoreCustomerControllerDocs {
     @GetMapping("/{storeId}")
-    override fun getStoreById(@PathVariable storeId: Long): ApiResponse<StoreDetailResponse> {
-        val storeDto = storeQueryUseCase.getStoreById(storeId)
-        val response = StoreDetailResponse.from(storeDto)
+    override fun getStoreById(@PathVariable storeId: Long, @CustomerId customerId: Long): ApiResponse<StoreDetailResponse> {
+        val (storeDto, isFavorite) = storeQueryUseCase.getStoreByIdWithSubscription(storeId, customerId)
+        val response = StoreDetailResponse.from(storeDto, isFavorite)
         return ApiResponse.success(response)
     }
 } 

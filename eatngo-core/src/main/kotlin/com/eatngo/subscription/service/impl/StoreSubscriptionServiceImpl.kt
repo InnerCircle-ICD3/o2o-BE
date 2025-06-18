@@ -114,6 +114,16 @@ class StoreSubscriptionServiceImpl(
 
         return Cursor.from(subscriptionDtos, cursoredSubscriptions.lastId)
     }
+
+    override fun isSubscribed(storeId: Long, customerId: Long): Boolean {
+        val subscription = storeSubscriptionPersistence.findAllByUserIdAndStoreId(customerId, storeId)
+        return subscription?.isActive() == true
+    }
+
+    override fun getSubscribedStoreIds(customerId: Long): List<Long> {
+        // Repository에서 이미 deletedAt IS NULL 조건으로 활성 구독만 조회
+        return storeSubscriptionPersistence.findStoreIdsByUserId(customerId)
+    }
     
     /**
      * 단일 매장 최저가 상품 정보 조회

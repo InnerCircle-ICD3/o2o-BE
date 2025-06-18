@@ -10,8 +10,8 @@ import com.eatngo.inventory.infra.InventoryCachePersistence
 import com.eatngo.inventory.infra.InventoryPersistence
 import com.eatngo.order.domain.OrderItem
 import com.eatngo.order.event.OrderCanceledEvent
+import com.eatngo.order.event.OrderCreatedEvent
 import com.eatngo.order.event.OrderEvent
-import com.eatngo.order.event.OrderReadyEvent
 import com.eatngo.product.domain.Product
 import com.eatngo.product.infra.ProductPersistence
 import com.eatngo.product.service.InventoryChangeNotifier
@@ -31,11 +31,10 @@ class ProductEventListener(
     private val productService: ProductService,
     private val inventoryPersistence: InventoryPersistence,
 ) {
-
     @EventListener
     fun handleOrderEvent(event: OrderEvent) {
         when (event) {
-            is OrderReadyEvent -> event.order.orderItems.forEach { processStockDecrease(it) }
+            is OrderCreatedEvent -> event.order.orderItems.forEach { processStockDecrease(it) }
             is OrderCanceledEvent -> event.order.orderItems.forEach { processStockRollback(it) }
         }
     }
@@ -83,15 +82,17 @@ class ProductEventListener(
     }
 
     private fun publishInventoryChangeIfNeeded(orderItem: OrderItem) {
-        val storeId = productPersistence.findActivatedProductById(orderItem.productId)
-            .orThrow { ProductNotFound(orderItem.productId) }
-            .storeId
+        val storeId =
+            productPersistence
+                .findActivatedProductById(orderItem.productId)
+                .orThrow { ProductNotFound(orderItem.productId) }
+                .storeId
         val initialStock = productService.findTotalInitialStocks(storeId)
 
         inventoryChangeNotifier.notifyInventoryStatusChange(
             storeId = storeId,
             productId = orderItem.productId,
-            initialStock = initialStock
+            initialStock = initialStock,
         )
     }
 
@@ -104,26 +105,26 @@ class ProductEventListener(
         }
     }
 
-    private fun calculateDailyInventoryCreationDate(event: StorePickupEndedEvent): LocalDate {
-        return event.closedAt.plusDays(1).toLocalDate()
-    }
+    private fun calculateDailyInventoryCreationDate(event: StorePickupEndedEvent): LocalDate = event.closedAt.plusDays(1).toLocalDate()
 
     private fun findStoreInventories(
         storeId: Long,
-        inventoryDate: LocalDate
+        inventoryDate: LocalDate,
     ): List<Inventory> {
-        val products: List<Product> = productPersistence.findAllActivatedProductByStoreId(storeId)
-            .orThrow { ProductNotFound(storeId) }
+        val products: List<Product> =
+            productPersistence
+                .findAllActivatedProductByStoreId(storeId)
+                .orThrow { ProductNotFound(storeId) }
         // 캐시로 바꿀지 고민 필요! ~> 캐시로 변경 시 InventorySyncPublisher 호출 필요!
-        val inventories: List<Inventory> = products.map { product ->
-            Inventory(
-                quantity = 0,
-                stock = 0,
-                productId = product.id,
-                inventoryDate = inventoryDate
-            )
-        }
+        val inventories: List<Inventory> =
+            products.map { product ->
+                Inventory(
+                    quantity = 0,
+                    stock = 0,
+                    productId = product.id,
+                    inventoryDate = inventoryDate,
+                )
+            }
         return inventories
     }
-
 }

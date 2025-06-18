@@ -22,4 +22,12 @@ class CustomerSubscriptionQueryUseCase(
     fun getSubscriptionsByQueryParameter(queryParam: CustomerSubscriptionQueryParamDto): Cursor<StoreSubscriptionDto> {
         return storeSubscriptionService.getSubscriptionsByQueryParameter(queryParam)
     }
+
+    /**
+     * 고객이 구독하고 있는 매장 ID 목록 조회 (메인 화면 최적화용)
+     */
+    @Transactional(readOnly = true)
+    fun getSubscribedStoreIds(customerId: Long): List<Long> {
+        return storeSubscriptionService.getSubscribedStoreIds(customerId)
+    }
 } 
