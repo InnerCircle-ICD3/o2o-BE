@@ -16,7 +16,7 @@ class StoreController(
     private val storeQueryUseCase: StoreQueryUseCase
 ) : StoreCustomerControllerDocs {
     @GetMapping("/{storeId}")
-    override fun getStoreById(@PathVariable storeId: Long, @CustomerId customerId: Long): ApiResponse<StoreDetailResponse> {
+    override fun getStoreById(@PathVariable storeId: Long, @CustomerId customerId: Long?): ApiResponse<StoreDetailResponse> {
         val (storeDto, isFavorite) = storeQueryUseCase.getStoreByIdWithSubscription(storeId, customerId)
         val response = StoreDetailResponse.from(storeDto, isFavorite)
         return ApiResponse.success(response)

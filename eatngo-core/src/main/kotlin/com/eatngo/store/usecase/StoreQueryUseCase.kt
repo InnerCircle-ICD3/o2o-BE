@@ -21,7 +21,7 @@ class StoreQueryUseCase(
     }
 
     @Transactional(readOnly = true)
-    fun getStoreByIdWithSubscription(storeId: Long, customerId: Long): Pair<StoreDto, Boolean> {
+    fun getStoreByIdWithSubscription(storeId: Long, customerId: Long?): Pair<StoreDto, Boolean> {
         val store = storeService.getStoreById(storeId)
         val reviewStats = storeReviewStatsService.getStoreReviewStats(storeId)
         val storeDto = StoreDto.from(store, reviewStats)

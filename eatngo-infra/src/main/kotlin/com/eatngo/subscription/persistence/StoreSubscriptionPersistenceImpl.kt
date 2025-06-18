@@ -35,7 +35,7 @@ class StoreSubscriptionPersistenceImpl(
             .map { StoreSubscriptionJpaEntity.toSubscription(it) }
     }
 
-    override fun findAllByUserIdAndStoreId(userId: Long, storeId: Long): StoreSubscription? {
+    override fun findAllByUserIdAndStoreId(userId: Long?, storeId: Long): StoreSubscription? {
         return storeSubscriptionRdbRepository.findByUserIdAndStoreId(userId, storeId)
             ?.let { StoreSubscriptionJpaEntity.toSubscription(it) }
     }

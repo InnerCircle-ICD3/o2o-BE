@@ -115,7 +115,8 @@ class StoreSubscriptionServiceImpl(
         return Cursor.from(subscriptionDtos, cursoredSubscriptions.lastId)
     }
 
-    override fun isSubscribed(storeId: Long, customerId: Long): Boolean {
+    override fun isSubscribed(storeId: Long, customerId: Long?): Boolean {
+        if (customerId == null) return false
         val subscription = storeSubscriptionPersistence.findAllByUserIdAndStoreId(customerId, storeId)
         return subscription?.isActive() == true
     }

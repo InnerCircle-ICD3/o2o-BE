@@ -36,7 +36,7 @@ interface StoreCustomerControllerDocs {
     fun getStoreById(
         @Parameter(description = "조회할 매장 ID", required = true)
         @PathVariable storeId: Long,
-        @Parameter(description = "고객 ID", hidden = true)
-        customerId: Long
+        @Parameter(description = "고객 ID", required = false, hidden = true)
+        customerId: Long?
     ): com.eatngo.common.response.ApiResponse<StoreDetailResponse>
 }
