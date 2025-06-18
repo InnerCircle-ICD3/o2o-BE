@@ -253,10 +253,12 @@ class SearchService(
                     centerLng
                         .add(unit.multiply(BigDecimal.valueOf(i.toLong())))
                         .setScale(2, RoundingMode.HALF_UP)
+                        .toPlainString()
                 val lat =
                     centerLat
                         .add(unit.multiply(BigDecimal.valueOf(j.toLong())))
                         .setScale(2, RoundingMode.HALF_UP)
+                        .toPlainString()
                 val topLeft =
                     CoordinateVO.from(
                         longitude = lng.toDouble(),
