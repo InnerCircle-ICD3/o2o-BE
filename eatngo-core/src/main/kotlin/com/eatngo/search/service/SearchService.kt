@@ -48,7 +48,6 @@ class SearchService(
         val cachedFirstPageList =
             getFirstPageFromRedis(
                 userCoordinate = storeFilterDto.viewCoordinate,
-                size = size,
             )
 
         val searchStoreList =
