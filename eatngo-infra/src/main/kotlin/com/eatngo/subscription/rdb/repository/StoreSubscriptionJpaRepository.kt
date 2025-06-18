@@ -26,7 +26,7 @@ interface StoreSubscriptionJpaRepository : JpaRepository<StoreSubscriptionJpaEnt
     /**
      * 사용자 ID와 매장 ID로 구독 조회
      */
-    fun findByUserIdAndStoreId(userId: Long, storeId: Long): StoreSubscriptionJpaEntity?
+    fun findByUserIdAndStoreId(userId: Long?, storeId: Long): StoreSubscriptionJpaEntity?
 
     /**
      * 사용자 ID와 매장 ID로 구독 존재 여부 확인
