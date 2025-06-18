@@ -13,6 +13,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web") // REST API 지원
     implementation("org.jetbrains.kotlin:kotlin-reflect") // Kotlin 리플렉션 지원
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin") // Kotlin JSON 직렬화/역직렬화
+    implementation("com.fasterxml.jackson.core:jackson-databind")
 
     // 테스트 의존성
     testImplementation("io.kotest:kotest-runner-junit5:5.8.1")

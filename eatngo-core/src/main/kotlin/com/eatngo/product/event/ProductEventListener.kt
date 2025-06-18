@@ -1,8 +1,11 @@
 package com.eatngo.product.event
 
+import com.eatngo.common.exception.product.InventoryException.InventoryNotFound
 import com.eatngo.common.exception.product.ProductException.ProductNotFound
+import com.eatngo.common.exception.product.StockException.StockNotFound
 import com.eatngo.extension.orThrow
 import com.eatngo.inventory.domain.Inventory
+import com.eatngo.inventory.dto.InventoryDto
 import com.eatngo.inventory.infra.InventoryCachePersistence
 import com.eatngo.inventory.infra.InventoryPersistence
 import com.eatngo.order.domain.OrderItem
@@ -37,12 +40,44 @@ class ProductEventListener(
     }
 
     private fun processStockDecrease(orderItem: OrderItem) {
-        inventoryCachePersistence.decreaseStock(orderItem.productId, orderItem.quantity)
+        try {
+            inventoryCachePersistence.decreaseStock(orderItem.productId, orderItem.quantity)
+        } catch (e: StockNotFound) {
+            val today = LocalDate.now()
+            val inventory: Inventory = inventoryPersistence.findTopByProductIdOrderByVersionDesc(
+                productId = orderItem.productId,
+                localDate = today
+            ).orThrow { InventoryNotFound(orderItem.productId) }
+
+            val changedInventory = inventory.decreaseStock(orderItem.quantity)
+            inventoryPersistence.updateStock(
+                productId = orderItem.productId,
+                stockQuantity = changedInventory.stock,
+                localDate = today
+            )
+            inventoryCachePersistence.saveHash(orderItem.productId, InventoryDto.from(changedInventory))
+        }
         publishInventoryChangeIfNeeded(orderItem)
     }
 
     private fun processStockRollback(orderItem: OrderItem) {
-        inventoryCachePersistence.rollbackStock(orderItem.productId, orderItem.quantity)
+        try {
+            inventoryCachePersistence.rollbackStock(orderItem.productId, orderItem.quantity)
+        } catch (e: StockNotFound) {
+            val today = LocalDate.now()
+            val inventory: Inventory = inventoryPersistence.findTopByProductIdOrderByVersionDesc(
+                productId = orderItem.productId,
+                localDate = today
+            ).orThrow { InventoryNotFound(orderItem.productId) }
+
+            val changedInventory = inventory.increaseStock(orderItem.quantity)
+            inventoryPersistence.updateStock(
+                productId = orderItem.productId,
+                stockQuantity = changedInventory.stock,
+                localDate = today
+            )
+            inventoryCachePersistence.saveHash(orderItem.productId, InventoryDto.from(changedInventory))
+        }
         publishInventoryChangeIfNeeded(orderItem)
     }
 

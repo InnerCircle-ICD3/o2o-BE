@@ -3,6 +3,7 @@ package com.eatngo.inventory.batch
 import com.eatngo.inventory.domain.Inventory
 import com.eatngo.inventory.infra.InventoryPersistence
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.data.redis.core.script.DefaultRedisScript
 import org.springframework.scheduling.annotation.Scheduled
@@ -13,12 +14,13 @@ import java.time.LocalDate
 @Component
 class InventorySyncScheduler(
     private val inventoryPersistence: InventoryPersistence,
-    private val redisTemplate: RedisTemplate<String, String>,
+    @Qualifier("stringRedisTemplate")
+    private val stringRedisTemplate: RedisTemplate<String, String>,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
     companion object {
-        private const val REDIS_KEY_PREFIX = "inventory:"
+        private const val REDIS_KEY_PREFIX = "inventory:hash:"
         private const val CHANGED_SET_KEY = "changedProductIds"
         private const val CHUNK_SIZE = 500
 
@@ -29,10 +31,10 @@ class InventorySyncScheduler(
         """
     }
 
-    @Scheduled(cron = "0 0/10 * * * ?")
+    @Scheduled(cron = "0 0 12 * * ?")
     @Transactional
     fun syncInventoryFromRedisToRdb() {
-        val changedIds = fetchAndClearChangedIdsAtomically()
+        val changedIds: List<String> = fetchAndClearChangedIdsAtomically()
 
         if (changedIds.isEmpty()) {
             logger.info("동기화할 변경된 재고 ID가 없습니다.")
@@ -71,12 +73,10 @@ class InventorySyncScheduler(
             resultType = List::class.java as Class<List<String>>
         }
 
-        val result = redisTemplate.execute(
+        return stringRedisTemplate.execute(
             redisScript,
             listOf(CHANGED_SET_KEY)
         )
-
-        return result ?: emptyList()
     }
 
     private fun updateRdbWithSingleChunk(
@@ -93,14 +93,15 @@ class InventorySyncScheduler(
 
         inventories.forEach { inventory ->
             val redisKey = "$REDIS_KEY_PREFIX${inventory.productId}"
-            val stockValue = redisTemplate.opsForHash<String, String>()
+            val redisStock = stringRedisTemplate.opsForHash<String, String>()
                 .get(redisKey, "stock")
-            val redisStock = stockValue?.toIntOrNull()
+
             if (redisStock == null) {
                 logger.warn("chunk #$chunkIndex: Redis 키 '$redisKey' 의 'stock' 필드가 없거나 파싱 실패. 건너뜁니다.")
                 return@forEach
             }
-            inventory.changeInventory(stock = redisStock)
+
+            inventory.modify(stock = redisStock.toInt())
         }
 
         inventoryPersistence.saveAll(inventories)
