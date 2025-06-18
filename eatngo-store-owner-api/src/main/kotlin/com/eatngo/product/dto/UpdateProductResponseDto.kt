@@ -14,6 +14,7 @@ data class UpdateProductResponseDto(
     val inventory: UpdateProductInventoryResponseDto,
     val foodType: List<String>,
     val status: String?,
+    val image: String?,
     val createdAt: LocalDateTime?,
     val updatedAt: LocalDateTime?
 ) {
@@ -30,6 +31,7 @@ data class UpdateProductResponseDto(
                 inventory = UpdateProductInventoryResponseDto.from(productDto.inventory),
                 foodType = productDto.foodTypes,
                 status = productDto.status,
+                image = productDto.imageUrl,
                 createdAt = productDto.createdAt,
                 updatedAt = productDto.updatedAt
             )
