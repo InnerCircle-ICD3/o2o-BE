@@ -13,6 +13,7 @@ data class OrderDto(
     val storeId: Long,
     val status: String,
     val orderItems: List<OrderItemDto>,
+    val pickupDateTime: LocalDateTime,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime,
     val readiedAt: LocalDateTime?,
@@ -34,6 +35,7 @@ data class OrderDto(
                 storeId = storeId,
                 status = status.name,
                 orderItems = orderItems.map { OrderItemDto.from(it) },
+                pickupDateTime = pickupDateTime,
                 createdAt = createdAt,
                 updatedAt = updatedAt,
                 readiedAt =
@@ -67,6 +69,7 @@ data class OrderListDto(
     val storeName: String,
     val status: String,
     val orderItems: List<OrderItemDto>,
+    val pickupDateTime: LocalDateTime,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime,
     val readiedAt: LocalDateTime?,
@@ -89,6 +92,7 @@ data class OrderListDto(
                 storeId = storeId,
                 status = status.name,
                 orderItems = orderItems.map { OrderItemDto.from(it) },
+                pickupDateTime = pickupDateTime,
                 createdAt = createdAt,
                 updatedAt = updatedAt,
                 readiedAt =
