@@ -14,7 +14,8 @@ import org.springframework.web.method.support.ModelAndViewContainer
 class CustomerIdArgumentResolver : HandlerMethodArgumentResolver {
     override fun supportsParameter(parameter: MethodParameter): Boolean {
         return parameter.hasParameterAnnotation(CustomerId::class.java)
-                && parameter.parameterType == Long::class.javaObjectType
+                && (parameter.parameterType == Long::class.java
+                || parameter.parameterType == Long::class.javaObjectType)
     }
 
     override fun resolveArgument(
