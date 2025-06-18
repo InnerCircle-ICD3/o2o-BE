@@ -22,6 +22,7 @@ import com.eatngo.search.infra.SearchSuggestionRepository
 import com.eatngo.store.service.StoreTotalStockService
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
+import java.math.RoundingMode
 
 @Service
 class SearchService(
@@ -243,12 +244,24 @@ class SearchService(
 
     fun getNineBoxesTopLeftFromCenter(center: CoordinateVO): List<CoordinateVO> {
         val topLeftList = mutableListOf<CoordinateVO>()
+        val unit = BigDecimal.valueOf(cacheBoxSize)
+
+        val centerLng = BigDecimal.valueOf(center.longitude)
+        val centerLat = BigDecimal.valueOf(center.latitude)
         for (i in -1..1) {
             for (j in -1..1) {
+                val lng =
+                    centerLng
+                        .add(unit.multiply(BigDecimal.valueOf(i.toLong())))
+                        .setScale(2, RoundingMode.HALF_UP)
+                val lat =
+                    centerLat
+                        .add(unit.multiply(BigDecimal.valueOf(j.toLong())))
+                        .setScale(2, RoundingMode.HALF_UP)
                 val topLeft =
                     CoordinateVO.from(
-                        longitude = center.longitude + i * cacheBoxSize,
-                        latitude = center.latitude + j * cacheBoxSize,
+                        longitude = lng.toDouble(),
+                        latitude = lat.toDouble(),
                     )
                 topLeftList.add(topLeft)
             }
@@ -258,7 +271,7 @@ class SearchService(
 
     fun getFirstPageFromRedis(
         userCoordinate: CoordinateVO,
-        size: Int = 10,
+        size: Int = 5,
     ): List<SearchStore> {
         // center 값을 기준으로 해당하는 box 좌표를 구한다.
         val box: Box =
