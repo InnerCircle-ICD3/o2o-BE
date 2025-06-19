@@ -58,6 +58,30 @@ services:
       - INFLUXDB_USER_PASSWORD=k61234
     restart: unless-stopped
 
+  # k6 웹 대시보드 서비스
+  k6-dashboard:
+    image: grafana/k6:latest
+    container_name: eatngo-k6-dashboard
+    ports:
+      - "5665:5665"  # k6 웹 대시보드 포트
+    volumes:
+      - ../load-tests:/scripts
+      - ./k6-reports:/reports
+    environment:
+      - K6_WEB_DASHBOARD=true
+      - K6_WEB_DASHBOARD_EXPORT=/reports/html-report.html
+      - K6_WEB_DASHBOARD_PORT=5665
+      - K6_OUT=influxdb=http://influxdb:8086/k6
+    command: >
+      sh -c "
+        echo 'k6 웹 대시보드가 http://localhost:5665 에서 실행 중입니다...'
+        echo 'HTML 리포트는 /reports 디렉토리에 저장됩니다.'
+        tail -f /dev/null
+      "
+    depends_on:
+      - influxdb
+    restart: unless-stopped
+
 volumes:
   prometheus_data:
   grafana_data:
