@@ -244,7 +244,8 @@ class SearchStoreRepositoryImpl(
                 Document(
                     "equals",
                     Document("path", "status")
-                        .append("value", SearchStoreStatus.OPEN.code),
+                        .append("value", SearchStoreStatus.OPEN.code)
+                        .append("score", Document("boost", Document("value", 2.0))),
                 )
             )
         }
