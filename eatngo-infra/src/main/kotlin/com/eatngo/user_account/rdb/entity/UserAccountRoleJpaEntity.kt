@@ -6,6 +6,7 @@ import com.eatngo.user_account.domain.UserRole
 import com.eatngo.user_account.oauth2.constants.Role
 import jakarta.persistence.*
 import org.hibernate.annotations.Filter
+import java.time.LocalDateTime
 
 @Filter(name = DELETED_FILTER)
 @Entity
@@ -27,19 +28,23 @@ class UserAccountRoleJpaEntity(
         fun of(
             roleId: Long? = 0L,
             role: Role = Role.USER,
-            account: UserAccountJpaEntity
+            account: UserAccountJpaEntity,
+            deletedAt: LocalDateTime? = null
         ): UserAccountRoleJpaEntity {
             return UserAccountRoleJpaEntity(
                 id = roleId ?: 0L,
                 account = account,
                 role = role
-            )
+            ).also {
+                it.deletedAt = deletedAt
+            }
         }
 
         fun toRole(accountRole: UserAccountRoleJpaEntity) = with(accountRole) {
             UserRole(
                 id = id,
-                role = Role.valueOf(role.name)
+                role = Role.valueOf(role.name),
+                accountRole.deletedAt
             )
         }
     }

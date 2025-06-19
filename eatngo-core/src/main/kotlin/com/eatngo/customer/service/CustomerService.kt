@@ -22,9 +22,10 @@ class CustomerService(
     }
 
     fun deleteCustomer(id: Long) {
+        val customer = customerPersistence.getByIdOrThrow(id)
         customerPersistence.deleteById(id)
         applicationEventPublisher.publishEvent(
-            CustomerDeletedEvent(id)
+            CustomerDeletedEvent(customer.account.id)
         )
     }
 

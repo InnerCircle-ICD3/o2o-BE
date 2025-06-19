@@ -21,9 +21,10 @@ class StoreOwnerService(
     }
 
     fun deleteStoreOwner(id: Long) {
+        val storeOwner = storeOwnerPersistence.getByIdOrThrow(id)
         storeOwnerPersistence.deleteById(id)
         applicationEventPublisher.publishEvent(
-            StoreOwnerDeletedEvent(id)
+            StoreOwnerDeletedEvent(storeOwner.account.id)
         )
     }
 
