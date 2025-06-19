@@ -289,15 +289,24 @@ class SearchService(
         size: Int,
         excludedStoreIds: Set<Long>,
     ): List<SearchStore> {
-        return searchStoreRepository
-            .searchStore(
-                longitude = storeFilterDto.viewCoordinate.longitude,
-                latitude = storeFilterDto.viewCoordinate.latitude,
-                maxDistance = searchDistance,
-                searchFilter = storeFilterDto.filter,
-                size = size,
-            ).orThrow { SearchException.SearchStoreListFailed(storeFilterDto.viewCoordinate, storeFilterDto.filter) }
-            .filterNot { it.storeId in excludedStoreIds } // 캐시된 storeId를 제외
+        val result =
+            searchStoreRepository
+                .searchStore(
+                    longitude = storeFilterDto.viewCoordinate.longitude,
+                    latitude = storeFilterDto.viewCoordinate.latitude,
+                    maxDistance = searchDistance,
+                    searchFilter = storeFilterDto.filter,
+                    size = size,
+                ).orThrow { SearchException.SearchStoreListFailed(storeFilterDto.viewCoordinate, storeFilterDto.filter) }
+        return if (storeFilterDto.filter.searchText == null &&
+            storeFilterDto.filter.storeCategory == null &&
+            storeFilterDto.filter.time == null &&
+            !storeFilterDto.filter.onlyReservable
+        ) {
+            result.filterNot { excludedStoreIds.contains(it.storeId) }
+        } else {
+            result
+        }
     }
 
     fun isFirstPage(storeFilterDto: StoreFilterDto): Boolean =

@@ -252,14 +252,30 @@ class SearchStoreRepositoryImpl(
 
         // 검색어 필터링
         if (searchFilter.searchText != null && searchFilter.searchText != "") {
-            must += (
-                Document(
-                    "text",
-                    Document("query", searchFilter.searchText)
-                        .append("path", listOf("storeName", "roadNameAddress", "foodCategory"))
-                        .append("score", Document("boost", Document("value", 1.0))),
+            val shouldText =
+                listOf(
+                    Document(
+                        "text",
+                        Document()
+                            .append("query", searchFilter.searchText)
+                            .append("path", listOf("storeName", "roadNameAddress", "foodCategory", "foodTypes"))
+                            .append("score", Document("boost", Document("value", 1.0))),
+                    ),
+                    Document(
+                        "equals",
+                        Document()
+                            .append("path", "storeName")
+                            .append("value", searchFilter.searchText)
+                            .append("score", Document("boost", Document("value", 2.0))),
+                    ),
                 )
-            )
+
+            must +=
+                Document(
+                    "compound",
+                    Document("should", shouldText)
+                        .append("minimumShouldMatch", 1),
+                )
         }
         // 카테고리 필터링
         searchFilter.storeCategory?.let { storeCategory ->
