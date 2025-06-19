@@ -5,6 +5,7 @@ import com.eatngo.auth.dto.LoginUser
 import com.eatngo.store.infra.StorePersistence
 import com.eatngo.store_owner.domain.StoreOwner
 import com.eatngo.store_owner.infra.StoreOwnerPersistence
+import com.eatngo.user_account.domain.UserRole
 import com.eatngo.user_account.infra.UserAccountPersistence
 import com.eatngo.user_account.oauth2.constants.Role
 import jakarta.servlet.http.HttpServletResponse
@@ -26,6 +27,8 @@ class StoreOwnerOAuth2SuccessPostProcessor(
     ): LoginUser {
         val storeOwner = storeOwnerPersistence.findByUserId(userId) ?: run {
             val userAccount = userAccountPersistence.getByIdOrThrow(userId)
+            userAccount.roles.add(UserRole(null, Role.STORE_OWNER))
+            userAccountPersistence.save(userAccount)
             storeOwnerPersistence.save(StoreOwner.create(userAccount))
         }
 

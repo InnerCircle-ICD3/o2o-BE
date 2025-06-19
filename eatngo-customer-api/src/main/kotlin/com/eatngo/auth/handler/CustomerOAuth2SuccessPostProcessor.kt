@@ -4,6 +4,7 @@ import com.eatngo.auth.dto.LoginCustomer
 import com.eatngo.auth.dto.LoginUser
 import com.eatngo.customer.domain.Customer
 import com.eatngo.customer.infra.CustomerPersistence
+import com.eatngo.user_account.domain.UserRole
 import com.eatngo.user_account.infra.UserAccountPersistence
 import com.eatngo.user_account.oauth2.constants.Role
 import jakarta.servlet.http.HttpServletResponse
@@ -24,6 +25,8 @@ class CustomerOAuth2SuccessPostProcessor(
     ): LoginUser {
         val customer = customerPersistence.findByUserId(userId) ?: run {
             val userAccount = userAccountPersistence.getByIdOrThrow(userId)
+            userAccount.roles.add(UserRole(null, Role.CUSTOMER))
+            userAccountPersistence.save(userAccount)
             customerPersistence.save(Customer.create(userAccount))
         }
 

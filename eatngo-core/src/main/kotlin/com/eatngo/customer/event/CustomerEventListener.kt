@@ -4,10 +4,9 @@ import com.eatngo.user_account.event.UserDeletedEvent
 import com.eatngo.user_account.infra.UserAccountPersistence
 import com.eatngo.user_account.oauth2.constants.Role
 import org.springframework.context.ApplicationEventPublisher
+import org.springframework.context.event.EventListener
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Component
-import org.springframework.transaction.event.TransactionPhase
-import org.springframework.transaction.event.TransactionalEventListener
 
 @Component
 class CustomerEventListener(
@@ -16,17 +15,15 @@ class CustomerEventListener(
 ) {
 
     @Async
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    @EventListener
     fun onCustomerDeleted(event: CustomerDeletedEvent) {
         val userId = event.userId
         userAccountPersistence.findById(userId)?.let { userAccount ->
-            val roles = userAccount.roles
-            roles.find { it.role == Role.CUSTOMER }?.let {
-                roles.remove(it)
-            }
+            userAccount.roles.find { it.role == Role.CUSTOMER }?.delete()
             userAccountPersistence.save(userAccount)
 
-            if (roles.isEmpty()) {
+            val liveRoles = userAccount.roles.filter { it.deletedAt == null }
+            if (liveRoles.size == 1 && liveRoles.firstOrNull()?.role == Role.USER) {
                 userAccountPersistence.deleteById(userId)
                 applicationEventPublisher.publishEvent(
                     UserDeletedEvent(userAccount)

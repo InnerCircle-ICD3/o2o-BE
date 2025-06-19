@@ -18,7 +18,7 @@ class UserAccountPersistenceImpl(
 
     override fun save(account: UserAccount): UserAccount {
         val from = UserAccountJpaEntity.from(account)
-        val accountJpaEntity = userAccountRdbRepository.save(from)
+        val accountJpaEntity = userAccountRdbRepository.saveAndFlush(from)
         return UserAccountJpaEntity.toUserAccount(accountJpaEntity)
     }
 

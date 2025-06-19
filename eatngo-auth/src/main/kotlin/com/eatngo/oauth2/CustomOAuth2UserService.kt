@@ -53,14 +53,13 @@ class CustomOAuth2UserService(
                     )
                 })
             ?: UserAccount.create(oAuth2)
-        userAccountPersistence.save(userAccount)
+        val savedAccount = userAccountPersistence.save(userAccount)
 
-
-        val roles = handleRoles(userAccount)
+        val roles = handleRoles(savedAccount)
             .map { SimpleGrantedAuthority(it.toString()) }
 
         val oAuth2UserAttributesMap = oAuth2User.attributes.toMutableMap()
-        oAuth2UserAttributesMap.put(PRINCIPAL_KEY, userAccount.id.toString())
+        oAuth2UserAttributesMap.put(PRINCIPAL_KEY, savedAccount.id.toString())
 
         return DefaultOAuth2User(
             roles,
