@@ -13,7 +13,7 @@ const BASE_URL = "https://customer.eatngo.org";
 
 export default function () {
   // 매장 목록 조회
-  let storeListRes = http.get(`${BASE_URL}/api/v1/search/store?size=10&latitude=37.569755&longitude=127.049845`);
+  let storeListRes = http.get(`${BASE_URL}/api/v1/search/store?latitude=37.569755&longitude=127.049845&size=10`);
   
   check(storeListRes, {
     "store list status is 200": (r) => r.status === 200,
@@ -29,7 +29,7 @@ export default function () {
   });
 
   // 검색 API
-  let searchRes = http.get(`${BASE_URL}/api/v1/search/store?size=10&latitude=37.569755&longitude=127.04984&keyword=카페`);
+  let searchRes = http.get(`${BASE_URL}/api/v1/search/store?latitude=37.569755&longitude=127.049845&searchText=%EC%95%BD%EA%B3%BC&size=10`);
   
   check(searchRes, {
     "search status is 200": (r) => r.status === 200,
