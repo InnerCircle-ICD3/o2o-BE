@@ -18,27 +18,32 @@ class OrderCreateUseCase(
     val orderService: OrderService,
     val customerService: CustomerService,
     val productService: ProductService,
-    val eventPublisher: ApplicationEventPublisher
+    val eventPublisher: ApplicationEventPublisher,
 ) {
     @Transactional
     fun create(orderDto: OrderCreateDto): OrderDto {
         val customer = customerService.getCustomerById(orderDto.customerId)
-        val idToProduct = productService.findAllProducts(orderDto.storeId)
-            .associateBy { it.id!! }
+        val idToProduct =
+            productService
+                .findAllProducts(orderDto.storeId)
+                .associateBy { it.id!! }
 
         val orderItemSnapshotDtos = toOrderItemSnapshotDto(orderDto.orderItems, idToProduct)
 
-        val order = orderService.createOrder(
-            storeId = orderDto.storeId,
-            customerId = orderDto.customerId,
-            pickupDateTime = orderDto.pickupDateTime,
-            nickname = customer.account
-                .nickname
-                ?.toString() ?: "",
-            orderItemSnapshotDtos = orderItemSnapshotDtos
-        )
+        val order =
+            orderService.createOrder(
+                storeId = orderDto.storeId,
+                customerId = orderDto.customerId,
+                pickupDateTime = orderDto.pickupDateTime,
+                nickname =
+                    customer.account
+                        .nickname
+                        ?.toString() ?: "",
+                orderItemSnapshotDtos = orderItemSnapshotDtos,
+            )
 
-        OrderEvent.from(order, order.customerId)
+        OrderEvent
+            .from(order, order.customerId)
             ?.let { eventPublisher.publishEvent(it) }
 
         return OrderDto.from(order)
@@ -46,9 +51,9 @@ class OrderCreateUseCase(
 
     private fun toOrderItemSnapshotDto(
         orderItemDto: List<OrderItemCreateDto>,
-        idToProduct: Map<Long, ProductDto>
-    ) =
-        orderItemDto.map {
+        idToProduct: Map<Long, ProductDto>,
+    ) = orderItemDto
+        .map {
             val product = idToProduct.getOrDefault(it.productId, null)
 
             requireNotNull(product) { "존재하지 않는 상품을 선택하셨습니다." }
@@ -59,12 +64,10 @@ class OrderCreateUseCase(
             return@map OrderItemSnapshotDto(
                 productId = product.id!!,
                 productName = product.name,
-                quantity = product.inventory.stock,
+                quantity = it.quantity,
                 originPrice = product.price.originalPrice,
                 finalPrice = product.price.finalPrice,
-                imageUrl = product.imageUrl
+                imageUrl = product.imageUrl,
             )
         }.toList()
-
 }
-
