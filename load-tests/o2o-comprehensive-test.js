@@ -100,18 +100,18 @@ function browsingScenario(location, headers) {
   sleep(3); // 화면 확인 시간
 
   // 무한스크롤 1-3회
-  const scrollCount = Math.floor(Math.random() * 3) + 1;
-  for (let i = 0; i < scrollCount; i++) {
-    let scrollLoad = http.get(
-      `${BASE_URL}/api/v1/search/store?latitude=${location.lat}&longitude=${location.lng}&size=20&lastId=${Math.random().toString()}`
-    );
-    
-    check(scrollLoad, {
-      [`무한스크롤 ${i+1} 성공`]: (r) => r.status === 200,
-    });
-    
-    sleep(2);
-  }
+  // const scrollCount = Math.floor(Math.random() * 3) + 1;
+  // for (let i = 0; i < scrollCount; i++) {
+  //   let scrollLoad = http.get(
+  //     `${BASE_URL}/api/v1/search/store?latitude=${location.lat}&longitude=${location.lng}&size=20&lastId=${Math.random().toString()}`
+  //   );
+  //
+  //   check(scrollLoad, {
+  //     [`무한스크롤 ${i+1} 성공`]: (r) => r.status === 200,
+  //   });
+  //
+  //   sleep(2);
+  // }
 
   // 매장 상세 보기 (50% 확률)
   if (Math.random() < 0.5) {
