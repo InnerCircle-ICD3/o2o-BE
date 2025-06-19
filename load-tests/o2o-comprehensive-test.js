@@ -6,15 +6,15 @@ import { randomItem } from "https://jslib.k6.io/k6-utils/1.2.0/index.js";
 export let options = {
   stages: [
     { duration: "1m", target: 30 },    // 오전 시간 (앱 확인)
-    { duration: "2m", target: 80 },    // 점심 준비 시간
-    { duration: "5m", target: 200 },   // 점심 러시 (11:30-12:30)
-    { duration: "3m", target: 400 },   // 극한 피크 (12:00-12:30)
-    { duration: "2m", target: 150 },   // 점심 후반
-    { duration: "2m", target: 50 },    // 오후 시간
-    { duration: "2m", target: 120 },   // 저녁 준비
-    { duration: "4m", target: 350 },   // 저녁 러시 (18:00-19:30)
-    { duration: "2m", target: 100 },   // 저녁 후반
-    { duration: "1m", target: 0 },     // 마감
+    // { duration: "2m", target: 80 },    // 점심 준비 시간
+    // { duration: "5m", target: 200 },   // 점심 러시 (11:30-12:30)
+    // { duration: "3m", target: 400 },   // 극한 피크 (12:00-12:30)
+    // { duration: "2m", target: 150 },   // 점심 후반
+    // { duration: "2m", target: 50 },    // 오후 시간
+    // { duration: "2m", target: 120 },   // 저녁 준비
+    // { duration: "4m", target: 350 },   // 저녁 러시 (18:00-19:30)
+    // { duration: "2m", target: 100 },   // 저녁 후반
+    // { duration: "1m", target: 0 },     // 마감
   ],
 };
 
@@ -37,8 +37,8 @@ const LOCATIONS = [
 ];
 
 const FOOD_CATEGORIES = ["KOREAN", "PIZZA", "CAFE", "BREAD", "RICECAKE"];
-const SEARCH_KEYWORDS = ["치킨", "피자", "커피", "햄버거", "쌀국수", "초밥", "파스타", "샐러드", "떡", "빵", "카페"];
-
+// const SEARCH_KEYWORDS = ["치킨", "피자", "커피", "햄버거", "쌀국수", "초밥", "파스타", "샐러드", "떡", "빵", "카페"];
+const SEARCH_KEYWORDS = ["%EC%B9%98%ED%82%A8", "%ED%94%BC%EC%9E%90", "%EC%BB%A4%ED%94%BC", "%ED%96%84%EB%B2%84%EA%B1%B0", "%EC%8C%80%EA%B5%AD%EC%88%98", "%EC%B4%88%EB%B0%A5", "%ED%8C%8C%EC%8A%A4%ED%83%80", "%EC%83%90%EB%9F%AC%EB%93%9C", "%EB%96%A1", "%EB%B9%B5", "%EC%B9%B4%ED%8E%98"]
 export default function () {
   const token = randomItem(JWT_TOKENS);
   const location = randomItem(LOCATIONS);
