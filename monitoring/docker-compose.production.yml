@@ -40,7 +40,25 @@ services:
     restart: unless-stopped
     depends_on:
       - prometheus
+      - influxdb
+
+  influxdb:
+    image: influxdb:1.8
+    container_name: eatngo-influxdb
+    ports:
+      - "8086:8086"
+    volumes:
+      - influxdb_data:/var/lib/influxdb
+    environment:
+      - INFLUXDB_DB=k6
+      - INFLUXDB_HTTP_AUTH_ENABLED=true
+      - INFLUXDB_ADMIN_USER=admin
+      - INFLUXDB_ADMIN_PASSWORD=admin1234
+      - INFLUXDB_USER=k6
+      - INFLUXDB_USER_PASSWORD=k61234
+    restart: unless-stopped
 
 volumes:
   prometheus_data:
-  grafana_data: 
+  grafana_data:
+  influxdb_data:
