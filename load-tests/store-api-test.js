@@ -9,11 +9,11 @@ export let options = {
   ],
 };
 
-const BASE_URL = "http://localhost:8080";
+const BASE_URL = "https://customer.eatngo.org";
 
 export default function () {
   // 매장 목록 조회
-  let storeListRes = http.get(`${BASE_URL}/api/v1/stores?page=0&size=10`);
+  let storeListRes = http.get(`${BASE_URL}/api/v1/search/store?size=10&latitude=37.569755&longitude=127.049845`);
   
   check(storeListRes, {
     "store list status is 200": (r) => r.status === 200,
@@ -29,7 +29,7 @@ export default function () {
   });
 
   // 검색 API
-  let searchRes = http.get(`${BASE_URL}/api/v1/search/stores?keyword=치킨&page=0&size=10`);
+  let searchRes = http.get(`${BASE_URL}/api/v1/search/store?size=10&latitude=37.569755&longitude=127.04984&keyword=카페`);
   
   check(searchRes, {
     "search status is 200": (r) => r.status === 200,
