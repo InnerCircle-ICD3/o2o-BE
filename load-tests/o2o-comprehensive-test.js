@@ -39,6 +39,7 @@ const LOCATIONS = [
 const FOOD_CATEGORIES = ["KOREAN", "PIZZA", "CAFE", "BREAD", "RICECAKE"];
 // const SEARCH_KEYWORDS = ["치킨", "피자", "커피", "햄버거", "쌀국수", "초밥", "파스타", "샐러드", "떡", "빵", "카페"];
 const SEARCH_KEYWORDS = ["%EC%B9%98%ED%82%A8", "%ED%94%BC%EC%9E%90", "%EC%BB%A4%ED%94%BC", "%ED%96%84%EB%B2%84%EA%B1%B0", "%EC%8C%80%EA%B5%AD%EC%88%98", "%EC%B4%88%EB%B0%A5", "%ED%8C%8C%EC%8A%A4%ED%83%80", "%EC%83%90%EB%9F%AC%EB%93%9C", "%EB%96%A1", "%EB%B9%B5", "%EC%B9%B4%ED%8E%98"]
+
 export default function () {
   const token = randomItem(JWT_TOKENS);
   const location = randomItem(LOCATIONS);
