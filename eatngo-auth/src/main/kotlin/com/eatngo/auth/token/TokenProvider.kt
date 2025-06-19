@@ -146,7 +146,7 @@ class TokenProvider(
             .from(name, value)
             .httpOnly(true)
             .domain(".eatngo.org")
-//            .secure(true)
+            .secure(true)
             .path("/")
             .sameSite("None")
             .maxAge(Duration.ofHours(1))
