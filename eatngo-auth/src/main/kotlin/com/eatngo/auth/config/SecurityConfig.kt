@@ -7,6 +7,7 @@ import com.eatngo.auth.token.TokenProvider
 import com.eatngo.oauth2.CustomOAuth2UserService
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.http.ResponseCookie
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.http.SessionCreationPolicy
@@ -66,9 +67,20 @@ class SecurityConfig(
                         request.cookies
                             ?.find { cookie -> cookie.name == ACCESS_TOKEN }
                             ?.value
-                            ?.let { tokenProvider.deleteRefreshToken(it) }
+                            ?.let {
+                                tokenProvider.deleteRefreshToken(it)
+                                val expiredCookie = ResponseCookie.from(ACCESS_TOKEN, "")
+                                    .httpOnly(true)
+                                    .domain(".eatngo.org")
+                                    .secure(true)
+                                    .path("/")
+                                    .sameSite("None")
+                                    .maxAge(0)
+                                    .build()
+
+                                response.addHeader("Set-Cookie", expiredCookie.toString())
+                            }
                     }
-                    .deleteCookies(ACCESS_TOKEN)
             }
 
         return http.build()
