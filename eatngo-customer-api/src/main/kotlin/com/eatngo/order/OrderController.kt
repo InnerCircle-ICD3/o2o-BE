@@ -94,6 +94,17 @@ class OrderController(
         ),
     )
 
+    @GetMapping("/api/v1/orders/{orderId}")
+    @Operation(summary = "주문 상세 조회", description = "주문 상세 조회")
+    fun getOrder(
+        @CustomerId customerId: Long,
+        @PathVariable orderId: Long,
+    ) = ResponseEntity.ok(
+        ApiResponse.success(
+            customerReadOrderUseCase.findOrder(orderId, customerId),
+        ),
+    )
+
     @GetMapping("/api/v1/customers/orders")
     @Operation(summary = "내 주문 조회", description = "내 주문 이력 조회")
     fun getOrdersByCustomerId(
