@@ -3,6 +3,7 @@ package com.eatngo.order.usecase
 import com.eatngo.common.response.Cursor
 import com.eatngo.customer.service.CustomerService
 import com.eatngo.order.domain.Status
+import com.eatngo.order.dto.OrderDto
 import com.eatngo.order.dto.OrderListDto
 import com.eatngo.order.dto.OrderQueryParamDto
 import com.eatngo.order.service.OrderService
@@ -46,5 +47,16 @@ class CustomerReadOrderUseCase(
                     },
             lastId = cursoredOrders.lastId,
         )
+    }
+
+    @Transactional(readOnly = true)
+    fun findOrder(
+        orderId: Long,
+        customerId: Long,
+    ): OrderDto {
+        val order = orderService.getById(orderId)
+        require(order.customerId == customerId) { "자신의 주문 외에는 조회할 수 없습니다." }
+
+        return OrderDto.from(order)
     }
 }
