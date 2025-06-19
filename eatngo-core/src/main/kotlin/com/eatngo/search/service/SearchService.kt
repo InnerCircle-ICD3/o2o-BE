@@ -3,8 +3,7 @@ package com.eatngo.search.service
 import com.eatngo.common.exception.search.SearchException
 import com.eatngo.common.type.CoordinateVO
 import com.eatngo.common.util.DistanceCalculator
-import com.eatngo.common.util.normalizeCeil
-import com.eatngo.common.util.normalizeFloor
+import com.eatngo.common.util.customNormalizeFloor
 import com.eatngo.extension.orThrow
 import com.eatngo.search.constant.SuggestionType
 import com.eatngo.search.domain.SearchStore
@@ -139,7 +138,7 @@ class SearchService(
     }
 
     /**
-     * 검색 쿼리에서 box 좌표(0.005단위로 캐싱)를 구하는 메서드
+     * 검색 쿼리에서 box 좌표(0.01단위로 캐싱)를 구하는 메서드
      * @param longitude 경도
      * @param latitude 위도
      * @return Box 객체
@@ -149,21 +148,23 @@ class SearchService(
         latitude: Double,
     ): Box {
         val unit = BigDecimal.valueOf(cacheBoxSize)
-        val epsilon = unit.divide(BigDecimal("10")) // 예: 0.001 (unit이 0.01일 때)
 
-        val leftLng = BigDecimal.valueOf(longitude).normalizeFloor(unit).toDouble()
+        val lngBD = BigDecimal.valueOf(longitude)
+        val latBD = BigDecimal.valueOf(latitude)
+
+        val leftLng = lngBD.customNormalizeFloor(unit).setScale(2, RoundingMode.HALF_UP).toDouble()
         val rightLng =
             BigDecimal
-                .valueOf(longitude)
-                .add(epsilon)
-                .normalizeCeil(unit)
+                .valueOf(leftLng)
+                .add(unit)
+                .setScale(2, RoundingMode.HALF_UP)
                 .toDouble()
-        val bottomLat = BigDecimal.valueOf(latitude).normalizeFloor(unit).toDouble()
+        val bottomLat = latBD.customNormalizeFloor(unit).setScale(2, RoundingMode.HALF_UP).toDouble()
         val topLat =
             BigDecimal
-                .valueOf(latitude)
-                .add(epsilon)
-                .normalizeCeil(unit)
+                .valueOf(bottomLat)
+                .add(unit)
+                .setScale(2, RoundingMode.HALF_UP)
                 .toDouble()
 
         val topLeft = CoordinateVO.from(longitude = leftLng, latitude = topLat)
@@ -177,7 +178,8 @@ class SearchService(
             searchMapRedisRepository.getKey(box.topLeft)
 
         val searchStoreList: List<SearchStore> = searchStoreRepository.findBox(box)
-        // Redis에 저장
+        // Redis에 삭제 후 다시 쓰기
+        searchMapRedisRepository.deleteByKey(redisKey)
         searchMapRedisRepository
             .save(
                 key = redisKey,
@@ -242,29 +244,18 @@ class SearchService(
     }
 
     fun getNineBoxesTopLeftFromCenter(center: CoordinateVO): List<CoordinateVO> {
-        val topLeftList = mutableListOf<CoordinateVO>()
         val unit = BigDecimal.valueOf(cacheBoxSize)
-
         val centerLng = BigDecimal.valueOf(center.longitude)
         val centerLat = BigDecimal.valueOf(center.latitude)
+
+        val topLeftList = mutableListOf<CoordinateVO>()
         for (i in -1..1) {
             for (j in -1..1) {
-                val lng =
-                    centerLng
-                        .add(unit.multiply(BigDecimal.valueOf(i.toLong())))
-                        .setScale(2, RoundingMode.HALF_UP)
-                        .toPlainString()
-                val lat =
-                    centerLat
-                        .add(unit.multiply(BigDecimal.valueOf(j.toLong())))
-                        .setScale(2, RoundingMode.HALF_UP)
-                        .toPlainString()
-                val topLeft =
-                    CoordinateVO.from(
-                        longitude = lng.toDouble(),
-                        latitude = lat.toDouble(),
-                    )
-                topLeftList.add(topLeft)
+                val lng = centerLng.add(unit.multiply(BigDecimal.valueOf(i.toLong()))).toDouble()
+                val lat = centerLat.add(unit.multiply(BigDecimal.valueOf(j.toLong()))).toDouble()
+
+                val box = getBox(longitude = lng, latitude = lat)
+                topLeftList.add(box.topLeft)
             }
         }
         return topLeftList

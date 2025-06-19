@@ -3,6 +3,7 @@ package com.eatngo.search.schduler
 import com.eatngo.review.service.StoreReviewStatsService
 import com.eatngo.search.constant.SuggestionType
 import com.eatngo.search.domain.SearchStore
+import com.eatngo.search.domain.SearchStoreStatus
 import com.eatngo.search.domain.SearchSuggestion
 import com.eatngo.search.dto.Box
 import com.eatngo.search.infra.SearchMapRedisRepository
@@ -79,7 +80,7 @@ class SearchProductScheduler(
                     foodTypes.addAll(types)
                 }
 
-                if (store.deletedAt != null) {
+                if (store.deletedAt != null || store.status == SearchStoreStatus.PENDING) {
                     deleteStoreIds.add(storeId)
                 } else {
                     reviewStatsMap[storeId]?.let { reviewStats ->
@@ -126,7 +127,6 @@ class SearchProductScheduler(
             // 키워드 정보 업데이트
             searchSuggestionRepository.saveSuggestionList(updateSuggestion)
             searchSuggestionRepository.deleteByKeywordIdList(deleteStoreIds)
-            // TODO: 키워드 정보 Redis 업데이트 및 삭제된 매장 삭제
         } catch (e: Exception) {
             log.error("Error updating search index from store", e)
         }
