@@ -76,10 +76,16 @@ class StoreSubscriptionPersistenceImpl(
             else -> throw IllegalArgumentException("지원하지 않는 쿼리 파라미터 타입입니다: ${queryParam::class.simpleName}")
         }
 
+        val nextLastId = if (cursoredSubscriptionJpaEntities.hasNext()) {
+            cursoredSubscriptionJpaEntities.content.lastOrNull()?.id
+        } else {
+            null
+        }
+
         return Cursor.from(
             cursoredSubscriptionJpaEntities.content
                 .map(StoreSubscriptionJpaEntity::toSubscription),
-            cursoredSubscriptionJpaEntities.lastOrNull()?.id
+            nextLastId
         )
     }
 } 
