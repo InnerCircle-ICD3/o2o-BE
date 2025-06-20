@@ -3,6 +3,7 @@ package com.eatngo.customer.rdb.repository
 import com.eatngo.common.type.CoordinateVO
 import com.eatngo.customer.domain.CustomerAddressType
 import com.eatngo.customer.rdb.entity.CustomerAddressJpaEntity
+import com.eatngo.customer.rdb.entity.CustomerJpaEntity
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import java.util.*
@@ -27,7 +28,7 @@ interface CustomerAddressRdbRepository : JpaRepository<CustomerAddressJpaEntity,
         """
     )
     fun findByAddress(
-        customerId: Long?,
+        customer: CustomerJpaEntity?,
         radiusInKilometers: Double,
         customerAddressType: CustomerAddressType,
         coordinate: CoordinateVO
