@@ -16,6 +16,8 @@ import org.springframework.transaction.annotation.Transactional
 class CustomerAddressPersistenceImpl(
     private val customerAddressRdbRepository: CustomerAddressRdbRepository,
 ) : CustomerAddressPersistence {
+
+    @SoftDeletedFilter
     override fun save(customer: Customer, customerAddress: CustomerAddress): CustomerAddress {
         val addressJpaEntity = CustomerAddressJpaEntity.of(
             customer = CustomerJpaEntity.from(customer),
