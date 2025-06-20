@@ -42,7 +42,7 @@ class CustomerReadOrderUseCase(
                         OrderListDto.from(
                             order = it,
                             hasReview = orderIdToReview.containsKey(it.id),
-                            storeName = storeIdToStore[it.storeId]!!.name.toString(),
+                            storeName = storeIdToStore[it.storeId]!!.name.value,
                         )
                     },
             lastId = cursoredOrders.lastId,
