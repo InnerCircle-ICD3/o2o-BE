@@ -4,6 +4,7 @@ import com.eatngo.configuration.TestConfiguration
 import com.eatngo.customer.dto.CustomerDto
 import com.eatngo.customer.dto.CustomerUpdateDto
 import com.eatngo.helper.CustomerTestHelper
+import com.eatngo.oauth2.client.KakaoOAuth2Client
 import com.eatngo.user_account.vo.Nickname
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
@@ -12,13 +13,17 @@ import io.restassured.http.ContentType
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.server.LocalServerPort
 import org.springframework.context.annotation.Import
+import org.springframework.test.context.bean.override.mockito.MockitoBean
 
 @Import(TestConfiguration::class, CustomerTestHelper::class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class CustomerControllerTest(
     @LocalServerPort val port: Int,
-    private val customerTestHelper: CustomerTestHelper
+    private val customerTestHelper: CustomerTestHelper,
 ) : DescribeSpec() {
+
+    @MockitoBean
+    lateinit var kakaoOAuth2Client: KakaoOAuth2Client
 
     init {
         beforeSpec {

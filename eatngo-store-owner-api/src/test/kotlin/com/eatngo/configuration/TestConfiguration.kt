@@ -1,6 +1,6 @@
 package com.eatngo.configuration
 
-import com.eatngo.resolver.TestCustomerIdArgumentResolver
+import com.eatngo.resolver.TestStoreOwnerIdArgumentResolver
 import io.kotest.core.config.AbstractProjectConfig
 import io.kotest.core.listeners.ProjectListener
 import org.springframework.boot.test.context.TestConfiguration
@@ -10,7 +10,7 @@ import org.testcontainers.containers.GenericContainer
 
 @TestConfiguration
 class TestConfiguration(
-    private val customerIdArgumentResolver: TestCustomerIdArgumentResolver
+    private val customerIdArgumentResolver: TestStoreOwnerIdArgumentResolver
 ) : WebMvcConfigurer {
     override fun addArgumentResolvers(resolvers: MutableList<HandlerMethodArgumentResolver>) {
         resolvers.add(customerIdArgumentResolver)

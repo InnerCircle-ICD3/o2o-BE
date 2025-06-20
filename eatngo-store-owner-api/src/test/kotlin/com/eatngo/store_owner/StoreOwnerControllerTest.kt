@@ -3,6 +3,7 @@ package com.eatngo.store_owner
 import com.eatngo.auth.dto.LoginStoreOwner
 import com.eatngo.auth.token.TokenProvider
 import com.eatngo.configuration.TestConfiguration
+import com.eatngo.oauth2.client.KakaoOAuth2Client
 import com.eatngo.store_owner.dto.StoreOwnerDto
 import com.eatngo.store_owner.dto.StoreOwnerUpdateDto
 import com.eatngo.store_owner.service.StoreOwnerService
@@ -12,11 +13,13 @@ import com.eatngo.user_account.service.UserAccountService
 import com.eatngo.user_account.vo.Nickname
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
+import io.mockk.impl.annotations.MockK
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.server.LocalServerPort
 import org.springframework.context.annotation.Import
+import org.springframework.test.context.bean.override.mockito.MockitoBean
 import java.time.LocalDateTime
 
 @Import(TestConfiguration::class)
@@ -27,6 +30,9 @@ class StoreOwnerControllerTest(
     private val storeOwnerService: StoreOwnerService,
     private val tokenProvider: TokenProvider,
 ) : DescribeSpec() {
+
+    @MockitoBean
+    lateinit var kakaoOAuth2Client: KakaoOAuth2Client
 
     init {
         beforeSpec {
