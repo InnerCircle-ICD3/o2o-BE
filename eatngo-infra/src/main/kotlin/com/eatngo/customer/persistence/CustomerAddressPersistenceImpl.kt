@@ -2,7 +2,6 @@ package com.eatngo.customer.persistence
 
 import com.eatngo.aop.SoftDeletedFilter
 import com.eatngo.common.exception.user.CustomerAddressException
-import com.eatngo.common.type.Address
 import com.eatngo.customer.domain.Customer
 import com.eatngo.customer.domain.CustomerAddress
 import com.eatngo.customer.infra.CustomerAddressPersistence
@@ -24,7 +23,7 @@ class CustomerAddressPersistenceImpl(
         )
 
         val address = customerAddress.address
-        val existing = findByAddress(customerAddress, address)
+        val existing = findByAddress(addressJpaEntity)
 
         if (existing.isPresent) {
             throw CustomerAddressException.CustomerAddressAlreadyExists(
@@ -42,13 +41,12 @@ class CustomerAddressPersistenceImpl(
 
     @SoftDeletedFilter
     fun findByAddress(
-        customerAddress: CustomerAddress,
-        address: Address
+        customerAddress: CustomerAddressJpaEntity,
     ) = customerAddressRdbRepository.findByAddress(
-        customerId = customerAddress.customerId,
+        customer = customerAddress.customer,
         radiusInKilometers = customerAddress.radiusInKilometers,
         customerAddressType = customerAddress.customerAddressType,
-        coordinate = address.coordinate
+        coordinate = customerAddress.coordinate
     )
 
     @SoftDeletedFilter
