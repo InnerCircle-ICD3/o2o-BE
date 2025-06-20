@@ -23,6 +23,7 @@ interface CustomerAddressRdbRepository : JpaRepository<CustomerAddressJpaEntity,
             WHERE c.radiusInKilometers = :radiusInKilometers
             AND c.customerAddressType = :customerAddressType
             AND c.coordinate = :coordinate
+            AND c.deletedAt IS NULL
         """
     )
     fun findByAddress(
