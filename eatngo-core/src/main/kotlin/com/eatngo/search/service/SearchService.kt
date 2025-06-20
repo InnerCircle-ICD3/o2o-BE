@@ -196,7 +196,7 @@ class SearchService(
                 .getSuggestionsByKeyword(
                     keyword = keyword,
                     type = SuggestionType.STORE_NAME,
-                    size = 5,
+                    size = 3,
                 ).map { it.to() }
 
         val foodCategoryList: List<SearchSuggestionDto> =
@@ -204,7 +204,7 @@ class SearchService(
                 .getSuggestionsByKeyword(
                     keyword = keyword,
                     type = SuggestionType.FOOD_TYPE,
-                    size = 10,
+                    size = 7,
                 ).map { it.to() }
 
         return storeNameList + foodCategoryList
@@ -263,7 +263,7 @@ class SearchService(
 
     fun getFirstPageFromRedis(
         userCoordinate: CoordinateVO,
-        size: Int = 5,
+        size: Int = 4,
     ): List<SearchStore> {
         // center 값을 기준으로 해당하는 box 좌표를 구한다.
         val box: Box =
