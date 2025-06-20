@@ -28,9 +28,32 @@ class SearchSuggestionRepositoryImpl(
         val must = mutableListOf<Document>()
         val filter = mutableListOf<Document>()
 
-        must.add(
-            Document("text", Document("query", keyword).append("path", "keyword")),
-        )
+        val shouldText = mutableListOf<Document>()
+        // 검색어 조건을 should로 추가
+        shouldText +=
+            Document(
+                "text",
+                Document("query", keyword).append("path", "keyword"),
+            )
+        shouldText +=
+            Document(
+                "equals",
+                Document("value", keyword).append("path", "keyword.key"),
+            )
+        shouldText +=
+            Document(
+                "autocomplete",
+                Document("query", keyword).append("path", "keyword"),
+            )
+
+        // 검색어가 포함된 키워드만 가져오기 위해 must에 추가
+
+        must +=
+            Document(
+                "compound",
+                Document("should", shouldText)
+                    .append("minimumShouldMatch", 1),
+            )
         if (type != null) {
             filter.add(
                 Document("equals", Document("value", type.code).append("path", "type")),

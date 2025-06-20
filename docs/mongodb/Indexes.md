@@ -80,14 +80,62 @@ atlas tokenizer 설정
 ## 자동 검색 완성어 인덱스 생성
 - autoComplete 인덱스는 Atlas Search에서 제공하는 기능으로, 사용자가 입력하는 검색어에 대한 자동 완성 기능을 제공
 - string 필드에 대해서만 생성 가능하며, 배열 필드에 대해서는 생성할 수 없음
+
+autoComplete 없는 인덱스
 ```json
 {
   "mappings": {
     "dynamic": false,
     "fields": {
-      "storeName": {
-        "type": "autocomplete"
-      }
+      "keyword": {
+        "analyzer": "lucene.nori",
+        "multi": {
+          "key": {
+            "analyzer": "lucene.keyword",
+            "type": "string"
+          }
+        },
+        "type": "string"
+      },
+      "type": [
+        {
+          "type": "number"
+        }
+      ]
+    }
+  }
+}
+```
+
+autoComplete 포함 인덱스
+```json
+{
+  "mappings": {
+    "dynamic": false,
+    "fields": {
+      "keyword": [
+        {
+          "type": "string",
+          "analyzer": "lucene.nori",
+            "multi": {
+                "key": {
+                "type": "string",
+                "analyzer": "lucene.keyword"
+                }
+            }
+        },
+        {
+          "type": "autocomplete",
+          "tokenization": "edgeGram",
+          "maxGrams": 4,
+          "minGrams": 1
+        }
+      ],
+      "type": [
+        {
+          "type": "number"
+        }
+      ]
     }
   }
 }
