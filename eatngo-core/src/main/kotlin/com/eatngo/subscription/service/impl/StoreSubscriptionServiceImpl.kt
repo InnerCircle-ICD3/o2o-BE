@@ -65,22 +65,19 @@ class StoreSubscriptionServiceImpl(
 
         val cursoredSubscriptions = storeSubscriptionPersistence.findAllByQueryParameter(queryParam)
         val storeIds = cursoredSubscriptions.contents.map { it.storeId }.distinct()
-        val stores = storePersistence.findAllByIds(storeIds).associateBy { it.id }
         
-        // 매장별 최저가 상품 정보
+        val stores = storePersistence.findAllByIds(storeIds).associateBy { it.id }
         val cheapestProductInfoMap = getCheapestProductInfoBatch(storeIds)
-
-        val subscriptionDtos = cursoredSubscriptions.contents.map { subscription ->
-            val store = stores[subscription.storeId].orThrow { StoreException.StoreNotFound(subscription.storeId) }
-            
-            when (queryParam) {
-                is CustomerSubscriptionQueryParamDto -> {
-                    // 고객용: 상세 정보 포함
+        
+        val subscriptionDtos = when (queryParam) {
+            is CustomerSubscriptionQueryParamDto -> {
+                val stockMap = storeTotalStockService.getStoreStockMapForResponse(storeIds)
+                
+                cursoredSubscriptions.contents.map { subscription ->
+                    val store = stores[subscription.storeId].orThrow { StoreException.StoreNotFound(subscription.storeId) }
                     val today = LocalDate.now().dayOfWeek
                     val todayHour = store.businessHours?.find { it.dayOfWeek == today }
-
-                    // Redis에서 총 재고 수량 조회 (null이면 -1 반환: 오늘 판매 안함)
-                    val totalStockCount = storeTotalStockService.getStoreTotalStockForResponse(subscription.storeId)
+                    val totalStockCount = stockMap[subscription.storeId] ?: -1
                     val cheapestProductInfo = cheapestProductInfoMap[subscription.storeId] ?: getDefaultProductInfo()
                     
                     StoreSubscriptionDto.from(
@@ -99,8 +96,10 @@ class StoreSubscriptionServiceImpl(
                         pickupDay = store.pickUpDay.pickUpDay.name
                     )
                 }
-                is StoreOwnerSubscriptionQueryParamDto -> {
-                    // 점주용: 기본 정보만
+            }
+            is StoreOwnerSubscriptionQueryParamDto -> {
+                cursoredSubscriptions.contents.map { subscription ->
+                    val store = stores[subscription.storeId].orThrow { StoreException.StoreNotFound(subscription.storeId) }
                     StoreSubscriptionDto.from(
                         subscription = subscription,
                         storeName = store.name.value,
@@ -108,8 +107,8 @@ class StoreSubscriptionServiceImpl(
                         status = store.status
                     )
                 }
-                else -> throw IllegalArgumentException("지원하지 않는 쿼리 파라미터 타입입니다")
             }
+            else -> throw IllegalArgumentException("지원하지 않는 쿼리 파라미터 타입입니다")
         }
 
         return Cursor.from(subscriptionDtos, cursoredSubscriptions.lastId)
