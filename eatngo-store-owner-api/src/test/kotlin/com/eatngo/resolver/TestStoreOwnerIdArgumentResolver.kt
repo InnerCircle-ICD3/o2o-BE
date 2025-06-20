@@ -10,7 +10,7 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver
 import org.springframework.web.method.support.ModelAndViewContainer
 
 @Component
-class TestCustomerIdArgumentResolver(
+class TestStoreOwnerIdArgumentResolver(
     private val tokenProvider: TokenProvider
 ) : HandlerMethodArgumentResolver {
     override fun supportsParameter(parameter: MethodParameter) = true
