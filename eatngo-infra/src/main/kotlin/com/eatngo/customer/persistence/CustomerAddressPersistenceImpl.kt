@@ -16,6 +16,8 @@ import org.springframework.transaction.annotation.Transactional
 class CustomerAddressPersistenceImpl(
     private val customerAddressRdbRepository: CustomerAddressRdbRepository,
 ) : CustomerAddressPersistence {
+
+    @SoftDeletedFilter
     override fun save(customer: Customer, customerAddress: CustomerAddress): CustomerAddress {
         val addressJpaEntity = CustomerAddressJpaEntity.of(
             customer = CustomerJpaEntity.from(customer),
@@ -23,7 +25,7 @@ class CustomerAddressPersistenceImpl(
         )
 
         val address = customerAddress.address
-        val existing = findByAddress(addressJpaEntity)
+        val existing = findByAddress(customer, customerAddress)
 
         if (existing.isPresent) {
             throw CustomerAddressException.CustomerAddressAlreadyExists(
@@ -41,12 +43,13 @@ class CustomerAddressPersistenceImpl(
 
     @SoftDeletedFilter
     fun findByAddress(
-        customerAddress: CustomerAddressJpaEntity,
+        customer: Customer,
+        customerAddress: CustomerAddress,
     ) = customerAddressRdbRepository.findByAddress(
-        customer = customerAddress.customer,
+        customerId = customer.id,
         radiusInKilometers = customerAddress.radiusInKilometers,
         customerAddressType = customerAddress.customerAddressType,
-        coordinate = customerAddress.coordinate
+        coordinate = customerAddress.address.coordinate
     )
 
     @SoftDeletedFilter
