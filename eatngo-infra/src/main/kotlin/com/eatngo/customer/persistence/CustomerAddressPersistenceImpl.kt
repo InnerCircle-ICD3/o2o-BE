@@ -45,6 +45,7 @@ class CustomerAddressPersistenceImpl(
         customerAddress: CustomerAddress,
         address: Address
     ) = customerAddressRdbRepository.findByAddress(
+        customerId = customerAddress.customerId,
         radiusInKilometers = customerAddress.radiusInKilometers,
         customerAddressType = customerAddress.customerAddressType,
         coordinate = address.coordinate
