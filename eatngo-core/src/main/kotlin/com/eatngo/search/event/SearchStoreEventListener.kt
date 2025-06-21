@@ -77,6 +77,7 @@ class SearchStoreEventListener(
                 storeId = event.storeId,
                 status = SearchStoreStatus.from(event.currentStatus).code,
             )
+            // TODO : 로직 개선
             val storeInfo = searchStorePersistence.syncStore(event.storeId)
             val box =
                 searchService.getBox(
