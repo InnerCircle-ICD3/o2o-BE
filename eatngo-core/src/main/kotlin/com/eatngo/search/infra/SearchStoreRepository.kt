@@ -22,7 +22,7 @@ interface SearchStoreRepository {
 
     fun updateStoreStatus(
         storeId: Long,
-        status: String,
+        status: Int,
     )
 
     fun updateFoodTypesAll(searchStoreList: List<SearchStoreFoodTypes>)
