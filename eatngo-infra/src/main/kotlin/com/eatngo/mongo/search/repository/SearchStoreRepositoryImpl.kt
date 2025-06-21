@@ -169,7 +169,7 @@ class SearchStoreRepositoryImpl(
 
     override fun updateStoreStatus(
         storeId: Long,
-        status: String,
+        status: Int,
     ) {
         val query = Query(Criteria.where("_id").`is`(storeId))
         val update =

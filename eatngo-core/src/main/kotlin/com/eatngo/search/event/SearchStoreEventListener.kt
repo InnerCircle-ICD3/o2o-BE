@@ -1,5 +1,6 @@
 package com.eatngo.search.event
 
+import com.eatngo.search.domain.SearchStoreStatus
 import com.eatngo.search.infra.SearchMapRedisRepository
 import com.eatngo.search.infra.SearchStorePersistence
 import com.eatngo.search.infra.SearchStoreRepository
@@ -74,7 +75,7 @@ class SearchStoreEventListener(
         try {
             searchStoreRepository.updateStoreStatus(
                 storeId = event.storeId,
-                status = event.currentStatus.name,
+                status = SearchStoreStatus.from(event.currentStatus).code,
             )
         } catch (e: Exception) {
             log.error(
