@@ -1,8 +1,6 @@
 package com.eatngo.inventory.service
 
-import com.eatngo.common.exception.product.InventoryException.InventoryNotFound
 import com.eatngo.extension.orElse
-import com.eatngo.extension.orThrow
 import com.eatngo.inventory.domain.Inventory
 import com.eatngo.inventory.dto.InventoryDto
 import com.eatngo.inventory.event.InventorySyncEvent
@@ -68,10 +66,18 @@ class InventoryService(
         storeId: Long,
         initialStock: Int
     ): InventoryDto {
-        val inventory: Inventory = inventoryPersistence.findTopByProductIdOrderByVersionDesc(
-            productCurrentStockDto.id,
-            LocalDate.now()
-        ).orThrow { InventoryNotFound(productCurrentStockDto.id) }
+        val inventory: Inventory =
+            inventoryPersistence.findTopByProductIdOrderByVersionDesc(productCurrentStockDto.id, LocalDate.now())
+                .orElse {
+                    inventoryPersistence.save(
+                        Inventory(
+                            quantity = 0,
+                            stock = 0,
+                            productId = productCurrentStockDto.id,
+                            inventoryDate = LocalDate.now(),
+                        )
+                    )
+                }
         val changedInventory = inventory.changeStock(productCurrentStockDto.action, productCurrentStockDto.amount)
         val savedInventory: Inventory = inventoryPersistence.save(changedInventory)
 
@@ -98,7 +104,16 @@ class InventoryService(
     fun modifyInventory(productDto: ProductDto, initialStock: Int): InventoryDto {
         val inventory: Inventory =
             inventoryPersistence.findTopByProductIdOrderByVersionDesc(productDto.id!!, LocalDate.now())
-                .orThrow { InventoryNotFound(productDto.id!!) }
+                .orElse {
+                    inventoryPersistence.save(
+                        Inventory(
+                            quantity = 0,
+                            stock = 0,
+                            productId = productDto.id!!,
+                            inventoryDate = LocalDate.now(),
+                        )
+                    )
+                }
 
         inventory.modify(
             quantity = productDto.inventory.quantity,
