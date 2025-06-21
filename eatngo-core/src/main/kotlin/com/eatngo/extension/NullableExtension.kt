@@ -6,3 +6,6 @@ package com.eatngo.extension
  */
 inline fun <T> T?.orThrow(exceptionSupplier: () -> Throwable): T =
     this ?: throw exceptionSupplier()
+
+inline fun <T> T?.orElse(defaultSupplier: () -> T): T =
+    this ?: defaultSupplier()
