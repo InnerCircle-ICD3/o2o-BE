@@ -32,6 +32,11 @@ data class OrderCreatedEvent(
     val order: Order,
 ) : OrderEvent
 
+data class OrderReadiedEvent(
+    val userId: Long,
+    val order: Order,
+) : OrderEvent
+
 data class OrderCanceledEvent(
     val userId: Long,
     val order: Order,
