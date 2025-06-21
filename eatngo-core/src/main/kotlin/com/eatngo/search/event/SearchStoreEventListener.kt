@@ -77,6 +77,15 @@ class SearchStoreEventListener(
                 storeId = event.storeId,
                 status = SearchStoreStatus.from(event.currentStatus).code,
             )
+            val storeInfo = searchStorePersistence.syncStore(event.storeId)
+            val box =
+                searchService.getBox(
+                    latitude = storeInfo.coordinate.latitude,
+                    longitude = storeInfo.coordinate.longitude,
+                )
+            searchService.saveBoxRedis(
+                box = box,
+            )
         } catch (e: Exception) {
             log.error(
                 "Failed to update store status in search repository for storeId: ${event.storeId}, status: ${event.currentStatus}",
