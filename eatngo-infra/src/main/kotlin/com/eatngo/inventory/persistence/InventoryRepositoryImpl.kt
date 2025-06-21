@@ -17,7 +17,7 @@ class InventoryRepositoryImpl(
     }
 
     override fun findTopByProductIdOrderByVersionDesc(productId: Long, localDate: LocalDate): Inventory? {
-        return jpaInventoryRepository.findTopByProductIdAndInventoryDateOrderByVersionDesc(productId, localDate)
+        return jpaInventoryRepository.findTopByProductIdAndInventoryDateOrderByVersionDescIdDesc(productId, localDate)
             .map(InventoryMapper::toDomain)
             .orElse(null)
     }

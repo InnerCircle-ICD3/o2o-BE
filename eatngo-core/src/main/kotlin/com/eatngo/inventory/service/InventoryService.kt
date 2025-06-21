@@ -1,6 +1,7 @@
 package com.eatngo.inventory.service
 
 import com.eatngo.common.exception.product.InventoryException.InventoryNotFound
+import com.eatngo.extension.orElse
 import com.eatngo.extension.orThrow
 import com.eatngo.inventory.domain.Inventory
 import com.eatngo.inventory.dto.InventoryDto
@@ -40,7 +41,16 @@ class InventoryService(
     fun getInventoryDetails(productId: Long): InventoryDto {
         val inventory: Inventory =
             inventoryPersistence.findTopByProductIdOrderByVersionDesc(productId, LocalDate.now())
-                .orThrow { InventoryNotFound(productId) }
+                .orElse {
+                    inventoryPersistence.save(
+                        Inventory(
+                            quantity = 0,
+                            stock = 0,
+                            productId = productId,
+                            inventoryDate = LocalDate.now(),
+                        )
+                    )
+                }
         return InventoryDto(inventory.quantity, inventory.stock)
     }
 

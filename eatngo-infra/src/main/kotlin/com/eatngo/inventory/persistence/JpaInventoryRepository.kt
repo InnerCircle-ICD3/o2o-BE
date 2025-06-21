@@ -9,7 +9,7 @@ import java.time.LocalDate
 import java.util.*
 
 interface JpaInventoryRepository : JpaRepository<InventoryEntity, Long> {
-    fun findTopByProductIdAndInventoryDateOrderByVersionDesc(
+    fun findTopByProductIdAndInventoryDateOrderByVersionDescIdDesc(
         productId: Long,
         localDate: LocalDate
     ): Optional<InventoryEntity>
