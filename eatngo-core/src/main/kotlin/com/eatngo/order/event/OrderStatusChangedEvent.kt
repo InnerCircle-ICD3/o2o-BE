@@ -15,7 +15,11 @@ interface OrderEvent {
                         order = order,
                         userId = userId,
                     )
-                Status.READY -> null
+                Status.READY ->
+                    OrderReadiedEvent(
+                        order = order,
+                        userId = userId,
+                    )
                 Status.CONFIRMED -> null
                 Status.CANCELED ->
                     OrderCanceledEvent(
