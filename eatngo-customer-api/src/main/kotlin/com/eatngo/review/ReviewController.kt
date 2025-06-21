@@ -45,7 +45,6 @@ class ReviewController(
     @Operation(summary = "리뷰 조회", description = "리뷰 조회")
     fun getReview(
         @PathVariable orderId: Long,
-        @CustomerId customerId: Long,
     ) = ResponseEntity.ok(
         ApiResponse.success(
             ReviewResponseDto.from(
@@ -58,7 +57,6 @@ class ReviewController(
     @Operation(summary = "상점 리뷰 목록 조회", description = "상점 리뷰 목록 조회")
     fun getStoreReviews(
         @PathVariable storeId: Long,
-        @CustomerId customerId: Long,
         @RequestParam(required = false) lastId: Long?,
     ) = ResponseEntity.ok(
         ApiResponse.success(
