@@ -4,7 +4,7 @@ import com.eatngo.notification.event.NotificationEvent
 import com.eatngo.notification.event.NotificationEventType
 import com.eatngo.notification.infra.NotificationPublisher
 import com.eatngo.order.dto.OrderDto
-import com.eatngo.order.event.OrderCreatedEvent
+import com.eatngo.order.event.OrderReadiedEvent
 import org.springframework.stereotype.Component
 import org.springframework.transaction.event.TransactionalEventListener
 
@@ -13,7 +13,7 @@ class OrderNotificationEventListener(
     private val notificationPublisher: NotificationPublisher,
 ) {
     @TransactionalEventListener
-    fun handle(event: OrderCreatedEvent) {
+    fun handle(event: OrderReadiedEvent) {
         notificationPublisher.publish(
             NotificationEvent(
                 storeId = event.userId,
