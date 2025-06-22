@@ -1,5 +1,6 @@
 package com.eatngo.search.persistence
 
+import com.eatngo.common.type.CoordinateVO
 import com.eatngo.search.domain.SearchStore
 import com.eatngo.search.domain.SearchStoreFoodTypes
 import com.eatngo.search.infra.SearchStorePersistence
@@ -17,6 +18,8 @@ class SearchStorePersistenceImpl(
                 .findByStoreId(storeId)
         return storeDto.toSearchStore()
     }
+
+    override fun findAddressByStoreId(storeId: Long): CoordinateVO = searchStoreRepository.findAddressByStoreId(storeId)
 
     override fun findFoodTypesByStoreIds(storeIds: List<Long>): List<SearchStoreFoodTypes> {
         val foodTypeDto = searchStoreRepository.findFoodTypesByStoreIds(storeIds)

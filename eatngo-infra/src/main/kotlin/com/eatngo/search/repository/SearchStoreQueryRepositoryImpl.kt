@@ -1,5 +1,6 @@
 package com.eatngo.search.repository
 
+import com.eatngo.common.type.CoordinateVO
 import com.eatngo.search.dto.SearchStoreFoodTypeDto
 import com.eatngo.search.dto.SearchStoreRdbDto
 import jakarta.persistence.EntityManager
@@ -21,7 +22,7 @@ class SearchStoreQueryRepositoryImpl(
                     s.imageUrl,
                     s.storeCategory,
                     s.foodCategory,
-                    f,
+                    null,
                     s.address.roadNameAddress,
                     s.address.latitude,
                     s.address.longitude,
@@ -31,14 +32,28 @@ class SearchStoreQueryRepositoryImpl(
                     s.createdAt
                 )
                 FROM StoreJpaEntity s 
-                    JOIN s.address
-                    LEFT JOIN ProductEntity p ON p.storeId = s.id
-                    LEFT JOIN p.foodTypes f
+                LEFT JOIN s.address a
                 WHERE s.id = :storeId
                 """.trimIndent(),
                 SearchStoreRdbDto::class.java,
             ).setParameter("storeId", storeId)
             .singleResult
+
+    override fun findAddressByStoreId(storeId: Long): CoordinateVO =
+        em
+            .createNativeQuery(
+                """
+                SELECT a.latitude,
+                       a.longitude
+                FROM store_address a
+                WHERE a.id = :storeId
+                """.trimIndent(),
+            ).setParameter("storeId", storeId)
+            .singleResult
+            .let { result ->
+                val (latitude, longitude) = result as Array<*>
+                CoordinateVO.from(latitude as Double, longitude as Double)
+            }
 
     override fun findFoodTypesByStoreIds(storeIds: List<Long>): List<SearchStoreFoodTypeDto> =
         em

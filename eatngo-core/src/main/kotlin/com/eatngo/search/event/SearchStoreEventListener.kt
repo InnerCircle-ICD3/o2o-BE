@@ -32,18 +32,19 @@ class SearchStoreEventListener(
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     fun handleStoreCUDEvent(event: StoreCUDEvent) {
-        val rdbStore = searchStorePersistence.syncStore(event.storeId)
-        val box =
-            searchService.getBox(
-                latitude = rdbStore.coordinate.latitude,
-                longitude = rdbStore.coordinate.longitude,
-            )
-        val searchMapKey = searchMapRedisRepository.getKey(box.topLeft)
         try {
             when (event.eventType) {
                 StoreCUDEventType.CREATED,
                 StoreCUDEventType.UPDATED,
                 -> {
+                    val rdbStore = searchStorePersistence.syncStore(event.storeId)
+                    val box =
+                        searchService.getBox(
+                            latitude = rdbStore.coordinate.latitude,
+                            longitude = rdbStore.coordinate.longitude,
+                        )
+                    val searchMapKey = searchMapRedisRepository.getKey(box.topLeft)
+
                     searchStoreRepository.saveStore(rdbStore)
                     // 매장 정보 변경 후, 검색 맵 캐시를 갱신
                     searchMapRedisRepository.saveStore(
@@ -52,6 +53,14 @@ class SearchStoreEventListener(
                     )
                 }
                 StoreCUDEventType.DELETED -> {
+                    val coordinate = searchStorePersistence.findAddressByStoreId(event.storeId)
+                    val box =
+                        searchService.getBox(
+                            latitude = coordinate.latitude,
+                            longitude = coordinate.longitude,
+                        )
+                    val searchMapKey = searchMapRedisRepository.getKey(box.topLeft)
+
                     searchStoreRepository.deleteId(event.storeId)
                     // 매장 삭제 후, 검색 맵 캐시에서 해당 매장 정보 제거
                     searchMapRedisRepository.deleteOneByKey(
