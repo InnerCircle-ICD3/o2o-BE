@@ -19,7 +19,7 @@ import java.util.*
 class S3Service(
     private val s3Client: S3Client,
     private val s3PreSigner: S3Presigner,
-    @Value("\${cloud.aws.s3.bucket}") private val bucket: String
+    @Value("\${cloud.aws.s3.bucket}") private val bucket: String,
 ) : FileStorageService {
     companion object {
         private val log = LoggerFactory.getLogger(S3Service::class.java)
@@ -29,29 +29,32 @@ class S3Service(
     override fun generatePreSignedUploadUrl(
         fileName: String,
         contentType: String,
-        folderPath: String
+        folderPath: String,
     ): Pair<String, String> {
         val image = Image(fileName, contentType, folderPath)
         val s3Key: String = createS3Key(image)
 
         try {
-            val putObjectRequest = PutObjectRequest.builder()
-                .bucket(bucket)
-                .key(s3Key)
-                .contentType(contentType)
-                .build()
+            val putObjectRequest =
+                PutObjectRequest
+                    .builder()
+                    .bucket(bucket)
+                    .key(s3Key)
+//                .contentType(contentType)
+                    .build()
 
-            val putObjectPreSignRequest = PutObjectPresignRequest.builder()
-                .signatureDuration(PRE_SIGNED_URL_DURATION)
-                .putObjectRequest(putObjectRequest)
-                .build()
+            val putObjectPreSignRequest =
+                PutObjectPresignRequest
+                    .builder()
+                    .signatureDuration(PRE_SIGNED_URL_DURATION)
+                    .putObjectRequest(putObjectRequest)
+                    .build()
 
             val preSignedRequest = s3PreSigner.presignPutObject(putObjectPreSignRequest)
 
             log.info("Generated pre-signed URL for key: {}, URL: {}", s3Key, preSignedRequest.url())
 
             return Pair(preSignedRequest.url().toString(), s3Key)
-
         } catch (e: Exception) {
             log.error("Pre-signed URL 생성 중 오류 발생: {}", e.message, e)
             throw RuntimeException("Pre-signed URL 생성에 실패했습니다.", e)
@@ -70,10 +73,12 @@ class S3Service(
 
     override fun deleteFile(key: String) { // ex. images/uuid_filename.jpg"
         try {
-            val deleteObjectRequest = DeleteObjectRequest.builder()
-                .bucket(bucket)
-                .key(key)
-                .build()
+            val deleteObjectRequest =
+                DeleteObjectRequest
+                    .builder()
+                    .bucket(bucket)
+                    .key(key)
+                    .build()
 
             s3Client.deleteObject(deleteObjectRequest)
         } catch (e: Exception) {
@@ -88,16 +93,17 @@ class S3Service(
         }
 
         try {
-            val getUrlRequest = GetUrlRequest.builder()
-                .bucket(bucket)
-                .key(key) // s3 key
-                .build()
+            val getUrlRequest =
+                GetUrlRequest
+                    .builder()
+                    .bucket(bucket)
+                    .key(key) // s3 key
+                    .build()
 
             return s3Client.utilities().getUrl(getUrlRequest).toString()
         } catch (e: Exception) {
             log.error("이미지 URL 변환 중 오류 발생: {}", e.message, e)
             throw IOException("이미지 URL 변환에 실패했습니다.", e)
         }
-
     }
 }
