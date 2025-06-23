@@ -1,5 +1,7 @@
 package com.eatngo.product.service
 
+import com.eatngo.common.exception.product.ProductException.ProductTypeDuplicationException
+import com.eatngo.common.exception.product.ProductException.StoreProductCountException
 import com.eatngo.product.domain.Product
 import com.eatngo.product.domain.ProductSizeType
 import com.eatngo.product.infra.ProductPersistence
@@ -16,21 +18,21 @@ class StoreProductValidator(
 
     private fun validateStoreProductSizeType(storeId: Long) {
         val products = productPersistence.findAllActivatedProductByStoreId(storeId)
-        validateTotalProductCountOverInStore(products)
-        validateDuplicateProductTypeInStore(products)
+        validateTotalProductCountOverInStore(storeId, products)
+        validateDuplicateProductTypeInStore(storeId, products)
     }
 
-    private fun validateTotalProductCountOverInStore(products: List<Product>) {
+    private fun validateTotalProductCountOverInStore(storeId: Long, products: List<Product>) {
         if (products.size > 3) {
-            throw IllegalArgumentException("There is more than 3 products in the store")
+            throw StoreProductCountException(storeId = storeId)
         }
     }
 
-    private fun validateDuplicateProductTypeInStore(products: List<Product>) {
+    private fun validateDuplicateProductTypeInStore(storeId: Long, products: List<Product>) {
         val sizeCountMap: Map<ProductSizeType, Int> = products.groupingBy { it.getSize() }.eachCount()
 
         if (hasDuplicateProductSize(sizeCountMap)) {
-            throw IllegalArgumentException("There are multiple products in the store")
+            throw ProductTypeDuplicationException(storeId = storeId)
         }
     }
 

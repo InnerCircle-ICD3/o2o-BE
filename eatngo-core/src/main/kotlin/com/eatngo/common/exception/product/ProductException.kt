@@ -21,15 +21,15 @@ open class ProductException(
         data = mapOf("productId" to productId)
     )
 
-    class ProductNotAvailable(productId: Long) : ProductException(
-        errorCode = BusinessErrorCode.PRODUCT_NOT_AVAILABLE,
-        message = "${BusinessErrorCode.PRODUCT_NOT_AVAILABLE.message} (ID: $productId)",
-        data = mapOf("productId" to productId)
+    class StoreProductCountException(storeId: Long) : ProductException(
+        errorCode = BusinessErrorCode.STORE_PRODUCT_COUNT_EXCEPTION,
+        message = "${BusinessErrorCode.STORE_PRODUCT_COUNT_EXCEPTION.message} (ID: $storeId)",
+        data = mapOf("storeId" to storeId)
     )
 
-    class ProductSoldOut(productId: Long) : ProductException(
-        errorCode = BusinessErrorCode.PRODUCT_SOLD_OUT,
-        message = "${BusinessErrorCode.PRODUCT_SOLD_OUT.message} (ID: $productId)",
-        data = mapOf("productId" to productId)
+    class ProductTypeDuplicationException(storeId: Long) : ProductException(
+        errorCode = BusinessErrorCode.PRODUCT_TYPE_DUPLICATION_EXCEPTION,
+        message = "${BusinessErrorCode.PRODUCT_TYPE_DUPLICATION_EXCEPTION.message} (ID: $storeId)",
+        data = mapOf("storeId" to storeId)
     )
 }

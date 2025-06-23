@@ -85,6 +85,8 @@ enum class BusinessErrorCode(
     PRODUCT_CREATION_FAILED("M005", "메뉴 등록에 실패했습니다.", 400),
     PRODUCT_UPDATE_FAILED("M006", "메뉴 수정에 실패했습니다.", 400),
     PRODUCT_DELETE_FAILED("M007", "메뉴 삭제에 실패했습니다.", 400),
+    STORE_PRODUCT_COUNT_EXCEPTION("M002", "매장에 메뉴가 3개 초과일 수 없습니다.", 400),
+    PRODUCT_TYPE_DUPLICATION_EXCEPTION("M002", "매장에 같은 종류의 메뉴가 있을 수 없습니다.", 400),
 
     // 검색 관련 오류
     SEARCH_INVALID_COORDINATE("H001", "유효하지 않은 좌표 입니다.", 400),
