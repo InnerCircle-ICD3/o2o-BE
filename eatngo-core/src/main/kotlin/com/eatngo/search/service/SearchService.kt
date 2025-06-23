@@ -44,6 +44,7 @@ class SearchService(
         searchDistance: Double,
         size: Int,
     ): SearchStoreResultDto {
+        /* TODO: 버그로 인해 우선 첫 페이지 캐싱 로직 삭제
         val cachedFirstPageList =
             getFirstPageFromRedis(
                 userCoordinate = storeFilterDto.viewCoordinate,
@@ -56,10 +57,11 @@ class SearchService(
                 val cachedStoreIds = cachedFirstPageList.map { it.storeId }.toSet()
                 getFilteredSearchStoreList(storeFilterDto, searchDistance, size, cachedStoreIds)
             }
+         */
 
         return buildSearchResult(
             userCoordinate = storeFilterDto.viewCoordinate,
-            searchStoreList = searchStoreList,
+            searchStoreList = getFilteredSearchStoreList(storeFilterDto, searchDistance, size, emptySet()),
         )
     }
 
