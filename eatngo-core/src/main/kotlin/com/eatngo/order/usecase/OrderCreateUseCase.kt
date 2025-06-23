@@ -1,10 +1,15 @@
 package com.eatngo.order.usecase
 
+import com.eatngo.common.exception.order.OrderException
 import com.eatngo.customer.service.CustomerService
+import com.eatngo.extension.orThrow
+import com.eatngo.order.domain.Order
+import com.eatngo.order.domain.Status
 import com.eatngo.order.dto.OrderCreateDto
 import com.eatngo.order.dto.OrderDto
 import com.eatngo.order.dto.OrderItemCreateDto
 import com.eatngo.order.dto.OrderItemSnapshotDto
+import com.eatngo.order.dto.OrderQueryParamDto
 import com.eatngo.order.event.OrderEvent
 import com.eatngo.order.service.OrderService
 import com.eatngo.product.dto.ProductDto
@@ -29,6 +34,23 @@ class OrderCreateUseCase(
                 .associateBy { it.id!! }
 
         val orderItemSnapshotDtos = toOrderItemSnapshotDto(orderDto.orderItems, idToProduct)
+
+        val existOrders =
+            orderService
+                .findAllByQueryParam(
+                    queryParam =
+                        OrderQueryParamDto(
+                            customerId = orderDto.customerId,
+                            status = Status.CREATED,
+                            lastId = null,
+                            updatedAt = null,
+                            storeId = null,
+                        ),
+                ).contents
+
+        existOrders
+            .isEmpty()
+            .orThrow { OrderException.OrderCreatedAlreadyExists(existOrders.map(Order::id)) }
 
         val order =
             orderService.createOrder(

@@ -7,7 +7,7 @@ package com.eatngo.common.error
 enum class BusinessErrorCode(
     override val code: String,
     override val message: String,
-    override val httpStatus: Int? = null
+    override val httpStatus: Int? = null,
 ) : ErrorCode {
     // 일반 비즈니스 오류
     BUSINESS_EXCEPTION("B001", "비즈니스 로직 처리 중 오류가 발생했습니다.", 500),
@@ -27,6 +27,7 @@ enum class BusinessErrorCode(
     ORDER_ALREADY_COMPLETED("O002", "이미 완료된 주문입니다.", 409),
     ORDER_ALREADY_CANCELED("O003", "이미 취소된 주문입니다.", 409),
     ORDER_ITEM_NOT_AVAILABLE("O004", "주문 가능하지 않은 메뉴입니다.", 400),
+    ORDER_CREATED_ALREADY_EXISTS("O005", "예약 확정하지 않은 주문이 있습니다.", 400),
 
     // 주문 관련 오류
     REVIEW_NOT_FOUND("R001", "리뷰를 찾을 수 없습니다.", 404),
@@ -103,5 +104,4 @@ enum class BusinessErrorCode(
     STOCK_EMPTY("ST002", "상품의 재고가 없습니다.", 409),
     INVENTORY_NOT_FOUND("I001", "상품 재고를 찾을 수 없습니다.", 400),
     STORE_TOTAL_STOCK_QUERY_FAILED("ST003", "매장 총 재고 조회에 실패했습니다.", 500),
-
 }
