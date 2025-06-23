@@ -83,4 +83,29 @@ open class StoreException(
         cause = cause,
         logLevel = Level.WARN
     )
+
+    class StoreCannotOpenNoStock(
+        storeId: Long,
+        totalStock: Int
+    ) : StoreException(
+        errorCode = BusinessErrorCode.STORE_CANNOT_OPEN_NO_STOCK,
+        message = "${BusinessErrorCode.STORE_CANNOT_OPEN_NO_STOCK.message}: storeId=$storeId, totalStock=$totalStock",
+        data = mapOf("storeId" to storeId, "totalStock" to totalStock),
+        logLevel = Level.WARN
+    )
+
+    class StoreOwnerLimitExceeded(
+        storeOwnerId: Long,
+        currentStoreCount: Int,
+        maxAllowedStores: Int
+    ) : StoreException(
+        errorCode = BusinessErrorCode.STORE_OWNER_LIMIT_EXCEEDED,
+        message = "${BusinessErrorCode.STORE_OWNER_LIMIT_EXCEEDED.message} (최대 ${maxAllowedStores}개, 현재 ${currentStoreCount}개): storeOwnerId=$storeOwnerId",
+        data = mapOf(
+            "storeOwnerId" to storeOwnerId, 
+            "currentStoreCount" to currentStoreCount,
+            "maxAllowedStores" to maxAllowedStores
+        ),
+        logLevel = Level.WARN
+    )
 }

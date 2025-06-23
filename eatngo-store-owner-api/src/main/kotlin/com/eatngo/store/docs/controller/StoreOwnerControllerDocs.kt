@@ -43,7 +43,7 @@ interface StoreOwnerControllerDocs {
 
     @Operation(
         summary = "매장 등록",
-        description = "새로운 매장을 등록합니다. 매장 등록 시 필수 정보와 선택 정보를 입력받습니다."
+        description = "새로운 매장을 등록합니다. 매장 등록 시 필수 정보와 선택 정보를 입력받습니다.(매장은 점주 ID당 1개씩만 등록 가능합니다.)"
     )
     @ApiResponses(
         value = [
@@ -96,7 +96,12 @@ interface StoreOwnerControllerDocs {
 
     @Operation(
         summary = "매장 상태 변경",
-        description = "매장의 영업 상태를 변경합니다. (OPEN: 영업중, CLOSED: 영업종료, PENDING: 승인대기)"
+        description = """
+           매장의 영업 상태를 변경합니다.
+           [OPEN: 영업중, CLOSED: 영업종료, PENDING: 승인대기] 중
+           점주는 [OPEN: 영업중] 또는 [CLOSED: 영업종료]로만 변경 가능하며,
+           재고가 1개도 없는 상태에서는 닫힌 매장의 상태를 OPEN 할 수 없습니다.
+        """
     )
     @ApiResponses(
         value = [
