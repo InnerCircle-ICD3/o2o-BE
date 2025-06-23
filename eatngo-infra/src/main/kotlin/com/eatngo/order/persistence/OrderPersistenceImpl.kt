@@ -31,7 +31,7 @@ class OrderPersistenceImpl(
             .mapOrNull(OrderJpaEntity::toOrder)
 
     override fun findAllByQueryParameter(queryParam: OrderQueryParamDto): Cursor<Order> {
-        val pageRequest = PageRequest.of(0, 10, Sort.by("id").descending())
+        val pageRequest = PageRequest.of(0, 50, Sort.by("id").descending())
 
         val cursoredOrderJpaEntities =
             getCursoredOrderJpaEntities(queryParam, pageRequest)
@@ -39,7 +39,7 @@ class OrderPersistenceImpl(
         return Cursor.from(
             cursoredOrderJpaEntities.content
                 .map(OrderJpaEntity::toOrder),
-            if (cursoredOrderJpaEntities.hasNext()) cursoredOrderJpaEntities.lastOrNull()?.id else null,
+            cursoredOrderJpaEntities.lastOrNull()?.id,
         )
     }
 
