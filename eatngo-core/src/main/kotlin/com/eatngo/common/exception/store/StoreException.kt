@@ -83,4 +83,14 @@ open class StoreException(
         cause = cause,
         logLevel = Level.WARN
     )
+
+    class StoreCannotOpenNoStock(
+        storeId: Long,
+        totalStock: Int
+    ) : StoreException(
+        errorCode = BusinessErrorCode.STORE_CANNOT_OPEN_NO_STOCK,
+        message = "${BusinessErrorCode.STORE_CANNOT_OPEN_NO_STOCK.message}: storeId=$storeId, totalStock=$totalStock",
+        data = mapOf("storeId" to storeId, "totalStock" to totalStock),
+        logLevel = Level.WARN
+    )
 }

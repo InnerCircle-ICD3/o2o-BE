@@ -56,8 +56,6 @@ class StoreServiceImpl(
         storeOwnerId: Long?,
     ): Store {
         val existingStore = storePersistence.findById(id).orThrow { StoreException.StoreNotFound(id) }
-        // 점주가 직접 변경하는 경우에만 권한 확인
-        storeOwnerId?.let { existingStore.requireOwner(it) }
 
         when (newStatus) {
             StoreEnum.StoreStatus.OPEN -> existingStore.toOpen()
