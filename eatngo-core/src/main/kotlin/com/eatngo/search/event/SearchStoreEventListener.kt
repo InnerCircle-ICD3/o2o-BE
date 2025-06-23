@@ -38,6 +38,9 @@ class SearchStoreEventListener(
                 StoreCUDEventType.UPDATED,
                 -> {
                     val rdbStore = searchStorePersistence.syncStore(event.storeId)
+                    if (rdbStore.status == SearchStoreStatus.PENDING) {
+                        return
+                    }
                     val box =
                         searchService.getBox(
                             latitude = rdbStore.coordinate.latitude,
