@@ -78,6 +78,9 @@ enum class BusinessErrorCode(
     // 매장 스케줄러 관련 오류
     STORE_BATCH_UPDATE_FAILED("S017", "매장 상태 배치 업데이트에 실패했습니다.", 500),
 
+    // 점주당 매장 개수 제한 오류
+    STORE_OWNER_LIMIT_EXCEEDED("S018", "점주당 매장 등록 개수 제한을 초과했습니다.", 409),
+
     // 메뉴 관련 오류
     PRODUCT_NOT_FOUND("M001", "메뉴를 찾을 수 없습니다.", 404),
     PRODUCT_NOT_AVAILABLE("M002", "현재 제공하지 않는 메뉴입니다.", 409),
