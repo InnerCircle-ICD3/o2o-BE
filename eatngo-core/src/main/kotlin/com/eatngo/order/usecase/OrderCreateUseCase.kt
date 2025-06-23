@@ -2,7 +2,6 @@ package com.eatngo.order.usecase
 
 import com.eatngo.common.exception.order.OrderException
 import com.eatngo.customer.service.CustomerService
-import com.eatngo.extension.orThrow
 import com.eatngo.order.domain.Order
 import com.eatngo.order.domain.Status
 import com.eatngo.order.dto.OrderCreateDto
@@ -28,12 +27,6 @@ class OrderCreateUseCase(
     @Transactional
     fun create(orderDto: OrderCreateDto): OrderDto {
         val customer = customerService.getCustomerById(orderDto.customerId)
-        val idToProduct =
-            productService
-                .findAllProducts(orderDto.storeId)
-                .associateBy { it.id!! }
-
-        val orderItemSnapshotDtos = toOrderItemSnapshotDto(orderDto.orderItems, idToProduct)
 
         val existOrders =
             orderService
@@ -48,9 +41,16 @@ class OrderCreateUseCase(
                         ),
                 ).contents
 
-        existOrders
-            .isEmpty()
-            .orThrow { OrderException.OrderCreatedAlreadyExists(existOrders.map(Order::id)) }
+        if (existOrders.isNotEmpty()) {
+            throw OrderException.OrderCreatedAlreadyExists(existOrders.map(Order::id))
+        }
+
+        val idToProduct =
+            productService
+                .findAllProducts(orderDto.storeId)
+                .associateBy { it.id!! }
+
+        val orderItemSnapshotDtos = toOrderItemSnapshotDto(orderDto.orderItems, idToProduct)
 
         val order =
             orderService.createOrder(
