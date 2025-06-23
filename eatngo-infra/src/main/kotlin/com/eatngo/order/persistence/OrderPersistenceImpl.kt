@@ -39,7 +39,7 @@ class OrderPersistenceImpl(
         return Cursor.from(
             cursoredOrderJpaEntities.content
                 .map(OrderJpaEntity::toOrder),
-            if (cursoredOrderJpaEntities.hasNext()) cursoredOrderJpaEntities.lastOrNull()?.id else null,
+            cursoredOrderJpaEntities.lastOrNull()?.id,
         )
     }
 
