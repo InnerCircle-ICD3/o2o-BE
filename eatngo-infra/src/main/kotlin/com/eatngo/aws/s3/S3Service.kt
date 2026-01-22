@@ -1,5 +1,6 @@
 package com.eatngo.aws.s3
 
+import com.eatngo.common.circuitbreaker.annotation.RedisCircuitBreaker
 import com.eatngo.file.FileStorageService
 import com.eatngo.product.domain.Image
 import org.slf4j.LoggerFactory
@@ -11,7 +12,6 @@ import software.amazon.awssdk.services.s3.model.GetUrlRequest
 import software.amazon.awssdk.services.s3.model.PutObjectRequest
 import software.amazon.awssdk.services.s3.presigner.S3Presigner
 import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest
-import java.io.IOException
 import java.time.Duration
 import java.util.*
 
@@ -26,6 +26,12 @@ class S3Service(
         private val PRE_SIGNED_URL_DURATION = Duration.ofMinutes(10)
     }
 
+    @RedisCircuitBreaker(
+        name = "s3-presigned-url",
+        fallbackMethod = "generatePreSignedUploadUrlFallback",
+        failureThreshold = 5,
+        timeoutMinutes = 1L,
+    )
     override fun generatePreSignedUploadUrl(
         fileName: String,
         contentType: String,
@@ -34,31 +40,36 @@ class S3Service(
         val image = Image(fileName, contentType, folderPath)
         val s3Key: String = createS3Key(image)
 
-        try {
-            val putObjectRequest =
-                PutObjectRequest
-                    .builder()
-                    .bucket(bucket)
-                    .key(s3Key)
+        val putObjectRequest =
+            PutObjectRequest
+                .builder()
+                .bucket(bucket)
+                .key(s3Key)
 //                .contentType(contentType)
-                    .build()
+                .build()
 
-            val putObjectPreSignRequest =
-                PutObjectPresignRequest
-                    .builder()
-                    .signatureDuration(PRE_SIGNED_URL_DURATION)
-                    .putObjectRequest(putObjectRequest)
-                    .build()
+        val putObjectPreSignRequest =
+            PutObjectPresignRequest
+                .builder()
+                .signatureDuration(PRE_SIGNED_URL_DURATION)
+                .putObjectRequest(putObjectRequest)
+                .build()
 
-            val preSignedRequest = s3PreSigner.presignPutObject(putObjectPreSignRequest)
+        val preSignedRequest = s3PreSigner.presignPutObject(putObjectPreSignRequest)
 
-            log.info("Generated pre-signed URL for key: {}, URL: {}", s3Key, preSignedRequest.url())
+        log.info("Generated pre-signed URL for key: {}, URL: {}", s3Key, preSignedRequest.url())
 
-            return Pair(preSignedRequest.url().toString(), s3Key)
-        } catch (e: Exception) {
-            log.error("Pre-signed URL 생성 중 오류 발생: {}", e.message, e)
-            throw RuntimeException("Pre-signed URL 생성에 실패했습니다.", e)
-        }
+        return Pair(preSignedRequest.url().toString(), s3Key)
+    }
+
+    private fun generatePreSignedUploadUrlFallback(
+        fileName: String,
+        contentType: String,
+        folderPath: String,
+        ex: Exception
+    ): Pair<String, String> {
+        log.error("S3 pre-signed URL generation failed", ex)
+        throw IllegalStateException("현재 이미지 업로드가 일시적으로 불가능합니다. 잠시 후 다시 시도해주세요.", ex)
     }
 
     private fun createS3Key(image: Image): String {
@@ -71,39 +82,57 @@ class S3Service(
         return cleanedFolderPath + UUID.randomUUID() + "_" + image.fileName
     }
 
+    @RedisCircuitBreaker(
+        name = "s3-delete-file",
+        fallbackMethod = "deleteFileFallback",
+        failureThreshold = 3,
+        timeoutMinutes = 5L,
+    )
     override fun deleteFile(key: String) { // ex. images/uuid_filename.jpg"
-        try {
-            val deleteObjectRequest =
-                DeleteObjectRequest
-                    .builder()
-                    .bucket(bucket)
-                    .key(key)
-                    .build()
+        val deleteObjectRequest =
+            DeleteObjectRequest
+                .builder()
+                .bucket(bucket)
+                .key(key)
+                .build()
 
-            s3Client.deleteObject(deleteObjectRequest)
-        } catch (e: Exception) {
-            log.error("파일 삭제 중 오류 발생: {}", e.message, e)
-            throw IllegalArgumentException("파일 삭제에 실패했습니다.", e)
-        }
+        s3Client.deleteObject(deleteObjectRequest)
     }
 
+    private fun deleteFileFallback(key: String, ex: Exception) {
+        log.error(
+            "[S3_DELETE_FAILED] key: {}, operation: DELETE, error: {}, " +
+            "action: DB는 이미 삭제됨. 수동 재시도 필요.",
+            key, ex.message, ex
+        )
+        // TODO: 대안 1 - Slack/Teams 알림 전송
+        // TODO: 대안 2 - Datadog/NewRelic 알림 설정
+        // TODO: 대안 3 - 주간 리포트에 실패 건수 포함
+    }
+
+    @RedisCircuitBreaker(
+        name = "s3-resolve-image-url",
+        fallbackMethod = "resolveImageUrlFallback",
+        failureThreshold = 5,
+        timeoutMinutes = 2L,
+    )
     override fun resolveImageUrl(key: String): String {
         if (key.startsWith("http://") || key.startsWith("https://")) {
             return key
         }
 
-        try {
-            val getUrlRequest =
-                GetUrlRequest
-                    .builder()
-                    .bucket(bucket)
-                    .key(key) // s3 key
-                    .build()
+        val getUrlRequest =
+            GetUrlRequest
+                .builder()
+                .bucket(bucket)
+                .key(key) // s3 key
+                .build()
 
-            return s3Client.utilities().getUrl(getUrlRequest).toString()
-        } catch (e: Exception) {
-            log.error("이미지 URL 변환 중 오류 발생: {}", e.message, e)
-            throw IOException("이미지 URL 변환에 실패했습니다.", e)
-        }
+        return s3Client.utilities().getUrl(getUrlRequest).toString()
+    }
+
+    private fun resolveImageUrlFallback(key: String, ex: Exception): String {
+        log.warn("S3 resolveImageUrl failed for key: $key, returning empty string", ex)
+        return ""  // ProductService에서 ?.let()으로 안전하게 처리됨
     }
 }
