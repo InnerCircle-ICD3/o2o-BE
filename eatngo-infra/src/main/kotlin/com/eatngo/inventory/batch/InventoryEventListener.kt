@@ -18,6 +18,11 @@ class InventoryEventListener(
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
+    companion object {
+        private const val CHANGED_SET_KEY = "changedProductIds"
+        private const val PENDING_SET_KEY = "pendingSyncProductIds"
+    }
+
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     fun onInventoryChangedByOrder(event: InventoryChangedEvent) {
         addChangedProductId(event.productId)
@@ -33,10 +38,18 @@ class InventoryEventListener(
             try {
                 val changedProductId = productId.toString()
                 reactiveStringRedisTemplate.opsForSet()
-                    .add("changedProductIds", changedProductId)
+                    .add(CHANGED_SET_KEY, changedProductId)
                     .awaitSingle()
             } catch (ex: Exception) {
-                logger.error("Redis에 변경된 상품 ID 추가 실패: $productId", ex)
+                // Redis 실패 시 pending Set에 추가 (복구 시 처리)
+                logger.warn("Redis Set 추가 실패, pending으로 전환: $productId", ex)
+                try {
+                    reactiveStringRedisTemplate.opsForSet()
+                        .add(PENDING_SET_KEY, productId.toString())
+                        .awaitSingle()
+                } catch (pendingEx: Exception) {
+                    logger.error("Pending Set 추가도 실패: $productId", pendingEx)
+                }
             }
         }
     }
