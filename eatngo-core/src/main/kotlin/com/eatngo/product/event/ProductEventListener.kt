@@ -1,12 +1,12 @@
 package com.eatngo.product.event
 
-import com.eatngo.common.exception.product.InventoryException.InventoryNotFound
+import com.eatngo.common.circuitbreaker.annotation.RedisCircuitBreaker
 import com.eatngo.common.exception.product.ProductException.ProductNotFound
-import com.eatngo.common.exception.product.StockException.StockNotFound
 import com.eatngo.extension.orElse
 import com.eatngo.extension.orThrow
 import com.eatngo.inventory.domain.Inventory
-import com.eatngo.inventory.dto.InventoryDto
+import com.eatngo.inventory.event.InventorySyncEvent
+import com.eatngo.inventory.event.InventorySyncPublisher
 import com.eatngo.inventory.infra.InventoryCachePersistence
 import com.eatngo.inventory.infra.InventoryPersistence
 import com.eatngo.order.domain.OrderItem
@@ -18,6 +18,7 @@ import com.eatngo.product.infra.ProductPersistence
 import com.eatngo.product.service.InventoryChangeNotifier
 import com.eatngo.product.service.ProductService
 import com.eatngo.store.event.StorePickupEndedEvent
+import org.slf4j.LoggerFactory
 import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
@@ -31,8 +32,18 @@ class ProductEventListener(
     private val inventoryChangeNotifier: InventoryChangeNotifier,
     private val productService: ProductService,
     private val inventoryPersistence: InventoryPersistence,
+    private val inventorySyncPublisher: InventorySyncPublisher,
 ) {
+    companion object {
+        private val log = LoggerFactory.getLogger(ProductEventListener::class.java)
+    }
     @EventListener
+    @RedisCircuitBreaker(
+        name = "product-stock-decrease",
+        fallbackMethod = "handleOrderEventFallback",
+        failureThreshold = 3,
+        timeoutMinutes = 1L,
+    )
     fun handleOrderEvent(event: OrderEvent) {
         when (event) {
             is OrderCreatedEvent -> event.order.orderItems.forEach { processStockDecrease(it) }
@@ -41,60 +52,12 @@ class ProductEventListener(
     }
 
     private fun processStockDecrease(orderItem: OrderItem) {
-        try {
-            inventoryCachePersistence.decreaseStock(orderItem.productId, orderItem.quantity)
-        } catch (e: StockNotFound) {
-            val today = LocalDate.now()
-            val inventory: Inventory =
-                inventoryPersistence.findTopByProductIdOrderByVersionDesc(orderItem.productId, LocalDate.now())
-                    .orElse {
-                        inventoryPersistence.save(
-                            Inventory(
-                                quantity = 0,
-                                stock = 0,
-                                productId = orderItem.productId,
-                                inventoryDate = LocalDate.now(),
-                            )
-                        )
-                    }
-
-            val changedInventory = inventory.decreaseStock(orderItem.quantity)
-            inventoryPersistence.updateStock(
-                productId = orderItem.productId,
-                stockQuantity = changedInventory.stock,
-                localDate = today
-            )
-            inventoryCachePersistence.saveHash(orderItem.productId, InventoryDto.from(changedInventory))
-        }
+        inventoryCachePersistence.decreaseStock(orderItem.productId, orderItem.quantity)
         publishInventoryChangeIfNeeded(orderItem)
     }
 
     private fun processStockRollback(orderItem: OrderItem) {
-        try {
-            inventoryCachePersistence.rollbackStock(orderItem.productId, orderItem.quantity)
-        } catch (e: StockNotFound) {
-            val today = LocalDate.now()
-            val inventory: Inventory =
-                inventoryPersistence.findTopByProductIdOrderByVersionDesc(orderItem.productId, LocalDate.now())
-                    .orElse {
-                        inventoryPersistence.save(
-                            Inventory(
-                                quantity = 0,
-                                stock = 0,
-                                productId = orderItem.productId,
-                                inventoryDate = LocalDate.now(),
-                            )
-                        )
-                    }
-
-            val changedInventory = inventory.increaseStock(orderItem.quantity)
-            inventoryPersistence.updateStock(
-                productId = orderItem.productId,
-                stockQuantity = changedInventory.stock,
-                localDate = today
-            )
-            inventoryCachePersistence.saveHash(orderItem.productId, InventoryDto.from(changedInventory))
-        }
+        inventoryCachePersistence.rollbackStock(orderItem.productId, orderItem.quantity)
         publishInventoryChangeIfNeeded(orderItem)
     }
 
@@ -111,6 +74,70 @@ class ProductEventListener(
             productId = orderItem.productId,
             initialStock = initialStock,
         )
+    }
+
+    private fun handleOrderEventFallback(event: OrderEvent, ex: Exception) {
+        log.warn("Redis stock operation failed, falling back to DB", ex)
+
+        when (event) {
+            is OrderCreatedEvent -> event.order.orderItems.forEach { processStockDecreaseFromDB(it) }
+            is OrderCanceledEvent -> event.order.orderItems.forEach { processStockRollbackFromDB(it) }
+        }
+    }
+
+    private fun processStockDecreaseFromDB(orderItem: OrderItem) {
+        val today = LocalDate.now()
+        val inventory: Inventory =
+            inventoryPersistence.findTopByProductIdOrderByVersionDesc(orderItem.productId, today)
+                .orElse {
+                    inventoryPersistence.save(
+                        Inventory(
+                            quantity = 0,
+                            stock = 0,
+                            productId = orderItem.productId,
+                            inventoryDate = today,
+                        )
+                    )
+                }
+
+        val changedInventory = inventory.decreaseStock(orderItem.quantity)
+        inventoryPersistence.updateStock(
+            productId = orderItem.productId,
+            stockQuantity = changedInventory.stock,
+            localDate = today
+        )
+
+        // Redis 복구 후 동기화를 위해 이벤트 발행
+        inventorySyncPublisher.publishEvent(InventorySyncEvent(orderItem.productId, changedInventory.stock))
+
+        publishInventoryChangeIfNeeded(orderItem)
+    }
+
+    private fun processStockRollbackFromDB(orderItem: OrderItem) {
+        val today = LocalDate.now()
+        val inventory: Inventory =
+            inventoryPersistence.findTopByProductIdOrderByVersionDesc(orderItem.productId, today)
+                .orElse {
+                    inventoryPersistence.save(
+                        Inventory(
+                            quantity = 0,
+                            stock = 0,
+                            productId = orderItem.productId,
+                            inventoryDate = today,
+                        )
+                    )
+                }
+
+        val changedInventory = inventory.increaseStock(orderItem.quantity)
+        inventoryPersistence.updateStock(
+            productId = orderItem.productId,
+            stockQuantity = changedInventory.stock,
+            localDate = today
+        )
+
+        inventorySyncPublisher.publishEvent(InventorySyncEvent(orderItem.productId, changedInventory.stock))
+
+        publishInventoryChangeIfNeeded(orderItem)
     }
 
     @EventListener

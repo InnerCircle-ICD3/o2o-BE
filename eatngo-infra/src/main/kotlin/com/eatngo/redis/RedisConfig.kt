@@ -1,5 +1,6 @@
 package com.eatngo.redis
 
+import com.eatngo.redis.handler.RedisCacheErrorHandler
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -8,6 +9,7 @@ import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.cache.CacheManager
 import org.springframework.cache.annotation.EnableCaching
+import org.springframework.cache.interceptor.CacheErrorHandler
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
@@ -34,7 +36,8 @@ import java.time.Duration
 @EnableCaching
 class RedisConfig(
     private val env: Environment,
-    private val objectMapper: ObjectMapper
+    private val objectMapper: ObjectMapper,
+    private val redisCacheErrorHandler: RedisCacheErrorHandler
 ) {
     val stringSerializer: StringRedisSerializer = StringRedisSerializer()
 
@@ -148,5 +151,8 @@ class RedisConfig(
             .build()
     }
 
-
+    @Bean
+    fun cacheErrorHandler(): CacheErrorHandler {
+        return redisCacheErrorHandler
+    }
 }

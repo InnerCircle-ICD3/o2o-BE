@@ -7,6 +7,7 @@ plugins {
 dependencies {
     // core 모듈 의존성
     implementation(project(":eatngo-core"))
+    implementation(project(":eatngo-common:circuit-breaker"))
 //    implementation(project(":eatngo-common"))
 
     // Spring Boot 기본 의존성
