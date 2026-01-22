@@ -1,5 +1,6 @@
 package com.eatngo.redis.repository.inventory
 
+import com.eatngo.common.circuitbreaker.exception.CircuitBreakerException
 import com.eatngo.common.exception.product.StockException.StockEmpty
 import com.eatngo.common.exception.product.StockException.StockNotFound
 import com.eatngo.inventory.dto.InventoryDto
@@ -39,20 +40,32 @@ class InventoryRedisPersistenceImpl(
     }
 
     override fun decreaseStock(productId: Long, stockQuantityToDecrease: Int): Int {
-        val script = DefaultRedisScript(LUA_DEC_STOCK, Long::class.java)
-        val result = stringRedisTemplate.execute(
-            script,
-            listOf(luaKey(productId)),
-            stockQuantityToDecrease.toString()
-        ) ?: -2L
-        when (result) {
-            -1L -> throw StockEmpty(productId)
-            -2L -> throw StockNotFound(productId)
-            // TODO 재시도 처리 로직 필요 -> fail 시 DB에도 한번 다녀오도록 해야 함 ~> redis에는 재고 정보가 없어질 수도 있기 때문
-        }
+        return try {
+            val script = DefaultRedisScript(LUA_DEC_STOCK, Long::class.java)
+            val result = stringRedisTemplate.execute(
+                script,
+                listOf(luaKey(productId)),
+                stockQuantityToDecrease.toString()
+            ) ?: throw CircuitBreakerException("Redis execution returned null for productId: $productId")
 
-        updateInventoryCacheWithClassInfo(productId)
-        return result.toInt()
+            when (result) {
+                -1L -> throw StockEmpty(productId)  // BusinessException - Circuit Breaker 미포함
+                -2L -> throw StockNotFound(productId)  // BusinessException - Circuit Breaker 미포함
+                else -> {
+                    updateInventoryCacheWithClassInfo(productId)
+                    result.toInt()
+                }
+            }
+        } catch (e: StockEmpty) {
+            throw e  // 비즈니스 예외는 그대로 전파
+        } catch (e: StockNotFound) {
+            throw e  // 비즈니스 예외는 그대로 전파
+        } catch (e: CircuitBreakerException) {
+            throw e  // CircuitBreakerException은 그대로 전파
+        } catch (e: Exception) {
+            // Redis 연결 실패 등 시스템 장애만 CircuitBreakerException으로 래핑
+            throw CircuitBreakerException("Redis operation failed for productId: $productId", e)
+        }
     }
 
     private fun updateInventoryCacheWithClassInfo(productId: Long) {

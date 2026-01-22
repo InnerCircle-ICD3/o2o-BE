@@ -1,5 +1,6 @@
 package com.eatngo.common.exception
 
+import com.eatngo.common.circuitbreaker.exception.BusinessExceptionMarker
 import com.eatngo.common.error.BusinessErrorCode
 import org.slf4j.event.Level
 
@@ -9,4 +10,4 @@ abstract class BusinessException(
     open val data: Map<String, Any>? = null,
     open val logLevel: Level = Level.WARN,
     override val cause: Throwable? = null
-) : RuntimeException(message, cause)
+) : RuntimeException(message, cause), BusinessExceptionMarker
