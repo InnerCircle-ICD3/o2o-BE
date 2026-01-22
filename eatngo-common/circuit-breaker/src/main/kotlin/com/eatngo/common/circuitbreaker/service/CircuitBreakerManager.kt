@@ -21,14 +21,16 @@ class CircuitBreakerManager {
         val name: String,
         val failureThreshold: Int,
         val timeoutMinutes: Long,
+        val successThreshold: Int = 3,
         val failureCount: AtomicInteger = AtomicInteger(0),
+        val consecutiveSuccessCount: AtomicInteger = AtomicInteger(0),
         val lastFailureTime: AtomicReference<LocalDateTime> = AtomicReference(),
         val state: AtomicReference<State> = AtomicReference(State.CLOSED)
     )
     
-    fun getOrCreate(name: String, failureThreshold: Int, timeoutMinutes: Long): CircuitBreakerState {
+    fun getOrCreate(name: String, failureThreshold: Int, timeoutMinutes: Long, successThreshold: Int = 3): CircuitBreakerState {
         return circuitBreakers.computeIfAbsent(name) {
-            CircuitBreakerState(name, failureThreshold, timeoutMinutes)
+            CircuitBreakerState(name, failureThreshold, timeoutMinutes, successThreshold)
         }
     }
     
@@ -41,14 +43,32 @@ class CircuitBreakerManager {
     }
     
     fun onSuccess(circuitBreaker: CircuitBreakerState) {
-        circuitBreaker.failureCount.set(0)
-        circuitBreaker.state.set(State.CLOSED)
+        when (circuitBreaker.state.get()) {
+            State.HALF_OPEN -> {
+                val successes = circuitBreaker.consecutiveSuccessCount.incrementAndGet()
+                if (successes >= circuitBreaker.successThreshold) {
+                    circuitBreaker.state.set(State.CLOSED)
+                    circuitBreaker.consecutiveSuccessCount.set(0)
+                    circuitBreaker.failureCount.set(0)
+                }
+            }
+            State.CLOSED -> {
+                // 이미 정상 상태 - 연속 성공 카운트 초기화
+                circuitBreaker.consecutiveSuccessCount.set(0)
+            }
+            State.OPEN -> {
+                // 예외적 상황 - 정상적으로 발생하지 않음
+                circuitBreaker.state.set(State.CLOSED)
+                circuitBreaker.consecutiveSuccessCount.set(0)
+            }
+        }
     }
     
     fun onFailure(circuitBreaker: CircuitBreakerState) {
         circuitBreaker.lastFailureTime.set(LocalDateTime.now())
+        circuitBreaker.consecutiveSuccessCount.set(0)  // 실패 시 연속 성공 카운트 초기화
         val failures = circuitBreaker.failureCount.incrementAndGet()
-        
+
         if (failures >= circuitBreaker.failureThreshold) {
             circuitBreaker.state.set(State.OPEN)
         }
