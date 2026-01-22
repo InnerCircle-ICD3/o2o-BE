@@ -1,6 +1,7 @@
 package com.eatngo.common.circuitbreaker.aspect
 
 import com.eatngo.common.circuitbreaker.annotation.RedisCircuitBreaker
+import com.eatngo.common.circuitbreaker.exception.BusinessExceptionMarker
 import com.eatngo.common.circuitbreaker.metrics.CircuitBreakerMetrics
 import com.eatngo.common.circuitbreaker.service.CircuitBreakerManager
 import mu.KotlinLogging
@@ -27,7 +28,8 @@ class RedisCircuitBreakerAspect(
         val circuitBreaker = circuitBreakerManager.getOrCreate(
             redisCircuitBreaker.name,
             redisCircuitBreaker.failureThreshold,
-            redisCircuitBreaker.timeoutMinutes
+            redisCircuitBreaker.timeoutMinutes,
+            redisCircuitBreaker.successThreshold
         )
         
         val startTime = Instant.now()
@@ -53,42 +55,49 @@ class RedisCircuitBreakerAspect(
             } else {
                 // Circuit Breaker가 OPEN 상태인 경우 fallback 실행
                 logger.warn { "Circuit Breaker [${redisCircuitBreaker.name}] is OPEN, executing fallback" }
-                executeFallback(joinPoint, redisCircuitBreaker, "Circuit breaker is OPEN")
+                executeFallback(joinPoint, redisCircuitBreaker, "Circuit breaker is OPEN", null)
             }
         } catch (ex: Exception) {
             val executionTime = Duration.between(startTime, Instant.now())
-            
-            // 실패 처리
+
+            // 비즈니스 예외는 Circuit Breaker 대상이 아님
+            if (ex is BusinessExceptionMarker) {
+                logger.warn { "BusinessException occurred (not counted for circuit breaker): ${ex.message}" }
+                throw ex
+            }
+
+            // 시스템 장애만 Circuit Breaker에 카운트
             circuitBreakerManager.onFailure(circuitBreaker)
             circuitBreakerMetrics.recordFailure(redisCircuitBreaker.name, executionTime, ex)
-            
+
             // 상태 변경 체크
             val currentState = circuitBreaker.state.get()
             if (previousState != currentState) {
                 logger.warn { "Circuit Breaker [${redisCircuitBreaker.name}] state changed due to failure: $previousState -> $currentState" }
                 circuitBreakerMetrics.recordStateChange(redisCircuitBreaker.name, previousState, currentState)
             }
-            
+
             // 실패 로그
             logger.error { "Circuit Breaker [${redisCircuitBreaker.name}] execution failed: ${ex.message}" }
-            
-            // fallback 실행
-            executeFallback(joinPoint, redisCircuitBreaker, "Exception: ${ex.message}")
+
+            // fallback 실행 (실제 예외 전달)
+            executeFallback(joinPoint, redisCircuitBreaker, "Exception: ${ex.message}", ex)
         }
     }
     
     private fun executeFallback(
         joinPoint: ProceedingJoinPoint,
         redisCircuitBreaker: RedisCircuitBreaker,
-        reason: String
+        reason: String,
+        ex: Exception? = null
     ): Any? {
         val fallbackMethodName = redisCircuitBreaker.fallbackMethod
-        
+
         return if (fallbackMethodName.isNotEmpty()) {
             try {
                 logger.info { "Circuit Breaker [${redisCircuitBreaker.name}] executing fallback: $fallbackMethodName" }
                 circuitBreakerMetrics.recordFallback(redisCircuitBreaker.name, reason)
-                invokeFallbackMethod(joinPoint, fallbackMethodName)
+                invokeFallbackMethod(joinPoint, fallbackMethodName, ex)
             } catch (fallbackEx: Exception) {
                 logger.error(fallbackEx) { "Circuit Breaker [${redisCircuitBreaker.name}] fallback failed: $fallbackMethodName" }
                 throw fallbackEx
@@ -99,18 +108,22 @@ class RedisCircuitBreakerAspect(
         }
     }
     
-    private fun invokeFallbackMethod(joinPoint: ProceedingJoinPoint, fallbackMethodName: String): Any? {
+    private fun invokeFallbackMethod(
+        joinPoint: ProceedingJoinPoint,
+        fallbackMethodName: String,
+        ex: Exception? = null
+    ): Any? {
         val target = joinPoint.target
         val targetClass = target.javaClass
         val originalArgs = joinPoint.args
-        
+
         // fallback 메서드 찾기 (파라미터 타입 + Exception 타입)
         val fallbackMethod = findFallbackMethod(targetClass, fallbackMethodName, originalArgs)
             ?: throw NoSuchMethodException("Fallback method '$fallbackMethodName' not found in ${targetClass.simpleName}")
-        
+
         return if (fallbackMethod.parameterCount == originalArgs.size + 1) {
-            // Exception 파라미터가 있는 경우
-            val argsWithException = originalArgs + RuntimeException("Circuit breaker triggered")
+            // Exception 파라미터가 있는 경우 - 실제 예외 전달
+            val argsWithException = originalArgs + (ex ?: RuntimeException("Circuit breaker triggered"))
             fallbackMethod.invoke(target, *argsWithException)
         } else {
             // Exception 파라미터가 없는 경우
