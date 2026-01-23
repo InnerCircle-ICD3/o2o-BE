@@ -25,7 +25,6 @@ import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 
 @Component
-@Transactional
 class ProductEventListener(
     private val inventoryCachePersistence: InventoryCachePersistence,
     private val productPersistence: ProductPersistence,
@@ -37,6 +36,11 @@ class ProductEventListener(
     companion object {
         private val log = LoggerFactory.getLogger(ProductEventListener::class.java)
     }
+
+    /**
+     * Redis 연산은 트랜잭션 외부에서 실행됩니다.
+     * Redis 성공 시 changedProductIds에 추가되어 나중에 DB에 동기화됩니다.
+     */
     @EventListener
     @RedisCircuitBreaker(
         name = "product-stock-decrease",
@@ -53,11 +57,13 @@ class ProductEventListener(
 
     private fun processStockDecrease(orderItem: OrderItem) {
         inventoryCachePersistence.decreaseStock(orderItem.productId, orderItem.quantity)
+        inventoryCachePersistence.addChangedProductId(orderItem.productId)
         publishInventoryChangeIfNeeded(orderItem)
     }
 
     private fun processStockRollback(orderItem: OrderItem) {
         inventoryCachePersistence.rollbackStock(orderItem.productId, orderItem.quantity)
+        inventoryCachePersistence.addChangedProductId(orderItem.productId)
         publishInventoryChangeIfNeeded(orderItem)
     }
 
@@ -76,6 +82,11 @@ class ProductEventListener(
         )
     }
 
+    /**
+     * Redis 장애 시 DB fallback 처리
+     * 이 메서드는 @Transactional이 적용되어 DB 연산의 원자성을 보장합니다.
+     */
+    @Transactional
     private fun handleOrderEventFallback(event: OrderEvent, ex: Exception) {
         log.warn("Redis stock operation failed, falling back to DB", ex)
 
@@ -107,7 +118,10 @@ class ProductEventListener(
             localDate = today
         )
 
-        // Redis 복구 후 동기화를 위해 이벤트 발행
+        // Redis 복구 후 동기화를 위해 pendingSyncProductIds에 추가
+        inventoryCachePersistence.addPendingSyncProductId(orderItem.productId)
+
+        // 이벤트 발행 (기존 동작 유지)
         inventorySyncPublisher.publishEvent(InventorySyncEvent(orderItem.productId, changedInventory.stock))
 
         publishInventoryChangeIfNeeded(orderItem)
@@ -135,12 +149,16 @@ class ProductEventListener(
             localDate = today
         )
 
+        // Redis 복구 후 동기화를 위해 pendingSyncProductIds에 추가
+        inventoryCachePersistence.addPendingSyncProductId(orderItem.productId)
+
         inventorySyncPublisher.publishEvent(InventorySyncEvent(orderItem.productId, changedInventory.stock))
 
         publishInventoryChangeIfNeeded(orderItem)
     }
 
     @EventListener
+    @Transactional
     fun handleStoreEvent(event: StorePickupEndedEvent) {
         val inventoryDate = calculateDailyInventoryCreationDate(event)
         event.closedStoreIds.forEach {

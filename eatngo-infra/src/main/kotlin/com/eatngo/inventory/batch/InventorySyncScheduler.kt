@@ -3,10 +3,11 @@ package com.eatngo.inventory.batch
 import com.eatngo.inventory.domain.Inventory
 import com.eatngo.inventory.infra.InventoryCachePersistence
 import com.eatngo.inventory.infra.InventoryPersistence
+import com.eatngo.inventory.infra.PartitionedRedisSetRepository
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.redis.core.RedisTemplate
-import org.springframework.data.redis.core.script.DefaultRedisScript
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
@@ -18,7 +19,10 @@ class InventorySyncScheduler(
     @Qualifier("stringRedisTemplate")
     private val stringRedisTemplate: RedisTemplate<String, String>,
     private val inventoryCachePersistence: InventoryCachePersistence,
-    private val inventorySyncHealthCheck: InventorySyncHealthCheck
+    private val inventorySyncHealthCheck: InventorySyncHealthCheck,
+    private val partitionedRedisSetRepository: PartitionedRedisSetRepository,
+    @Value("\${inventory.partition.count:10}")
+    private val partitionCount: Int,
 ) {
     private val logger = LoggerFactory.getLogger(javaClass)
 
@@ -27,12 +31,6 @@ class InventorySyncScheduler(
         private const val CHANGED_SET_KEY = "changedProductIds"
         private const val PENDING_SET_KEY = "pendingSyncProductIds"
         private const val CHUNK_SIZE = 500
-
-        private const val LUA_POP_AND_DELETE = """
-            local members = redis.call('SMEMBERS', KEYS[1])
-            redis.call('DEL', KEYS[1])
-            return members
-        """
     }
 
     @Scheduled(cron = "0 0 12 * * ?")
@@ -82,15 +80,19 @@ class InventorySyncScheduler(
     }
 
     private fun fetchAndClearChangedIdsAtomically(): List<String> {
-        val redisScript = DefaultRedisScript<List<String>>().apply {
-            setScriptText(LUA_POP_AND_DELETE.trimIndent())
-            resultType = List::class.java as Class<List<String>>
+        // 파티션별로 순차적으로 가져오고 삭제
+        val allIds = mutableListOf<String>()
+
+        for (i in 0 until partitionCount) {
+            try {
+                val partitionIds = partitionedRedisSetRepository.popAndDeletePartition(CHANGED_SET_KEY, i)
+                allIds.addAll(partitionIds)
+            } catch (ex: Exception) {
+                logger.error("Failed to fetch and delete partition #$i", ex)
+            }
         }
 
-        return stringRedisTemplate.execute(
-            redisScript,
-            listOf(CHANGED_SET_KEY)
-        )
+        return allIds
     }
 
     private fun updateRdbWithSingleChunk(
@@ -161,7 +163,11 @@ class InventorySyncScheduler(
 
     private fun clearPendingIds(ids: List<String>) {
         try {
-            stringRedisTemplate.opsForSet().remove(PENDING_SET_KEY, *ids.toTypedArray())
+            ids.forEach { idStr ->
+                idStr.toLongOrNull()?.let { productId ->
+                    partitionedRedisSetRepository.remove(PENDING_SET_KEY, productId, partitionCount)
+                }
+            }
             logger.info("Pending IDs ${ids.size}건 제거 완료.")
         } catch (ex: Exception) {
             logger.error("Pending IDs 제거 실패", ex)

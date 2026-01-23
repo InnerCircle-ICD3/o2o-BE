@@ -8,4 +8,6 @@ interface InventoryCachePersistence {
     fun rollbackStock(productId: Long, stockQuantity: Int): Int
     fun saveHash(productId: Long, inventoryDto: InventoryDto)
     fun deleteHash(productId: Long)
+    fun addChangedProductId(productId: Long)
+    fun addPendingSyncProductId(productId: Long)
 }

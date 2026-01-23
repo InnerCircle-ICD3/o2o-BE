@@ -10,3 +10,8 @@ spring:
     redis:
       repositories:
         enabled: false
+
+# 재고 관리 설정
+inventory:
+  partition:
+    count: 10  # Redis Set 파티션 개수 (병목 완화를 위한 분할)

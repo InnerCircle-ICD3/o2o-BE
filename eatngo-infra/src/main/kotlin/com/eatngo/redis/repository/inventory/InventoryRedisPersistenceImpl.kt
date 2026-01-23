@@ -5,7 +5,9 @@ import com.eatngo.common.exception.product.StockException.StockEmpty
 import com.eatngo.common.exception.product.StockException.StockNotFound
 import com.eatngo.inventory.dto.InventoryDto
 import com.eatngo.inventory.infra.InventoryCachePersistence
+import com.eatngo.inventory.infra.PartitionedRedisSetRepository
 import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.data.redis.core.script.DefaultRedisScript
 import org.springframework.stereotype.Repository
@@ -16,11 +18,16 @@ class InventoryRedisPersistenceImpl(
     private val stringRedisTemplate: RedisTemplate<String, String>,
     @Qualifier("typeRedisTemplate")
     private val typeRedisTemplate: RedisTemplate<String, Any>,
+    private val partitionedRedisSetRepository: PartitionedRedisSetRepository,
+    @Value("\${inventory.partition.count:10}")
+    private val partitionCount: Int,
 ) : InventoryCachePersistence {
 
     companion object {
         private fun luaKey(id: Long) = "inventory:hash:$id"
         private fun pKey(productId: Long) = "inventory::$productId"
+        private const val CHANGED_SET_KEY = "changedProductIds"
+        private const val PENDING_SET_KEY = "pendingSyncProductIds"
 
         private const val LUA_DEC_STOCK = """
             local cur = redis.call('HGET', KEYS[1], 'stock')
@@ -113,5 +120,13 @@ class InventoryRedisPersistenceImpl(
 
     override fun deleteHash(productId: Long) {
         stringRedisTemplate.delete("inventory:hash:$productId")
+    }
+
+    override fun addChangedProductId(productId: Long) {
+        partitionedRedisSetRepository.add(CHANGED_SET_KEY, productId, partitionCount)
+    }
+
+    override fun addPendingSyncProductId(productId: Long) {
+        partitionedRedisSetRepository.add(PENDING_SET_KEY, productId, partitionCount)
     }
 }
