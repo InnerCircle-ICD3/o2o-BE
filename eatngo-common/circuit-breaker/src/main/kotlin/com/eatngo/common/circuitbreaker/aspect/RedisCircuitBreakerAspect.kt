@@ -1,6 +1,7 @@
 package com.eatngo.common.circuitbreaker.aspect
 
 import com.eatngo.common.circuitbreaker.annotation.RedisCircuitBreaker
+import com.eatngo.common.circuitbreaker.event.CircuitBreakerStateChangedEvent
 import com.eatngo.common.circuitbreaker.exception.BusinessExceptionMarker
 import com.eatngo.common.circuitbreaker.metrics.CircuitBreakerMetrics
 import com.eatngo.common.circuitbreaker.service.CircuitBreakerManager
@@ -8,6 +9,7 @@ import mu.KotlinLogging
 import org.aspectj.lang.ProceedingJoinPoint
 import org.aspectj.lang.annotation.Around
 import org.aspectj.lang.annotation.Aspect
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Component
 import java.lang.reflect.Method
 import java.time.Duration
@@ -17,7 +19,8 @@ import java.time.Instant
 @Component
 class RedisCircuitBreakerAspect(
     private val circuitBreakerManager: CircuitBreakerManager,
-    private val circuitBreakerMetrics: CircuitBreakerMetrics
+    private val circuitBreakerMetrics: CircuitBreakerMetrics,
+    private val eventPublisher: ApplicationEventPublisher
 ) {
     companion object {
         private val logger = KotlinLogging.logger {}
@@ -49,6 +52,7 @@ class RedisCircuitBreakerAspect(
                 if (previousState != currentState) {
                     logger.info { "Circuit Breaker [${redisCircuitBreaker.name}] state changed: $previousState -> $currentState" }
                     circuitBreakerMetrics.recordStateChange(redisCircuitBreaker.name, previousState, currentState)
+                    publishStateChange(redisCircuitBreaker.name, previousState, currentState)
                 }
                 
                 result
@@ -75,6 +79,7 @@ class RedisCircuitBreakerAspect(
             if (previousState != currentState) {
                 logger.warn { "Circuit Breaker [${redisCircuitBreaker.name}] state changed due to failure: $previousState -> $currentState" }
                 circuitBreakerMetrics.recordStateChange(redisCircuitBreaker.name, previousState, currentState)
+                publishStateChange(redisCircuitBreaker.name, previousState, currentState)
             }
 
             // 실패 로그
@@ -148,6 +153,24 @@ class RedisCircuitBreakerAspect(
                     (method.parameterCount == args.size || method.parameterCount == args.size + 1)
                 }
             }
+        }
+    }
+
+    private fun publishStateChange(
+        name: String,
+        previousState: CircuitBreakerManager.State,
+        currentState: CircuitBreakerManager.State
+    ) {
+        try {
+            eventPublisher.publishEvent(
+                CircuitBreakerStateChangedEvent(
+                    circuitBreakerName = name,
+                    previousState = previousState,
+                    currentState = currentState
+                )
+            )
+        } catch (ex: Exception) {
+            logger.warn(ex) { "Failed to publish circuit breaker state change event" }
         }
     }
 } 
